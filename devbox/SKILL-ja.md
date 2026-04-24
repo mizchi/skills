@@ -1,44 +1,44 @@
 ---
 name: devbox
-description: Reference for the devbox development environment manager. Covers Nix-based reproducible dev environments and GitHub Actions usage examples.
+description: devbox 開発環境管理ツールのリファレンス。Nix ベースの再現可能な開発環境、GitHub Actions での使用例を提供。
 ---
 
 # devbox Skill
 
-devbox is a Nix-based development environment manager. It provides isolated, reproducible environments per project.
+devbox は Nix ベースの開発環境管理ツール。プロジェクトごとに隔離された再現可能な環境を提供。
 
-## Installation
+## インストール
 
 ```bash
 curl -fsSL https://get.jetify.com/devbox | bash
 ```
 
-## Basic Commands
+## 基本コマンド
 
 ```bash
-# Initialize project (creates devbox.json)
+# プロジェクト初期化（devbox.json 作成）
 devbox init
 
-# Add packages
+# パッケージ追加
 devbox add nodejs@20
 devbox add python@3.12 go@1.22
 
-# Remove a package
+# パッケージ削除
 devbox rm nodejs
 
-# Enter the devbox shell
+# devbox シェルに入る
 devbox shell
 
-# Run a command (without entering the shell)
+# コマンド実行（シェルに入らずに）
 devbox run -- npm test
 
-# Run a script
+# スクリプト実行
 devbox run test
 
-# Start services (process-compose)
+# サービス起動（process-compose）
 devbox services start
 
-# Search packages
+# パッケージ検索
 devbox search nodejs
 ```
 
@@ -65,7 +65,7 @@ devbox search nodejs
 }
 ```
 
-## Package Specification
+## パッケージ指定
 
 ```json
 {
@@ -78,9 +78,9 @@ devbox search nodejs
 }
 ```
 
-Package search: https://www.nixhub.io
+パッケージ検索: https://www.nixhub.io
 
-## Scripts
+## スクリプト
 
 ```json
 {
@@ -102,9 +102,9 @@ devbox run test
 devbox run dev
 ```
 
-## Services (process-compose)
+## サービス（process-compose）
 
-Create `process-compose.yaml`:
+`process-compose.yaml` を作成:
 
 ```yaml
 processes:
@@ -115,12 +115,12 @@ processes:
 ```
 
 ```bash
-devbox services start      # Start all services
-devbox services stop       # Stop all services
-devbox services ls         # List services
+devbox services start      # 全サービス起動
+devbox services stop       # 全サービス停止
+devbox services ls         # サービス一覧
 ```
 
-## Environment Variables
+## 環境変数
 
 ```json
 {
@@ -138,7 +138,7 @@ devbox services ls         # List services
 
 ## GitHub Actions
 
-Use `jetify-com/devbox-install-action`. See `assets/gh_action_example.yaml` for a complete example.
+`jetify-com/devbox-install-action` を使用。完全な例は `assets/gh_action_example.yaml` を参照。
 
 ```yaml
 steps:
@@ -146,20 +146,20 @@ steps:
 
   - uses: jetify-com/devbox-install-action@v0.12.0
     # with:
-    #   enable-cache: true  # Nix store cache
+    #   enable-cache: true  # Nix store キャッシュ
 
   - run: devbox run test
 ```
 
-## Common Options
+## よく使うオプション
 
-| Option | Description |
+| オプション | 説明 |
 |-----------|------|
-| `--config` | Path to devbox.json |
-| `--quiet` | Suppress output |
-| `--print-env` | Print environment variables |
+| `--config` | devbox.json のパス指定 |
+| `--quiet` | 出力抑制 |
+| `--print-env` | 環境変数を出力 |
 
-## References
+## 参考
 
 - https://github.com/jetify-com/devbox
 - https://www.jetify.com/devbox/docs/

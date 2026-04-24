@@ -1,23 +1,23 @@
 ---
 name: conventional-changelog
-description: Conventional Commits 規約と CHANGELOG 自動生成の横断リファレンス。commit 書式、Keep a Changelog 形式、semver タグ運用、release-please / changesets / git-cliff / towncrier 等の生成ツール比較を含む。新規リポジトリで release フローを整備するとき、既存 repo の commit 規約を統一するとき、言語に合った changelog ツールを選ぶとき、release-please 以外の選択肢を検討するときに使う。
+description: Cross-cutting reference for Conventional Commits and automatic CHANGELOG generation. Covers commit format, Keep a Changelog format, semver tag practices, and a comparison of generation tools like release-please / changesets / git-cliff / towncrier. Use when setting up a release flow on a new repository, unifying commit conventions on an existing repo, picking a changelog tool suited to your language, or evaluating alternatives to release-please.
 ---
 
 # Conventional Changelog
 
-commit メッセージを Conventional Commits 規約で書き、そこから CHANGELOG と semver タグを機械的に生成する運用のガイド。npm / cargo / python / rust / go を横断してツールを選び、手で CHANGELOG を書かずに済ませる。
+A guide to writing commit messages following the Conventional Commits spec and mechanically generating CHANGELOGs and semver tags from them. Pick tools across npm / cargo / python / rust / go and avoid writing CHANGELOGs by hand.
 
-## いつ使うか
+## When to use
 
-- 新規 repo に release フローを整備する
-- 既存 repo の commit メッセージが揺れていて、CHANGELOG 生成を導入したい
-- release-please を試したが合わない / 別ツールを検討したい
-- 言語（Rust / Python / Go 等）に合った changelog ツールを探している
-- tag と CHANGELOG が手運用で壊れがち、自動化したい
+- Setting up a release flow on a new repo
+- Commit messages on an existing repo are inconsistent and you want to introduce CHANGELOG generation
+- You tried release-please but it did not fit / you want to evaluate alternatives
+- Looking for a changelog tool suited to the language (Rust / Python / Go, etc.)
+- Tags and CHANGELOGs keep breaking under manual operation, and you want to automate them
 
-## Conventional Commits 書式
+## Conventional Commits format
 
-形式: `<type>[optional scope]: <subject>`
+Form: `<type>[optional scope]: <subject>`
 
 ```
 feat(api): add rate-limit middleware
@@ -26,25 +26,25 @@ docs: clarify OAuth flow diagram
 chore: bump deps
 ```
 
-### type の一覧と semver 影響
+### List of types and semver impact
 
-| type | semver bump | CHANGELOG 掲載 |
+| type | semver bump | Included in CHANGELOG |
 |---|---|---|
 | `feat` | **minor** | ✓ (Added / Features) |
 | `fix` | **patch** | ✓ (Fixed) |
 | `perf` | patch | ✓ (Changed) |
-| `refactor` | なし | × (デフォルト) |
-| `docs` | なし | × |
-| `style` | なし | × |
-| `test` | なし | × |
-| `build` | なし | × |
-| `ci` | なし | × |
-| `chore` | なし | × |
-| `revert` | 直前に依存 | ✓ |
+| `refactor` | none | × (default) |
+| `docs` | none | × |
+| `style` | none | × |
+| `test` | none | × |
+| `build` | none | × |
+| `ci` | none | × |
+| `chore` | none | × |
+| `revert` | depends on the reverted commit | ✓ |
 
-### Breaking change（major bump）
+### Breaking change (major bump)
 
-2 通り: footer に `BREAKING CHANGE:` を書く、または type の後に `!`:
+Two ways: put `BREAKING CHANGE:` in the footer, or a `!` after the type:
 
 ```
 feat(api)!: replace REST endpoint with GraphQL
@@ -52,32 +52,32 @@ feat(api)!: replace REST endpoint with GraphQL
 BREAKING CHANGE: /api/v1/users is removed. Use GraphQL Query.user instead.
 ```
 
-両方書くのが丁寧（タイトル見てすぐ分かる + footer で詳細）。
+Writing both is polite (obvious from the title + detail in the footer).
 
 ### scope
 
-optional だが付けると CHANGELOG が読みやすくなる。monorepo では package 名を scope に:
+Optional, but including it makes the CHANGELOG easier to read. In a monorepo, use the package name as the scope:
 
 ```
 feat(@pkg/auth): add oauth2 flow
 feat(@pkg/billing): stripe migration
 ```
 
-scope で release-please の「変更対象パッケージ」も自動判定される（manifest モード）。
+release-please also auto-detects the "target package of the change" from the scope (in manifest mode).
 
 ### subject
 
-- 小文字で始める（文末ピリオドなし）
-- 命令形（"add X" / "fix Y"、"added" や "fixes" は避ける）
-- 50 文字以内が目安
+- Start lowercase (no trailing period)
+- Imperative mood ("add X" / "fix Y"; avoid "added" or "fixes")
+- Aim for 50 characters or fewer
 
 ### body / footer
 
-空行を挟んで本文、さらに空行で footer（`Closes #123`, `Co-authored-by: ...`, `BREAKING CHANGE: ...`）。
+Body after a blank line, then another blank line before the footer (`Closes #123`, `Co-authored-by: ...`, `BREAKING CHANGE: ...`).
 
-## CHANGELOG.md 形式（Keep a Changelog）
+## CHANGELOG.md format (Keep a Changelog)
 
-[keepachangelog.com](https://keepachangelog.com/) に準拠。version 降順、semver、セクションは決まった 6 種:
+Follows [keepachangelog.com](https://keepachangelog.com/). Versions in descending order, semver, and a fixed set of 6 sections:
 
 ```markdown
 # Changelog
@@ -127,45 +127,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.2.0]: https://github.com/owner/repo/compare/v1.1.0...v1.2.0
 ```
 
-6 セクション:
-- `Added`: 新機能
-- `Changed`: 既存機能の変更
-- `Deprecated`: 削除予定（まだ残っている）
-- `Removed`: 削除済み
-- `Fixed`: バグ修正
-- `Security`: 脆弱性対応
+The 6 sections:
+- `Added`: new features
+- `Changed`: changes to existing functionality
+- `Deprecated`: scheduled for removal (still present)
+- `Removed`: already removed
+- `Fixed`: bug fixes
+- `Security`: vulnerability fixes
 
-## semver タグ運用
+## semver tag practices
 
-- tag は `v<MAJOR>.<MINOR>.<PATCH>` 形式（`v1.2.3`）。`v` prefix が主流
-- pre-release は `v1.0.0-beta.1` / `v1.0.0-rc.1`
-- `git tag -a v1.2.3 -m "Release v1.2.3"`（annotated tag）→ `git push origin v1.2.3`
-- tag 打ちとデプロイの連動は GitHub Release + Actions の `on: release` で組む
+- Tags in `v<MAJOR>.<MINOR>.<PATCH>` form (`v1.2.3`). The `v` prefix is the norm
+- Pre-releases: `v1.0.0-beta.1` / `v1.0.0-rc.1`
+- `git tag -a v1.2.3 -m "Release v1.2.3"` (annotated tag) → `git push origin v1.2.3`
+- Wire up tag creation and deployment via GitHub Release + Actions with `on: release`
 
-## ツール比較
+## Tool comparison
 
-| ツール | 対応言語 | 方式 | CHANGELOG 生成 | version bump | 主な利点 | 弱点 |
+| Tool | Supported languages | Style | CHANGELOG generation | version bump | Main strengths | Weaknesses |
 |---|---|---|---|---|---|---|
-| **release-please** | npm / python / rust / go / java / php / ruby | Release PR が自動で作られる | ○ | ○ (PR merge で tag) | monorepo 対応、Google 製で安定 | PR ベースで学習コスト |
-| **changesets** | npm 専用 | `changeset add` で手動記録 | ○ | ○ | monorepo + 柔軟 (npm workspaces) | commit 駆動ではない |
-| **conventional-changelog-cli** | 言語非依存（コマンド） | commit から 1 発生成 | ○ | × | 軽量、既存 CHANGELOG に追記 | tag / bump は別で手動 |
-| **standard-version** (deprecated) | npm | commit → bump + CHANGELOG | ○ | ○ | シンプル | **メンテ停止**、release-please に移行推奨 |
-| **git-cliff** | 言語非依存（Rust 製） | TOML 設定で高カスタマイズ | ○ | × | 高速、テンプレ柔軟、Rust エコシステムに好まれる | tag / bump は別 |
-| **towncrier** | Python | news fragment を PR 毎に書く | ○ | × | fragment で merge 時の衝突回避 | 独特なワークフロー |
-| **auto** (intuit/auto) | 複数 | label ベース + CI 統合 | ○ | ○ | GitHub label 駆動 | 独自 label 規約 |
+| **release-please** | npm / python / rust / go / java / php / ruby | Auto-creates a Release PR | ✓ | ✓ (tag on PR merge) | Monorepo support, stable Google-maintained project | PR-based with a learning curve |
+| **changesets** | npm only | Manual entries via `changeset add` | ✓ | ✓ | Monorepo + flexibility (npm workspaces) | Not commit-driven |
+| **conventional-changelog-cli** | Language-agnostic (command) | One-shot generation from commits | ✓ | × | Lightweight, appends to existing CHANGELOG | Tags / bumps handled separately by hand |
+| **standard-version** (deprecated) | npm | commit → bump + CHANGELOG | ✓ | ✓ | Simple | **Maintenance halted**; migration to release-please recommended |
+| **git-cliff** | Language-agnostic (written in Rust) | Highly customizable via TOML config | ✓ | × | Fast, flexible templates, popular in the Rust ecosystem | Tags / bumps separate |
+| **towncrier** | Python | Write a news fragment per PR | ✓ | × | Fragments avoid merge conflicts | Idiosyncratic workflow |
+| **auto** (intuit/auto) | Multiple | Label-based + CI integration | ✓ | ✓ | Driven by GitHub labels | Custom label conventions |
 
-### 一言推奨
+### One-line recommendations
 
-- **npm 単一 package で自動化したい** → release-please
-- **npm monorepo** → release-please（manifest モード）or changesets（細かい制御）
+- **Want to automate a single npm package** → release-please
+- **npm monorepo** → release-please (manifest mode) or changesets (for fine-grained control)
 - **Rust** → git-cliff
-- **Python** → towncrier（or release-please）
-- **Go / 汎用** → git-cliff or release-please
-- **CHANGELOG だけ生成したい（tag 管理は手動）** → conventional-changelog-cli or git-cliff
+- **Python** → towncrier (or release-please)
+- **Go / generic** → git-cliff or release-please
+- **Just want to generate a CHANGELOG (manual tag management)** → conventional-changelog-cli or git-cliff
 
-## release-please セットアップ（最推奨パス）
+## release-please setup (most recommended path)
 
-npm project で新規導入する場合:
+Fresh setup on an npm project:
 
 ```json
 // release-please-config.json
@@ -204,22 +204,22 @@ jobs:
           manifest-file: .release-please-manifest.json
 ```
 
-commit を conventional 規約で書いて main に push すると、自動で「Release PR」が作られる。merge すると tag + GitHub Release + CHANGELOG 更新が走る。
+Write commits following the Conventional Commits spec and push to main; a "Release PR" is created automatically. Merging it triggers the tag + GitHub Release + CHANGELOG update.
 
-**publish 連動 workflow の 2 形態**:
+**Two forms of publish-linked workflow**:
 
-| 形態 | trigger | 利点 | 弱点 |
+| Form | trigger | Strengths | Weaknesses |
 |---|---|---|---|
-| 同一 workflow 内で job 分離（`needs: release-please` + `if: outputs.release_created`） | `push: main` | 1 ファイルで完結、release-please の outputs を直接参照、概観しやすい | release-please job が失敗すると publish も巻き込まれる、責務が混ざる |
-| 別 workflow（`on: release`） | `release: { types: [published] }` | 関心の分離、手動 release でも publish が走る、再実行が独立 | secrets / permissions を 2 箇所に書く、release-please outputs が使えない |
+| Job separation within the same workflow (`needs: release-please` + `if: outputs.release_created`) | `push: main` | Self-contained in one file, directly references release-please outputs, easy to grasp | If the release-please job fails, publish is dragged down with it; responsibilities get mixed |
+| Separate workflow (`on: release`) | `release: { types: [published] }` | Separation of concerns, publish runs even for manual releases, re-runs are independent | secrets / permissions must be declared in two places; release-please outputs are unavailable |
 
-**選択指針**: 単一 package・単一 publish 先（npm のみ）なら同一 workflow が簡潔。複数 publish 先（npm + GitHub Container Registry など）や手動 release も許容するなら `on: release` 別 workflow。OIDC Trusted Publishing を使う場合は `id-token: write` 権限を publish job 側にだけ付ければよく、どちらでも成立する。
+**Selection guidance**: For a single package with a single publish target (npm only), a single workflow is concise. If there are multiple publish targets (npm + GitHub Container Registry etc.) or manual releases are also allowed, use a separate `on: release` workflow. When using OIDC Trusted Publishing, attaching `id-token: write` only to the publish job is sufficient, and either form works.
 
-詳細は `npm-release` skill（ローカル管理）の publish フロー参照。
+See the publish flow in the `npm-release` skill (locally managed) for details.
 
-### Pre-release (beta / rc) 段階リリース
+### Pre-release (beta / rc) staged releases
 
-breaking change を含む v2.0.0 を beta → rc → 正式版の順に出したいとき。release-please の `prerelease` / `prerelease-type` フラグを使う:
+When you want to ship a v2.0.0 with breaking changes in the order beta → rc → stable. Use release-please's `prerelease` / `prerelease-type` flags:
 
 ```json
 // release-please-config.json
@@ -234,18 +234,18 @@ breaking change を含む v2.0.0 を beta → rc → 正式版の順に出した
 }
 ```
 
-フロー:
+Flow:
 
-1. `prerelease-type: "beta"` で commit を積む → `v2.0.0-beta.1` が切られる
-2. 追加 commit で `v2.0.0-beta.2` / `beta.3` ... が積み重なる
-3. RC 昇格時: config を `"prerelease-type": "rc"` に書き換え → `v2.0.0-rc.1`
-4. 正式リリース時: `"prerelease": false`（or フィールド削除）→ `v2.0.0`
+1. Stack commits with `prerelease-type: "beta"` → `v2.0.0-beta.1` is cut
+2. More commits stack up as `v2.0.0-beta.2` / `beta.3` ...
+3. Promote to RC: rewrite config to `"prerelease-type": "rc"` → `v2.0.0-rc.1`
+4. Stable release: `"prerelease": false` (or remove the field) → `v2.0.0`
 
-**CHANGELOG の書き方**: release-please は **各 beta/rc で独立セクションを確定** させる（Keep a Changelog の `[Unreleased]` に貯める方式ではない）。`[2.0.0-beta.1]` / `[2.0.0-beta.2]` / `[2.0.0-rc.1]` / `[2.0.0]` がすべて残る。`2.0.0` 正式版のセクションには期間内の全 `feat!` / `BREAKING CHANGE` が集約される。
+**How to write the CHANGELOG**: release-please **finalizes an independent section for each beta/rc** (it is not the Keep a Changelog style of accumulating into `[Unreleased]`). `[2.0.0-beta.1]` / `[2.0.0-beta.2]` / `[2.0.0-rc.1]` / `[2.0.0]` all remain. The `2.0.0` stable section aggregates every `feat!` / `BREAKING CHANGE` from the period.
 
-### Monorepo + `workspace:*` の相互作用
+### Monorepo + `workspace:*` interaction
 
-pnpm workspace で `@org/core`, `@org/ui`, `@org/cli` を持ち、`@org/ui` と `@org/cli` が `@org/core` に依存するとき:
+In a pnpm workspace with `@org/core`, `@org/ui`, `@org/cli` where `@org/ui` and `@org/cli` depend on `@org/core`:
 
 ```json
 // release-please-config.json
@@ -275,12 +275,12 @@ pnpm workspace で `@org/core`, `@org/ui`, `@org/cli` を持ち、`@org/ui` と 
 }
 ```
 
-- `include-component-in-tag: true` → tag 名は `@org/core-v2.0.0` のように component 名を含む（monorepo 衝突回避）
-- `node-workspace` plugin → `@org/core` 側の bump を検出して `@org/ui` / `@org/cli` の `dependencies."@org/core"` を書き換え、両者を patch bump として PR に追加
-- `updatePeerDependencies: true` → peer 依存も同様に書き換え（library 側で必要）
-- `separate-pull-requests: false` → 全 package の bump を 1 本の Release PR に集約
+- `include-component-in-tag: true` → tag names include the component name, like `@org/core-v2.0.0` (avoids monorepo collisions)
+- `node-workspace` plugin → detects a bump on `@org/core`, rewrites `dependencies."@org/core"` in `@org/ui` / `@org/cli`, and adds both as patch bumps to the PR
+- `updatePeerDependencies: true` → rewrites peer dependencies the same way (needed on the library side)
+- `separate-pull-requests: false` → consolidates bumps for all packages into a single Release PR
 
-**commit scope に package 名**を入れる運用:
+**Include the package name in the commit scope**:
 
 ```
 feat(@org/core): add streaming parser
@@ -288,11 +288,11 @@ fix(@org/ui): button focus ring on safari
 feat(@org/cli)!: rename --config to --profile
 ```
 
-scope で変更対象を自動判定。該当 package の CHANGELOG にだけエントリが書かれる。
+The scope automatically determines the target of the change. An entry is written only into the CHANGELOG of the relevant package.
 
-**`workspace:*` 置換の仕組み**: `@org/ui/package.json` で `"@org/core": "workspace:*"` と書いても publish 時に pnpm が自動で `^<実バージョン>` に置換する。release-please 側は bump 時に `workspace:*` のまま source を弄らない。この前提でちょうど辻褄が合う（pnpm 側で `workspace:^` → `^同major`、`workspace:~` → `~同minor`）。
+**How `workspace:*` substitution works**: Even if you write `"@org/core": "workspace:*"` in `@org/ui/package.json`, pnpm automatically substitutes it with `^<actual version>` at publish time. release-please leaves the source as `workspace:*` during bumps without touching it. This assumption lines up perfectly (on the pnpm side, `workspace:^` → `^same-major`, `workspace:~` → `~same-minor`).
 
-## git-cliff セットアップ（Rust / 汎用）
+## git-cliff setup (Rust / generic)
 
 ```bash
 cargo install git-cliff
@@ -316,7 +316,7 @@ body = """
 
 [git]
 conventional_commits = true
-filter_unconventional = true       # 既存の規約違反 commit を CHANGELOG から除外
+filter_unconventional = true       # Exclude existing non-conforming commits from the CHANGELOG
 protect_breaking_commits = true
 commit_parsers = [
   { message = "^feat",     group = "Added" },
@@ -328,59 +328,59 @@ commit_parsers = [
   { message = "^security", group = "Security" },
   { message = "^revert",   group = "Reverted" },
   { message = "^(docs|style|test|build|ci|chore)", skip = true },
-  { message = ".*",        skip = true },   # 規約違反一括除外（遡及書き換えしない）
+  { message = ".*",        skip = true },   # Bulk-exclude non-conforming commits (do not rewrite history)
 ]
 tag_pattern = "v[0-9]*"
 sort_commits = "newest"
 ```
 
-Rust 向け運用で `cargo-release` と併用する場合、`cargo-release` が `Cargo.toml` の version bump と tag 打ちを担い、git-cliff は CHANGELOG 生成に専念する（疎結合）。release-please のような PR ベース自動 bump を入れない理由でもある。
+For Rust projects used alongside `cargo-release`, `cargo-release` handles the version bump in `Cargo.toml` and tagging, while git-cliff focuses solely on CHANGELOG generation (loosely coupled). This is also why you would not layer a PR-based automatic bump like release-please on top.
 
 ```bash
-git-cliff --output CHANGELOG.md            # 全履歴から再生成
-git-cliff --unreleased --prepend CHANGELOG.md  # 未リリース分だけ上に追記
-git-cliff --tag v1.2.0 --output CHANGELOG.md   # 特定 tag 向けに生成
+git-cliff --output CHANGELOG.md            # Regenerate from full history
+git-cliff --unreleased --prepend CHANGELOG.md  # Prepend only the unreleased section
+git-cliff --tag v1.2.0 --output CHANGELOG.md   # Generate for a specific tag
 ```
 
-### cargo-release との結線（具体例）
+### Wiring with cargo-release (concrete example)
 
-`Cargo.toml` の `[package.metadata.release]` に hook を仕込む。`cargo release <level>` を叩くと、bump → CHANGELOG 生成 → commit → tag → push が一連で走る:
+Put hooks into `[package.metadata.release]` in `Cargo.toml`. Running `cargo release <level>` runs bump → CHANGELOG generation → commit → tag → push in sequence:
 
 ```toml
 # Cargo.toml
 [package.metadata.release]
-# version bump 後・commit 前に git-cliff で CHANGELOG を更新
+# After the version bump and before the commit, update CHANGELOG with git-cliff
 pre-release-hook = ["git", "cliff", "--tag", "v{{version}}", "--unreleased", "--prepend", "CHANGELOG.md"]
-# tag は cargo-release 側が打つ
+# The tag itself is created by cargo-release
 tag-name = "v{{version}}"
-# release commit に CHANGELOG.md を含める
+# Include CHANGELOG.md in the release commit
 pre-release-commit-message = "chore(release): v{{version}}"
 ```
 
-順序:
+Order:
 
-1. `cargo release minor --execute` → `Cargo.toml` の version bump
-2. `pre-release-hook` で `git cliff` が次 version の `[Unreleased]` を `[v0.2.0] - 2026-04-19` に確定し `CHANGELOG.md` を更新
-3. cargo-release が `Cargo.toml` + `CHANGELOG.md` を release commit にまとめる
-4. `tag-name` で `v0.2.0` を annotated tag として打つ
+1. `cargo release minor --execute` → version bump in `Cargo.toml`
+2. `pre-release-hook` runs `git cliff` to finalize the next version's `[Unreleased]` as `[v0.2.0] - 2026-04-19` and update `CHANGELOG.md`
+3. cargo-release bundles `Cargo.toml` + `CHANGELOG.md` into the release commit
+4. `tag-name` creates `v0.2.0` as an annotated tag
 5. `cargo publish` + `git push --tags`
 
-**注意**: `git-cliff` 側の `[changelog.bump]` セクション（`features_always_bump_minor` 等）は git-cliff 自身が bump 判断する独自機能で、cargo-release と併用するときは使わない（bump 主体は cargo-release）。`<level>` (patch / minor / major) は人間が選ぶ前提。
+**Note**: The `[changelog.bump]` section on the git-cliff side (`features_always_bump_minor` etc.) is a git-cliff-specific feature where git-cliff itself decides the bump; do not use it when combined with cargo-release (the bump decision belongs to cargo-release). `<level>` (patch / minor / major) is chosen by a human.
 
-## conventional-changelog-cli（軽量、言語非依存）
+## conventional-changelog-cli (lightweight, language-agnostic)
 
 ```bash
 npm install -g conventional-changelog-cli
 conventional-changelog -p angular -i CHANGELOG.md -s -r 0
 # -p: preset (angular / atom / ember / eslint / jquery / jshint)
-# -i: input, -s: same file, -r 0: 全履歴
+# -i: input, -s: same file, -r 0: full history
 ```
 
-preset は主に `angular`（conventional commits の origin）。既存 CHANGELOG に追記する運用に向く。
+The main preset is `angular` (the origin of Conventional Commits). Well-suited to appending to an existing CHANGELOG.
 
-## pre-commit で commit メッセージを検査
+## Validating commit messages with pre-commit
 
-commit 時点で conventional 規約違反を弾く:
+Reject commits that violate the Conventional Commits spec at commit time:
 
 ### commitlint
 
@@ -403,43 +403,43 @@ module.exports = { extends: ['@commitlint/config-conventional'] };
       additional_dependencies: ['@commitlint/config-conventional']
 ```
 
-**罠**: `additional_dependencies` を付けないと hook 実行時に `config-conventional` が解決できず `Cannot find module` で落ちる。`commitlint.config.js` で `extends` しているだけでは不足、hook の isolated 環境にも明示する必要がある。
+**Pitfall**: Without `additional_dependencies`, the hook cannot resolve `config-conventional` at run time and fails with `Cannot find module`. Just `extends` in `commitlint.config.js` is not enough; you must also declare it explicitly in the hook's isolated environment.
 
-**prek vs pre-commit**: `prek` は Rust 製の pre-commit 互換実装（https://github.com/j178/prek）。設定ファイル (`.pre-commit-config.yaml`) と hook 仕様は共通、実行速度が 5-10x 速い。コマンドは `prek install` / `prek run`。mizchi 環境では prek を使用（chezmoi-management skill 参照）。
+**prek vs pre-commit**: `prek` is a Rust-based pre-commit-compatible implementation (https://github.com/j178/prek). Configuration files (`.pre-commit-config.yaml`) and hook specifications are shared, and execution is 5-10x faster. Commands: `prek install` / `prek run`. The mizchi environment uses prek (see the `chezmoi-management` skill).
 
-### commitizen（対話的 commit 作成）
+### commitizen (interactive commit creation)
 
 ```bash
 npm install -D commitizen cz-conventional-changelog
 # package.json
 "config": { "commitizen": { "path": "./node_modules/cz-conventional-changelog" } }
-# 使用
+# usage
 git cz
 ```
 
-## よくある失敗
+## Common failures
 
-- **commit 規約途中から導入**: 既存履歴は壊れた形式のまま。release-please は「規約違反 commit」を scan 時に無視する。遡及書き換えは不要、次から揃える
-- **`chore:` ばかり使って release PR が立たない**: bug fix なのに `chore:` と書くと CHANGELOG に載らない / version も bump しない。**重要度ではなく「変更の種類」で type を選ぶ**（fix はユーザーに見える修正、chore は内部整理）
-- **BREAKING CHANGE を subject に書いて footer を省く**: release-please は footer の `BREAKING CHANGE:` か type の `!` を見る。subject に「breaking: ...」と書いても major bump しない
-- **CHANGELOG を手動編集 + tool 併用**: release-please の管理下にある CHANGELOG を手編集すると、次回生成で drift。追記は必ず PR へ（release-please の「Edit」機能を使う）
-- **tag を先に打って release-please で PR を作る**: release-please は PR merge 時に tag を打つ。手動 tag と競合する。手動運用なら conventional-changelog-cli / git-cliff + 手 tag に統一
+- **Introducing the commit convention partway through**: existing history stays in the broken format. release-please ignores "non-conforming commits" during its scan. No retroactive rewrite is needed; just align from now on
+- **Using `chore:` for everything so no release PR opens**: writing `chore:` for a bug fix omits it from the CHANGELOG / does not bump the version. **Pick the type by "kind of change", not by importance** (fix is a user-visible fix, chore is internal housekeeping)
+- **Writing BREAKING CHANGE in the subject and omitting the footer**: release-please looks at the `BREAKING CHANGE:` in the footer or the `!` on the type. Writing "breaking: ..." in the subject will not trigger a major bump
+- **Mixing manual CHANGELOG edits with the tool**: manually editing a CHANGELOG managed by release-please causes drift on the next generation. Add entries only via PRs (use release-please's "Edit" feature)
+- **Creating a tag first and then opening a release-please PR**: release-please creates the tag on PR merge. A manual tag conflicts with it. For manual operation, standardize on conventional-changelog-cli / git-cliff + manual tagging
 
 ## Red flags
 
-| 出てくる思考 | 実態 |
+| Thought that comes up | Reality |
 |---|---|
-| 「CHANGELOG は手で書いた方が丁寧」 | commit から生成すれば漏れない。手書きは漏れ・表記揺れが必ず起きる |
-| 「tag を先に打ってから changelog を書く」 | 順序が逆。commit → tool が CHANGELOG 生成 → tag、を守る |
-| 「breaking change は subject に書けばわかる」 | tool は footer / `!` を機械的に読む。subject の自然文は無視される |
-| 「プロジェクト固有の type を増やそう」 | `feat` / `fix` / `chore` の範囲で表現できる。独自 type は tool の preset が対応しない |
-| 「conventional 違反 commit を rebase で直す」 | 遡及書き換えは履歴汚染。違反は次から揃えれば良い、tool は無視してくれる |
+| "Writing the CHANGELOG by hand is more polished" | Generating from commits misses nothing. Handwriting inevitably produces omissions and inconsistent wording |
+| "Create the tag first, then write the changelog" | The order is backwards. Stick to commit → tool generates CHANGELOG → tag |
+| "Breaking changes are clear if written in the subject" | Tools mechanically read the footer / `!`. Natural-language phrasing in the subject is ignored |
+| "Let's add project-specific types" | You can express things within `feat` / `fix` / `chore`. Custom types are not supported by the tools' presets |
+| "Let's fix non-conforming commits via rebase" | Retroactive rewrites pollute history. Just align from now on; the tool will ignore the rest |
 
-## 関連
+## Related
 
-- `npm-release` — release-please + OIDC Trusted Publishing で publish まで自動化（セッション固有のローカル管理）
-- `apm-usage` references/publishing.md — skill 公開時の CHANGELOG 慣習
-- `gh-fix-ci` — release workflow が CI で落ちたとき
+- `npm-release` — automates all the way to publish with release-please + OIDC Trusted Publishing (session-specific local management)
+- `apm-usage` references/publishing.md — CHANGELOG conventions when publishing a skill
+- `gh-fix-ci` — when the release workflow fails in CI
 - Keep a Changelog: https://keepachangelog.com/
 - Conventional Commits: https://www.conventionalcommits.org/
 - release-please: https://github.com/googleapis/release-please

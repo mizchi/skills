@@ -1,31 +1,31 @@
 ---
 name: ast-grep-practice
-description: ast-grep をプロジェクト lint ツールとして運用するためのガイド。sgconfig.yml 設定、fix/rewrite ルール、constraints、transform、テスト、CI 統合、既存 linter との使い分けを扱う。汎用 linter で表現できないルールを ast-grep で書くときに使用。
+description: Guide for operating ast-grep as a project lint tool. Covers sgconfig.yml configuration, fix/rewrite rules, constraints, transform, testing, CI integration, and how to choose between ast-grep and existing linters. Use when writing rules in ast-grep that general-purpose linters cannot express.
 ---
 
 # ast-grep Practice
 
-汎用 lint ツール（ESLint, oxlint, Biome, clippy 等）で表現できないパターンを ast-grep で補完する。自然言語プロンプトより再現可能な静的ルールを常に優先する。
+Complement general-purpose lint tools (ESLint, oxlint, Biome, clippy, etc.) with ast-grep for patterns they cannot express. Always prefer reproducible static rules over natural-language prompts.
 
-## インストール
+## Installation
 
 ```bash
-# npm (プロジェクトローカル推奨)
+# npm (project-local recommended)
 npm install -D @ast-grep/cli
 npx ast-grep --help
 
-# または cargo
+# or cargo
 cargo install ast-grep --locked
 
-# または brew
+# or brew
 brew install ast-grep
 ```
 
-**パッケージマネージャ選定**: プロジェクトの `package.json` に `packageManager` が設定されていればそれに従う（pnpm / yarn 等）。無ければ npm でローカル install する。CI も同じツールに揃える（混在させると lockfile / バイナリ参照経路が割れる）。グローバル install は dev マシンだけにし、CI と repo 内 script は必ずローカル参照にする。
+**Package manager selection**: If the project's `package.json` has `packageManager` set, follow it (pnpm / yarn / etc.). Otherwise install locally with npm. Use the same tool in CI (mixing them splits lockfile and binary resolution paths). Keep global installs on dev machines only; CI and in-repo scripts must always use local references.
 
-## クイックスタート
+## Quick Start
 
-最小構成で動作確認する:
+Minimum configuration to verify operation:
 
 ```bash
 mkdir -p rules rule-tests
@@ -42,7 +42,7 @@ language: TypeScript
 severity: warning
 rule:
   pattern: console.log($$$ARGS)
-message: console.log を残さない。
+message: Do not leave console.log behind.
 fix: ''
 EOF
 
@@ -55,50 +55,50 @@ invalid:
   - "console.log('a', 'b')"
 EOF
 
-ast-grep test --skip-snapshot-tests  # テスト実行
-ast-grep scan src/                    # プロジェクトスキャン
+ast-grep test --skip-snapshot-tests  # run tests
+ast-grep scan src/                    # scan project
 ```
 
-## 原則
+## Principles
 
-- まず既存 linter でカバーできないか確認する
-- ast-grep は「構造的パターン」が必要なときに使う
-- ルールは TDD で開発する: テストファースト → ルール実装 → CI 統合
-- `fix` を書けるなら書く。検出だけのルールより自動修正付きルールを優先する
+- First check whether an existing linter can cover the rule
+- Use ast-grep when you need "structural patterns"
+- Develop rules with TDD: test-first → rule implementation → CI integration
+- Write `fix` when you can. Prefer rules with auto-fix over detection-only rules
 
-## 既存 linter との使い分け
+## Choosing between ast-grep and existing linters
 
-| ケース | ツール |
-|--------|--------|
+| Case | Tool |
+|------|------|
 | unused import, no-console, naming convention | ESLint / oxlint / Biome |
 | type error, unreachable code | TypeScript compiler / clippy |
 | formatting | Prettier / Biome / rustfmt |
-| 特定の関数呼び出しパターンの禁止 | ast-grep |
-| deprecated API の検出と自動書き換え | ast-grep (fix) |
-| 特定コンテキスト内での禁止パターン | ast-grep (inside/has) |
-| プロジェクト固有の構造制約 | ast-grep |
+| Forbidding a specific function-call pattern | ast-grep |
+| Detecting and rewriting deprecated APIs | ast-grep (fix) |
+| Forbidden pattern inside a specific context | ast-grep (inside/has) |
+| Project-specific structural constraints | ast-grep |
 
-ast-grep を使うべきサイン:
-- 既存ルールの設定だけでは表現できない
-- AST の親子・兄弟関係に依存する
-- 自動書き換え（migration）が必要
+Signs that ast-grep is the right choice:
+- The rule cannot be expressed by configuring existing rules
+- It depends on parent/child/sibling AST relationships
+- Automatic rewriting (migration) is required
 
-## プロジェクト設定
+## Project setup
 
 ### sgconfig.yml
 
 ```yaml
-ruleDirs:            # 必須: ルールファイルの格納先
+ruleDirs:            # required: directories holding rule files
   - rules
-testConfigs:         # 任意: テスト設定
+testConfigs:         # optional: test configuration
   - testDir: rule-tests
-utilDirs:            # 任意: 共有ユーティリティルール
+utilDirs:            # optional: shared utility rules
   - rule-utils
-languageGlobs:       # 任意: 非標準拡張子のマッピング (TS/JS/Python 等は不要)
+languageGlobs:       # optional: mapping for non-standard extensions (unnecessary for TS/JS/Python etc.)
   html: ['*.vue', '*.svelte', '*.astro']
 ```
 
-### ディレクトリ構成
+### Directory layout
 
 ```
 project/
@@ -114,9 +114,9 @@ project/
     is-async-function.yml
 ```
 
-`ast-grep scan` は `sgconfig.yml` のある場所から `ruleDirs` 内の全ルールを実行する。
+`ast-grep scan` runs every rule under `ruleDirs` starting from the directory that contains `sgconfig.yml`.
 
-## ルールファイル構造
+## Rule file structure
 
 ```yaml
 id: no-direct-env-access
@@ -130,8 +130,8 @@ rule:
       has:
         pattern: getEnv
       stopBy: end
-message: process.env を直接参照しない。getEnv() を経由する。
-note: 環境変数の型安全なアクセスを保証するため。
+message: Do not reference process.env directly. Go through getEnv().
+note: Ensures type-safe access to environment variables.
 fix: getEnv('$KEY')
 files:
   - "src/**"
@@ -139,24 +139,24 @@ ignores:
   - "src/config.ts"
 ```
 
-### フィールド
+### Fields
 
-| フィールド | 必須 | 説明 |
-|-----------|------|------|
-| `id` | Yes | ルール識別子 |
-| `language` | Yes | 対象言語 |
-| `rule` | Yes | マッチ条件 |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | rule identifier |
+| `language` | Yes | target language |
+| `rule` | Yes | match condition |
 | `severity` | No | `hint`, `warning`, `error` |
-| `message` | No | 1 行の説明 |
-| `note` | No | 詳細説明・修正ガイド |
-| `fix` | No | 自動修正テンプレート |
-| `constraints` | No | メタ変数の追加制約 |
-| `transform` | No | メタ変数のテキスト変換 |
-| `files` | No | 対象 glob |
-| `ignores` | No | 除外 glob |
-| `url` | No | ドキュメント URL |
+| `message` | No | one-line description |
+| `note` | No | detailed description / migration guide |
+| `fix` | No | auto-fix template |
+| `constraints` | No | additional constraints on metavariables |
+| `transform` | No | text transformation of metavariables |
+| `files` | No | target glob |
+| `ignores` | No | excluded glob |
+| `url` | No | documentation URL |
 
-### 抑制コメント
+### Suppression comments
 
 ```typescript
 // ast-grep-ignore
@@ -166,30 +166,30 @@ someCode()
 process.env.NODE_ENV
 ```
 
-## メタ変数の注意点
+## Metavariable pitfalls
 
-パターンマッチの落とし穴:
+Pattern-matching caveats:
 
-- `$OBJ.$PROP` は **ドットアクセスのみ** マッチする。`obj['key']`（ブラケットアクセス）にはマッチしない
-- `$VAR` は単一の AST ノード 1 つにマッチ
-- `$$$VARS` はゼロ個以上の AST ノードにマッチ（可変長引数、複数文、等）
-- `$_` はワイルドカード（キャプチャしない）。同名でも異なる内容にマッチ可能
-- メタ変数はノード全体を占める必要がある: `obj.on$EVENT` や `"hello $NAME"` は動かない
+- `$OBJ.$PROP` matches **dot access only**. It does not match `obj['key']` (bracket access)
+- `$VAR` matches exactly one AST node
+- `$$$VARS` matches zero or more AST nodes (variadic arguments, multiple statements, etc.)
+- `$_` is a wildcard (does not capture). The same name can match different contents
+- A metavariable must occupy a whole node: `obj.on$EVENT` and `"hello $NAME"` do not work
 
-## fix (自動修正)
+## fix (auto-fix)
 
-### fix を付けるかどうかの判断
+### Deciding whether to attach a fix
 
-`fix` は便利だが、付けると自動適用されるので意味論を変える危険がある。次の場合は **付けない**（検出のみにする）:
+`fix` is convenient, but since it is applied automatically it can change semantics. Do **not** attach one (detection-only) when:
 
-- 書き換えで型安全性が変わる（例: `as any` → `as unknown` は型推論結果が変わる）
-- 副作用や評価順序が変わる可能性（短絡評価の有無、例外発生タイミング）
-- 文脈依存で正しい置換が一意に決まらない（API 移行の引数順入れ替え等、レビューが必須）
-- 削除系で、削除対象が同一文の他の式と絡んでいる
+- The rewrite changes type safety (e.g. `as any` → `as unknown` changes type-inference results)
+- Side effects or evaluation order may change (short-circuit behavior, timing of exceptions)
+- Context dependence means the correct replacement is not unique (e.g. API migrations that swap argument order; review is mandatory)
+- The deletion entangles with other expressions in the same statement
 
-迷ったら fix なしで note に「手動移行手順」を書く。fix を付けるのは「全置換しても安全」と確信できる場合に限る。
+When in doubt, skip `fix` and document the manual migration steps in `note`. Only attach `fix` when you are confident that "replacing everywhere is safe".
 
-### 基本
+### Basics
 
 ```yaml
 rule:
@@ -197,9 +197,9 @@ rule:
 fix: logger.info($ARG)
 ```
 
-メタ変数はそのまま `fix` テンプレート内で使える。マッチしなかったメタ変数は空文字になる。
+Metavariables are usable as-is inside the `fix` template. Unmatched metavariables become empty strings.
 
-### 削除
+### Deletion
 
 ```yaml
 rule:
@@ -207,23 +207,23 @@ rule:
 fix: ''
 ```
 
-`fix: ''` でマッチしたノードを削除する。ただし空行が残ることがある。**ステートメント終端 `;` や末尾カンマも一緒に消したい場合は必ず `expandEnd` を併用する**（後述「範囲拡張」）。空行が残るのが許容範囲なら expandEnd 不要。判断基準: 削除後にフォーマッタ（Prettier 等）が走るプロジェクトなら空行は自動整理されるので expandEnd 不要、走らないなら expandEnd 推奨。
+`fix: ''` deletes the matched node. Note that a blank line may remain. **If you want to also remove trailing `;` on statements or trailing commas, always combine with `expandEnd`** (see "Range expansion" below). If leaving a blank line is acceptable, `expandEnd` is not needed. Rule of thumb: in projects where a formatter (Prettier etc.) runs after, blank lines get tidied automatically, so `expandEnd` is unnecessary; if no formatter runs, `expandEnd` is recommended.
 
-### `any:` で複数パターンを束ねるときの fix
+### Fix when bundling multiple patterns with `any:`
 
-`any:` 配下の各分岐で **同一の fix テンプレート** が使えるなら 1 ルールに統合して良い:
+If each branch under `any:` can use the **same fix template**, it is fine to consolidate into one rule:
 
 ```yaml
 rule:
   any:
     - pattern: $ARR.filter($P).length === 0
     - pattern: $ARR.filter($P).length == 0
-fix: '!$ARR.some($P)'   # 両分岐で共通のメタ変数 + 同一テンプレート
+fix: '!$ARR.some($P)'   # metavariables shared across both branches + identical template
 ```
 
-**分岐ごとに fix が異なる場合は必ずルールを分割する**（`any:` 内で分岐ごとの fix は書けない）。例: `=== 0` → `!some()`、`!== 0` → `some()` は別ルールにする。同じ目的でもルール分割は許容される（id を `*-empty` / `*-nonempty` などで揃えると見通しが良い）。
+**If the fix differs per branch, always split into separate rules** (you cannot write a per-branch fix inside `any:`). Example: `=== 0` → `!some()` and `!== 0` → `some()` should be split. Splitting is acceptable even when the intent is the same (aligning the ids as `*-empty` / `*-nonempty` keeps things readable).
 
-### 複数行
+### Multi-line
 
 ```yaml
 rule:
@@ -235,11 +235,11 @@ fix: |-
     $$$S
 ```
 
-インデントは元コードの位置に合わせて保持される。
+Indentation is preserved relative to the original code's position.
 
-### 範囲拡張 (FixConfig)
+### Range expansion (FixConfig)
 
-末尾のカンマなどを含めて削除したい場合:
+When you want to include the trailing comma etc. in the deletion:
 
 ```yaml
 fix:
@@ -248,23 +248,23 @@ fix:
     regex: ','
 ```
 
-### CLI での簡易書き換え
+### Quick rewrites from the CLI
 
 ```bash
 ast-grep run --pattern 'oldFunc($$$ARGS)' --rewrite 'newFunc($$$ARGS)' --lang typescript .
-# --update-all で確認なしに一括適用
+# --update-all applies everywhere without confirmation
 ```
 
 ## constraints
 
-メタ変数に追加条件を付ける。`$ARG` のみ対象（`$$$ARGS` は不可）。ルールマッチ後にフィルタされる。
+Add extra conditions to metavariables. Only `$ARG` is supported (`$$$ARGS` is not). It filters matches after the rule matches.
 
-**constraints と構造制約 (has/inside/not) の使い分け**:
-- **メタ変数の中身** に条件を付けたい → `constraints`（例: `$METHOD` が `get` / `set` / `delete` のいずれか）
-- **パターンの外側・内側の構造** に条件を付けたい → `has` / `inside` / `not` / `precedes` / `follows`（例: 特定の親要素の内側、特定の子要素を持つ）
-- パターン自体に具体的リテラルを書ける場合はそれが最もシンプル（`pattern: new Set($X)` で Set 存在を担保）
+**Choosing between constraints and structural constraints (has/inside/not)**:
+- You want to constrain **the contents of a metavariable** → `constraints` (e.g. `$METHOD` is one of `get` / `set` / `delete`)
+- You want to constrain **the structure outside or inside the pattern** → `has` / `inside` / `not` / `precedes` / `follows` (e.g. inside a specific parent, or having a specific child)
+- If you can write the concrete literal directly in the pattern, that is the simplest (`pattern: new Set($X)` guarantees Set is present)
 
-`rule` の直下に `pattern` と `has` / `not` を併記すると **AND 評価** される（pattern にマッチ かつ has が真）。`pattern` 単独で表現しきれない構造制約はこの形で付け足す。
+Writing `pattern` together with `has` / `not` directly under `rule` is evaluated as **AND** (matches pattern AND has is true). Use this shape to tack on structural constraints that `pattern` alone cannot express.
 
 ```yaml
 rule:
@@ -276,15 +276,15 @@ constraints:
     kind: identifier
 ```
 
-使えるフィールド: `kind`, `regex`, `pattern`
+Usable fields: `kind`, `regex`, `pattern`
 
-注意: `not` 内の制約付きメタ変数は期待通り動作しないことがある。
+Note: constrained metavariables inside `not` may not behave as expected.
 
 ## transform
 
-マッチしたメタ変数をテキスト変換してから `fix` で使う。
+Textually transform matched metavariables before using them in `fix`.
 
-### replace (正規表現置換)
+### replace (regex replacement)
 
 ```yaml
 transform:
@@ -296,7 +296,7 @@ transform:
 fix: $NEW_NAME($$$ARGS)
 ```
 
-### substring (部分文字列)
+### substring
 
 ```yaml
 transform:
@@ -307,9 +307,9 @@ transform:
       endChar: -1
 ```
 
-負のインデックスは末尾から。Python のスライスと同じ。
+Negative indices count from the end. Same semantics as Python slicing.
 
-### convert (ケース変換)
+### convert (case conversion)
 
 ```yaml
 transform:
@@ -320,11 +320,11 @@ transform:
       separatedBy: [caseChange]
 ```
 
-対応ケース: `camelCase`, `snakeCase`, `kebabCase`, `pascalCase`, `upperCase`, `lowerCase`, `capitalize`
+Supported cases: `camelCase`, `snakeCase`, `kebabCase`, `pascalCase`, `upperCase`, `lowerCase`, `capitalize`
 
-### rewrite (実験的)
+### rewrite (experimental)
 
-メタ変数内のノードを rewriter ルールで再帰的に書き換える。
+Recursively rewrite nodes inside a metavariable using rewriter rules.
 
 ```yaml
 transform:
@@ -335,9 +335,9 @@ transform:
       joinBy: "\n"
 ```
 
-## utils (ユーティリティルール)
+## utils (utility rules)
 
-`utilDirs` に定義した共通ルールを `matches` で参照する。
+Reference shared rules defined under `utilDirs` with `matches`.
 
 ```yaml
 # rule-utils/is-async-function.yml
@@ -369,19 +369,19 @@ rule:
         has:
           kind: try_statement
           stopBy: end
-message: async 関数に try-catch がない。
+message: async function lacks try-catch.
 severity: warning
 ```
 
-## テスト
+## Testing
 
-テストには 2 系統ある。混同しない:
-- **分類テスト** (`test --skip-snapshot-tests`): `valid` / `invalid` に並べたコードが正しく分類されるかだけを確認。CI で回すのはこちら。
-- **スナップショットテスト** (`test` / `test -U`): invalid コードへのマッチ位置や fix 適用結果を snapshot として固定し、回帰を検出。初回は `-U` で生成、以降は人間レビュー。CI 前に一度通す。
+There are two kinds of tests. Do not conflate them:
+- **Classification test** (`test --skip-snapshot-tests`): only verifies that the code listed under `valid` / `invalid` is classified correctly. This is the one to run in CI.
+- **Snapshot test** (`test` / `test -U`): pins the match positions and fix results on invalid code as snapshots and detects regressions. Generate for the first time with `-U`, then have humans review afterwards. Run at least once before CI.
 
-### テストファイル形式
+### Test file format
 
-テストファイル内の `id` がルールファイルの `id` と一致している必要がある。ファイル名は自由（慣例は `{rule-id}-test.yml`）。
+The `id` inside the test file must match the `id` of the rule file. The filename is free (convention: `{rule-id}-test.yml`).
 
 ```yaml
 # rule-tests/no-direct-env-access-test.yml
@@ -394,33 +394,33 @@ invalid:
   - process.env.PORT
 ```
 
-### テスト実行
+### Running tests
 
 ```bash
-# 分類テスト (valid/invalid が正しいか)
+# classification test (is valid/invalid correct?)
 ast-grep test --skip-snapshot-tests
 
-# スナップショット生成・更新
+# generate / update snapshots
 ast-grep test -U
 
-# スナップショット対話的レビュー
+# interactive snapshot review
 ast-grep test --interactive
 ```
 
-テスト結果:
-- `.` : パス
-- `N` : ノイジー (false positive — valid コードにマッチ)
-- `M` : ミッシング (false negative — invalid コードにマッチしない)
+Test result markers:
+- `.` : pass
+- `N` : noisy (false positive — matches valid code)
+- `M` : missing (false negative — fails to match invalid code)
 
-### ワークフロー
+### Workflow
 
-1. `rule-tests/` にテストファイルを書く (Red)
-2. `rules/` にルールを書く (Green)
-3. `ast-grep test --skip-snapshot-tests` で確認
-4. `ast-grep test -U` でスナップショット生成
-5. スナップショットをレビューして commit
+1. Write the test file under `rule-tests/` (Red)
+2. Write the rule under `rules/` (Green)
+3. Verify with `ast-grep test --skip-snapshot-tests`
+4. Generate snapshots with `ast-grep test -U`
+5. Review the snapshots and commit
 
-## CI 統合
+## CI integration
 
 ### justfile
 
@@ -436,13 +436,13 @@ check: format-check typecheck ast-grep-lint test
 
 ### GitHub Actions
 
-dev 環境とツールを揃える（プロジェクトで pnpm を使うなら CI も pnpm、npm なら npm）:
+Align tools with the dev environment (use pnpm in CI if the project uses pnpm, npm if it uses npm):
 
 ```yaml
 - uses: actions/setup-node@v4
-  with: { node-version: 24, cache: npm }   # pnpm プロジェクトなら pnpm/action-setup@v4 + cache: pnpm
+  with: { node-version: 24, cache: npm }   # for pnpm projects: pnpm/action-setup@v4 + cache: pnpm
 
-- run: npm ci   # pnpm なら pnpm install --frozen-lockfile
+- run: npm ci   # for pnpm: pnpm install --frozen-lockfile
 
 - name: ast-grep rule tests
   run: npx ast-grep test --skip-snapshot-tests
@@ -451,29 +451,29 @@ dev 環境とツールを揃える（プロジェクトで pnpm を使うなら 
   run: npx ast-grep scan --error
 ```
 
-**severity と終了コード**:
-- `ast-grep scan` はデフォルトで `error` severity が 1 件でもあれば非ゼロ終了
-- `--error` を付けると `warning` / `hint` でも非ゼロ終了させられる（CI で warning も落としたい場合）
-- `--error=error` のように severity を指定して段階的に厳しくすることも可能
-- `--format json` で構造化出力（別ツール連携用）
+**severity and exit codes**:
+- `ast-grep scan` exits non-zero by default if at least one finding has `error` severity
+- Passing `--error` makes `warning` / `hint` also cause non-zero exit (use when CI should fail on warnings too)
+- You can specify a severity like `--error=error` to tighten gradually
+- `--format json` for structured output (for integrating with other tools)
 
-## kind 名の調べ方
+## Looking up kind names
 
-kind 名は言語の Tree-sitter grammar に依存する。
+Kind names depend on the language's Tree-sitter grammar.
 
 ```bash
-# AST ダンプ（名前付きノードのみ、ルール記述に使う）
+# AST dump (named nodes only, use these when writing rules)
 ast-grep run --pattern 'YOUR_CODE' --lang typescript --debug-query=ast
 
-# CST ダンプ（全ノード、anonymous トークン含む）
+# CST dump (all nodes, including anonymous tokens)
 ast-grep run --pattern 'YOUR_CODE' --lang typescript --debug-query=cst
 ```
 
-言語別の頻出 kind カタログは [references/kind-catalog.md](references/kind-catalog.md) 参照（TypeScript / Rust / Go / Python を網羅）。
+See [references/kind-catalog.md](references/kind-catalog.md) for a per-language catalog of common kinds (covers TypeScript / Rust / Go / Python).
 
-## 実践的なルール例
+## Practical rule examples
 
-### TypeScript: `as any` キャストの禁止（検出のみ、fix 無し）
+### TypeScript: forbid `as any` casts (detection only, no fix)
 
 ```yaml
 id: no-as-any
@@ -481,15 +481,16 @@ language: TypeScript
 severity: error
 rule:
   pattern: $EXPR as any
-message: as any は型システムを無効化する。as unknown 経由か型ガードを使う。
+message: as any disables the type system. Go through as unknown or a type guard.
 note: |
-  自動 fix を付けない理由: `as any` → `as unknown` への機械置換は型推論結果が
-  変わるため、呼び出し側で新たなコンパイルエラーを生む。検出のみにして手動移行。
+  Why no auto-fix: mechanically replacing `as any` → `as unknown` changes type
+  inference results and introduces new compile errors at call sites. Detection-only,
+  migrate manually.
 ```
 
-`as any` のように「型アサーション」にマッチさせる場合、`$EXPR as any` が `as_expression` ノードとして動く。`$EXPR` がマッチするのは左辺全体なので、`JSON.parse(raw) as any` にも `(value as any)` にもマッチする。
+When matching a type assertion like `as any`, `$EXPR as any` works on the `as_expression` node. `$EXPR` matches the whole left-hand side, so it matches both `JSON.parse(raw) as any` and `(value as any)`.
 
-### TypeScript: deprecated API の書き換え
+### TypeScript: rewrite a deprecated API
 
 ```yaml
 id: migrate-old-api
@@ -498,10 +499,10 @@ severity: error
 rule:
   pattern: oldClient.fetch($URL, $OPTS)
 fix: newClient.request($URL, $OPTS)
-message: oldClient.fetch は廃止。newClient.request に移行する。
+message: oldClient.fetch is deprecated. Migrate to newClient.request.
 ```
 
-### 特定 import の禁止
+### Forbid a specific import
 
 ```yaml
 id: no-lodash-import
@@ -509,11 +510,11 @@ language: TypeScript
 severity: warning
 rule:
   pattern: import $_ from 'lodash'
-message: lodash の全体 import を禁止。lodash/xxx を使う。
-fix: import $_ from 'lodash/xxx' // TODO: 正しいパスに修正
+message: Do not import lodash wholesale. Use lodash/xxx.
+fix: import $_ from 'lodash/xxx' // TODO: fix the correct path
 ```
 
-### TypeScript: React コンポーネント内の直接 fetch 禁止
+### TypeScript: forbid direct fetch inside React components
 
 ```yaml
 id: no-fetch-in-component
@@ -532,10 +533,10 @@ rule:
           kind: variable_declarator
           regex: '^[A-Z]'
     stopBy: end
-message: コンポーネント内で直接 fetch しない。hooks か server action を使う。
+message: Do not fetch directly inside a component. Use hooks or a server action.
 ```
 
-### Rust: unwrap() の禁止
+### Rust: forbid unwrap()
 
 ```yaml
 id: no-unwrap
@@ -548,11 +549,11 @@ rule:
       kind: function_item
       regex: '#\[test\]'
       stopBy: end
-message: テスト以外で unwrap() を使わない。? か expect() を使う。
-note: unwrap() は panic するため、本番コードでは避ける。
+message: Do not use unwrap() outside tests. Use ? or expect().
+note: unwrap() panics, so avoid it in production code.
 ```
 
-### Rust: unsafe ブロックの検出
+### Rust: flag unsafe blocks
 
 ```yaml
 id: flag-unsafe-block
@@ -560,10 +561,10 @@ language: Rust
 severity: warning
 rule:
   kind: unsafe_block
-message: unsafe ブロック。安全性の根拠をコメントで示す。
+message: unsafe block. Explain the safety rationale in a comment.
 ```
 
-### Rust: println! を log マクロに移行
+### Rust: migrate println! to log macros
 
 ```yaml
 id: no-println-in-lib
@@ -576,7 +577,7 @@ rule:
       kind: function_item
       regex: 'fn main'
       stopBy: end
-message: ライブラリコードで println! を使わない。log::info! 等を使う。
+message: Do not use println! in library code. Use log::info! etc.
 fix: log::info!($$$ARGS)
 files:
   - "src/lib.rs"
@@ -587,7 +588,7 @@ ignores:
   - "src/bin/**"
 ```
 
-### Go: エラー無視の検出
+### Go: detect ignored errors
 
 ```yaml
 id: no-ignored-error
@@ -603,10 +604,10 @@ rule:
     kind: call_expression
     field: right
     stopBy: end
-message: エラーを _ で無視しない。適切にハンドリングする。
+message: Do not ignore errors with _. Handle them appropriately.
 ```
 
-### Go: defer で Close する忘れ防止
+### Go: prevent forgetting defer Close()
 
 ```yaml
 id: defer-close-after-open
@@ -623,10 +624,10 @@ rule:
       pattern: defer $_.Close()
       stopBy:
         kind: return_statement
-message: os.Open の直後に defer Close() を入れる。
+message: Add defer Close() immediately after os.Open.
 ```
 
-### Python: bare except の禁止
+### Python: forbid bare except
 
 ```yaml
 id: no-bare-except
@@ -638,10 +639,10 @@ rule:
     has:
       kind: identifier
       stopBy: neighbor
-message: bare except を使わない。具体的な例外型を指定する。
+message: Do not use bare except. Specify the exception type.
 ```
 
-### Python: print() をロガーに移行
+### Python: migrate print() to a logger
 
 ```yaml
 id: no-print-in-src
@@ -654,7 +655,7 @@ rule:
       kind: function_definition
       regex: 'def main'
       stopBy: end
-message: print() ではなく logger を使う。
+message: Use logger instead of print().
 fix: logger.info($$$ARGS)
 files:
   - "src/**"
@@ -662,14 +663,14 @@ files:
 
 ## References
 
-### 本 skill 内の詳細
+### In-skill details
 
-- [references/rule-yaml.md](references/rule-yaml.md) — ルール YAML 全フィールド・評価順序・メタ変数束縛スコープ・`any:` + fix の統合/分割・`$$$ARGS` 空マッチ等
-- [references/testing.md](references/testing.md) — 分類テスト vs スナップショット、複数行コード記法、snapshot 運用
-- [references/cli.md](references/cli.md) — サブコマンド・フラグ全般、`--error` / exit code / `--format json`
-- [references/kind-catalog.md](references/kind-catalog.md) — 言語別 kind カタログ（TypeScript / Rust / Go / Python）
+- [references/rule-yaml.md](references/rule-yaml.md) — all rule YAML fields, evaluation order, metavariable binding scope, `any:` + fix consolidation/splitting, `$$$ARGS` empty match, etc.
+- [references/testing.md](references/testing.md) — classification vs snapshot tests, multi-line code notation, snapshot operation
+- [references/cli.md](references/cli.md) — subcommands and flags in general, `--error` / exit codes / `--format json`
+- [references/kind-catalog.md](references/kind-catalog.md) — per-language kind catalog (TypeScript / Rust / Go / Python)
 
-### 公式
+### Official
 
 - ast-grep docs: https://ast-grep.github.io/
 - Rule reference: https://ast-grep.github.io/reference/yaml.html

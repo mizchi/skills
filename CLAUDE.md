@@ -22,3 +22,11 @@ After a batch of edits, commit + push here, then the next `apm install -g --upda
 - Skill directory name must match the `name:` in its `SKILL.md` frontmatter.
 - Do not commit MoonBit build artifacts (`_build/`, `.mooncakes/`) or `node_modules/` — `.gitignore` covers them.
 - If a skill gains security-sensitive detail, move it to chezmoi-local and remove from this repo (see how `npm-release` is handled).
+
+## Language policy
+
+`SKILL.md` must be written in English (public repo rule). When a skill originated in Japanese, the original is preserved next to it as `SKILL-ja.md`. When editing a skill that has both:
+
+- Edit `SKILL.md` (English) as the source of truth.
+- Update `SKILL-ja.md` only when a non-trivial content change needs to be kept in sync for Japanese readers. Small wording fixes to the English file don't require touching the Japanese copy.
+- Exception: `mizchi-blog-style` stays Japanese-only because the skill itself teaches Japanese writing style — translating would defeat its purpose.

@@ -1,102 +1,102 @@
 ---
 name: tech-article-reproducibility
-description: 技術記事の再現性 (読者が手元で再現できるか) を評価するスキル。subagent に「初見の読者として手元で再現を試みる」シミュレーションをさせ、足りない情報をリストアップさせる。記事ドラフトの最終チェック、または公開後フィードバック前の事前検証で使う。
+description: A skill for evaluating the reproducibility of technical articles (whether readers can reproduce them in their own environment). Dispatch a subagent to simulate "a first-time reader attempting to reproduce the work locally" and have it list the missing information. Use it as the final check on an article draft, or as pre-publication verification before collecting reader feedback.
 ---
 
 # Tech Article Reproducibility
 
-技術記事の品質を「読者が手元で同じことを再現できるか」の観点で測る。文体評価 (mizchi-blog-style) や論理評価とは独立した別軸。**技術記事で一番大事なのは、読んだ読者が手元で再現できるかどうか** という前提に立つ。
+Measure the quality of a technical article from the angle of "can a reader reproduce the same thing on their machine?" This is an independent axis from prose-style evaluation (mizchi-blog-style) or logical evaluation. The premise: **the most important thing about a technical article is whether a reader can reproduce it on their own machine.**
 
-## いつ使うか
+## When to use
 
-- 技術記事ドラフトの公開前最終チェック
-- ハンズオン記事 / チュートリアル記事
-- ツール導入記事 / セットアップ記事
-- 「動いた」と書いた記事の検証
+- Final pre-publication check on a technical article draft
+- Hands-on articles / tutorial articles
+- Tool introduction articles / setup articles
+- Verifying an article that claims "it worked"
 
-使わない場面:
-- 概念解説記事 (再現するものがない)
-- ポエム / オピニオン記事
-- 記事内で完結する小ネタ
+When not to use:
+- Conceptual explainer articles (nothing to reproduce)
+- Poems / opinion pieces
+- Self-contained small tidbits
 
-## 再現性チェック観点 (10 軸)
+## Reproducibility check axes (10 axes)
 
-各軸を 0〜2 点で採点、合計 20 点満点 → 10 点換算。
+Score each axis on a 0–2 scale, 20 points total → converted to a 10-point scale.
 
-| # | 軸 | 0 (NG) | 1 (部分的) | 2 (OK) |
+| # | Axis | 0 (NG) | 1 (partial) | 2 (OK) |
 |---|---|---|---|---|
-| 1 | 環境前提の明示 | OS / バージョン / 必要ツール記載なし | 一部記載 | 全部記載 (OS, lang version, CLI ツール) |
-| 2 | コードの完全性 | 断片のみ、import/setup 省略 | 主要部分のみ | コピペで動く完全形 |
-| 3 | コマンドの正確性 | placeholder のまま (`<your-token>` 等が説明なし) | 一部 placeholder | そのまま実行可能 |
-| 4 | バージョン依存の明示 | 言及なし | 一部 | 「v3.x で動作」「v2 以前は X」等明示 |
-| 5 | 設定ファイル全文掲載 | 抜粋のみ | 主要キーのみ | 動く最小構成全文 |
-| 6 | 期待される出力の提示 | なし | 文章で説明 | 実出力 / スクショ |
-| 7 | エラー時の対処 | 触れず | 1 件触れる | 主要エラー数件 + 対処 |
-| 8 | プロジェクト前提の明示 | 著者環境前提が暗黙 | 部分的に明示 | path / repo 構造 / 既存設定が全部明示 |
-| 9 | リンク健全性 | リンク切れ or 認証必要 | 一部要認証 | 全部 public でアクセス可 |
-| 10 | 著者依存知識の明示 | ヘルパー / dotfiles 暗黙 | 一部明示 | 全部明示 or 不要 |
+| 1 | Environment prerequisites stated | No OS / version / required tools listed | Partially listed | Everything listed (OS, lang version, CLI tools) |
+| 2 | Code completeness | Fragments only, imports/setup omitted | Only the main part | Full, copy-pasteable form that runs |
+| 3 | Command accuracy | Placeholders left as-is (`<your-token>` etc. without explanation) | Some placeholders | Runnable as-is |
+| 4 | Version dependency stated | No mention | Partial | Explicit, e.g. "works on v3.x", "v2 or earlier behaves as X" |
+| 5 | Full config files included | Excerpts only | Main keys only | Full minimal working config |
+| 6 | Expected output shown | None | Explained in prose | Actual output / screenshot |
+| 7 | Handling of errors | Not mentioned | One case touched on | Several major errors + how to handle them |
+| 8 | Project prerequisites stated | Author-environment assumptions are implicit | Partially stated | Paths / repo structure / existing config all stated |
+| 9 | Link health | Links broken or require auth | Some require auth | All accessible publicly |
+| 10 | Author-specific knowledge stated | Helpers / dotfiles assumed implicitly | Partially stated | Fully stated or not required |
 
-## 評価ワークフロー
+## Evaluation workflow
 
-技術記事の評価には empirical-prompt-tuning と同じ subagent dispatch を使う。違いは subagent に「実行者」ではなく **「再現を試みる初見の読者」のロールプレイ** をさせること。
+For evaluating technical articles, use the same subagent dispatch as empirical-prompt-tuning. The difference is that the subagent plays the role of **"a first-time reader trying to reproduce the work"** rather than "an executor."
 
-1. 対象記事を確定
-2. subagent dispatch (後述のテンプレ)
-3. 戻ってきた評価から「再現詰まりポイント」を抽出
-4. 詰まりポイントに対応する記述を記事に追加 / 修正
-5. 必要なら新規 subagent で再評価
+1. Fix the target article
+2. subagent dispatch (template below)
+3. Extract "reproduction sticking points" from the returned evaluation
+4. Add / fix text in the article to address those sticking points
+5. If needed, re-evaluate with a fresh subagent
 
-## subagent dispatch テンプレ
+## subagent dispatch template
 
 ```
-あなたは <記事のテーマ領域> に興味があるが <技術スタック> は初めての読者です。
-この記事を読んで、手元の環境で同じことを再現しようとします。
+You are a reader interested in <the article's subject area> but new to <the tech stack>.
+You are going to read this article and try to reproduce the same thing in your local environment.
 
-## 対象記事
-<記事ファイルのパス>
+## Target article
+<path to the article file>
 
-## 評価観点 (再現性 10 軸)
-各軸を 0〜2 点で採点。`tech-article-reproducibility` skill の判定表参照:
+## Evaluation axes (10 reproducibility axes)
+Score each axis 0–2. Refer to the rubric in the `tech-article-reproducibility` skill:
 /Users/mz/.claude/skills/tech-article-reproducibility/SKILL.md
 
-1. 環境前提の明示
-2. コードの完全性
-3. コマンドの正確性
-4. バージョン依存の明示
-5. 設定ファイル全文掲載
-6. 期待される出力の提示
-7. エラー時の対処
-8. プロジェクト前提の明示
-9. リンク健全性 (実際に WebFetch で確認)
-10. 著者依存知識の明示
+1. Environment prerequisites stated
+2. Code completeness
+3. Command accuracy
+4. Version dependency stated
+5. Full config files included
+6. Expected output shown
+7. Handling of errors
+8. Project prerequisites stated
+9. Link health (actually verify with WebFetch)
+10. Author-specific knowledge stated
 
-## タスク
-1. 記事を読みながら「自分が手元で再現するならどこで詰まるか」を想像する
-2. 各軸 0〜2 で採点 + 根拠を引用
-3. 詰まりポイント Top 5 を行番号付きで列挙
+## Tasks
+1. While reading the article, imagine "where would I get stuck if I reproduced this on my own machine?"
+2. Score each axis 0–2 with quoted evidence
+3. List the top 5 sticking points with line numbers
 
-## レポート構造
-- 再現性スコア: X/20 (内訳テーブル)
-- 詰まりポイント Top 5: <行番号> <引用> → <なぜ詰まるか>
-- 不足情報: 記事に追加すべき情報のリスト
-- 総評: この記事を読んで手元で再現できる確率は何 % か (主観)
+## Report structure
+- Reproducibility score: X/20 (breakdown table)
+- Top 5 sticking points: <line number> <quote> → <why it sticks>
+- Missing information: list of things that should be added to the article
+- Overall verdict: what percentage chance (subjective) do you have of reproducing this after reading the article
 ```
 
-## スコアの読み方
+## How to read the score
 
-- **18-20**: ハンズオンとして公開可能、ほぼ追加情報不要
-- **14-17**: 多少のググりは必要だが再現可能、公開可
-- **10-13**: 再現するには記事外の情報が必要、追加修正推奨
-- **9 以下**: 再現困難、記事の前提を見直す or ハンズオン以外として位置付ける
+- **18-20**: Publishable as a hands-on piece; almost no additional information needed
+- **14-17**: Some googling required, but reproducible; okay to publish
+- **10-13**: Information outside the article is required to reproduce; revisions recommended
+- **9 or below**: Hard to reproduce; rethink the article's premise or position it as something other than a hands-on piece
 
-## 落とし穴
+## Pitfalls
 
-- **評価者の前提知識が高すぎる**: subagent に「初心者ロール」を明示しないと、専門家視点で「足りる」と判定する。プロンプトで「初見」を強調する
-- **リンク健全性を無視**: 公開時点では生きてても 1 年後切れることがある。**生きてる** リンクのみで再現可能か別途チェック
-- **サンプルコードを全部 inline**: 再現性が上がる代わりに記事が肥大化する。リポジトリへのリンクと併用するハイブリッドが現実的
-- **再現性 ≠ 文体品質**: 再現性が高くても読みにくい記事はある。`mizchi-blog-style` 等と併用して両軸で測る
+- **The evaluator's background knowledge is too high**: if you don't explicitly tell the subagent to play a "beginner role," it will judge "enough information" from an expert's viewpoint. Emphasize "first-time reader" in the prompt
+- **Ignoring link health**: links that are alive at publication time can break a year later. Separately check whether reproduction is possible using only **live** links
+- **Inlining all sample code**: reproducibility goes up, but the article bloats. A hybrid approach that combines inline code with a link to the repository is realistic
+- **Reproducibility ≠ prose quality**: an article can be highly reproducible yet hard to read. Combine with `mizchi-blog-style` and similar to measure both axes
 
-## 関連
+## Related
 
-- `empirical-prompt-tuning` — subagent dispatch + 反復改善のメタスキル
-- `mizchi-blog-style` — 文体軸の評価 (本スキルと独立した軸)
+- `empirical-prompt-tuning` — meta-skill for subagent dispatch + iterative improvement
+- `mizchi-blog-style` — evaluation on the prose-style axis (independent from this skill)

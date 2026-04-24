@@ -1,129 +1,129 @@
 ---
 name: retrospective-codify
-description: タスク完了時に「最初に失敗した内容」と「最終的に通った解法」を対応付け、最初に知っておくべきだった知見を ast-grep ルール / skill / CLAUDE.md ルールのいずれかに言語化する。試行錯誤の末にたどり着いた解や、同じ落とし穴を将来の自分（または別エージェント）に繰り返させたくないときに使う。ユーザーから「今回の学びをルール化して」「skill にして」「lint に落として」と指示されたとき、またはタスク終了時に学びを棚卸しする場面で起動する。
+description: On task completion, pair up "what failed first" with "what finally worked" and codify the insight you should have known from the start into one of the following forms: an ast-grep rule, a skill, or a CLAUDE.md rule. Use when you reached the solution after trial and error, or when you do not want to let your future self (or another agent) fall into the same pitfall again. Trigger when the user says "codify today's lessons," "make it a skill," or "drop it into lint," or when you want to take stock of lessons at the end of a task.
 ---
 
 # Retrospective Codify
 
-タスクの終盤で「最初にこれを知っていれば遠回りしなかった」知見を抽出し、静的ルール・skill・常時有効ルールのいずれかに固定する。プロンプトに頼らず再現可能な形に落とすことを優先する。
+Toward the end of a task, extract the insight of "if only I had known this first, I would not have taken detours" and pin it down as one of: a static rule, a skill, or an always-on rule. Prioritize landing it in a reproducible form that does not rely on prompts.
 
-## いつ使うか
+## When to use
 
-- タスク完了直前、またはユーザーから「学びを残して」「ルール化して」と指示されたとき
-- 試行錯誤の末に解にたどり着いたとき（初手で詰まった、誤った仮説を立てた、ドキュメント不足で時間を溶かした 等）
-- 同種のタスクを将来また行う可能性があるとき
+- Right before task completion, or when the user says "leave the lesson behind" or "codify it"
+- When you arrived at the solution after trial and error (stuck on the first attempt, built a wrong hypothesis, burned time due to missing docs, etc.)
+- When you might perform a similar task again in the future
 
-使わない場面:
-- 一発で通った単純なタスク（抽出する学びがない）
-- プロジェクト固有の一回限りの対応（コミットメッセージで十分）
+When not to use:
+- Simple tasks that passed on the first try (nothing to extract)
+- Project-specific one-off handling (a commit message is enough)
 
-## ワークフロー
+## Workflow
 
-1. **失敗⇄成功の対応付け**: 今回のタスクから次の 3 点を書き出す。
-   - 最初の試行（何をした / どう失敗した）
-   - 最終解（何が効いた）
-   - 橋渡しになった気付き（なぜ最初の試行では届かなかったか）
-2. **「最初に知るべきだったこと」の言語化**: 気付きを 1 〜 3 文で要約する。回顧でなく、未来の自分への指示形で書く（"〜するな" / "〜を先に確認せよ"）。
-3. **分類**: 下の判定表に従って出力先を決める。
-4. **重複チェック（必須）**: 提案前に既存の知見と照合する。重複や近接する規則があれば「新規追加」ではなく「既存への追記 / 更新」を選ぶ。これを怠ると skill / ルールが肥大化する。
+1. **Pair failure with success**: From the current task, write out the following 3 points.
+   - The first attempt (what you did / how it failed)
+   - The final solution (what worked)
+   - The bridging insight (why the first attempt did not get there)
+2. **Verbalize "what you should have known first"**: Summarize the insight in 1-3 sentences. Write it not as retrospection but as an instruction to your future self (in imperative form: "do not do X" / "check Y first").
+3. **Classify**: Decide the output destination following the decision table below.
+4. **Dedup check (mandatory)**: Before proposing, cross-check against existing knowledge. If a duplicate or nearby rule exists, choose "append to / update existing" rather than "add new." Skipping this step bloats skills / rules.
 
-   検索キー候補は気付きから 2 〜 3 語抽出する（ツール名・API 名・症状語・対義語）。例: 気付きが「pnpm v10 を使う」なら `pnpm`, `packageManager`, `lockfile`。
+   Extract 2-3 search keys from the insight (tool names, API names, symptom words, antonyms). Example: if the insight is "use pnpm v10," use `pnpm`, `packageManager`, `lockfile`.
 
-   照合先と最低限の検索:
+   Match targets and minimum searches:
    ```
-   # skill 重複（global）
+   # skill duplicates (global)
    ls ~/.claude/skills/
-   Grep "<キー>" ~/.claude/skills/*/SKILL.md
+   Grep "<key>" ~/.claude/skills/*/SKILL.md
 
-   # CLAUDE.md 重複
-   Grep "<キー>" ~/.claude/CLAUDE.md
-   Grep "<キー>" <project-root>/CLAUDE.md   # 該当プロジェクトがある場合
+   # CLAUDE.md duplicates
+   Grep "<key>" ~/.claude/CLAUDE.md
+   Grep "<key>" <project-root>/CLAUDE.md   # if there is a matching project
 
-   # lint ルール重複
+   # lint rule duplicates
    ls <project-root>/rules/
-   Grep "<キー>" <project-root>/rules/
+   Grep "<key>" <project-root>/rules/
    ```
 
-   結果を 4 段階に分類:
-   - **新規**: ヒット無し → 通常の提案
-   - **既存追記**: 関連 skill/ルールが存在し、追加情報が補完的 → 「既存に追記」を提案
-     - 「部分重複」（学びの一部だけが既存カバー、残りが新規）もこの分類に含める。重複した部分は「重複検出」節に、新規部分は「採用候補」節（`[skill 追記]` または `[rule]`）に分けて書く。
-   - **既存と重複（提案不要）**: 既存が同じ知見を完全にカバー済み → 提案ゼロ、ただし提示フォーマットには「重複検出」行を残す（監査可能性のため）。重複検出行には根拠として既存 skill 名 + 該当節名（または行番号）を添える。
-   - **判断保留**: 重複かどうか agent が判定できない → ユーザーに照合結果を見せて判断を仰ぐ
-5. **書き出し**: 選んだ形式のテンプレート（後述）に沿って artifact を生成する。
-6. **確認**: ユーザーに diff を見せて採用可否を取る。棄却された場合は skill ではなくセッション内のメモに留める。
+   Classify the result into 4 tiers:
+   - **New**: no hits -> normal proposal
+   - **Append to existing**: a related skill/rule exists and the new info is complementary -> propose "append to existing"
+     - "Partial overlap" (part of the insight is covered by the existing one, rest is new) also falls in this tier. Write the overlapping part under "Duplicate detected," and the new part under "Adoption candidates" (`[skill append]` or `[rule]`) separately.
+   - **Duplicate with existing (no proposal needed)**: the existing entry already fully covers the same insight -> zero proposals, but keep the "Duplicate detected" line in the presentation format (for auditability). Attach the existing skill name + the relevant section name (or line number) as evidence on the Duplicate detected line.
+   - **Undecidable**: the agent cannot tell whether it is a duplicate -> show the match result to the user and ask for judgment
+5. **Write out**: Generate the artifact following the template (below) for the chosen format.
+6. **Confirm**: Show the diff to the user and get approval. If rejected, keep it as a session note instead of a skill.
 
-## 分類判定
+## Classification decision
 
 ```dot
 digraph classify {
-    "機械的に検出可能？" [shape=diamond];
-    "毎回適用すべき短い指示？" [shape=diamond];
-    "複数ステップの手順や判断を伴う？" [shape=diamond];
-    "ast-grep ルール / lint" [shape=box];
-    "CLAUDE.md ルール" [shape=box];
+    "Mechanically detectable?" [shape=diamond];
+    "Short instruction to apply every time?" [shape=diamond];
+    "Involves multi-step procedure or judgment?" [shape=diamond];
+    "ast-grep rule / lint" [shape=box];
+    "CLAUDE.md rule" [shape=box];
     "skill" [shape=box];
-    "メモに留める" [shape=box];
+    "keep as note" [shape=box];
 
-    "機械的に検出可能？" -> "ast-grep ルール / lint" [label="yes"];
-    "機械的に検出可能？" -> "毎回適用すべき短い指示？" [label="no"];
-    "毎回適用すべき短い指示？" -> "CLAUDE.md ルール" [label="yes"];
-    "毎回適用すべき短い指示？" -> "複数ステップの手順や判断を伴う？" [label="no"];
-    "複数ステップの手順や判断を伴う？" -> "skill" [label="yes"];
-    "複数ステップの手順や判断を伴う？" -> "メモに留める" [label="no"];
+    "Mechanically detectable?" -> "ast-grep rule / lint" [label="yes"];
+    "Mechanically detectable?" -> "Short instruction to apply every time?" [label="no"];
+    "Short instruction to apply every time?" -> "CLAUDE.md rule" [label="yes"];
+    "Short instruction to apply every time?" -> "Involves multi-step procedure or judgment?" [label="no"];
+    "Involves multi-step procedure or judgment?" -> "skill" [label="yes"];
+    "Involves multi-step procedure or judgment?" -> "keep as note" [label="no"];
 }
 ```
 
-| 判定軸 | 出力先 | 例 |
+| Decision axis | Output destination | Example |
 |---|---|---|
-| コード/設定の構文レベルで検出可能 | `ast-grep` ルール または既存 linter 設定 | "`Array.from(set).length` を使うな、`set.size` を使え" |
-| 短く、常時適用、判断を伴わない | `CLAUDE.md`（user global / project） | "pnpm は v10 以上を使う" |
-| 手順・文脈判断・テンプレが必要 | 新規 skill または既存 skill への追記 | "MoonBit の C binding を書く手順" |
-| プロジェクト固有で一回限り | 採用しない（コミットメッセージ / PR 説明に留める） | — |
+| Detectable at the code/config syntax level | `ast-grep` rule or existing linter config | "Do not use `Array.from(set).length`, use `set.size`" |
+| Short, always-applied, no judgment involved | `CLAUDE.md` (user global / project) | "Use pnpm v10 or later" |
+| Requires procedure, contextual judgment, or templates | New skill or append to existing skill | "Steps to write a C binding for MoonBit" |
+| Project-specific and one-off | Do not adopt (keep in commit message / PR description) | — |
 
-**ast-grep を優先する原則**: 静的に検出可能なものはプロンプトやドキュメントに書かず、必ず `ast-grep` ルールにする（ユーザーの global ルール）。
+**Principle: prefer ast-grep**: For things that are statically detectable, do not write them in prompts or docs; always make them an `ast-grep` rule (as the user's global rule).
 
-**CLAUDE.md の書き出し先**:
-- 言語横断・ツール横断の一般則 → `~/.claude/CLAUDE.md`
-- 特定リポジトリ限定 → そのリポジトリの `CLAUDE.md`
+**CLAUDE.md write destinations**:
+- Cross-language / cross-tool general rules -> `~/.claude/CLAUDE.md`
+- Limited to a specific repository -> that repository's `CLAUDE.md`
 
-## 出力テンプレート
+## Output templates
 
-### ast-grep ルール
-`ast-grep-practice` skill を参照。`rules/` ディレクトリに YAML を追加し、`rule-tests/` に valid / invalid ペアを必ず書く。
+### ast-grep rule
+See the `ast-grep-practice` skill. Add YAML under the `rules/` directory and always write a valid / invalid pair under `rule-tests/`.
 
-### CLAUDE.md への追記
+### Append to CLAUDE.md
 ```markdown
-# <既存セクションに追記>
-- <命令形の 1 文>（理由: <短い根拠>）
+# <append to existing section>
+- <one imperative sentence> (reason: <short rationale>)
 ```
-理由を括弧書きで必ず添える（将来の自分が edge case を判断できるように）。
+Always attach the reason in parentheses (so that your future self can judge edge cases).
 
-### 新規 skill
-`writing-skills`（superpowers）の最小テンプレに従う:
+### New skill
+Follow the minimal template from `writing-skills` (superpowers):
 ```markdown
 ---
 name: <kebab-case>
-description: Use when <具体的な状況> / <症状>
+description: Use when <specific situation> / <symptom>
 ---
 
 # <Title>
 
-## 目的
-## いつ使うか
-## ワークフロー
-## 落とし穴
+## Purpose
+## When to use
+## Workflow
+## Pitfalls
 ```
 
-## 具体例
+## Concrete examples
 
-### 例 1: ast-grep ルール化（機械検出可能）
+### Example 1: Codify as an ast-grep rule (mechanically detectable)
 
-- 最初の試行: TypeScript で集合のサイズを `Array.from(set).length` で取得していたが、レビューで非効率と指摘された。
-- 最終解: `set.size` を使う。
-- 気付き: `Set` / `Map` のサイズ取得は `.size` プロパティを使う。`Array.from(...).length` は構文レベルで検出可能。
+- First attempt: In TypeScript, retrieved a set's size with `Array.from(set).length`, but review pointed out this is inefficient.
+- Final solution: Use `set.size`.
+- Insight: For `Set` / `Map` size, use the `.size` property. `Array.from(...).length` is detectable at the syntax level.
 
-→ `rules/no-array-from-size.yml` を追加:
+-> Add `rules/no-array-from-size.yml`:
 ```yaml
 id: no-array-from-size
 language: TypeScript
@@ -133,119 +133,119 @@ rule:
 message: Set/Map のサイズは .size プロパティを使う。
 ```
 
-### 例 2: CLAUDE.md ルール化（短い常時ルール）
+### Example 2: Codify as a CLAUDE.md rule (short always-on rule)
 
-- 最初の試行: `pnpm install` を実行したら lockfile 形式の差分で CI が落ちた。
-- 最終解: pnpm のバージョンを v10 系に揃えた。
-- 気付き: pnpm はバージョン差で lockfile が変わる。常に v10 以上を使う。
+- First attempt: Ran `pnpm install` and CI broke due to a lockfile format diff.
+- Final solution: Aligned pnpm's version to the v10 line.
+- Insight: pnpm changes its lockfile across versions. Always use v10 or later.
 
-→ `~/.claude/CLAUDE.md` の「ツール」節に追記:
+-> Append to the "ツール" section of `~/.claude/CLAUDE.md`:
 ```markdown
 - pnpm は v10 以上を使う（理由: lockfile 形式が v9 以前と非互換で CI 差分が出る）
 ```
 
-### 例 3: 新規 skill 化（手順 + 判断を伴う）
+### Example 3: Codify as a new skill (procedure + judgment involved)
 
-- 最初の試行: MoonBit から C ライブラリを呼ぶのに、いくつかの方法を試して FFI 宣言と stub の配置で詰まった。
-- 最終解: `extern "c"` 宣言 + `moonbit.h` を使った stub + `moon.pkg.json` の `native-stub` / `link.native` 設定の組み合わせ。
-- 気付き: 単一手順では収まらず、宣言・stub・ビルド設定の 3 層を一括して理解する必要がある。
+- First attempt: To call a C library from MoonBit, tried several approaches and got stuck on the placement of FFI declarations and stubs.
+- Final solution: The combination of an `extern "c"` declaration + a stub using `moonbit.h` + `native-stub` / `link.native` settings in `moon.pkg.json`.
+- Insight: It does not fit in a single step; you need to understand the three layers — declaration, stub, and build config — together.
 
-→ 新規 skill `moonbit-c-binding` として手順とテンプレを切り出し（既に存在するため、本例は「重複チェックで既存への追記」を選ぶケース）。
+-> Carve out the procedure and templates as a new skill `moonbit-c-binding` (since it already exists, this example is the case of choosing "append to existing" via the dedup check).
 
-## Red flags（合理化に注意）
+## Red flags (watch out for rationalizations)
 
-下記の思考が出たら一度止まる。
+Stop once if the following thoughts appear.
 
-| 出てくる合理化 | 実態 |
+| Rationalization that surfaces | Reality |
 |---|---|
-| 「プロジェクト固有だけど一応 skill にしておこう」 | skill が肥大化し検索性が落ちる。コミットメッセージ / PR で十分。 |
-| 「承認は省いて先に書き出しておこう、後で見せればいい」 | 勝手に CLAUDE.md / skill を変更すると将来の挙動が読めなくなる。必ず提案 → 承認 → 書き出し。 |
-| 「ast-grep で書ける気もするけど、自然言語でルールに書いた方が早い」 | 静的検出可能なものを散文で書くと、エージェントが守らない。ast-grep を優先。 |
-| 「気付きが薄いけど、何か書かないと格好がつかない」 | 提案ゼロも正解。空の retrospective は害がない。 |
-| 「重複チェックは面倒だから飛ばそう、被ったら後で消せばいい」 | 重複ルールが残ると挙動が割れる。dedup は必須工程。 |
-| 「失敗の側は省いて、最終解だけ書けばいい」 | 失敗の記述がないと、将来の自分は同じ落とし穴に再度落ちる。 |
+| "It is project-specific but let's make a skill just in case" | Skills bloat and searchability drops. A commit message / PR is enough. |
+| "Skip approval and write it out first; I can show it later" | Modifying CLAUDE.md / skills on your own makes future behavior unpredictable. Always: propose -> approve -> write out. |
+| "I kind of could write it in ast-grep, but writing it in natural language as a rule is faster" | Writing statically detectable things in prose means agents do not follow them. Prefer ast-grep. |
+| "The insight is thin, but I have to write something to save face" | Zero proposals is also a correct answer. An empty retrospective causes no harm. |
+| "Dedup checks are tedious; skip them, erase duplicates later" | If duplicate rules remain, behavior splits. Dedup is a mandatory step. |
+| "Omit the failure side and only write the final solution" | Without describing the failure, your future self will fall into the same pitfall again. |
 
-## ユーザーへの提示フォーマット
+## Presentation format to the user
 
-タスク終了時に次の形で棚卸しを提示する。**学びは複数あって良い。重複や不採用も明示的に列挙して、判断の足跡を残す。**
-
-```
-## Retrospective
-
-### 学び 1: <短いラベル>
-- 最初の失敗: <1 行>
-- 最終解: <1 行>
-- 気付き: <1 行>
-
-### 学び 2: <短いラベル>      # 学びが 1 つだけならこのブロックは省く
-- 最初の失敗: <1 行>
-- 最終解: <1 行>
-- 気付き: <1 行>
-
-## 提案
-
-採用候補:
-- [lint] <ルール名>: <1 行>（artifact: <path>, 学び N 由来）
-- [skill 追記] <既存 skill 名>: <1 行>（学び N 由来）
-- [skill 新規] <skill 名>: <1 行>（学び N 由来）
-- [rule] CLAUDE.md（global/project）: <1 行>（学び N 由来）
-
-重複検出（提案不要）:
-- <学び N>: 既存 <skill/rule 名> の <該当節名 or 行番号> が完全カバー → 追加なし
-
-不採用:
-- <学び N>: <不採用理由 1 行>（例: プロジェクト固有 / cross-file で lint 表現困難 / 他の学びに吸収）
-
-採用するものを番号または項目名で指示してください。提案ゼロも妥当な結論です。
-```
-
-**書式ルール:**
-- 学びが 1 つなら `### 学び N` 見出しは省き、Retrospective ブロックを 1 つだけ書く
-- 「採用候補」「重複検出」「不採用」のいずれかが空ならその節ごと省く（"なし" 行は書かない）
-- 各提案行末に「学び N 由来」を必ず書く（複数学びを跨ぐ場合は「学び 1, 3 由来」のように列挙して良い）
-- 「採用候補」が空で「重複検出」のみ残るときは、末尾文を `採用するものを指示してください` ではなく `採用候補なし。記録目的でレビューしてください。` に置き換える
-- ユーザーが採用を指示した項目のみ書き出す。黙って書き出さない
-
-### 提示例: 全学びが既存カバー（重複検出のみ）
+At the end of a task, present the stock-taking in the following form. **Multiple lessons are fine. Explicitly list duplicates and non-adoptions too, to leave a trace of the judgment.**
 
 ```
 ## Retrospective
 
-### 学び 1: <ラベル>
-- 最初の失敗: ...
-- 最終解: ...
-- 気付き: ...
+### Lesson 1: <short label>
+- First failure: <1 line>
+- Final solution: <1 line>
+- Insight: <1 line>
 
-## 提案
+### Lesson 2: <short label>      # omit this block if there is only 1 lesson
+- First failure: <1 line>
+- Final solution: <1 line>
+- Insight: <1 line>
 
-重複検出（提案不要）:
-- 学び 1: 既存 skill `<skill 名>` の `<節名>` が完全カバー → 追加なし
+## Proposals
 
-採用候補なし。記録目的でレビューしてください。
+Adoption candidates:
+- [lint] <rule name>: <1 line> (artifact: <path>, from lesson N)
+- [skill append] <existing skill name>: <1 line> (from lesson N)
+- [skill new] <skill name>: <1 line> (from lesson N)
+- [rule] CLAUDE.md (global/project): <1 line> (from lesson N)
+
+Duplicate detected (no proposal needed):
+- <lesson N>: fully covered by <section name or line number> of existing <skill/rule name> -> no addition
+
+Not adopted:
+- <lesson N>: <one-line reason for non-adoption> (e.g. project-specific / hard to express in lint across files / absorbed by another lesson)
+
+Please indicate which to adopt by number or item name. Zero proposals is also a valid conclusion.
 ```
 
-### 提示例: 部分重複（既存追記 + 重複検出）
+**Format rules:**
+- If there is only 1 lesson, omit the `### Lesson N` heading and write only one Retrospective block
+- If any of "Adoption candidates," "Duplicate detected," or "Not adopted" is empty, omit the whole section (do not write a "none" line)
+- Always end each proposal line with "from lesson N" (if it spans multiple lessons, you may enumerate as "from lessons 1, 3")
+- When "Adoption candidates" is empty and only "Duplicate detected" remains, replace the closing sentence from `Please indicate which to adopt` with `No adoption candidates. Please review for the record.`
+- Write out only items the user instructs you to adopt. Do not write silently.
+
+### Presentation example: all lessons already covered (Duplicate detected only)
 
 ```
-## 提案
+## Retrospective
 
-採用候補:
-- [skill 追記] <既存 skill 名>: <新規部分の 1 行>（学び 1 由来, 既存節 `<節名>` への補完）
+### Lesson 1: <label>
+- First failure: ...
+- Final solution: ...
+- Insight: ...
 
-重複検出（提案不要）:
-- 学び 1（version 値部分）: 既存 `~/.claude/CLAUDE.md` ツール節が既にカバー → 追記不要
+## Proposals
+
+Duplicate detected (no proposal needed):
+- Lesson 1: fully covered by `<section name>` of existing skill `<skill name>` -> no addition
+
+No adoption candidates. Please review for the record.
 ```
 
-## よくある失敗
+### Presentation example: partial overlap (append to existing + Duplicate detected)
 
-- **粒度が細かすぎる**: その一回限りの事情（特定の関数名、特定のバージョン）までルール化してしまう → 抽象化して「何を確認するか」レベルに引き上げる
-- **プロンプトで書きがち**: 静的に検出可能な規則を自然言語で CLAUDE.md に書く → `ast-grep` ルールに移す
-- **理由を書かない**: ルールの根拠が残らず、将来の自分がなぜそれを守るのか判断できなくなる → 必ず `Why:` を添える
-- **勝手に書き出す**: ユーザー承認なしに CLAUDE.md や skill を更新する → 必ず提案 → 承認 → 書き出し の順を守る
-- **失敗の言語化を省く**: 「最終解は X」だけ書いて、なぜ初手で詰まったかを残さない → 失敗側の記述が無いと、将来の自分は同じ落とし穴にまた落ちる
+```
+## Proposals
 
-## 関連 skill
+Adoption candidates:
+- [skill append] <existing skill name>: <1 line for the new portion> (from lesson 1, complements existing section `<section name>`)
 
-- `superpowers:writing-skills` — 新規 skill を書くときのテンプレと TDD フロー
-- `ast-grep-practice` — lint ルール化する場合の書き方とテスト
-- `update-config` — settings.json / permissions の変更が必要な場合
+Duplicate detected (no proposal needed):
+- Lesson 1 (version value portion): already covered by the tools section in `~/.claude/CLAUDE.md` -> no append needed
+```
+
+## Common failures
+
+- **Granularity too fine**: codifying the one-off specifics (a specific function name, a specific version) -> abstract it up to the level of "what to check"
+- **Tends to be written as a prompt**: writing a statically detectable rule in natural language in CLAUDE.md -> move it to an `ast-grep` rule
+- **Does not write the reason**: the rule's rationale is not left behind, and the future self cannot judge why to follow it -> always attach a `Why:`
+- **Writes out on its own**: updates CLAUDE.md or skills without user approval -> always follow propose -> approve -> write out in that order
+- **Omits verbalizing the failure**: writes only "the final solution is X" and does not leave why the first move got stuck -> without a description on the failure side, your future self will fall into the same pitfall again
+
+## Related skills
+
+- `superpowers:writing-skills` — template and TDD flow for writing a new skill
+- `ast-grep-practice` — how to write and test when codifying as a lint rule
+- `update-config` — when changes to settings.json / permissions are required

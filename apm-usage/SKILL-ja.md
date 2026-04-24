@@ -76,9 +76,9 @@ dependencies:
 scripts: {}
 ```
 
-### `scripts:` examples
+### `scripts:` の実例
 
-`scripts:` is a name → command map. Register post-`apm install` setup or one-shot tasks used during development:
+`scripts:` は name → command のマップ。`apm install` 後の setup、開発中のワンショット処理を登録する:
 
 ```yaml
 scripts:
@@ -87,36 +87,36 @@ scripts:
   audit: "apm audit"
 ```
 
-Invoke with `apm run <name>` (e.g. `apm run verify`). `postinstall` runs automatically when `apm install` succeeds (hook). One-shot tasks (e.g. `apm run audit`) must be called explicitly.
+呼び出し: `apm run <name>`（例: `apm run verify`）。`postinstall` は `apm install` 成功時に自動実行される（hook）。ワンショット処理（例: `apm run audit`）は明示的に呼ぶ。
 
-### Lockfile (`apm.lock.yaml`) workflow
+### lockfile (`apm.lock.yaml`) の運用
 
-`apm install` generates `apm.lock.yaml`. To guarantee reproducibility:
+`apm install` は `apm.lock.yaml` を生成する。再現性を担保するため:
 
-- **project scope**: **commit** `apm.lock.yaml` so teammates resolve the same skill versions. Same idea as `package-lock` in `node_modules`.
-- **global scope**: sync `~/.apm/apm.lock.yaml` via chezmoi so a new machine installs the same versions.
-- In CI / on a new machine, use `apm install --frozen-lockfile` to prevent drift (fails if the lockfile does not match the manifest).
-- Only run `apm install --update` when you intentionally want to update the lockfile.
+- **project スコープ**: `apm.lock.yaml` を **commit** する（チーム間で同じ skill version を解決するため）。`node_modules` の package-lock と同じ発想
+- **global スコープ**: `~/.apm/apm.lock.yaml` は chezmoi で同期すると新マシンで同じ version が入る
+- CI / 新マシンでは `apm install --frozen-lockfile` を使って drift を防ぐ（lockfile が manifest と一致しなければ fail）
+- lockfile を意図的に更新したいときだけ `apm install --update`
 
-### Coexisting with chezmoi
+### chezmoi との共存
 
-If you manage dotfiles with chezmoi, the boundary with APM is:
+chezmoi で dotfiles を管理している場合、APM との境界:
 
 | path | chezmoi | APM |
 |---|---|---|
-| `~/.apm/apm.yml` | managed (copied into source) | reads |
-| `~/.apm/apm.lock.yaml` | managed (for new-machine reproducibility) | generates |
-| `~/.apm/apm_modules/` | ignore (large cache) | manages |
-| `~/.claude/skills/<name>/` | ignore (APM-managed is outside chezmoi) | deploy target |
+| `~/.apm/apm.yml` | 管理（source にコピー） | 読む |
+| `~/.apm/apm.lock.yaml` | 管理（新マシン再現性のため） | 生成 |
+| `~/.apm/apm_modules/` | ignore（大きいキャッシュ） | 管理 |
+| `~/.claude/skills/<name>/` | ignore（APM-managed は chezmoi 対象外） | 展開先 |
 
-Add the following to chezmoi's `.chezmoiignore`:
+chezmoi 側の `.chezmoiignore` に次を追加:
 
 ```
 .apm/apm_modules
 .claude/skills/<apm-managed-name>
 ```
 
-Watch for name collisions with your own skills (those copied into the chezmoi source with `chezmoi add`). On collision APM overwrites at install time. See the `chezmoi-management` skill for details.
+自作 skill（`chezmoi add` で source にコピーしたもの）とは名前が衝突しないよう注意。衝突時は APM が install 時に上書きする。詳細は `chezmoi-management` skill を参照。
 
 ## Creating skills in a repository
 

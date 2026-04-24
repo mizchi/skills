@@ -1,16 +1,16 @@
 ---
 name: dotenvx
-description: dotenvx 環境変数管理ツールのリファレンス。暗号化、複数環境対応、GitHub Actions での使用例を提供。
+description: Reference for the dotenvx environment variable management tool. Covers encryption, multi-environment support, and GitHub Actions usage examples.
 ---
 
 # dotenvx Skill
 
-dotenvx は .env ファイルの読み込み・暗号化を行う環境変数管理ツール。言語・フレームワーク非依存。
+dotenvx is an environment variable management tool that loads and encrypts .env files. Language- and framework-agnostic.
 
-## インストール
+## Installation
 
 ```bash
-# curl（推奨）
+# curl (recommended)
 curl -sfS https://dotenvx.sh | sh
 
 # brew
@@ -20,117 +20,117 @@ brew install dotenvx/brew/dotenvx
 npm install @dotenvx/dotenvx --save
 ```
 
-## 基本コマンド
+## Basic Commands
 
 ```bash
-# 環境変数を読み込んでコマンド実行
+# Load environment variables and run a command
 dotenvx run -- node index.js
 
-# 特定の .env ファイルを指定
+# Specify a particular .env file
 dotenvx run -f .env.production -- npm start
 
-# 複数ファイル読み込み（後が優先）
+# Load multiple files (later ones take precedence)
 dotenvx run -f .env -f .env.local -- npm start
 
-# 環境変数を取得
+# Get an environment variable
 dotenvx get DATABASE_URL
 
-# 全環境変数を表示
+# Display all environment variables
 dotenvx get
 ```
 
-## 暗号化
+## Encryption
 
 ```bash
-# .env を暗号化（DOTENV_PUBLIC_KEY, DOTENV_PRIVATE_KEY 生成）
+# Encrypt .env (generates DOTENV_PUBLIC_KEY, DOTENV_PRIVATE_KEY)
 dotenvx encrypt
 
-# 特定ファイルを暗号化
+# Encrypt a specific file
 dotenvx encrypt -f .env.production
 
-# 復号化
+# Decrypt
 dotenvx decrypt
 
-# 暗号化されたファイルを実行（DOTENV_PRIVATE_KEY が必要）
+# Run an encrypted file (requires DOTENV_PRIVATE_KEY)
 dotenvx run -- node index.js
 ```
 
-### 暗号化の仕組み
+### How Encryption Works
 
-- `dotenvx encrypt` 実行で公開鍵/秘密鍵ペアを生成
-- `DOTENV_PUBLIC_KEY`: .env ファイル内に保存（暗号化用）
-- `DOTENV_PRIVATE_KEY`: ローカル環境または CI に設定（復号化用）
-- 環境別: `DOTENV_PRIVATE_KEY_PRODUCTION` で自動判定
+- Running `dotenvx encrypt` generates a public/private key pair
+- `DOTENV_PUBLIC_KEY`: stored inside the .env file (for encryption)
+- `DOTENV_PRIVATE_KEY`: set in the local environment or CI (for decryption)
+- Per-environment: auto-detected via `DOTENV_PRIVATE_KEY_PRODUCTION`
 
-## オプション
+## Options
 
-| オプション | 説明 |
+| Option | Description |
 |-----------|------|
-| `-f, --env-file` | .env ファイル指定 |
-| `--overload` | 後続ファイルで上書き |
-| `--quiet` | 出力抑制 |
-| `--verbose` | 詳細表示 |
-| `--debug` | デバッグ情報表示 |
+| `-f, --env-file` | Specify the .env file |
+| `--overload` | Overwrite with subsequent files |
+| `--quiet` | Suppress output |
+| `--verbose` | Verbose output |
+| `--debug` | Show debug information |
 
-## 複数環境の管理
+## Managing Multiple Environments
 
 ```
-.env                 # 共通設定
-.env.local           # ローカル上書き（gitignore）
-.env.production      # 本番環境
-.env.development     # 開発環境
+.env                 # Shared settings
+.env.local           # Local overrides (gitignore)
+.env.production      # Production
+.env.development     # Development
 ```
 
 ```bash
-# 本番環境で実行
+# Run in production
 dotenvx run -f .env.production -- npm start
 
-# 開発 + ローカル上書き
+# Development + local overrides
 dotenvx run -f .env.development -f .env.local -- npm run dev
 ```
 
-## Key ローテーション
+## Key Rotation
 
-private key が漏洩疑いになったとき、または定期的な rotation 時の手順。`dotenvx rotate` 専用コマンドは 2026/04 時点で存在しないため、decrypt → 新 key で encrypt を明示的に行う。
+Procedure for when a private key is suspected of being leaked, or for periodic rotation. As of 2026/04 there is no dedicated `dotenvx rotate` command, so explicitly do decrypt → encrypt with a new key.
 
-**順序が最重要**: CI secret を **先に** 新 key に更新してから、新暗号文を merge する。逆だと旧 key で新暗号文を復号しようとして prod が落ちる。
+**Order is critical**: update the CI secret to the new key **first**, then merge the new ciphertext. If reversed, prod will fail trying to decrypt the new ciphertext with the old key.
 
 ```bash
-# 1. 作業ブランチ + 旧 key 退避
+# 1. Working branch + stash old key
 git switch -c chore/rotate-prod-dotenv-key
 set +o history
 OLD_PRIV="$DOTENV_PRIVATE_KEY_PRODUCTION"
 
-# 2. 旧 key で復号（平文に戻す）
+# 2. Decrypt with the old key (back to plaintext)
 DOTENV_PRIVATE_KEY_PRODUCTION="$OLD_PRIV" dotenvx decrypt -f .env.production
 
-# 3. 既存 PUBLIC_KEY を削除してから再 encrypt（新 key ペアが生成される）
+# 3. Remove the existing PUBLIC_KEY, then re-encrypt (a new key pair is generated)
 sed -i.bak '/^DOTENV_PUBLIC_KEY_PRODUCTION=/d' .env.production
 dotenvx encrypt -f .env.production
 NEW_PRIV=$(dotenvx get DOTENV_PRIVATE_KEY_PRODUCTION -f .env.keys)
 
-# 4. CI secret を新 key に更新（merge より先）
+# 4. Update CI secret to the new key (before the merge)
 gh secret set DOTENV_PRIVATE_KEY_PRODUCTION --body "$NEW_PRIV" --env production
 
-# 5. 新暗号文を commit + merge + deploy
+# 5. Commit + merge + deploy the new ciphertext
 git add .env.production && git commit -m "chore: rotate production dotenv key"
 git push && gh pr create --fill && gh pr merge --squash --auto
 
-# 6. クリーンアップ
+# 6. Cleanup
 unset OLD_PRIV; set -o history
 rm .env.production.bak
 ```
 
-**漏洩時の追加対応**:
-- git 履歴に残る旧暗号文は過去の旧 key で復号可能なまま。key ローテだけでは不十分
-- 暗号化されていた値自体（DB password、API key 等）も **並行して再発行** 必須
-- 履歴からの完全除去が必要なら `git filter-repo` を使うが、force push 影響が大きいので慎重に
+**Additional steps on a leak**:
+- Old ciphertext remaining in git history can still be decrypted with the past old key. Key rotation alone is insufficient
+- The encrypted values themselves (DB passwords, API keys, etc.) **must also be reissued in parallel**
+- If full removal from history is required, use `git filter-repo`, but be careful due to the large impact of force push
 
-**ダウンタイム回避**: 一時的に `DOTENV_PRIVATE_KEY_PRODUCTION` と `DOTENV_PRIVATE_KEY_PRODUCTION_NEW` を並行保持し、デプロイ成功後に旧を削除する blue-green 運用も可。
+**Avoiding downtime**: a blue-green approach that temporarily keeps both `DOTENV_PRIVATE_KEY_PRODUCTION` and `DOTENV_PRIVATE_KEY_PRODUCTION_NEW` in parallel and removes the old one after a successful deploy is also viable.
 
 ## GitHub Actions
 
-curl でインストール。完全な例は `assets/gh_action_example.yaml` を参照。
+Install via curl. See `assets/gh_action_example.yaml` for a complete example.
 
 ```yaml
 steps:
@@ -145,7 +145,7 @@ steps:
     run: dotenvx run -- npm test
 ```
 
-## 参考
+## References
 
 - https://github.com/dotenvx/dotenvx
 - https://dotenvx.com/docs

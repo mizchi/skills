@@ -5,21 +5,21 @@ description: Best practices for building and reviewing Gleam projects on the Erl
 
 # Gleam Practice
 
-Gleam を新規作成するとき、既存プロジェクトを改善するとき、`wisp + mist + gleam_otp + just` 構成で実装するときに使う。
+Use this when creating a new Gleam project, improving an existing one, or implementing with a `wisp + mist + gleam_otp + just` stack.
 
 ## Default Workflow
 
-- まず `gleam new` と `gleam add` を使う。依存は手書きより solver に決めさせる。
-- TDD で進める。`探索 -> Red -> Green -> Refactor`。
-- 純粋ロジックと状態管理を分ける。domain module と actor/server module を分離する。
-- 公開 API は小さく保つ。`pub opaque type` を優先し、内部 constructor や protocol 型をむやみに公開しない。
-- `@external` は最後の手段。使う場合は薄い adapter module に閉じ込める。
-- web 層は薄くする。`wisp` handler は decode, call service, encode response に寄せる。
-- タスク実行は `justfile` に集約し、CI も `just ci` を叩く。
+- Start with `gleam new` and `gleam add`. Let the solver choose dependencies instead of hand-writing them.
+- Proceed TDD-style: `explore -> Red -> Green -> Refactor`.
+- Separate pure logic from state management. Split domain modules from actor/server modules.
+- Keep the public API small. Prefer `pub opaque type` and avoid casually exposing internal constructors or protocol types.
+- Treat `@external` as a last resort. When you do use it, contain it inside a thin adapter module.
+- Keep the web layer thin. `wisp` handlers should focus on decode, call service, encode response.
+- Centralize task execution in a `justfile`, and have CI invoke `just ci` too.
 
 ## Project Setup
 
-Erlang target の新規 project はこれを起点にする。
+Use this as the starting point for new Erlang-target projects.
 
 ```sh
 gleam new my_app --template erlang
@@ -29,7 +29,7 @@ gleam add gleam_json envoy
 gleam add --dev gleeunit
 ```
 
-必要に応じて追加する。
+Add the following as needed.
 
 - HTTP client: `gleam add gleam_http gleam_httpc`
 - file I/O: `gleam add simplifile filepath`
@@ -41,13 +41,13 @@ gleam add --dev gleeunit
 - logging config: `gleam add logging`
 - live reload DX: `gleam add --dev olive`
 
-外部 CLI:
+External CLI:
 
 - HTTP load test: `k6`
 
-`wisp` と `mist` は互換性のある組み合わせを使う。version を個別に固定するより、`gleam add wisp mist` を同じタイミングで解決させる方が安全。
+Use compatible combinations of `wisp` and `mist`. Rather than pinning versions individually, it is safer to run `gleam add wisp mist` together and let the solver resolve them at the same time.
 
-雛形:
+Templates:
 
 - `assets/README.md`
 - `assets/justfile`
@@ -60,7 +60,7 @@ gleam add --dev gleeunit
 
 ## gleam.toml Defaults
 
-最低限これを埋める。
+At minimum, fill these in.
 
 ```toml
 name = "my_app"
@@ -70,27 +70,27 @@ description = "Short package summary"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "owner", repo = "repo" }
 
-# Package 内だけで使う module は隠す
+# Hide modules that are only used inside the package
 internal_modules = [
   "my_app/internal",
   "my_app/http/internal",
 ]
 ```
 
-原則:
+Principles:
 
-- metadata を空のまま放置しない
-- package 内専用 module は `internal_modules` で隠す
-- broad な semver range は許容されるが、CI で必ず固定 lockfile を通す
+- Do not leave metadata empty.
+- Hide package-internal modules via `internal_modules`.
+- Broad semver ranges are acceptable, but always enforce a pinned lockfile in CI.
 
 ## Recommended Layout
 
-最初はこの分け方から始める。
+Start from this split.
 
 ```text
 src/
   my_app.gleam                # entrypoint
-  my_app/app.gleam            # DI と supervision 起動
+  my_app/app.gleam            # DI and supervision startup
   my_app/web.gleam            # router / request handling
   my_app/domain.gleam         # pure domain logic
   my_app/domain_server.gleam  # actor wrapper
@@ -105,23 +105,23 @@ bench/
 justfile
 ```
 
-分離の基準:
+Separation criteria:
 
-- `domain.gleam`: pure function のみ
+- `domain.gleam`: pure functions only
 - `*_server.gleam`: actor / supervision / timeout / mailbox
-- `web.gleam`: routing と HTTP mapping
-- `http_json.gleam`: JSON schema と codec
-- `app.gleam`: wiring のみ
+- `web.gleam`: routing and HTTP mapping
+- `http_json.gleam`: JSON schema and codec
+- `app.gleam`: wiring only
 
-1 file に router, JSON codec, business logic, actor state を混ぜない。
+Do not mix router, JSON codec, business logic, and actor state in one file.
 
-大きくなったらこう分ける。
+As it grows, split along these lines.
 
-- `web_*.gleam`: feature ごとの handler
-- `web_json_*.gleam`: domain ごとの encoder / decoder
+- `web_*.gleam`: handlers per feature
+- `web_json_*.gleam`: encoders / decoders per domain
 - `agent_*.gleam`: protocol, runner, tool, transport
 - `workspace_*.gleam`: overlay, patch, git, session, runtime
-- `*_test_support.gleam`: test helper を責務ごとに分離
+- `*_test_support.gleam`: split test helpers by responsibility
 
 ## Wisp + Mist Skeleton
 
@@ -182,18 +182,18 @@ pub fn app(app: App) -> fn(wisp.Request) -> wisp.Response {
 }
 ```
 
-web 層の原則:
+Web-layer principles:
 
-- `wisp.require_json` で payload を読む
-- decoder 失敗は `400`
-- domain error は `4xx/5xx` へ明示的に map する
-- handler は大きくなったら feature ごとに分割する
+- Read payloads with `wisp.require_json`.
+- Return `400` on decoder failure.
+- Map domain errors explicitly to `4xx/5xx`.
+- Split handlers by feature once they grow.
 
 ## OTP Pattern
 
-基本は `pure state` と `server` の 2 層。
+The basic shape is two layers: `pure state` and `server`.
 
-**重要**: `gleam_otp` は Erlang `gen_server` を静的型付けで包んだライブラリで、**API は gen_server と非互換**。`:gen_server.call` / `:gen_server.cast` を直接呼ばない。`Subject` と `actor.Message` の世界で完結させる。
+**Important**: `gleam_otp` is a statically-typed wrapper over Erlang's `gen_server`, and **its API is not compatible with `gen_server`**. Do not call `:gen_server.call` / `:gen_server.cast` directly. Keep everything inside the `Subject` and `actor.Message` world.
 
 ### pure state
 
@@ -212,7 +212,7 @@ pub fn incr(state: State, key: String) -> #(State, Bool) {
 }
 ```
 
-### actor wrapper（具体例）
+### actor wrapper (concrete example)
 
 ```gleam
 import gleam/erlang/process.{type Subject}
@@ -249,7 +249,7 @@ fn handle(state: State, msg: Message) -> actor.Next(State, Message) {
   }
 }
 
-// sync call pattern: 呼び出し側が reply subject を作って渡す
+// sync call pattern: the caller creates a reply subject and passes it in
 pub fn check(s: Server, key: String) -> Bool {
   let reply = process.new_subject()
   process.send(s.subject, Check(key, reply))
@@ -261,17 +261,17 @@ pub fn reset(s: Server, key: String) -> Nil {
 }
 ```
 
-### Supervision tree の 3 種
+### Three kinds of supervision trees
 
-`gleam_otp` は supervisor を用途別に 3 モジュールに分けている。
+`gleam_otp` splits supervisors across three modules by use case.
 
-| 種類 | モジュール | いつ使う |
+| Kind | Module | When to use |
 |---|---|---|
-| **static** | `gleam/otp/static_supervisor` | 起動時に子プロセスが確定（DB pool、設定済み actor）。再起動だけを扱う |
-| **factory** | `gleam/otp/supervisor_factory` | 同一 spec を動的に ID 付きで増やす（session per user 等）。`start_child(name, arg)` |
-| **dynamic** | `gleam/otp/supervisor_dynamic` | 任意の spec を動的に追加・削除（job worker pool 等）。`start_child(name, spec)` / `terminate_child` |
+| **static** | `gleam/otp/static_supervisor` | Child processes are fixed at startup (DB pool, pre-configured actors). Handles restarts only. |
+| **factory** | `gleam/otp/supervisor_factory` | Spawn the same spec dynamically with IDs (e.g. session-per-user). `start_child(name, arg)` |
+| **dynamic** | `gleam/otp/supervisor_dynamic` | Add/remove arbitrary specs dynamically (e.g. job worker pool). `start_child(name, spec)` / `terminate_child` |
 
-実際の API 名はバージョンで揺れる。`gleam_otp` 公式 hex docs で都度確認。以下は v0.16+ 前提の雛形:
+The exact API names vary by version. Check the official `gleam_otp` hex docs each time. The template below assumes v0.16+:
 
 ```gleam
 // src/my_app/app.gleam
@@ -281,7 +281,7 @@ import my_app/rate_limiter
 
 pub fn start() -> Result(Nil, actor.StartError) {
   sup.new(sup.OneForOne)
-  |> sup.restart_tolerance(intensity: 3, period: 60)  // 60s で 3 回までの再起動を許容
+  |> sup.restart_tolerance(intensity: 3, period: 60)  // allow up to 3 restarts in 60s
   |> sup.add(db_pool.supervised())                    // static child
   |> sup.add(rate_limiter.supervised(limit: 100))     // static child
   |> sup.start
@@ -289,25 +289,25 @@ pub fn start() -> Result(Nil, actor.StartError) {
 }
 ```
 
-restart strategy の選び方:
-- **`Permanent`**: 落ちたら必ず再起動（DB pool、認証サーバーなど基盤）
-- **`Transient`**: 正常終了は OK、異常終了のみ再起動（job worker）
-- **`Temporary`**: 再起動しない（一度だけの処理）
+How to pick a restart strategy:
+- **`Permanent`**: always restart on exit (infrastructure like DB pools or auth servers).
+- **`Transient`**: normal exits are fine, restart only on abnormal exits (job workers).
+- **`Temporary`**: never restart (one-shot work).
 
-`restart_intensity`（デフォルト 3）と `period`（デフォルト 5 秒）を超えた場合、supervisor 自身が落ちて上位に伝播する。
+When `restart_intensity` (default 3) over `period` (default 5 seconds) is exceeded, the supervisor itself crashes and propagates upward.
 
-### 指針
+### Guidelines
 
-- `Server` は opaque にする（外部から Subject を直接操作させない）
-- HTTP から state を直接触らない（actor 経由）
-- supervision tree は `app.gleam` に集める
-- restart strategy はまず `OneForOne`、最上位は `static_supervisor`
-- test しやすくするため named actor を使う
-- supervisor の種類を使い分ける: `static`（固定）、`factory`（同 spec 動的増）、`dynamic`（任意 spec 動的）
+- Keep `Server` opaque (do not let callers manipulate the Subject directly).
+- Do not touch state directly from HTTP (always go through the actor).
+- Collect the supervision tree inside `app.gleam`.
+- Start with `OneForOne` as the restart strategy, and use `static_supervisor` at the top level.
+- Use named actors to make testing easier.
+- Use the right supervisor kind for the job: `static` (fixed), `factory` (same spec, dynamic), `dynamic` (arbitrary spec, dynamic).
 
 ## JSON Codec (`gleam/dynamic/decode` + `gleam/json`)
 
-Gleam の JSON API はバージョンで変わりやすい（`gleam_json` v2+）。現行の idiomatic な書き方:
+Gleam's JSON API tends to shift between versions (`gleam_json` v2+). Current idiomatic usage:
 
 ### Decode
 
@@ -323,14 +323,14 @@ pub fn new_todo_decoder() -> decode.Decoder(NewTodo) {
   decode.success(NewTodo(title:, priority:))
 }
 
-// Wisp handler 内で
+// Inside a Wisp handler
 case decode.run(body, new_todo_decoder()) {
   Ok(nt) -> // ... use nt
   Error(errors) -> wisp.bad_request("invalid json: " <> string.inspect(errors))
 }
 ```
 
-`decode.field` は必須、`decode.optional_field(key, default, decoder)` はオプション。nested object は `decode.field("user", user_decoder())`。
+`decode.field` is required; `decode.optional_field(key, default, decoder)` is optional. For nested objects use `decode.field("user", user_decoder())`.
 
 ### Encode
 
@@ -343,17 +343,17 @@ pub fn encode_todo(t: Todo) -> json.Json {
   ])
 }
 
-// Wisp で返す
+// Return it from Wisp
 wisp.json_response(json.to_string_tree(encode_todo(t)), 201)
 ```
 
-リスト: `json.array(items, of: encode_todo)`。
+Lists: `json.array(items, of: encode_todo)`.
 
-**LSP Code Action**: `gleam-language-server` v1.2+ には「Generate JSON encoder/decoder」機能がある。`Todo` 型にカーソルを置いて Code Action を呼ぶと `encode_todo` / `todo_decoder` を自動生成。手書きより正確。
+**LSP Code Action**: `gleam-language-server` v1.2+ ships a "Generate JSON encoder/decoder" feature. Place the cursor on the `Todo` type and invoke the Code Action to auto-generate `encode_todo` / `todo_decoder`. More accurate than writing them by hand.
 
 ## justfile Template
 
-再利用するなら、まず `assets/justfile` を project root にコピーしてから微調整する。
+For reuse, first copy `assets/justfile` into the project root, then tweak.
 
 ```just
 set shell := ["bash", "-cu"]
@@ -400,13 +400,13 @@ bench *args:
   gleam run -m bench/main -- {{args}}
 ```
 
-方針:
+Policies:
 
-- shell は `bash`
-- CI の入口は `just ci`
-- `lint` 専用コマンドは作らず、`format-check + build --warnings-as-errors` で閉じる
+- Shell is `bash`.
+- The CI entrypoint is `just ci`.
+- Do not create a dedicated `lint` command; cover it with `format-check + build --warnings-as-errors`.
 
-必要ならこれも足す。
+Add these if needed.
 
 - `exports: gleam run -m cleam`
 - `snapshot-review: gleam run -m birdie`
@@ -416,18 +416,18 @@ bench *args:
 
 ## CI Workflow Template
 
-GitHub Actions を使うなら、まず `assets/github-actions/ci.yml` を `.github/workflows/ci.yml` にコピーしてから project 固有の step だけ足す。
+If you use GitHub Actions, first copy `assets/github-actions/ci.yml` to `.github/workflows/ci.yml` and only add project-specific steps on top.
 
-原則:
+Principles:
 
-- CI も local も `just ci` を唯一の入口にする
-- Erlang / Gleam version は workflow 側で固定する
-- `@external`, NIF, Wasm, Elixir 依存がある場合だけ追加 toolchain を足す
-- workflow で shell script を増やしすぎず、処理は `justfile` 側へ寄せる
+- Make `just ci` the single entrypoint for both CI and local.
+- Pin Erlang / Gleam versions on the workflow side.
+- Add extra toolchains only when you have `@external`, NIF, Wasm, or Elixir dependencies.
+- Do not pile shell scripts into the workflow; push logic down into the `justfile`.
 
 ## Testing
 
-まず pure function を固定し、そのあと actor、最後に HTTP を固定する。
+Lock down pure functions first, then actors, then finally HTTP.
 
 `test/my_app_test.gleam`
 
@@ -451,189 +451,189 @@ pub fn healthz_test() {
 }
 ```
 
-テスト方針:
+Testing policy:
 
-- pure module は state transition を直接 test
-- actor module は public API だけ test
-- HTTP test は `wisp/simulate` を優先
-- 外部 API は fake service を注入する
-- flaky な sleep ではなく poll/retry helper を使う
-- snapshot が効く出力には `birdie`
-- property-based test が効く pure logic には `qcheck`
-- ローカルの反復速度が欲しいときは `glacier`
+- Test state transitions of pure modules directly.
+- For actor modules, test only the public API.
+- Prefer `wisp/simulate` for HTTP tests.
+- Inject fake services for external APIs.
+- Use poll/retry helpers instead of flaky sleeps.
+- Use `birdie` for outputs where snapshots fit.
+- Use `qcheck` for pure logic where property-based tests fit.
+- Use `glacier` when you want faster local iteration.
 
-`birdie` の基本 workflow:
+Basic `birdie` workflow:
 
 1. `gleam test`
-2. failing / new snapshot を確認
+2. Check failing / new snapshots.
 3. `gleam run -m birdie`
-4. snapshot を review して commit
+4. Review snapshots and commit.
 
-`qcheck` の基本 workflow:
+Basic `qcheck` workflow:
 
-1. pure function の性質を 1 つ決める
-2. `qcheck.given(...)` で generator を流す
-3. 反例が出たら shrink 結果をもとに unit test へ落とし込む
-4. 長い test や並列実行が必要なら `qcheck_gleeunit_utils` を使う
+1. Pick one property of a pure function.
+2. Feed it generators through `qcheck.given(...)`.
+3. When a counterexample appears, use the shrunk result to write a unit test.
+4. For long-running tests or parallel execution, use `qcheck_gleeunit_utils`.
 
-`qcheck_gleeunit_utils` の注意:
+Notes on `qcheck_gleeunit_utils`:
 
-- Erlang target 専用
-- 全 test をまとめて並列化したいなら `run.run_gleeunit`
-- 長い test を 1 本だけ包みたいなら `test_spec.make`
-- custom timeout を付けたいなら `test_spec.make_with_timeout`
-- test group を明示したいなら `test_spec.run_in_parallel` / `run_in_order`
+- Erlang-target only.
+- To parallelize all tests together, use `run.run_gleeunit`.
+- To wrap only one long test, use `test_spec.make`.
+- To attach a custom timeout, use `test_spec.make_with_timeout`.
+- To make test groups explicit, use `test_spec.run_in_parallel` / `run_in_order`.
 
 ## Test Structure
 
-feature が増えたら test file を責務で割る。
+Once features grow, split test files by responsibility.
 
 - `domain_test.gleam`: pure domain logic
-- `runtime_test.gleam` / `app_test.gleam`: supervision と actor integration
+- `runtime_test.gleam` / `app_test.gleam`: supervision and actor integration
 - `web_app_test.gleam`: HTTP contract
 - `agent_test.gleam`: external API orchestration
-- `workspace_session_server_test.gleam`: server / state helper
-- `workspace_session_http_test.gleam`: session API の contract
+- `workspace_session_server_test.gleam`: server / state helpers
 - `workspace_bit_runtime_test.gleam`: FFI / git / wasm integration
+- `workspace_session_http_test.gleam`: session API contract
 
-support module も分ける。
+Split the support modules too.
 
-- `*_app_test_support.gleam`: app 起動、handler 作成、runtime helper
-- `*_workspace_test_support.gleam`: fixture directory、workspace helper
+- `*_app_test_support.gleam`: app startup, handler construction, runtime helpers
+- `*_workspace_test_support.gleam`: fixture directories, workspace helpers
 
-1つの巨大な test file に全部詰め込まない。refactor が進んだら test も一緒に分割する。
+Do not cram everything into a single giant test file. As refactoring proceeds, split the tests along with it.
 
 ## Lint and Quality
 
-Gleam には first-party の独立 lint tool より、formatter と compiler warning を厳格に使う方が合う。
+Gleam fits better with strict use of the formatter and compiler warnings than with a separate first-party lint tool.
 
-最低限:
+Minimum:
 
 - `gleam format --check .`
 - `gleam check`
 - `gleam build --warnings-as-errors`
 - `gleam test`
 
-補助:
+Supplementary:
 
-- deprecated API の追従: `gleam fix`
-- docs の確認: `gleam docs build`
-- unused export の検出: `gleam run -m cleam`
+- Track deprecated APIs: `gleam fix`
+- Check docs: `gleam docs build`
+- Detect unused exports: `gleam run -m cleam`
 
 ## Performance Measurement
 
-計測は 3 段でやる。
+Measure in three tiers.
 
-1. pure function の micro benchmark
-2. actor / workspace の integration benchmark
-3. HTTP endpoint の load test
+1. Micro benchmarks of pure functions.
+2. Integration benchmarks for actors / workspaces.
+3. Load tests against HTTP endpoints.
 
-原則:
+Principles:
 
-- benchmark 対象は pure function と I/O を分ける
-- warmup と measurement を分ける
-- debug log を切る
-- benchmark 前に `gleam clean` と依存 download を済ませる
-- micro benchmark の結果と HTTP 負荷試験の結果を同列に比較しない
-- FFI / Wasm / Port は cold start と hot path を分けて測る
+- Separate pure functions from I/O as benchmark targets.
+- Separate warmup from measurement.
+- Turn off debug logging.
+- Run `gleam clean` and pre-download dependencies before benchmarking.
+- Do not compare micro benchmark numbers against HTTP load-test numbers on equal footing.
+- For FFI / Wasm / Ports, measure cold start and hot path separately.
 
-手段:
+Tools:
 
-- micro benchmark: `bench/` module を作って `gleam run -m bench/main`
-- library を入れるなら `glychee` を使う
-- HTTP load test: `k6` か `wrk`
-- BEAM hotspot: `erl` / `gleam shell` から `:eprof`, `:fprof`, `:erlang.statistics(:reductions)` を使う
+- Micro benchmarks: create a `bench/` module and run it with `gleam run -m bench/main`.
+- If you want a library, use `glychee`.
+- HTTP load tests: `k6` or `wrk`.
+- BEAM hotspots: from `erl` / `gleam shell`, use `:eprof`, `:fprof`, `:erlang.statistics(:reductions)`.
 
-HTTP の最小測定例:
+Minimal HTTP measurement example:
 
 ```sh
 just run
 k6 run bench/http.js
 ```
 
-最初は `assets/bench/http.js` を `bench/http.js` にコピーして使う。
+Start by copying `assets/bench/http.js` to `bench/http.js`.
 
 ## FFI and Native Integration
 
-`@external` を使うときは次を守る。
+When you use `@external`, stick to these rules.
 
-- adapter module を 1 枚作る
-- `pub opaque type Handle` だけ公開する
-- Erlang/Elixir の型や pid を外に漏らしすぎない
-- path, ETS, NIF, Port, Wasm runtime の詳細は internal module に閉じ込める
-- live test と failure test を両方書く
+- Create a single adapter module.
+- Expose only `pub opaque type Handle`.
+- Do not leak too many Erlang/Elixir types or pids.
+- Keep the details of paths, ETS, NIF, Port, and Wasm runtimes inside internal modules.
+- Write both live tests and failure tests.
 
-`@external` 実装は compiler が検証しないので、Gleam 側の surface area を最小にする。
+The compiler does not validate `@external` implementations, so minimize the Gleam-side surface area.
 
 ## Additional Tools
 
-よく使う外部ツールの位置づけはこう考える。
+Think of frequently used external tools as follows.
 
-- `gleeunit`: 基本の unit test runner。まずこれ。
-- `birdie`: snapshot test。HTTP response や generated text の固定に向く。
-- `qcheck` + `qcheck_gleeunit_utils`: property-based test。pure domain logic に向く。
-- `glacier`: interactive / incremental test loop。`gleeunit` の drop-in replacement として使う。
-- `cleam`: 未使用 export の検出。公開 API の掃除に向く。
-- `glychee`: micro benchmark。pure function や small integration の比較に向く。
-- `k6`: HTTP / websocket 負荷試験。Gleam package ではなく外部 CLI。
-- `logging`: Erlang logger 設定。運用寄り project なら入れてよい。
-- `olive`: live reload 付き dev proxy。Wisp/Mist 開発体験を上げたいときだけ使う。
+- `gleeunit`: the default unit test runner. Start here.
+- `birdie`: snapshot tests. Good for pinning HTTP responses and generated text.
+- `qcheck` + `qcheck_gleeunit_utils`: property-based testing. Good for pure domain logic.
+- `glacier`: interactive / incremental test loop. Use as a drop-in replacement for `gleeunit`.
+- `cleam`: detect unused exports. Good for pruning the public API.
+- `glychee`: micro benchmarks. Good for comparing pure functions and small integrations.
+- `k6`: HTTP / WebSocket load testing. An external CLI, not a Gleam package.
+- `logging`: configuration for Erlang's logger. Reasonable to add for ops-heavy projects.
+- `olive`: dev proxy with live reload. Only bother when you want to improve the Wisp/Mist dev experience.
 
-使い分け:
+Selection:
 
-- default は `gleam format/check/build/test`
-- 追加で入れる第一候補は `birdie`, `qcheck`, `cleam`, `glychee`
-- `glacier` と `olive` は local DX を上げたいとき
-- `logging` は long-running service や production app 向け
+- Default: `gleam format/check/build/test`.
+- First additions worth considering: `birdie`, `qcheck`, `cleam`, `glychee`.
+- `glacier` and `olive`: when you want to improve local DX.
+- `logging`: for long-running services or production apps.
 
 ## Documentation
 
-README には少なくともこれを書く。
+The README should at least cover:
 
-- 何が実装済みで、何がまだ非対象か
-- 主要 module prefix と責務
-- 起動方法、`just ci`、主要 endpoint
-- test file の見方
+- What is implemented and what is explicitly out of scope.
+- The main module prefixes and their responsibilities.
+- How to start, `just ci`, and the main endpoints.
+- How to read the test files.
 
-中規模以上の project では `docs/` を置き、読む順番を案内する。
+For mid-sized or larger projects, add a `docs/` directory and guide readers through it.
 
-- `docs/reference-ja.md`: 日本語向けの実装ガイド
-- `docs/reference-en.md`: 英語向けの実装ガイド
+- `docs/reference-ja.md`: Japanese implementation guide.
+- `docs/reference-en.md`: English implementation guide.
 
-この project が「入門用」なのか「実践的な参照実装」なのかを README 冒頭で明示する。
+State clearly at the top of the README whether this project is "introductory" or a "practical reference implementation".
 
 ## Reference Project Positioning
 
-Gleam project を参照実装として見せるなら、位置づけを曖昧にしない。
+When presenting a Gleam project as a reference implementation, do not leave its positioning vague.
 
-- beginner sample: 小さい API と最小の OTP だけ
-- medium reference: `wisp + mist + gleam_otp + just + CI + docs`
-- advanced integration: FFI, Wasm, external LLM, workspace/session orchestration
+- beginner sample: a small API with minimal OTP.
+- medium reference: `wisp + mist + gleam_otp + just + CI + docs`.
+- advanced integration: FFI, Wasm, external LLM, workspace/session orchestration.
 
-高度な題材を入れる場合は、「これは一般的な Gleam の書き方」なのか「この project 固有の複雑さ」なのかを分けて説明する。
+When you include advanced material, explain separately whether each part is "standard Gleam style" or "complexity specific to this project".
 
 ## Closure Checklist
 
-一旦仕上げる区切りはこのあたり。
+Good checkpoints for calling a cut "done":
 
-- public / internal の境界が整理されている
-- `just ci` が green
-- test file が feature 単位に分かれている
-- support module が責務ごとに分かれている
-- README に実装状況と test 構成が書かれている
-- 必要なら `docs/` に参照ガイドがある
+- The public / internal boundary is organized.
+- `just ci` is green.
+- Test files are split per feature.
+- Support modules are split by responsibility.
+- The README covers implementation status and test layout.
+- If needed, `docs/` contains a reference guide.
 
 ## Review Checklist
 
-- 公開 constructor は本当に必要か
-- `pub type` を `pub opaque type` にできないか
-- `internal_modules` に隠すべき module はないか
-- web 層が decode/call/encode 以上のことをしていないか
-- pure logic と actor state が混ざっていないか
-- `just ci` が local と CI の共通入口になっているか
-- `gleam build --warnings-as-errors` を通しているか
-- absolute path や machine-local config を埋めていないか
-- external/FFI 境界が広すぎないか
+- Are the public constructors truly necessary?
+- Could `pub type` be made `pub opaque type`?
+- Are there modules that should be hidden in `internal_modules`?
+- Is the web layer doing more than decode/call/encode?
+- Is pure logic mixed with actor state?
+- Is `just ci` the shared entrypoint for local and CI?
+- Is `gleam build --warnings-as-errors` passing?
+- Are you baking in absolute paths or machine-local config?
+- Is the external/FFI boundary too wide?
 
 ## References
 

@@ -71,6 +71,10 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [mizchi-blog-style](mizchi-blog-style/) | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
 | [tech-article-reproducibility](tech-article-reproducibility/) | Simulate a first-time reader reproducing a technical article and list missing information. |
 
+## Language
+
+All `SKILL.md` files are written in English. Skills that were originally written in Japanese preserve the original as `SKILL-ja.md` alongside the English version. `mizchi-blog-style` is the single exception and stays Japanese-only because the skill itself is about Japanese blog writing style.
+
 ## Upstream skills (not in this repo)
 
 These are maintained in their own repositories and installed separately:
