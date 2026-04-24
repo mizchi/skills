@@ -33,6 +33,8 @@ When not to use:
 3. **Execution**: Hand the subagent a prompt that follows the **subagent invocation contract** described below, and have it execute the scenario. The executor produces an implementation or output and returns a self-report at the end.
 4. **Two-sided evaluation**: Record the following from the returned results.
    - **Executor self-report** (extracted from the body of the subagent's report): unclear points / discretionary fill-ins / places where template application got stuck
+   - **Trace interpretation**: each unclear point is tagged with the phase it originated in (Understanding / Planning / Execution / Formatting — see "Subagent invocation contract"). Phase-local fixes land better than global "the prompt was unclear" fixes; a single Understanding-phase ambiguity often looks like a chain of Execution-phase failures.
+   - **Structured reflection**: each unclear point must be returned as `Issue / Cause / General Fix Rule`. The `General Fix Rule` is the class-level abstraction that feeds the "Failure pattern ledger" — without it, fixes stay as one-off patches that rediscover the same mistake later.
    - **Instruction-side measurements** (the judgment rules are defined canonically in this section; refer to it from elsewhere):
      - Success/failure: counts as success (○) only when **all** requirements tagged `[critical]` are ○. If even one is × or partial, it is failure (×). The label is the binary ○ / × only.
      - Accuracy (achievement rate of the requirements checklist, %. ○ = full score, × = 0, partial = 0.5; sum and divide by total items)
@@ -43,6 +45,7 @@ When not to use:
    - The requirements checklist must include **at least one** `[critical]`-tagged item (if there are zero, the success judgment becomes vacuous). Do not add or remove [critical] tags after the fact.
 5. **Apply the diff**: Put the minimum fix into the prompt to eliminate the unclear points. One theme per iteration (multiple related fixes are OK, unrelated fixes go to next time).
    - **Before applying the fix, explicitly state "which item in the requirements checklist / judgment wording this fix satisfies"** (fixes inferred from axis names often do not land. See the "Fix propagation patterns" section below.)
+   - **Consult the failure pattern ledger first**. If the structured reflection's `General Fix Rule` already matches a known pattern, the first question is "why didn't the existing fix prevent it?" — the fix may need to move closer to the top of the prompt, or be re-worded, before a new ledger entry is added.
 6. **Re-evaluate**: Run 2 → 5 again with a new subagent (do not reuse the same agent: it has learned the previous improvements). Increase parallelism if iterating further does not plateau improvements.
 7. **Convergence check**: The rough rule is "stop when 2 consecutive iterations have zero new unclear points AND metric improvements fall below the thresholds (below)". Make it 3 consecutive for high-importance prompts.
 
@@ -107,7 +110,15 @@ You are an executor reading <target prompt name> with a blank slate.
 ## Report structure
 - Deliverable: <artifact or execution summary>
 - Requirement achievement: ○ / × / partial (with reason) for each item
-- Unclear points: places where you got stuck on the target prompt, wording you hesitated to interpret (bullets)
+- **Trace** (tag OK / stuck / skipped for each phase, one-line reason when not OK):
+  - Understanding (reading the instruction and building a mental model)
+  - Planning (deciding the approach / ordering)
+  - Execution (actually doing the work)
+  - Formatting (shaping the deliverable to the expected form)
+- **Unclear points (structured)**: for each issue, three lines:
+  - Issue: <what observably happened>
+  - Cause: <why, diagnosed at the instruction level>
+  - General Fix Rule: <a class-level rule, not a spot fix, that would prevent this class of mistake>
 - Discretionary fill-ins: places not fixed by the instruction and filled in by your own judgment (bullets)
 - Retries: number of times you redid the same decision and why
 ```
@@ -134,6 +145,40 @@ In environments where dispatching a new subagent is not possible (already runnin
 - **Divergence (suspect the design)**: if new unclear points do not decrease across 3+ iterations → the design direction of the prompt itself may be wrong. Stop fixing by patches and rewrite the structure
 - **Resource cutoff**: stop when importance and improvement cost no longer balance (the "ship at 80 points" call)
 
+## Failure pattern ledger
+
+Maintain a cumulative list of failure modes across iterations. Without it, each iteration re-discovers the same class of mistake, and accuracy improvements stall without the operator noticing that the same `General Fix Rule` keeps surfacing under different surface wording.
+
+Entry format:
+
+```
+- **Pattern name**: short descriptive handle (not "ambiguous X"; prefer "over-eager template application when skip clause is absent")
+  - Example: <representative Issue wording from some iter>
+  - General Fix Rule: <the class-level rule from that iter's structured reflection>
+  - Seen in: iter N, iter M, ...
+```
+
+Rules:
+- Before generating a fix in Workflow step 5, scan the ledger. If the current `General Fix Rule` matches an existing entry, update `Seen in` and investigate why the existing fix did not prevent recurrence (wording ambiguity? position too late in the prompt? missing example?) before creating a new entry.
+- A pattern that recurs 3+ times despite targeted fixes is a structural signal — escalate to the "Divergence" criterion above rather than continuing to patch.
+- The ledger is per-target-prompt, not global across all empirical-prompt-tuning runs.
+
+## Variant exploration (optional, plateau-breaking)
+
+When iterations approach a plateau but convergence criteria (2 consecutive clears) are not met, suspect local optimum and run a 2-variant round:
+
+- **Conservative variant**: current prompt + next-best minor fix
+- **Exploratory variant**: current prompt with one structural change — reorder sections, split a dense paragraph, drop a redundant section, or add a missing scaffolding (e.g., a worked example)
+
+Dispatch fresh subagents on the same scenarios in parallel (one message with multiple Agent tool calls). Keep the variant with higher accuracy; on tie, prefer fewer unclear points; on further tie, prefer lower `tool_uses`.
+
+Pairwise-comparison caveats:
+- Do **not** ask a subagent to rate "A vs B" directly. LLM position bias and self-preference bias make such judgments noisy at small n.
+- Compare on the objective axes only (accuracy, step count, unclear-points count, phase-weakness counts). Those are reproducible; "which prompt felt better" is not.
+- If qualitative comparison is genuinely needed, counterbalance: run both orderings (A,B) and (B,A) and accept a verdict only if both orderings agree.
+
+Cost: variant exploration doubles dispatch count per iteration. Use when plateau is suspected, not by default.
+
 ## Presentation format
 
 Record and present to the user with the following form at each iteration:
@@ -143,20 +188,27 @@ Record and present to the user with the following form at each iteration:
 
 ### Changes (diff from previous)
 - <one-line fix content>
+- Pattern applied: <pattern name from ledger, or "(new)">
 
 ### Execution results (per scenario)
-| Scenario | Success/Failure | Accuracy | steps | duration | retries |
-|---|---|---|---|---|---|
-| A | ○ | 90% | 4 | 20s | 0 |
-| B | × | 60% | 9 | 41s | 2 |
+| Scenario | Success/Failure | Accuracy | steps | duration | retries | Weak phase |
+|---|---|---|---|---|---|---|
+| A | ○ | 90% | 4 | 20s | 0 | — |
+| B | × | 60% | 9 | 41s | 2 | Execution |
 
-### Unclear points (newly surfaced this time)
-- <Scenario B>: [critical] item N is × — <one-line reason for drop>   # always add on failure
-- <Scenario B>: <other one-line finding>
+### Structured reflection (newly surfaced this time)
+- <Scenario B>: [critical] item N is × — <one-line reason for drop>
+  - Issue: <what observably happened>
+  - Cause: <why, at the instruction level>
+  - General Fix Rule: <class-level abstraction>
 - <Scenario A>: (nothing new)
 
 ### Discretionary fill-ins (newly surfaced this time)
 - <Scenario B>: <fill-in content>
+
+### Ledger updates
+- Added: <pattern name> (from Scenario B)
+- Re-seen: <pattern name> (originally iter K) — existing fix did not prevent recurrence because <reason>
 
 ### Next fix proposal
 - <one-line minimum fix>
