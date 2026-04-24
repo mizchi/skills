@@ -1,6 +1,6 @@
 ---
 name: retrospective-codify
-description: On task completion, pair up "what failed first" with "what finally worked" and codify the insight you should have known from the start into one of the following forms: an ast-grep rule, a skill, or a CLAUDE.md rule. Use when you reached the solution after trial and error, or when you do not want to let your future self (or another agent) fall into the same pitfall again. Trigger when the user says "codify today's lessons," "make it a skill," or "drop it into lint," or when you want to take stock of lessons at the end of a task.
+description: 'On task completion, pair up "what failed first" with "what finally worked" and codify the insight you should have known from the start into one of the following forms — an ast-grep rule, a skill, or a CLAUDE.md rule. Use when you reached the solution after trial and error, or when you do not want to let your future self (or another agent) fall into the same pitfall again. Trigger when the user says "codify today''s lessons," "make it a skill," or "drop it into lint," or when you want to take stock of lessons at the end of a task.'
 ---
 
 # Retrospective Codify
