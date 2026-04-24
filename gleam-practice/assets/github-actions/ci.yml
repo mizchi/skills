@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@v1
+        with:
+          gleam-version: "1.14.0"
+          otp-version: "28"
+          rebar3-version: "3.27.0"
+          # Elixir-backed deps を使う場合だけ有効化する
+          # elixir-version: "1.19.5"
+
+      - name: Setup just
+        uses: extractions/setup-just@v3
+
+      # Rust/NIF/Wasm を使う場合だけ追加する
+      # - name: Setup Rust
+      #   shell: bash
+      #   run: |
+      #     if ! command -v rustup >/dev/null 2>&1; then
+      #       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+      #       echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      #     fi
+      #     rustup toolchain install stable --profile minimal
+      #     rustup default stable
+
+      - name: Run CI
+        run: just ci

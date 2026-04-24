@@ -1,0 +1,7 @@
+# Secrets and per-machine overrides go here — never committed.
+private.nix
+*.secret.nix
+
+# home-manager build output
+result
+result-*

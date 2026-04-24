@@ -1,0 +1,19 @@
+# Project-local opam state (oxcaml-dev switch, ~1 GB after build)
+.opam/
+
+# dune build output
+_build/
+*.install
+
+# merlin (old-style)
+.merlin
+
+# direnv / nix-direnv cache
+.direnv/
+
+# editor swap files
+*.swp
+*~
+
+# oxcaml build artifacts if cloning the compiler locally
+oxcaml/

@@ -1,0 +1,6 @@
+{
+  "name": "justfile",
+  "version": "1.0.0",
+  "description": "Reference for just command runner. Provides justfile syntax and GitHub Actions examples.",
+  "skills": ["SKILL.md"]
+}

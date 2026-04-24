@@ -1,0 +1,19 @@
+import {
+  "moonbitlang/async",
+} for "test"
+
+options(
+  targets: {
+    "ffi.mbt": ["js"],
+    "async.mbt": ["js"],
+    "async_test.mbt": ["js"],
+    "modules.mbt": ["js"],
+    "modules_test.mbt": ["js"],
+  },
+  link: {
+    "js": {
+      "exports": ["add", "greet", "basename"],
+      "format": "esm",
+    },
+  },
+)

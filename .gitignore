@@ -1,0 +1,15 @@
+# APM dependencies
+apm_modules/
+.apm/
+
+# MoonBit build artifacts (inside asset project dirs)
+_build/
+target/
+.mooncakes/
+
+# Node / JS
+node_modules/
+
+# Editor / OS
+.DS_Store
+.vscode/

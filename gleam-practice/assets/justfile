@@ -1,0 +1,55 @@
+set shell := ["bash", "-cu"]
+
+default:
+  @just --list
+
+deps:
+  gleam deps download
+
+format:
+  gleam format
+
+format-check:
+  gleam format --check .
+
+typecheck:
+  gleam check
+
+build:
+  gleam build --warnings-as-errors
+
+test:
+  gleam test
+
+run:
+  gleam run
+
+docs:
+  gleam docs build
+
+check:
+  gleam format --check .
+  gleam check
+  gleam build --warnings-as-errors
+  gleam test
+
+ci: deps check
+
+clean:
+  gleam clean
+
+exports:
+  gleam run -m cleam
+
+snapshot-review:
+  gleam run -m birdie
+
+test-watch:
+  # glacier は gleeunit の置き換えとして導入してから使う
+  gleam test -- --glacier
+
+bench-http:
+  k6 run bench/http.js
+
+serve-dev:
+  gleam run -m olive

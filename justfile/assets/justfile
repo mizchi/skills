@@ -1,0 +1,23 @@
+# デフォルトは test
+default: test
+
+# テスト
+test *args:
+  npm test {{args}}
+
+# ビルド
+build:
+  npm run build
+
+# lint + format チェック
+check:
+  npm run lint
+  npm run format:check
+
+# 開発サーバー
+dev:
+  npm run dev
+
+# クリーンアップ
+clean:
+  rm -rf dist node_modules
