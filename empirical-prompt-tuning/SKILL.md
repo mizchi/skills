@@ -115,6 +115,7 @@ You are an executor reading <target prompt name> with a blank slate.
   - Planning (deciding the approach / ordering)
   - Execution (actually doing the work)
   - Formatting (shaping the deliverable to the expected form)
+  - *Collapsed form allowed*: when all four phases are OK, a single line `Trace: all OK` is sufficient. Emit phase-by-phase only when any phase is stuck or skipped. (This avoids happy-path boilerplate; the trace structure only earns its cost when something actually goes wrong.)
 - **Unclear points (structured)**: for each issue, three lines:
   - Issue: <what observably happened>
   - Cause: <why, diagnosed at the instruction level>
