@@ -13,3 +13,4 @@ node_modules/
 # Editor / OS
 .DS_Store
 .vscode/
+.claude/settings.local.json
