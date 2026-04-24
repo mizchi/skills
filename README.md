@@ -54,6 +54,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 
 | Skill | Description |
 | --- | --- |
+| [moonbit-practice](moonbit-practice/) | MoonBit code generation best practices — syntax, tests, benchmarks, FFI, Nix, mbtx. |
 | [moonbit-js-binding](moonbit-js-binding/) | Write MoonBit bindings to JavaScript with `extern "js"` (Promises, opaque types, esm/cjs/iife). |
 
 ### Languages
@@ -79,7 +80,6 @@ All `SKILL.md` files are written in English. Skills that were originally written
 
 These are maintained in their own repositories and installed separately:
 
-- [mizchi/moonbit-practice](https://github.com/mizchi/moonbit-practice) — `moonbit-practice`
 - [mizchi/flaker](https://github.com/mizchi/flaker) — `flaker-setup`
 - [mizchi/tui.mbt](https://github.com/mizchi/tui.mbt) — `tuimbt-practice`
 - [moonbitlang/moonbit-agent-guide](https://github.com/moonbitlang/moonbit-agent-guide) — `moonbit-agent-guide`, `moonbit-refactoring`, `moonbit-c-binding`

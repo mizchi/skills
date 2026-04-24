@@ -1,0 +1,32 @@
+# Github Actions CI Example
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [js, native]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install MoonBit CLI
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      # Required: without `moon update` the runner's registry index is
+      # empty, so `moon check` / `moon test` fail with
+      # "Failed to resolve registry dependency" on any external deps.
+      - name: Moon update
+        run: moon update
+      - name: Moon check
+        run: moon check --deny-warn --target ${{ matrix.target }}
+      - name: Moon test
+        run: moon test --target ${{ matrix.target }}

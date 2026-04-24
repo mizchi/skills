@@ -1,0 +1,54 @@
+# Publish an npm package whose build depends on MoonBit.
+#
+# Triggered by a GitHub Release (typically created via release-please or
+# a similar tool). Uses OIDC Trusted Publishing — register this repo at
+# https://www.npmjs.com/package/<pkg>/access so no NPM_TOKEN is needed.
+#
+# The `moon` CLI and `moon update` must both run before `pnpm build`
+# whenever the build script invokes moon (e.g. `pnpm build:parser` that
+# runs `moon -C tools/... build`). Skipping `moon update` causes
+# "Failed to resolve registry dependency" for any registry-hosted
+# MoonBit dependency.
+name: publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # Required for OIDC Trusted Publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      # Prefer the official installer over third-party actions like
+      # hustcer/setup-moonbit to keep the supply chain minimal.
+      - name: Install MoonBit CLI
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Moon update
+        run: moon update
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish to npm (OIDC Trusted Publishing)
+        run: npm publish --access public --provenance
