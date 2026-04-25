@@ -42,6 +42,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [justfile](justfile/) | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](nix-setup/) | Bootstrap Nix flakes for MoonBit / Rust / TypeScript / Python projects. |
 | [gh-fix-ci](gh-fix-ci/) | Debug and fix failing GitHub Actions PR checks via `gh`. |
+| [node-sqlite-vec](node-sqlite-vec/) | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
 
 ### Testing / Browser
 
