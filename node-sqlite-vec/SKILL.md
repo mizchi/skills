@@ -1,6 +1,6 @@
 ---
 name: node-sqlite-vec
-description: Set up Node.js 24+ built-in `node:sqlite` together with the loadable `sqlite-vec` extension for vector / RAG storage in a TypeScript project. Covers extension loading, the vec0 virtual table, the BigInt rowid trap, why vitest fails on `node:sqlite` (and how to use `node --test` instead), tsconfig flags for `.ts` imports, and a CLI shebang that suppresses the experimental warning. Use when adding embedding storage to a Node project without `better-sqlite3`.
+description: Set up Node 24+ built-in `node:sqlite` with the loadable `sqlite-vec` extension for vector / RAG storage in TypeScript, without `better-sqlite3`. Covers extension loading, vec0 BigInt rowids, vitest incompatibility (use `node --test`), tsconfig flags for `.ts` imports, and a CLI shebang.
 ---
 
 # node-sqlite-vec

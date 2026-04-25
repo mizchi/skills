@@ -1,6 +1,6 @@
 ---
 name: nix-setup
-description: Set up Nix flakes for development environments. Includes ready-to-use flake.nix templates for MoonBit, Rust, TypeScript (with pnpm), Python+uv, each preloaded with just / ast-grep / apm. Covers installation on sandboxed environments like Claude Code web, the buildNpmPackage idiom, direnv integration, and GitHub Actions. Use when starting a new project with Nix, adding a flake to an existing project, bootstrapping Nix in a container or CI image, or troubleshooting a broken Nix setup.
+description: Set up Nix flakes for dev environments. Templates for MoonBit, Rust, TypeScript+pnpm, Python+uv preloaded with just / ast-grep / apm. Covers buildNpmPackage, direnv, GitHub Actions, and bootstrapping in sandboxed envs (Claude Code web). Use when starting, adding, or troubleshooting a Nix setup.
 ---
 
 # Nix Setup Skill

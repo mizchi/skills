@@ -1,6 +1,6 @@
 ---
 name: chezmoi-management
-description: mizchi's personal chezmoi dotfiles operations notes. Covers source location, directory naming conventions, daily diff/apply flow, skill-addition procedure, the APM vs chezmoi boundary, pre-commit (prek + secretlint), and troubleshooting. Consult when touching ~/.claude/, ~/.config/, or ~/.zshrc, when initializing a new machine, or when adding a new skill.
+description: mizchi's chezmoi dotfiles operations: source location, diff/apply flow, skill addition, the APM vs chezmoi boundary, pre-commit (prek + secretlint). Consult when touching ~/.claude/, ~/.config/, or ~/.zshrc, or initializing a new machine.
 ---
 
 # chezmoi Management (mizchi personal)

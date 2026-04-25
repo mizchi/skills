@@ -1,6 +1,6 @@
 ---
 name: tech-article-reproducibility
-description: A skill for evaluating the reproducibility of technical articles (whether readers can reproduce them in their own environment). Dispatch a subagent to simulate "a first-time reader attempting to reproduce the work locally" and have it list the missing information. Use it as the final check on an article draft, or as pre-publication verification before collecting reader feedback.
+description: Evaluate the reproducibility of technical articles. Dispatch a subagent to simulate a first-time reader reproducing the work locally and list missing information. Use as the final check on a draft before publication.
 ---
 
 # Tech Article Reproducibility

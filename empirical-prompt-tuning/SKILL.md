@@ -1,6 +1,6 @@
 ---
 name: empirical-prompt-tuning
-description: A methodology for iteratively improving agent-facing text instructions (skills / slash commands / task prompts / CLAUDE.md sections / code-generation prompts) by having a bias-free executor actually run them and evaluating two-sidedly (executor self-report + instruction-side metrics). Keep iterating until improvements plateau. Use it right after creating or substantially revising a prompt or skill, or when you want to attribute an agent's unexpected behavior to ambiguity on the instruction side.
+description: Methodology for iteratively improving agent-facing instructions (skills / slash commands / CLAUDE.md / code-gen prompts) by having a bias-free executor run them and evaluating two-sidedly (executor self-report + instruction-side metrics) until improvements plateau. Use after creating or revising a prompt or skill.
 ---
 
 # Empirical Prompt Tuning

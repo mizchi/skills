@@ -1,6 +1,6 @@
 ---
 name: moonbit-js-binding
-description: Guide for writing MoonBit bindings to JavaScript using `extern "js"`. Use when adding FFI declarations against browser/Node/Deno APIs or npm packages, wrapping JS objects behind opaque types, bridging Promises with `async fn` and `Promise::wait()`, configuring `moon.pkg` exports for esm/cjs/iife output, or handling null/undefined at the JS boundary.
+description: Write MoonBit bindings to JavaScript with `extern "js"`. Use for FFI declarations against browser/Node/Deno APIs or npm packages, wrapping JS objects in opaque types, bridging Promises (`async fn` / `Promise::wait()`), `moon.pkg` exports (esm/cjs/iife), and null/undefined at the JS boundary.
 ---
 
 # MoonBit JS Binding Guide

@@ -1,6 +1,6 @@
 ---
 name: conventional-changelog
-description: Cross-cutting reference for Conventional Commits and automatic CHANGELOG generation. Covers commit format, Keep a Changelog format, semver tag practices, and a comparison of generation tools like release-please / changesets / git-cliff / towncrier. Use when setting up a release flow on a new repository, unifying commit conventions on an existing repo, picking a changelog tool suited to your language, or evaluating alternatives to release-please.
+description: Reference for Conventional Commits and automatic CHANGELOG generation. Compares release-please / changesets / git-cliff / towncrier and covers commit format, Keep a Changelog, and semver tag practices. Use when setting up or unifying a release flow.
 ---
 
 # Conventional Changelog

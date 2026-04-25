@@ -1,6 +1,6 @@
 ---
 name: ast-grep-practice
-description: Guide for operating ast-grep as a project lint tool. Covers sgconfig.yml configuration, fix/rewrite rules, constraints, transform, testing, CI integration, and how to choose between ast-grep and existing linters. Use when writing rules in ast-grep that general-purpose linters cannot express.
+description: Operate ast-grep as a project lint tool. Covers sgconfig.yml, fix/rewrite rules, constraints, transform, testing, and CI. Use when writing rules ast-grep can express but general-purpose linters cannot.
 ---
 
 # ast-grep Practice
