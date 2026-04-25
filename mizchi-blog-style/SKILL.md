@@ -1,6 +1,6 @@
 ---
 name: mizchi-blog-style
-description: mizchi 名義のブログ記事 (zenn / dev.to 等) を書くとき・レビューするときの文体ガイドと AI 臭判定基準。subagent dispatch で「mizchi が書いたように見えるか」「AI 臭くないか」の両軸で評価する手順を含む。記事ドラフト作成後、文体合わせの修正イテレーションで使用。
+description: Japanese-language style guide and AI-tone detection rubric for mizchi-authored blog posts (zenn / dev.to). Includes a subagent dispatch procedure that scores a draft on two axes — looks-like-mizchi vs sounds-AI-generated. Use after drafting an article during the style-matching revision loop.
 ---
 
 # mizchi Blog Style
