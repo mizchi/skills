@@ -43,6 +43,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [nix-setup](nix-setup/) | Bootstrap Nix flakes for MoonBit / Rust / TypeScript / Python projects. |
 | [gh-fix-ci](gh-fix-ci/) | Debug and fix failing GitHub Actions PR checks via `gh`. |
 | [node-sqlite-vec](node-sqlite-vec/) | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
+| [pi-coding-agent](pi-coding-agent/) | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |
 
 ### Testing / Browser
 
