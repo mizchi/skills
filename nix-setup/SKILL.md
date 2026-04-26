@@ -431,6 +431,43 @@ nix flake update              # all inputs
 nix flake update nixpkgs      # individual
 ```
 
+### `direnv-2.37.x` build hangs forever in the macOS Nix sandbox
+
+`./test/direnv-test.zsh` blocks indefinitely when direnv 2.37.x is built locally under the Determinate Nix sandbox on macOS. Symptom: `building '/nix/store/...-direnv-2.37.x.drv'...` sits with ~0 CPU for tens of minutes; a `zsh ./test/direnv-test.zsh` child stays at 0:00.01 forever.
+
+Fix: turn off `doCheck` for direnv globally via an overlay. Doing it on `programs.direnv.package` alone is **not** enough — `nix-direnv` carries the original `direnv` as a propagated dep, so the test phase still runs through that path.
+
+```nix
+# common.nix (home-manager) or any nixpkgs consumer
+nixpkgs.overlays = [
+  (_: prev: {
+    direnv = prev.direnv.overrideAttrs (_: { doCheck = false; });
+  })
+];
+```
+
+Drop the override once `cache.nixos.org` ships a prebuilt direnv 2.37.x for your platform.
+
+### direnv 2.37.x ignores `DIRENV_LOG_FORMAT` / `DIRENV_LOG_FILTER`
+
+Setting `export DIRENV_LOG_FORMAT=""` no longer silences direnv as of 2.37.x — the env-var path was reworked and direnv reads only `direnv.toml`. The noisy `direnv: loading … / using devbox / export +AR +AS +CC …` lines that fire on every shell start come through unaffected.
+
+Fix: write `~/.config/direnv/direnv.toml` instead. With home-manager:
+
+```nix
+programs.direnv.config.global.log_format = "";
+```
+
+Without home-manager:
+
+```toml
+# ~/.config/direnv/direnv.toml
+[global]
+log_format = ""
+```
+
+Errors and warnings still print; only the routine status lines are suppressed.
+
 ## References
 
 - [Nix manual (flakes)](https://nix.dev/concepts/flakes.html)

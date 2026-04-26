@@ -431,6 +431,43 @@ nix flake update              # 全 input
 nix flake update nixpkgs      # 個別
 ```
 
+### `direnv-2.37.x` のビルドが macOS の Nix sandbox で hang する
+
+`./test/direnv-test.zsh` が Determinate Nix sandbox 上で永久に block する。症状: `building '/nix/store/...-direnv-2.37.x.drv'...` が CPU ほぼ 0% で何十分も止まり、子プロセスとして `zsh ./test/direnv-test.zsh` が 0:00.01 のまま残る。
+
+回避: overlay で direnv の `doCheck` を **global に** 切る。`programs.direnv.package` だけ override しても、`nix-direnv` が propagated dep として original direnv を引いてしまい同じ test phase に入るので効かない。
+
+```nix
+# common.nix (home-manager) など
+nixpkgs.overlays = [
+  (_: prev: {
+    direnv = prev.direnv.overrideAttrs (_: { doCheck = false; });
+  })
+];
+```
+
+`cache.nixos.org` から該当プラットフォーム向け prebuilt が来るようになったら override は外せる。
+
+### direnv 2.37.x は `DIRENV_LOG_FORMAT` / `DIRENV_LOG_FILTER` を無視する
+
+2.37.x で env var 経由の log silencing は削除されている。`export DIRENV_LOG_FORMAT=""` を設定しても、シェル起動時の `direnv: loading … / using devbox / export +AR +AS +CC …` の行はそのまま出続ける。
+
+回避: `~/.config/direnv/direnv.toml` に書く。home-manager 経由なら:
+
+```nix
+programs.direnv.config.global.log_format = "";
+```
+
+home-manager を使わない場合:
+
+```toml
+# ~/.config/direnv/direnv.toml
+[global]
+log_format = ""
+```
+
+エラーや警告は引き続き表示される。抑制されるのは routine な status 行のみ。
+
 ## 参考リンク
 
 - [Nix manual (flakes)](https://nix.dev/concepts/flakes.html)
