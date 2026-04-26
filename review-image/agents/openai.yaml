@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Image"
+  short_description: "Review screenshots and images with OpenRouter vision models"
+  default_prompt: "Use $review-image to check whether this screenshot or generated image looks broken, invalid, or suspicious."
