@@ -40,6 +40,7 @@ moon ide outline src/parser.mbt
 - Use `moon doc '<Type>'` to explore APIs before implementing
 - Check reference/configuration.md before editing moon.pkg.json / moon.mod.json
 - Check reference/language.md for detailed language feature examples (types, traits, pattern matching, etc.)
+- Check reference/mbtx.md for single-file `.mbtx` scripts (`moon run script.mbtx`, stdin via `moon run -`, inline `import { }` block; nightly only)
 
 ## Common Pitfalls
 

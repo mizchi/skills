@@ -5,7 +5,7 @@ title: ".mbtx Single-File Script Mode (Nightly Only)"
 # .mbtx Single-File Script Mode
 
 > **Nightly only**: Requires `moon` nightly (`>= 0.1.20260214`).
-> Not available in stable releases as of 2026-02-18.
+> Verified with `moon 0.1.20260409` (2026-04-26).
 > Install: `curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s nightly`
 > Or upgrade: `moon upgrade --dev`
 
@@ -20,7 +20,20 @@ Implementation: `crates/moonbuild-rupes-recta/src/mbtx.rs`
 moon run script.mbtx
 moon run script.mbtx --target js
 moon run script.mbtx --target native -- arg1 arg2
+
+# Read .mbtx source from stdin
+moon run - < script.mbtx
+moon run - <<'EOF'
+fn main { println("hi") }
+EOF
+
+# CLI args propagate to @env.args() (positional args after the file)
+moon run script.mbtx foo bar             # OK when no other flags follow
+moon run script.mbtx --target native -- foo bar   # use `--` to disambiguate
 ```
+
+Note: default backend is `wasm-gc`, which does not support `async fn main` or
+`@stdio.stdin`. Use `--target native` for those.
 
 ## Import Block Syntax
 
@@ -49,13 +62,15 @@ fn main {
 | Rule | Example | Result |
 |------|---------|--------|
 | Core: no version | `"moonbitlang/core/json"` | OK, alias `@json` |
-| Core: version specified | `"moonbitlang/core@0.1.0/json"` | Error |
-| External: version required | `"moonbitlang/x@0.4.40/fs"` | OK |
-| External: no version | `"moonbitlang/x/fs"` | Error |
+| Core: version specified | `"moonbitlang/core@0.1.0/json"` | Error (`moonbitlang/core imports must not specify a version`) |
+| External: version pinned | `"moonbitlang/x@0.4.43/codec/base64"` | OK |
+| External: no version | `"moonbitlang/x/codec/base64"` | OK — resolved from local registry index (run `moon update` if missing) |
 | Same module, multiple versions | `x@0.4.38` + `x@0.4.40` | Error |
-| Custom alias | `"moonbitlang/x@0.4.40/fs" @xfs` | OK, use as `@xfs` |
-| No alias | `"moonbitlang/x@0.4.40/stack"` | Auto alias `@stack` |
-| `test-import` / `wbtest-import` | — | Not supported |
+| Custom alias | `"moonbitlang/x@0.4.43/codec/base64" @b64` | OK, use as `@b64` |
+| No alias | `"moonbitlang/x/codec/base64"` | Auto alias `@base64` |
+| Object-form entry | `{ "path": "...", "alias": "..." }` | Error — only string entries |
+| `for "test"` / `for "wbtest"` | — | Error (`test-import and wbtest-import are not supported in .mbtx import prelude`) |
+| `options(...)` block | — | Parse error |
 
 ### Import Block vs No Import Block
 
@@ -144,6 +159,42 @@ Wasm output only exports `_start`. There is no way to configure `exports` in `.m
 
 Tests in `.mbtx` are not discovered. `fn main` and `test` blocks conflict (`fn main` makes it a main package; tests need non-main).
 
+## Troubleshooting
+
+### `Front matter import '...' could not be resolved. Make sure its module is listed in moonbit.deps.`
+
+Misleading message. There is **no** `moonbit.deps` key inside `.mbtx` — that key
+belongs to the YAML frontmatter of `.mbt.md` files, not `.mbtx`. In a `.mbtx`
+file the only frontmatter is the `import { ... }` block itself.
+
+The real cause is almost always that **the package path does not exist in the
+target module**. The resolver cannot tell which segments are the module name and
+which are the sub-package, so it complains about an unknown module.
+
+Diagnosis steps:
+
+1. Inspect the actual layout of the module zip:
+   ```bash
+   unzip -l ~/.moon/registry/cache/<owner>/<module>/<version>.zip | grep moon.pkg
+   ```
+2. Confirm the sub-package path matches a directory containing `moon.pkg`.
+3. Re-run with the corrected path. Pin `@version` if you want determinism.
+
+Example: writing `"moonbitlang/x/encoding/base64"` fails because base64 actually
+lives at `codec/base64`. The correct import is `"moonbitlang/x/codec/base64"`.
+
+### `Package "<alias>" not found in the loaded packages.`
+
+The import block resolved successfully but the code uses an unknown alias.
+Either fix the alias or add the missing import. Auto alias is the **last path
+segment**, so `"moonbitlang/x/codec/base64"` becomes `@base64`, not `@codec`.
+
+### `failed to read .mbtx file` when piping from stdin
+
+`moon run -` only accepts `.mbtx` source on stdin (per the help text). Anything
+else — including a path passed instead of `-` — must end in `.mbt` or `.mbt.md`
+or `.mbtx`.
+
 ## Internal: How Preprocessing Works
 
 1. Regex extracts the first `import { ... }` block from file start
@@ -159,6 +210,12 @@ Tests in `.mbtx` are not discovered. `fn main` and `test` blocks conflict (`fn m
 # Run simple script
 moon run hello.mbtx
 
+# Run from stdin
+moon run - < hello.mbtx
+moon run - <<'EOF'
+fn main { println("hi") }
+EOF
+
 # Run with external deps, JS target
 moon run server.mbtx --target js
 
@@ -166,7 +223,7 @@ moon run server.mbtx --target js
 moon run app.mbtx --target js --release --build-only
 node _build/js/release/build/single/single.js
 
-# Native with CLI args
+# Native with CLI args (use `--` to separate program args from moon flags)
 moon run cli.mbtx --target native -- --port 8080
 
 # Suppress warnings
