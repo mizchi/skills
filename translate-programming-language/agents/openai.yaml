@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate Programming Language"
+  short_description: "Port services across languages with parity"
+  default_prompt: "Use $translate-programming-language to plan a language-to-language server migration with oracle-driven parity tests."
