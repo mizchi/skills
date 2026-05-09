@@ -69,6 +69,13 @@ optionally `config.workers: <N>` (default 2) in the eval file. claude
 processes run concurrently — adjust `workers` to match cost / rate-limit
 budget.
 
+To average over LLM non-determinism, set `config.trials_per_task: <N>`
+(default 1). Each task is invoked N times; the per-task pass rate is the
+mean across trials, and the iterate ledger collects unclear points from
+**all** trials — so the same `General Fix Rule` must surface in multiple
+runs to count as a stable signal. N=2 is the recommended baseline; higher
+N raises cost linearly.
+
 Project layout (a working example lives in
 [`mizchi/skills:evals/skill-selector/`](https://github.com/mizchi/skills/tree/main/evals/skill-selector)):
 

@@ -44,7 +44,7 @@ interface EvalConfig {
   skill: string;
   version?: string;
   config?: {
-    trials_per_task?: number;
+    trials_per_task?: number;  // default 1; N>1 mitigates LLM non-determinism
     timeout_seconds?: number;
     model?: string;
     parallel?: boolean;
@@ -93,12 +93,21 @@ interface SelfReport {
   raw: string;
 }
 
-interface TaskResult {
-  taskId: string;
-  taskName: string;
+interface TaskTrial {
+  trial: number;
   output: string;
   selfReport: SelfReport | null;
   graders: GraderResult[];
+  passRate: number;
+  durationMs: number;
+}
+
+interface TaskResult {
+  taskId: string;
+  taskName: string;
+  trials: TaskTrial[];
+  // Aggregates across trials. With trials_per_task=1 these mirror the
+  // single trial; with N>1 they are means/totals.
   passRate: number;
   durationMs: number;
 }
@@ -441,17 +450,18 @@ async function gradeLlm(
 
 // ---- Run a task ----------------------------------------------------------
 
-async function runTask(
+async function runOneTrial(
+  trialNum: number,
   repoRoot: string,
   evalCfg: EvalConfig,
   task: Task,
-): Promise<TaskResult> {
+  skillBody: string,
+  model: string,
+  timeout: number,
+  requireSelfReport: boolean,
+  totalTrials: number,
+): Promise<TaskTrial> {
   const start = performance.now();
-  const skillBody = await loadSkillBody(repoRoot, evalCfg.skill);
-  const model = evalCfg.config?.model ?? "claude-sonnet-4-6";
-  const timeout = evalCfg.config?.timeout_seconds ?? 300;
-  const requireSelfReport = task.expected?.require_self_report !== false;
-
   const prompt = [
     `以下の skill 本文を blank-slate executor として読み、続く scenario を実行して deliverable を返せ。`,
     ``,
@@ -472,7 +482,10 @@ async function runTask(
     requireSelfReport ? SELF_REPORT_REQUEST : "",
   ].join("\n");
 
-  console.log(`  [${task.id}] executing claude (model=${model}, timeout=${timeout}s)...`);
+  const trialLabel = totalTrials > 1 ? ` trial ${trialNum}/${totalTrials}` : "";
+  console.log(
+    `  [${task.id}]${trialLabel} executing claude (model=${model}, timeout=${timeout}s)...`,
+  );
   let output = "";
   try {
     output = await executeClaude(prompt, model, timeout);
@@ -482,7 +495,6 @@ async function runTask(
 
   const selfReport = requireSelfReport ? extractSelfReport(output) : null;
 
-  // Run all graders. LLM graders are async; others are sync.
   const allGraders: Grader[] = [...(evalCfg.graders ?? []), ...(task.graders ?? [])];
   const graderResults: GraderResult[] = [];
   graderResults.push(gradeOutputContains(task.expected?.output_contains, output));
@@ -506,13 +518,51 @@ async function runTask(
   const passRate = graderResults.length === 0 ? 1 : passes / graderResults.length;
 
   return {
-    taskId: task.id,
-    taskName: task.name,
+    trial: trialNum,
     output,
     selfReport,
     graders: graderResults,
     passRate,
     durationMs: Math.round(performance.now() - start),
+  };
+}
+
+async function runTask(
+  repoRoot: string,
+  evalCfg: EvalConfig,
+  task: Task,
+): Promise<TaskResult> {
+  const skillBody = await loadSkillBody(repoRoot, evalCfg.skill);
+  const model = evalCfg.config?.model ?? "claude-sonnet-4-6";
+  const timeout = evalCfg.config?.timeout_seconds ?? 300;
+  const requireSelfReport = task.expected?.require_self_report !== false;
+  const trialsPerTask = Math.max(1, evalCfg.config?.trials_per_task ?? 1);
+
+  const trials: TaskTrial[] = [];
+  for (let t = 1; t <= trialsPerTask; t++) {
+    const trial = await runOneTrial(
+      t,
+      repoRoot,
+      evalCfg,
+      task,
+      skillBody,
+      model,
+      timeout,
+      requireSelfReport,
+      trialsPerTask,
+    );
+    trials.push(trial);
+  }
+
+  const passRate = trials.reduce((a, t) => a + t.passRate, 0) / trials.length;
+  const durationMs = trials.reduce((a, t) => a + t.durationMs, 0);
+
+  return {
+    taskId: task.id,
+    taskName: task.name,
+    trials,
+    passRate,
+    durationMs,
   };
 }
 
@@ -536,19 +586,40 @@ async function loadTasks(
 
 function printTaskResult(idx: number, total: number, r: TaskResult) {
   console.log(`[${idx}/${total}] ${r.taskName}`);
-  for (const g of r.graders) {
-    const mark = g.pass ? "✓" : "✗";
-    console.log(`    ${mark} ${g.name} score=${g.score.toFixed(2)} ${g.message ?? ""}`);
+  const multi = r.trials.length > 1;
+  for (const trial of r.trials) {
+    if (multi) console.log(`  -- trial ${trial.trial}/${r.trials.length} --`);
+    for (const g of trial.graders) {
+      const mark = g.pass ? "✓" : "✗";
+      console.log(`    ${mark} ${g.name} score=${g.score.toFixed(2)} ${g.message ?? ""}`);
+    }
+    if (trial.selfReport) {
+      const stuck = trial.selfReport.phaseTrace.filter((p) => p.status !== "OK");
+      console.log(
+        `    self-report: phases=${
+          stuck.length === 0 ? "all OK" : stuck.map((p) => p.phase).join("/") + " stuck"
+        }, unclear=${trial.selfReport.unclearPoints.length}, retries=${trial.selfReport.retries}`,
+      );
+    } else {
+      console.log(`    self-report: (not extracted)`);
+    }
+    if (multi) {
+      console.log(
+        `    trial pass_rate=${(trial.passRate * 100).toFixed(0)}% (${trial.durationMs}ms)`,
+      );
+    }
   }
-  if (r.selfReport) {
-    const stuck = r.selfReport.phaseTrace.filter((p) => p.status !== "OK");
+  if (multi) {
+    const totalUnclear = r.trials.reduce(
+      (a, t) => a + (t.selfReport?.unclearPoints.length ?? 0),
+      0,
+    );
     console.log(
-      `    self-report: phases=${stuck.length === 0 ? "all OK" : stuck.map((p) => p.phase).join("/") + " stuck"}, unclear=${r.selfReport.unclearPoints.length}, retries=${r.selfReport.retries}`,
+      `  AGGREGATE: mean_pass_rate=${(r.passRate * 100).toFixed(0)}% across ${r.trials.length} trials, total_unclear=${totalUnclear}, total_dur=${r.durationMs}ms`,
     );
   } else {
-    console.log(`    self-report: (not extracted)`);
+    console.log(`  pass_rate=${(r.passRate * 100).toFixed(0)}% (${r.durationMs}ms)`);
   }
-  console.log(`  pass_rate=${(r.passRate * 100).toFixed(0)}% (${r.durationMs}ms)`);
   console.log("");
 }
 
@@ -563,17 +634,26 @@ async function persistJsonl(
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const suffix = iterTag ? `-${iterTag}` : "";
   const outFile = join(resultsDir, `${evalName}${suffix}-${stamp}.jsonl`);
-  const lines = results.map((r) =>
-    JSON.stringify({
-      eval: evalName,
-      task_id: r.taskId,
-      task_name: r.taskName,
-      pass_rate: r.passRate,
-      duration_ms: r.durationMs,
-      graders: r.graders,
-      self_report: r.selfReport,
-      output: r.output,
-    })
+  // One JSONL line per trial (so multi-trial runs can be analyzed
+  // trial-by-trial). The aggregate is duplicated on each row for grep-
+  // ability; readers that want unique aggregates can dedupe by task_id.
+  const lines = results.flatMap((r) =>
+    r.trials.map((t) =>
+      JSON.stringify({
+        eval: evalName,
+        task_id: r.taskId,
+        task_name: r.taskName,
+        trial: t.trial,
+        of_trials: r.trials.length,
+        trial_pass_rate: t.passRate,
+        trial_duration_ms: t.durationMs,
+        task_mean_pass_rate: r.passRate,
+        task_total_duration_ms: r.durationMs,
+        graders: t.graders,
+        self_report: t.selfReport,
+        output: t.output,
+      })
+    )
   );
   await Deno.writeTextFile(outFile, lines.join("\n") + "\n");
   return outFile;
@@ -749,7 +829,9 @@ async function runIterate(args: string[]) {
     console.log(`\n========== Iteration ${iter} ==========\n`);
     const { results } = await runEval(evalPath, { taskFilter, iterTag: `iter-${iter}` });
 
-    const allUnclear = results.flatMap((r) => r.selfReport?.unclearPoints ?? []);
+    const allUnclear = results.flatMap((r) =>
+      r.trials.flatMap((t) => t.selfReport?.unclearPoints ?? [])
+    );
     const { newRules, reseenRules } = classifyUnclear(ledger, iter, allUnclear);
     const overallPass = results.reduce((a, r) => a + r.passRate, 0) / results.length;
 
@@ -807,10 +889,14 @@ function summarizeResults(results: TaskResult[]): {
   unclear: number;
   meanDur: number;
 } {
+  // pass = number of tasks with mean pass_rate == 1 (every trial fully passed)
   const pass = results.filter((r) => r.passRate === 1).length;
   const total = results.length;
   const acc = total === 0 ? 0 : results.reduce((a, r) => a + r.passRate, 0) / total;
-  const unclear = results.reduce((a, r) => a + (r.selfReport?.unclearPoints.length ?? 0), 0);
+  const unclear = results.reduce(
+    (a, r) => a + r.trials.reduce((b, t) => b + (t.selfReport?.unclearPoints.length ?? 0), 0),
+    0,
+  );
   const meanDur = total === 0 ? 0 : results.reduce((a, r) => a + r.durationMs, 0) / total;
   return { pass, total, acc, unclear, meanDur };
 }

@@ -14,7 +14,11 @@ skill: skill-selector
 version: "1.0"
 
 config:
-  trials_per_task: 1
+  # 2 trials per task averages over LLM non-determinism. Per-task pass
+  # rate is the mean across trials; ledger collects unclear points from
+  # ALL trials (so the same Rule must surface in both runs to count
+  # as a stable signal).
+  trials_per_task: 2
   timeout_seconds: 300
   parallel: false
   # mock = quick smoke; switch to copilot-sdk (or Claude Code subagent
