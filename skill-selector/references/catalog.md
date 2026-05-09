@@ -24,6 +24,7 @@ The "Install" column may also be:
 | node-sqlite-vec | `mizchi/skills/node-sqlite-vec` | Project uses Node 24+ `node:sqlite` with `sqlite-vec` extension for vectors / RAG |
 | pi-coding-agent | `mizchi/skills/pi-coding-agent` | Embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts |
 | dotenvx | `mizchi/skills/dotenvx` | Repo uses or considers `dotenvx` for env-var encryption / multi-env |
+| esbuild-otel-instrumentation | `mizchi/skills/esbuild-otel-instrumentation` | esbuild ESM bundle silently drops `@opentelemetry/instrumentation-*` auto-instrumentation; no spans sent |
 
 ### MoonBit
 **Signals**: `moon.mod.json`, `moon.pkg.json`, `_build/`, `.mooncakes/`
@@ -73,11 +74,13 @@ The "Install" column may also be:
 | gh-fix-ci | `mizchi/skills/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
 
 ### Cloud deployment
-**Signals**: `wrangler.toml`, Cloudflare-related configs
+**Signals**: `wrangler.toml`, Cloudflare-related configs, ECS task / Fargate, AWS account access
 
 | Skill | Install | Use when |
 |---|---|---|
 | cloudflare-deploy | `mizchi/skills/cloudflare-deploy` | Deploying to Cloudflare Workers / Pages |
+| aws-ecs-service-connect-ipv6 | `mizchi/skills/aws-ecs-service-connect-ipv6` | ECS Service Connect alias resolves to IPv6 in IPv4-only Fargate task; `network is unreachable` |
+| aws-vault-mfa-iam | `mizchi/skills/aws-vault-mfa-iam` | aws-vault session blocked by IAM MFA-required policy; `iam:*` rejected with `InvalidClientTokenId` |
 
 ### Release / changelog
 **Signals**: `CHANGELOG.md`, release-please config, `.changeset/`, version-tag-driven release
@@ -107,6 +110,7 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | flaker-setup | `mizchi/flaker/skills/flaker-setup` | Introducing `@mizchi/flaker` to a repo for flaky-test detection / GitHub Actions integration |
+| flaker-storage-cache-on-ci | `mizchi/skills/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
 
 ---
 
@@ -119,6 +123,7 @@ The "Install" column may also be:
 | apm-usage | `mizchi/skills/apm-usage` | Adding / removing / updating skills via APM (always pair with `skill-selector`) |
 | empirical-prompt-tuning | `mizchi/skills/empirical-prompt-tuning` | Iteratively improving an agent-facing instruction via subagent execution |
 | retrospective-codify | `mizchi/skills/retrospective-codify` | Converting trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules |
+| extract-glossary | `mizchi/skills/extract-glossary` | Extracting domain-specific terms / repo implementation maps / onboarding Mermaid diagrams from one or more repos / GitHub orgs |
 
 ### Personal / dotfiles
 

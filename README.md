@@ -44,6 +44,10 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [gh-fix-ci](gh-fix-ci/) | Debug and fix failing GitHub Actions PR checks via `gh`. |
 | [node-sqlite-vec](node-sqlite-vec/) | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
 | [pi-coding-agent](pi-coding-agent/) | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |
+| [aws-ecs-service-connect-ipv6](aws-ecs-service-connect-ipv6/) | Diagnose and work around ECS Service Connect DNS aliases returning IPv6 addresses to IPv4-only Fargate tasks. |
+| [aws-vault-mfa-iam](aws-vault-mfa-iam/) | Configure aws-vault for IAM APIs blocked by MFA-required policies; FIDO2 passkey + virtual TOTP setup. |
+| [esbuild-otel-instrumentation](esbuild-otel-instrumentation/) | Workaround for `@opentelemetry/instrumentation-*` silently failing under esbuild ESM bundles (no traces sent). |
+| [flaker-storage-cache-on-ci](flaker-storage-cache-on-ci/) | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key, plus `--changed` derivation and ingest-source patterns. |
 
 ### Testing / Browser
 
@@ -73,6 +77,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [retrospective-codify](retrospective-codify/) | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
 | [skill-selector](skill-selector/) | Decide which skills to add to a project — Phase 1 picks from a curated catalog, Phase 2 searches and evaluates outside-catalog candidates. |
+| [extract-glossary](extract-glossary/) | Extract domain-specific terms, repository implementation maps, and onboarding Mermaid diagrams from one or more repos / GitHub orgs. |
 | [mizchi-blog-style](mizchi-blog-style/) | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
 | [tech-article-reproducibility](tech-article-reproducibility/) | Simulate a first-time reader reproducing a technical article and list missing information. |
 
