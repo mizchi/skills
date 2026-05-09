@@ -55,14 +55,9 @@ graders:
         - "'moonbit-c-binding' in output"
         - "'flaker-setup' in output"
 
-  - name: gh_fix_ci_rejected
-    type: code
-    config:
-      # gh-fix-ci should be explicitly rejected (not silently included).
-      # The output should mention either rejection wording or omit it
-      # entirely while explicitly noting Buildkite is out of scope.
-      assertions:
-        - "'gh-fix-ci' not in output or 'reject' in output.lower() or 'not install' in output.lower() or 'out of scope' in output.lower()"
+  # gh-fix-ci の判定 (Buildkite なので install しない) は LLM judge
+  # `edge_handling_semantic` 側でカバーする。code grader で or 連結 +
+  # `output.lower()` のような Python idiom を表現するのが煩雑なため。
 
   - name: rust_gracefully_handled
     type: text
@@ -76,3 +71,28 @@ graders:
     config:
       regex_match:
         - "(?i)pin.*(tag|sha)|apm\\s*view|frozen-lockfile"
+
+  # Empirical-prompt-tuning: structured self-report from the executor.
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  # LLM-as-Judge: catches semantic equivalents and the edge-specific
+  # judgment (Buildkite signal handled correctly + Rust escalation
+  # phrased as Phase 2 rubric or explicit defer).
+  - name: edge_handling_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 5 項目をすべて満たしているか?
+        1. MoonBit + C FFI 痛点 (a) を `moonbit-c-binding` で解決すると示している
+        2. flaky test 痛点 (b) を `flaker-setup` で解決すると示している
+        3. Rust gRPC service について、catalog 不在を認識した上で次のいずれか:
+           (a) Phase 2 escalation の検索/評価ルーブリックを記述、または
+           (b) 「near-term の recurring need ではない」と明示的に defer
+        4. Buildkite CI signal について `gh-fix-ci` を install しない判断 (理由: GHA-only) を明示
+        5. project scope (per-repo `apm.yml`) を選び、pinning (tag/SHA、`apm view` で resolve) を言及
+        全 5 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

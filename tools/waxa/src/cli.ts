@@ -290,6 +290,16 @@ function gradeText(grader: Grader, output: string): GraderResult {
 }
 
 function pythonToJs(expr: string): string {
+  // Best-effort waza-compat shim. Translates a few Python membership idioms
+  // to JS so basic assertions work with `new Function`. Intentionally narrow:
+  // - `len(x)` → `(x).length`
+  // - `'a' in x` / `'a' not in x` → `x.includes('a')` / `!x.includes('a')`
+  //
+  // NOT translated (would need a real parser to do safely):
+  // - boolean operators `or` / `and` / `not` (string-literal collisions)
+  // - method calls like `output.lower()` (Python-only)
+  // For richer logic, write the assertion in JS directly, or split into
+  // multiple graders, or use an `llm` grader with a rubric.
   let out = expr;
   out = out.replace(/\blen\s*\(([^()]+)\)/g, "($1).length");
   out = out.replace(/(['"][^'"]+['"])\s+not\s+in\s+([a-zA-Z_]\w*)/g, "!$2.includes($1)");

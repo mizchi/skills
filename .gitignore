@@ -18,9 +18,9 @@ node_modules/
 # Personal skills not tracked by this public repo
 chloe-chat/
 
-# waza eval framework runtime artifacts
+# waxa runtime artifacts
 results/
 .waza-cache/
-# ledger.yaml is per-skill cumulative state. Decide per-skill whether to
-# track it (commit it explicitly with `git add -f`) or treat it as runtime.
-evals/**/ledger.yaml
+# ledger.yaml は per-skill cumulative knowledge — General Fix Rule の
+# 累積、再発検知のための履歴。track する。
+# (個別 skill で「track したくない」場合のみ skill-local .gitignore で除外)
