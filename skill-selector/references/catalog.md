@@ -95,8 +95,8 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| playwright-cli | `mizchi/skills/playwright-cli` | Running Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding) |
-| playwright-test | `mizchi/skills/playwright-test` | Writing / reviewing Playwright Test (E2E) — no fixed waits, network triggers |
+| playwright-test | `mizchi/skills/playwright-test` | **Primary** for any Playwright project. Writing / reviewing E2E tests — no fixed waits, network triggers |
+| playwright-cli | `mizchi/skills/playwright-cli` | **Secondary** — add only when CI sharding, codegen, or one-off `screenshot/pdf` matters. Skip when test authoring is the only concern |
 | review-image | `mizchi/skills/review-image` | Reviewing screenshots / generated images via OpenRouter vision models, VRT prechecks |
 
 ---

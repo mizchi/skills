@@ -32,14 +32,18 @@ The catalog lives in [references/catalog.md](references/catalog.md). It is group
 Workflow:
 
 1. Read `references/catalog.md`.
-2. Identify project signals — e.g., `package.json` (Node), `moon.mod.json` (MoonBit), `gleam.toml` (Gleam), `flake.nix` (Nix), `.github/workflows/` (CI), Playwright config, `dotenvx` keystore. Use those to short-list catalog rows.
+2. Identify project signals from three sources:
+   - **Repo files**: `package.json` (Node), `moon.mod.json` (MoonBit), `gleam.toml` (Gleam), `flake.nix` (Nix), `.github/workflows/` (CI), Playwright config, `dotenvx` keystore.
+   - **Stated user intent**: in-message cues like "we plan to deploy to X", "we publish a small npm utility eventually".
+   - **CLAUDE.md mandates**: persistent rules in user-level `~/.claude/CLAUDE.md` or project-level `CLAUDE.md` (e.g., "task runner: justfile", "lint: ast-grep") count as signals even when the scenario text is silent. When mandate and stated intent disagree, surface the conflict to the user before installing.
 3. Confirm with the user before installing — propose, let them subtract. Default to fewer skills, not more. Each skill consumes context every conversation.
    - **Active-in-language heuristic**: if the user is actively writing code in a language with a `<lang>-practice` skill in the catalog (e.g. `moonbit-practice`, `gleam-practice`), include it. If they only consume a single binding or dep written in that language, hold off.
    - **Platform-name caveat**: if a catalog row's description names a specific CI provider / runtime / cloud and the project uses a different one, read the underlying SKILL.md before adopting. The core capability may still apply on the other platform — installing for that core, while noting "integration glue N/A," is fine. Skipping it just because of the platform mismatch is wrong.
    - **Out-of-band rows**: rows tagged `(out-of-band)` in the catalog cannot be installed via public APM (chezmoi-local, gated, etc.). Mention them in prose if the project would benefit, but do NOT put them in `apm.yml`.
-4. Install via APM (see `apm-usage`):
+4. Install via APM. **Read `apm-usage` first** to confirm the exact `apm.yml` syntax — the manifest format is non-trivial and field names should not be inferred from this skill alone.
    - Project scope: edit `apm.yml`, run `apm install`. Commit `apm.lock.yaml`.
    - Global scope: `apm install -g <repo>/<path>`, verify in `~/.apm/apm.yml`.
+   - Pinning: catalog entries do not carry tags. Resolve a concrete tag or SHA via `apm view <repo>` (or check the upstream repo's release page) before committing `apm.yml`. Floating refs are listed under Common mistakes.
 5. If a need is unmet, escalate to Phase 2. Do not skip Phase 1 — even if a search query is already forming in your head, scanning the catalog is cheaper.
 
 ## Phase 2 — Search and evaluate
