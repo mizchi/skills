@@ -21,3 +21,6 @@ chloe-chat/
 # waza eval framework runtime artifacts
 results/
 .waza-cache/
+# ledger.yaml is per-skill cumulative state. Decide per-skill whether to
+# track it (commit it explicitly with `git add -f`) or treat it as runtime.
+evals/**/ledger.yaml

@@ -42,23 +42,43 @@ graders:
       regex_match:
         - "(?i)phase\\s*1|catalog\\s*(scan|row)"
 
-  - name: critical_skills_present
+  - name: critical_skills_literal
     type: code
     config:
+      # Surface-literal check kept for regression sensitivity. Semantic
+      # equivalence is judged by the `critical_skills_semantic` LLM grader
+      # below; this one may legitimately fail when the deliverable refers
+      # to the manifest tool by `apm view` instead of `apm-usage`.
       assertions:
         - "'playwright-test' in output"
         - "'cloudflare-deploy' in output"
         - "'gh-fix-ci' in output"
-        - "'apm-usage' in output"
-
-  - name: scope_mentioned
-    type: text
-    config:
-      regex_match:
-        - "(?i)project\\s*scope|global\\s*scope"
 
   - name: pinning_mentioned
     type: text
     config:
       regex_match:
         - "(?i)pin.*(tag|sha)|apm\\s*view|frozen-lockfile"
+
+  # Empirical-prompt-tuning: structured self-report from the executor.
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  # LLM-as-Judge: catches semantic equivalents (e.g. "apm view" implies
+  # apm-usage knowledge) that surface-literal graders miss.
+  - name: critical_skills_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次をすべて満たしているか?
+        1. Playwright E2E に対応する skill (playwright-test) が提案されている
+        2. Cloudflare Pages/Workers の deploy skill (cloudflare-deploy) が提案されている
+        3. GitHub Actions PR check 修正の skill (gh-fix-ci) が提案されている
+        4. APM manifest 操作 skill (apm-usage) が提案されている、または `apm view` / `apm install` 等 APM 操作が言及され apm-usage を読む前提が暗黙にでも示されている
+        5. project scope vs global scope の判断、もしくは「per-project の `apm.yml` を編集する」等の文言で scope が暗黙に示されている
+        6. pinning (tag / SHA / `apm view` で resolve) について言及がある
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。
