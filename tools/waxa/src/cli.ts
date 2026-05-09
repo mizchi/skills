@@ -1,9 +1,10 @@
 #!/usr/bin/env -S deno run -A
 /**
- * Skill evaluation runner — waza-schema-compatible + empirical-prompt-tuning
- * methodology layered on top.
+ * waxa — skill evaluation CLI (waza-schema-compatible + empirical-prompt-tuning
+ * methodology on top).
  *
- * - Reads waza-shaped eval.yaml + tasks/*.yaml.
+ * - Reads waza-shaped eval.yaml + tasks/*.yaml. Repo-root config is `.waxa.yaml`
+ *   first, falling back to `.waza.yaml` so waza can coexist.
  * - Executes via `claude -p --system-prompt --disable-slash-commands` so the
  *   executor is bias-suppressed (no skill auto-discovery, no CLAUDE.md
  *   auto-merge), with the target skill's body injected into the user prompt.
@@ -13,11 +14,12 @@
  *   compat shim), self-report (structural assertions), llm (LLM-as-Judge).
  * - Persists JSONL into results/.
  *
- *   deno run -A evals/runner/run.ts evals/skill-selector/eval.yaml [--task ID]
+ *   waxa <eval.yaml> [--task ID]
+ *   waxa iterate <eval.yaml> [--max N] [--task ID]
  */
-import { parse as parseYaml, stringify as stringifyYaml } from "jsr:@std/yaml@1";
-import { dirname, join, resolve } from "jsr:@std/path@1";
-import { expandGlob } from "jsr:@std/fs@1";
+import { parse as parseYaml, stringify as stringifyYaml } from "@std/yaml";
+import { dirname, join, resolve } from "@std/path";
+import { expandGlob } from "@std/fs";
 
 // ---- Types ---------------------------------------------------------------
 
@@ -104,15 +106,19 @@ async function loadYaml<T>(path: string): Promise<T> {
 async function findRepoRoot(start: string): Promise<string> {
   let dir = resolve(start);
   for (let i = 0; i < 8; i++) {
-    try {
-      await Deno.stat(join(dir, ".waza.yaml"));
-      return dir;
-    } catch (_) { /* try parent */ }
+    for (const candidate of [".waxa.yaml", ".waza.yaml"]) {
+      try {
+        await Deno.stat(join(dir, candidate));
+        return dir;
+      } catch (_) { /* try next candidate */ }
+    }
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
-  throw new Error(`could not locate repo root (.waza.yaml) walking up from ${start}`);
+  throw new Error(
+    `could not locate repo root (.waxa.yaml or .waza.yaml) walking up from ${start}`,
+  );
 }
 
 async function loadSkillBody(repoRoot: string, skillName: string): Promise<string> {

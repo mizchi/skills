@@ -1,0 +1,22 @@
+{
+  "name": "@mizchi/waxa",
+  "version": "0.1.0",
+  "exports": "./src/cli.ts",
+  "tasks": {
+    "run": "deno run -A src/cli.ts",
+    "check": "deno check src/cli.ts scripts/build_npm.ts",
+    "fmt": "deno fmt src scripts",
+    "build:npm": "deno run -A scripts/build_npm.ts",
+    "publish:npm": "cd npm && npm publish --access public"
+  },
+  "imports": {
+    "@std/yaml": "jsr:@std/yaml@1",
+    "@std/path": "jsr:@std/path@1",
+    "@std/fs": "jsr:@std/fs@1",
+    "@deno/dnt": "jsr:@deno/dnt@0.41"
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "indentWidth": 2
+  }
+}
