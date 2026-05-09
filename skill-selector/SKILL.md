@@ -39,7 +39,9 @@ Workflow:
 3. Confirm with the user before installing — propose, let them subtract. Default to fewer skills, not more. Each skill consumes context every conversation.
    - **Non-interactive contexts** (subagent dispatch, scripted automation, batch runs): emit the proposal as the deliverable and stop. The caller subtracts. Do not stall waiting for a confirmation that will not come.
    - **Active-in-language heuristic**: if the user is actively writing code in a language with a `<lang>-practice` skill in the catalog (e.g. `moonbit-practice`, `gleam-practice`), include it. If they only consume a single binding or dep written in that language, hold off.
-   - **Platform-name caveat**: if a catalog row's description names a specific CI provider / runtime / cloud and the project uses a different one, read the underlying SKILL.md before adopting. The core capability may still apply on the other platform — installing for that core, while noting "integration glue N/A," is fine. Skipping it just because of the platform mismatch is wrong.
+   - **Platform-name caveat**: when a catalog row's description names a specific CI provider / runtime / cloud:
+     - **Project platform matches**: adopt as-is. Do not re-read the underlying SKILL.md; the catalog row already answered the question.
+     - **Project platform differs**: read the underlying SKILL.md before deciding. The core capability may still apply — install for that core, note "integration glue N/A." Skipping for platform mismatch alone is wrong.
    - **Out-of-band rows**: rows tagged `(out-of-band)` in the catalog cannot be installed via public APM (chezmoi-local, gated, etc.). Mention them in prose if the project would benefit, but do NOT put them in `apm.yml`.
 4. Install via APM. **Read `apm-usage` first** to confirm the exact `apm.yml` syntax — the manifest format is non-trivial and field names should not be inferred from this skill alone.
    - Project scope: edit `apm.yml`, run `apm install`. Commit `apm.lock.yaml`.
@@ -49,7 +51,13 @@ Workflow:
 
 ## Phase 2 — Search and evaluate
 
-Use only when Phase 1 has no candidate **AND the need is recurring, not one-off**. One-off setup tasks (Vite/React scaffolding, single-shot config conversion, ad-hoc data migration) belong inline; neither phase applies. Re-read the "When NOT to use" section above before escalating.
+Trigger Phase 2 only when **all** of the following are true:
+
+- Phase 1 has no candidate (catalog scanned, no row matched within ~30 seconds).
+- The need is **recurring**, not a one-off setup task. One-off scaffolding (Vite/React init, single-shot config conversion, ad-hoc data migration) belongs inline.
+- The need is **stated as an active pain or near-term task**, not just an ambient signal. A Rust service that exists in the repo but isn't currently causing skill-shaped questions does not by itself justify Phase 2 — wait until the recurring need surfaces.
+
+If any of the three is false, do nothing. Re-read the "When NOT to use" section above before escalating.
 
 Workflow:
 

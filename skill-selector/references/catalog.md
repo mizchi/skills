@@ -141,6 +141,19 @@ The "Install" column may also be:
 
 ---
 
+## Deliberately not in catalog
+
+Some axes have no catalog row by design. Do **not** escalate to Phase 2 for these — they are one-off setup tasks, not recurring skill-shaped needs. Solve inline with framework docs.
+
+| Axis | Reason no skill |
+|---|---|
+| Vite / React / Next.js / Solid frontend scaffolding | One-off setup; framework docs are sufficient. Recurring patterns (E2E, build, CI) are covered by other catalog rows. |
+| Single-shot config conversions (e.g., webpack → Vite, Jest → Vitest) | One-off migration; AI-aided porting handles this inline. |
+| Ad-hoc data migrations / one-time backfills | One-off; doesn't recur. |
+| ORMs / DB clients in general | Too project-specific; only listed when a concrete operational pain has been encoded (e.g., `node-sqlite-vec`). |
+
+If you find yourself wanting a skill on one of these axes, that's a Phase 2 escalation candidate — but verify the need is recurring across multiple sessions before searching.
+
 ## Catalog hygiene
 
 - A row here means: someone has actually used this skill on a real project and it pulled its weight.
