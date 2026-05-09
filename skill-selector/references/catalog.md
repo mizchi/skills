@@ -6,6 +6,11 @@ If a skill belongs to multiple axes, list it under its primary one.
 
 Install strings are written for global scope (`apm install -g <string>`). For project scope, drop the `-g` and add the same string under `dependencies.apm` in `apm.yml`.
 
+The "Install" column may also be:
+
+- `(out-of-band)` — not installable via public APM (chezmoi-local, internal-only, gated). Mention in prose when relevant; do NOT add to `apm.yml`.
+- A row whose description names a specific platform (CI provider, runtime, cloud). When the project's platform differs, the core capability may still apply — read the underlying `SKILL.md` before deciding whether to adopt.
+
 ---
 
 ## Languages / runtimes
@@ -80,7 +85,7 @@ Install strings are written for global scope (`apm install -g <string>`). For pr
 |---|---|---|
 | conventional-changelog | `mizchi/skills/conventional-changelog` | Setting up or unifying a release flow with Conventional Commits + auto changelog |
 | upstream-fix-and-pin | `mizchi/skills/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
-| npm-release | (chezmoi-local; ask mizchi) | Setting up npm publishing via release-please + OIDC. Not in public repo by design |
+| npm-release | `(out-of-band)` | Setting up npm publishing via release-please + OIDC. chezmoi-local; ask mizchi |
 
 ---
 
