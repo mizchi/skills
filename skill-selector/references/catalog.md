@@ -10,6 +10,7 @@ The "Install" column may also be:
 
 - `(out-of-band)` — not installable via public APM (chezmoi-local, internal-only, gated). Mention in prose when relevant; do NOT add to `apm.yml`.
 - A row whose description names a specific platform (CI provider, runtime, cloud). When the project's platform differs, the core capability may still apply — read the underlying `SKILL.md` before deciding whether to adopt.
+- A subpath that diverges from the `<owner>/<repo>/skills/<name>` convention (e.g., `moonbitlang/moonbit-agent-guide/moonbit-c-binding`). This reflects an upstream layout that does not put skills under `skills/`. Run `apm view <owner>/<repo>` (or open the upstream README) once before committing to confirm the subpath is correct.
 
 ---
 
