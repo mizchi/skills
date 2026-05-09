@@ -1,0 +1,64 @@
+# Scenario A (median) — TS+pnpm+Vite+Playwright+GHA+Cloudflare project init.
+# Mirrors the empirical-prompt-tuning Iter 1+ scenario A.
+id: skill-selector-init-typescript-001
+name: TypeScript+pnpm+Playwright+Cloudflare project skill init
+description: |
+  User starting a new TS web app needs apm.yml init via skill-selector.
+  Must run Phase 1 against the catalog and propose at least the four
+  critical skills tied to the stated signals.
+
+tags:
+  - typescript
+  - playwright
+  - cloudflare
+  - github-actions
+  - phase-1
+
+inputs:
+  prompt: |
+    新規 TypeScript Web アプリを始める:
+    - pnpm-based, Node 24
+    - Vite + React frontend
+    - Playwright for E2E
+    - GitHub Actions for CI
+    - 同じ monorepo から小さな npm utility を publish 予定 (eventually)
+    - Cloudflare Pages deploy
+
+    "initialize this project's skill set — what should go into apm.yml?"
+
+expected:
+  output_contains:
+    - "playwright-test"
+    - "cloudflare-deploy"
+    - "gh-fix-ci"
+    - "apm-usage"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: phase1_first
+    type: text
+    config:
+      regex_match:
+        - "(?i)phase\\s*1|catalog\\s*(scan|row)"
+
+  - name: critical_skills_present
+    type: code
+    config:
+      assertions:
+        - "'playwright-test' in output"
+        - "'cloudflare-deploy' in output"
+        - "'gh-fix-ci' in output"
+        - "'apm-usage' in output"
+
+  - name: scope_mentioned
+    type: text
+    config:
+      regex_match:
+        - "(?i)project\\s*scope|global\\s*scope"
+
+  - name: pinning_mentioned
+    type: text
+    config:
+      regex_match:
+        - "(?i)pin.*(tag|sha)|apm\\s*view|frozen-lockfile"

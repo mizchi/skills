@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
+name: skill-selector-eval
+description: |
+  Evaluation suite for skill-selector.
+  Maps the empirical-prompt-tuning Iter 1 baseline scenarios (median + edge)
+  onto waza's metric/grader system. Verifies:
+  - Phase 1 catalog scan is performed first
+  - Critical skills are proposed for the project signals
+  - Scope decision (project vs global) and pinning are stated
+  - Out-of-catalog needs are correctly handled (no Phase 2 escalation when
+    catalog suffices; explicit non-adoption when no recurring need)
+
+skill: skill-selector
+version: "1.0"
+
+config:
+  trials_per_task: 1
+  timeout_seconds: 300
+  parallel: false
+  # mock = quick smoke; switch to copilot-sdk (or Claude Code subagent
+  # adapter once available) for real evaluation.
+  executor: mock
+  # claude CLI requires hyphenated form (waza tolerates dotted form).
+  model: claude-sonnet-4-6
+
+metrics:
+  - name: phase1_first
+    weight: 0.2
+    threshold: 1.0
+    description: Phase 1 catalog scan is performed before any GitHub search
+  - name: critical_skills_present
+    weight: 0.4
+    threshold: 1.0
+    description: All required catalog rows for the scenario signals are proposed
+  - name: scope_mentioned
+    weight: 0.2
+    threshold: 1.0
+    description: Project vs global scope decision is stated with reasoning
+  - name: pinning_mentioned
+    weight: 0.2
+    threshold: 1.0
+    description: Pinning (tag or SHA, or `apm view`) is mentioned
+
+graders:
+  # Output must be substantive (sanity check)
+  - type: code
+    name: has_proposal
+    config:
+      assertions:
+        - "len(output) > 200"
+
+  # Output must NOT escalate to Phase 2 when scenario is fully catalog-covered
+  - type: text
+    name: no_phase2_when_unnecessary
+    config:
+      regex_not_match:
+        - "(?i)github\\s*search.*(topic|path):"
+
+tasks:
+  - "tasks/*.yaml"

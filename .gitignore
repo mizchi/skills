@@ -17,3 +17,7 @@ node_modules/
 
 # Personal skills not tracked by this public repo
 chloe-chat/
+
+# waza eval framework runtime artifacts
+results/
+.waza-cache/

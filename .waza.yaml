@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/config.schema.json
+# Experiment: evaluating skill-selector with waza.
+# This file is exploratory — may be removed if we move evals to a separate tree.
+paths:
+  skills: .
+  evals: evals/
+  results: results/
+defaults:
+  engine: copilot-sdk
+  model: claude-sonnet-4.6
+  timeout: 300
+  parallel: false
+  workers: 2
+  verbose: false
+graders:
+  programTimeout: 30

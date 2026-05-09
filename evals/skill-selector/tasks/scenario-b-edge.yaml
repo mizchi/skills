@@ -1,0 +1,78 @@
+# Scenario B (edge) — MoonBit+C-FFI + Rust gRPC + Buildkite + flaky tests.
+# Mirrors the empirical-prompt-tuning Iter 1+ scenario B. Tests:
+# - Phase 1 still selects the catalog rows that match (moonbit-c-binding,
+#   flaker-setup)
+# - Rust gRPC has no catalog row → either escalate to Phase 2 with rubric
+#   or explicitly state "no skill needed yet"
+# - Buildkite signal is correctly excluded from gh-fix-ci (GH-Actions only)
+id: skill-selector-edge-monorepo-001
+name: MoonBit C-FFI + Rust gRPC + Buildkite monorepo
+description: |
+  Mid-stream monorepo with mixed signals; user names two pain points but
+  also has off-catalog signals (Rust gRPC, Buildkite). Verifies the
+  selector handles "no catalog match" without padding.
+
+tags:
+  - moonbit
+  - c-ffi
+  - rust
+  - grpc
+  - buildkite
+  - phase-2
+
+inputs:
+  prompt: |
+    monorepo に複数 stack:
+    - MoonBit native-FFI package + C library (libxml2) — `extern "c"` 既にあり
+    - Rust gRPC service
+    - Buildkite-hosted CI (NOT GitHub Actions)
+    - 全 monorepo で flaky-test 追跡したい
+
+    Pain points:
+    (a) C bindings の追加が repetitive で error-prone
+    (b) flaky test と genuine failure の判別ができない
+
+    "I want to add the right skills now. We don't have any installed yet."
+
+expected:
+  output_contains:
+    - "moonbit-c-binding"
+    - "flaker-setup"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: phase1_first
+    type: text
+    config:
+      regex_match:
+        - "(?i)phase\\s*1|catalog\\s*(scan|row)"
+
+  - name: critical_skills_present
+    type: code
+    config:
+      assertions:
+        - "'moonbit-c-binding' in output"
+        - "'flaker-setup' in output"
+
+  - name: gh_fix_ci_rejected
+    type: code
+    config:
+      # gh-fix-ci should be explicitly rejected (not silently included).
+      # The output should mention either rejection wording or omit it
+      # entirely while explicitly noting Buildkite is out of scope.
+      assertions:
+        - "'gh-fix-ci' not in output or 'reject' in output.lower() or 'not install' in output.lower() or 'out of scope' in output.lower()"
+
+  - name: rust_gracefully_handled
+    type: text
+    config:
+      # Either Phase 2 escalation with rubric, or explicit non-adoption.
+      regex_match:
+        - "(?i)(phase\\s*2|search.*github|topic:claude-skill|no skill needed|defer)"
+
+  - name: pinning_mentioned
+    type: text
+    config:
+      regex_match:
+        - "(?i)pin.*(tag|sha)|apm\\s*view|frozen-lockfile"
