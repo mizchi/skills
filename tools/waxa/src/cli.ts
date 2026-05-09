@@ -730,7 +730,19 @@ async function runIterate(args: string[]) {
   const ledger = await loadLedger(ledgerPath, evalCfg0.name, evalCfg0.skill);
   const startIter = (ledger.iterations.at(-1)?.iter ?? 0) + 1;
 
+  // Restore the trailing zero-unclear streak from the ledger so that
+  // CONVERGED detection works across separate `waxa iterate` invocations
+  // (e.g. iter 2 ran yesterday, iter 3 today — both zero ⇒ CONVERGED).
   let consecutiveZero = 0;
+  for (let i = ledger.iterations.length - 1; i >= 0; i--) {
+    if (ledger.iterations[i].new_unclear_count === 0) consecutiveZero += 1;
+    else break;
+  }
+  if (consecutiveZero > 0) {
+    console.log(
+      `\n[ledger] resumed with ${consecutiveZero} prior zero-unclear iteration(s); CONVERGED triggers when this reaches 2.`,
+    );
+  }
   let lastDecisive: "converged" | "diverged" | "capped" | undefined;
 
   for (let iter = startIter; iter < startIter + max; iter++) {
