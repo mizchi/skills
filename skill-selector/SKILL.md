@@ -42,6 +42,7 @@ Workflow:
    - **Platform-name caveat**: when a catalog row's description names a specific CI provider / runtime / cloud:
      - **Project platform matches**: adopt as-is. Do not re-read the underlying SKILL.md; the catalog row already answered the question.
      - **Project platform differs**: read the underlying SKILL.md before deciding. The core capability may still apply — install for that core, note "integration glue N/A." Skipping for platform mismatch alone is wrong.
+     - **If you cannot read the underlying SKILL.md** (no local install, no upstream clone, no network): do NOT silently skip the check. **Surface the uncertainty in the proposal explicitly** — e.g., note "adopting `<skill>` based on its catalog description; the SKILL.md was not consulted, so the core-vs-integration split is unverified." The user can then decide whether to verify before committing the install. Silently dropping the verification leaves a bug (the wrong skill adopted, or a usable skill rejected) that no later step recovers.
    - **Out-of-band rows**: rows tagged `(out-of-band)` in the catalog cannot be installed via public APM (chezmoi-local, gated, etc.). Mention them in prose if the project would benefit, but do NOT put them in `apm.yml`.
 4. Install via APM. **Read `apm-usage` first** to confirm the exact `apm.yml` syntax — the manifest format is non-trivial and field names should not be inferred from this skill alone.
    - Project scope: edit `apm.yml`, run `apm install`. Commit `apm.lock.yaml`.

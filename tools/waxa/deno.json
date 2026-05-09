@@ -13,7 +13,7 @@
     "@std/yaml": "jsr:@std/yaml@1",
     "@std/path": "jsr:@std/path@1",
     "@std/fs": "jsr:@std/fs@1",
-    "@deno/dnt": "jsr:@deno/dnt@0.41"
+    "@deno/dnt": "jsr:@deno/dnt@0.42.3"
   },
   "fmt": {
     "lineWidth": 100,

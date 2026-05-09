@@ -53,7 +53,15 @@ await build({
     }
   },
   test: false,
-  typeCheck: "single",
+  // Type checking is done via `deno task check` against the source. The
+  // dnt shim's Deno.* surface still trips ts-morph occasionally (12
+  // diagnostics around dntShim.Deno.errors.NotSupported), so we skip
+  // the duplicate compile-time pass here.
+  typeCheck: false,
+  // Top-level await in cli.ts means we ship ESM-only. CommonJS would
+  // require splitting cli.ts into a library + a thin entry; not worth
+  // it for a CLI binary.
+  scriptModule: false,
 });
 
 console.log("\n[done] npm package built into ./npm");

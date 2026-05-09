@@ -56,7 +56,18 @@ waxa <path/to/eval.yaml> [--task <task-id>]
 
 # iteration loop with cumulative ledger
 waxa iterate <path/to/eval.yaml> [--max 5] [--task <task-id>]
+
+# multi-model comparison (objective axes only — no LLM A-vs-B judge)
+waxa compare <path/to/eval.yaml> --models claude-sonnet-4-6,claude-opus-4-7
+
+# skill A/B variant exploration (e.g. current vs experimental rewrite)
+waxa variant <path/to/eval.yaml> --base skill-current --candidate skill-rewritten
 ```
+
+To run tasks within an eval in parallel, set `config.parallel: true` and
+optionally `config.workers: <N>` (default 2) in the eval file. claude
+processes run concurrently — adjust `workers` to match cost / rate-limit
+budget.
 
 Project layout (a working example lives in
 [`mizchi/skills:evals/skill-selector/`](https://github.com/mizchi/skills/tree/main/evals/skill-selector)):
@@ -149,14 +160,15 @@ executor's response, parses the structured tail, and writes
 ## Build / publish
 
 ```bash
-deno task check       # type-check
-deno task build:npm   # dnt → ./npm  (see Known issues)
+deno task check       # type-check the source
+deno task build:npm   # dnt → ./npm (ESM-only)
 cd npm && npm publish --access public
 ```
 
-### Known issues
-
-- `deno task build:npm` panics on `@deno/dnt@0.41.3` with `RuntimeError: unreachable` on Deno 2.6.x. Tracking; pin a working dnt version once one is identified. Until fixed, ship the package by running waxa from source (`deno task run`) or by manually invoking `tsc` against `src/cli.ts`.
+The npm package is ESM-only (top-level `await` in `cli.ts`). dnt's compile-time
+type-check is skipped via `typeCheck: false` because the dnt shim's
+`Deno.errors.NotSupported` surface still trips ts-morph; type validation is
+performed by `deno task check` against the source instead.
 
 ## License
 

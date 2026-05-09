@@ -43,7 +43,13 @@ interface EvalConfig {
   description?: string;
   skill: string;
   version?: string;
-  config?: { trials_per_task?: number; timeout_seconds?: number; model?: string };
+  config?: {
+    trials_per_task?: number;
+    timeout_seconds?: number;
+    model?: string;
+    parallel?: boolean;
+    workers?: number;
+  };
   metrics?: Metric[];
   graders?: Grader[];
   tasks: string[];
@@ -573,12 +579,27 @@ async function persistJsonl(
   return outFile;
 }
 
+interface RunEvalOptions {
+  taskFilter?: string;
+  iterTag?: string;
+  modelOverride?: string;
+  skillOverride?: string;
+}
+
 async function runEval(
   evalPath: string,
-  taskFilter?: string,
-  iterTag?: string,
+  opts: RunEvalOptions = {},
 ): Promise<{ evalCfg: EvalConfig; evalDir: string; repoRoot: string; results: TaskResult[] }> {
-  const evalCfg = await loadYaml<EvalConfig>(evalPath);
+  const { taskFilter, iterTag, modelOverride, skillOverride } = opts;
+  const evalCfgRaw = await loadYaml<EvalConfig>(evalPath);
+  const evalCfg: EvalConfig = {
+    ...evalCfgRaw,
+    skill: skillOverride ?? evalCfgRaw.skill,
+    config: {
+      ...(evalCfgRaw.config ?? {}),
+      ...(modelOverride ? { model: modelOverride } : {}),
+    },
+  };
   const evalDir = dirname(resolve(evalPath));
   const repoRoot = await findRepoRoot(evalDir);
 
@@ -594,11 +615,32 @@ async function runEval(
     Deno.exit(2);
   }
 
+  const parallel = evalCfg.config?.parallel === true;
+  const workers = Math.max(1, evalCfg.config?.workers ?? 2);
   const results: TaskResult[] = [];
-  for (const task of tasks) {
-    const r = await runTask(repoRoot, evalCfg, task);
-    results.push(r);
-    printTaskResult(results.length, tasks.length, r);
+
+  if (parallel && tasks.length > 1) {
+    console.log(`[parallel] running ${tasks.length} tasks with up to ${workers} workers`);
+    let nextIdx = 0;
+    const numbered = tasks.map((t, i) => ({ idx: i, task: t }));
+    results.length = tasks.length;
+    async function worker() {
+      while (true) {
+        const slot = nextIdx++;
+        if (slot >= numbered.length) return;
+        const { idx, task } = numbered[slot];
+        const r = await runTask(repoRoot, evalCfg, task);
+        results[idx] = r;
+        printTaskResult(idx + 1, tasks.length, r);
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(workers, tasks.length) }, () => worker()));
+  } else {
+    for (const task of tasks) {
+      const r = await runTask(repoRoot, evalCfg, task);
+      results.push(r);
+      printTaskResult(results.length, tasks.length, r);
+    }
   }
 
   const overall = results.reduce((a, r) => a + r.passRate, 0) / results.length;
@@ -693,7 +735,7 @@ async function runIterate(args: string[]) {
 
   for (let iter = startIter; iter < startIter + max; iter++) {
     console.log(`\n========== Iteration ${iter} ==========\n`);
-    const { results } = await runEval(evalPath, taskFilter, `iter-${iter}`);
+    const { results } = await runEval(evalPath, { taskFilter, iterTag: `iter-${iter}` });
 
     const allUnclear = results.flatMap((r) => r.selfReport?.unclearPoints ?? []);
     const { newRules, reseenRules } = classifyUnclear(ledger, iter, allUnclear);
@@ -744,14 +786,123 @@ async function runIterate(args: string[]) {
   console.log(`\nLedger updated: ${ledgerPath}`);
 }
 
+// ---- compare sub-command (multi-model) -----------------------------------
+
+function summarizeResults(results: TaskResult[]): {
+  pass: number;
+  total: number;
+  acc: number;
+  unclear: number;
+  meanDur: number;
+} {
+  const pass = results.filter((r) => r.passRate === 1).length;
+  const total = results.length;
+  const acc = total === 0 ? 0 : results.reduce((a, r) => a + r.passRate, 0) / total;
+  const unclear = results.reduce((a, r) => a + (r.selfReport?.unclearPoints.length ?? 0), 0);
+  const meanDur = total === 0 ? 0 : results.reduce((a, r) => a + r.durationMs, 0) / total;
+  return { pass, total, acc, unclear, meanDur };
+}
+
+async function runCompare(args: string[]) {
+  const evalPath = args[0];
+  if (!evalPath) {
+    console.error("Usage: waxa compare <eval.yaml> --models <a,b,...> [--task ID]");
+    Deno.exit(1);
+  }
+  const modelsCsv = args.includes("--models") ? args[args.indexOf("--models") + 1] : "";
+  if (!modelsCsv) {
+    console.error("--models <csv> is required");
+    Deno.exit(1);
+  }
+  const models = modelsCsv.split(",").map((m) => m.trim()).filter(Boolean);
+  const taskFilter = args.includes("--task") ? args[args.indexOf("--task") + 1] : undefined;
+
+  const summary: { model: string; s: ReturnType<typeof summarizeResults> }[] = [];
+  for (const model of models) {
+    console.log(`\n========== Model: ${model} ==========\n`);
+    const { results } = await runEval(evalPath, {
+      taskFilter,
+      iterTag: `model-${model.replace(/[^a-z0-9-]/gi, "_")}`,
+      modelOverride: model,
+    });
+    summary.push({ model, s: summarizeResults(results) });
+  }
+
+  console.log(`\n===== Multi-model comparison =====`);
+  console.log(`(objective axes only — accuracy, mean duration, unclear count.`);
+  console.log(` LLM-as-judge "A vs B" is intentionally NOT used here — bias.)\n`);
+  console.log(`| model | pass | total | accuracy | unclear | mean_dur(ms) |`);
+  console.log(`|---|---|---|---|---|---|`);
+  for (const { model, s } of summary) {
+    console.log(
+      `| ${model} | ${s.pass} | ${s.total} | ${(s.acc * 100).toFixed(1)}% | ${s.unclear} | ${Math.round(s.meanDur)} |`,
+    );
+  }
+}
+
+// ---- variant sub-command (skill A/B exploration) -------------------------
+
+async function runVariant(args: string[]) {
+  const evalPath = args[0];
+  if (!evalPath) {
+    console.error("Usage: waxa variant <eval.yaml> --base <skill> --candidate <skill> [--task ID]");
+    Deno.exit(1);
+  }
+  const base = args.includes("--base") ? args[args.indexOf("--base") + 1] : undefined;
+  const candidate = args.includes("--candidate")
+    ? args[args.indexOf("--candidate") + 1]
+    : undefined;
+  if (!base || !candidate) {
+    console.error("--base <skill> and --candidate <skill> are both required");
+    Deno.exit(1);
+  }
+  const taskFilter = args.includes("--task") ? args[args.indexOf("--task") + 1] : undefined;
+
+  const variants = [
+    { label: "base", skill: base },
+    { label: "candidate", skill: candidate },
+  ];
+  const summary: { label: string; skill: string; s: ReturnType<typeof summarizeResults> }[] = [];
+  for (const v of variants) {
+    console.log(`\n========== Variant: ${v.label} (${v.skill}) ==========\n`);
+    const { results } = await runEval(evalPath, {
+      taskFilter,
+      iterTag: `variant-${v.label}`,
+      skillOverride: v.skill,
+    });
+    summary.push({ label: v.label, skill: v.skill, s: summarizeResults(results) });
+  }
+
+  console.log(`\n===== Variant exploration =====`);
+  console.log(`(objective axes only. Per empirical-prompt-tuning's pairwise caveat:`);
+  console.log(` we do not ask an LLM to rate "A vs B" directly — position + self-`);
+  console.log(` preference bias make such judgments noisy at small n.)\n`);
+  console.log(`| variant | skill | pass | accuracy | unclear | mean_dur(ms) |`);
+  console.log(`|---|---|---|---|---|---|`);
+  for (const x of summary) {
+    console.log(
+      `| ${x.label} | ${x.skill} | ${x.s.pass}/${x.s.total} | ${(x.s.acc * 100).toFixed(1)}% | ${x.s.unclear} | ${Math.round(x.s.meanDur)} |`,
+    );
+  }
+  // Recommendation per empirical: prefer higher accuracy → fewer unclear → lower duration.
+  const ranked = [...summary].sort((a, b) => {
+    if (b.s.acc !== a.s.acc) return b.s.acc - a.s.acc;
+    if (a.s.unclear !== b.s.unclear) return a.s.unclear - b.s.unclear;
+    return a.s.meanDur - b.s.meanDur;
+  });
+  console.log(`\nRecommended: ${ranked[0].label} (${ranked[0].skill})`);
+}
+
 // ---- Main ----------------------------------------------------------------
 
 async function main() {
   const sub = Deno.args[0];
   if (!sub || sub === "-h" || sub === "--help") {
     console.error("Usage:");
-    console.error("  run.ts <eval.yaml> [--task <task-id>]      single run");
-    console.error("  run.ts iterate <eval.yaml> [--max N] [--task ID]   iteration loop");
+    console.error("  waxa <eval.yaml> [--task <id>]                                 single run");
+    console.error("  waxa iterate <eval.yaml> [--max N] [--task <id>]              iteration loop");
+    console.error("  waxa compare <eval.yaml> --models <csv> [--task <id>]         multi-model comparison");
+    console.error("  waxa variant <eval.yaml> --base <skill> --candidate <skill>   skill A/B exploration");
     Deno.exit(sub ? 0 : 1);
   }
 
@@ -759,12 +910,20 @@ async function main() {
     await runIterate(Deno.args.slice(1));
     return;
   }
+  if (sub === "compare") {
+    await runCompare(Deno.args.slice(1));
+    return;
+  }
+  if (sub === "variant") {
+    await runVariant(Deno.args.slice(1));
+    return;
+  }
 
   // Default: single run
   const taskFilter = Deno.args.includes("--task")
     ? Deno.args[Deno.args.indexOf("--task") + 1]
     : undefined;
-  const { results } = await runEval(sub, taskFilter);
+  const { results } = await runEval(sub, { taskFilter });
   Deno.exit(results.every((r) => r.passRate === 1) ? 0 : 1);
 }
 
