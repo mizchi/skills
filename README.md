@@ -51,6 +51,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | --- | --- |
 | [playwright-cli](playwright-cli/) | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
 | [playwright-test](playwright-test/) | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
+| [review-image](review-image/) | Review screenshots or generated images with OpenRouter vision models via Deno scripts; includes a strict CI `pass|fail` wrapper for VRT prechecks. |
 
 ### MoonBit
 
@@ -71,6 +72,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | --- | --- |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [retrospective-codify](retrospective-codify/) | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
+| [skill-selector](skill-selector/) | Decide which skills to add to a project — Phase 1 picks from a curated catalog, Phase 2 searches and evaluates outside-catalog candidates. |
 | [mizchi-blog-style](mizchi-blog-style/) | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
 | [tech-article-reproducibility](tech-article-reproducibility/) | Simulate a first-time reader reproducing a technical article and list missing information. |
 
