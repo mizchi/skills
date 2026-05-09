@@ -37,6 +37,9 @@ The "Install" column may also be:
 | moonbit-refactoring | `moonbitlang/moonbit-agent-guide/moonbit-refactoring` | Refactoring an existing MoonBit package idiomatically |
 | moonbit-c-binding | `moonbitlang/moonbit-agent-guide/moonbit-c-binding` | MoonBit project links a C library via native FFI |
 | tuimbt-practice | `mizchi/tui.mbt/skills/tuimbt-practice` | Building terminal UI in MoonBit using `tui.mbt` |
+| mooncheat | `mizchi/js.mbt/.claude/skills/mooncheat` | MoonBit cheatsheet for syntax / corelibrary lookups while writing `.mbt` |
+| moon-component | `mizchi/moon-component/skill` | Using the `moon-component` CLI for MoonBit WIT / WebAssembly Component workflow |
+| vibe-scratch-workflow | `mizchi/vibe-lang` | `vibe-lang` scratch-db workflow — `vibe new` → `vibe shell-stdin --restore` → `finalize` / `normalize` / `apply` (repo-root SKILL.md; verify with `apm view`) |
 
 ### Gleam
 **Signals**: `gleam.toml`, `manifest.toml`, `.gleam_version`
@@ -65,6 +68,11 @@ The "Install" column may also be:
 |---|---|---|
 | ast-grep-practice | `mizchi/skills/ast-grep-practice` | Operating ast-grep as a project lint tool (rules, fix, CI) |
 | ast-grep | `ast-grep/agent-skill/ast-grep` | Writing ast-grep rules / structural search (general guide) |
+| check-similarity | `mizchi/similarity/.claude/skills/check-similarity` | Detect duplicate code via AST-based similarity; auto-selects per-language tool |
+| check-similarity-mbt | `mizchi/similarity/.claude/skills/check-similarity-mbt` | Same, MoonBit (`.mbt`) only |
+| check-similarity-py | `mizchi/similarity/.claude/skills/check-similarity-py` | Same, Python (`.py`) only |
+| check-similarity-rs | `mizchi/similarity/.claude/skills/check-similarity-rs` | Same, Rust (`.rs`) only |
+| check-similarity-ts | `mizchi/similarity/.claude/skills/check-similarity-ts` | Same, TypeScript / JavaScript only |
 
 ### CI / GitHub Actions
 **Signals**: `.github/workflows/`, failing PR checks
@@ -72,6 +80,15 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | gh-fix-ci | `mizchi/skills/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
+
+### Local CI runner
+**Signals**: `actrun.toml`, running GitHub Actions workflows locally
+
+| Skill | Install | Use when |
+|---|---|---|
+| actrun | `mizchi/actrun/.claude/skills/actrun` | Reference for the `actrun` CLI — local GitHub Actions runner; workflow proposal / parsing / execution support |
+| actrun-init | `mizchi/actrun/.claude/skills/actrun-init` | Introducing actrun to a project — install, `actrun.toml`, workflow adjustments |
+| actrun-debug | `mizchi/actrun/.claude/skills/actrun-debug` | Diagnosing actrun execution failures — log analysis, root-cause, fix suggestions |
 
 ### Cloud deployment
 **Signals**: `wrangler.toml`, Cloudflare-related configs, ECS task / Fargate, AWS account access
@@ -102,6 +119,24 @@ The "Install" column may also be:
 | playwright-test | `mizchi/skills/playwright-test` | **Primary** for any Playwright project. Writing / reviewing E2E tests — no fixed waits, network triggers |
 | playwright-cli | `mizchi/skills/playwright-cli` | **Secondary** — add only when CI sharding, codegen, or one-off `screenshot/pdf` matters. Skip when test authoring is the only concern |
 | review-image | `mizchi/skills/review-image` | Reviewing screenshots / generated images via OpenRouter vision models, VRT prechecks |
+| vrt | `mizchi/vrt` | Visual Regression Testing + a11y semantic verification CLI (`vrt-test`, `vrt`, `vrt-update`, `vrt compare`, `vrt snapshot`, fix-loop, VLM model selection). Repo-root SKILL.md; verify with `apm view` |
+
+### Frontend review (suite)
+**Signals**: a frontend project where someone wants a structured review pass (CI / hygiene / testing / security / weekly cadence)
+
+| Skill | Install | Use when |
+|---|---|---|
+| frontend-review-weekly | `mizchi/frontend-review/skills/frontend-review-weekly` | **Orchestrator** for the weekly AI review — dispatches triage / ci / hygiene / testing / security and the 5 perspective sub-skills |
+| frontend-review-triage | `mizchi/frontend-review/skills/frontend-review-triage` | Initial frontend-review assessment ("triage", day-1) |
+| frontend-review-ci | `mizchi/frontend-review/skills/frontend-review-ci` | CI is slow (>10 min), flaky, or you want to optimize GitHub Actions for a frontend project |
+| frontend-review-hygiene | `mizchi/frontend-review/skills/frontend-review-hygiene` | Code-hygiene audit — dependency freshness, TypeScript strictness, lint, dead code, duplication |
+| frontend-review-security | `mizchi/frontend-review/skills/frontend-review-security` | Frontend security review — `pnpm audit`, risky-pattern detection, AI self-pentest |
+| frontend-review-testing | `mizchi/frontend-review/skills/frontend-review-testing` | Test-infrastructure audit — vitest coverage, playwright config, VRT setup, coverage merging |
+| frontend-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/frontend-expert` | Frontend-architect perspective sub-skill (component design, state, DOM usage) |
+| frontend-ops-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/frontend-ops-expert` | Frontend-Ops perspective sub-skill (CI/CD, scheduler, KPI ratchet, release process) |
+| performance-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/performance-expert` | Performance perspective sub-skill (bundle size, LCP / CLS / INP, avoidable work) |
+| react-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/react-expert` | React-specialist perspective sub-skill (hooks, re-rendering, Suspense / RSC) |
+| security-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/security-expert` | Security-specialist perspective sub-skill (XSS / CSRF, authz boundaries, input validation) |
 
 ---
 
@@ -110,6 +145,7 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | flaker-setup | `mizchi/flaker/skills/flaker-setup` | Introducing `@mizchi/flaker` to a repo for flaky-test detection / GitHub Actions integration |
+| flaker-management | `mizchi/flaker/skills/flaker-management` | Operating `@mizchi/flaker` after setup — day-to-day runs, sampling / quarantine review, KPI ratchet |
 | flaker-storage-cache-on-ci | `mizchi/skills/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
 
 ---
@@ -143,6 +179,26 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | translate-programming-language | `mizchi/skills/translate-programming-language` | Porting modules / services / APIs between programming languages with behavior parity |
+
+### Memory / session (mnemo)
+**Signals**: agent needs persistent cross-session memory or session journaling; `mnemo` CLI on PATH
+
+| Skill | Install | Use when |
+|---|---|---|
+| mnemo-cmd | `mizchi/mnemo/skills/tools/mnemo-cmd` | Using the `mnemo` command entrypoint to inspect and mutate mnemo memory / sessions / skills / prompts |
+| mnemo-memory | `mizchi/mnemo/skills/memory/mnemo-memory` | `mnemo` as persistent agent memory — read context, record durable facts, update stale notes |
+| mnemo-session-journal | `mizchi/mnemo/skills/session/mnemo-session-journal` | `mnemo` for creating / appending / inspecting / resolving / searching session records |
+| mnemo-skill-select | `mizchi/mnemo/skills/tools/mnemo-skill-select` | Selecting agent skills from hosted mnemo (list / search uploaded skills, then load matching local) |
+
+### Security review (suite)
+**Signals**: user asks for a security review of a web application repository
+
+| Skill | Install | Use when |
+|---|---|---|
+| security-review | `mizchi/security-review/skills/security-review` | **Orchestrator** — runs the three sub-skills in order |
+| security-review-whitebox | `mizchi/security-review/skills/security-review-whitebox` | Static + source-code review with language-appropriate scanners |
+| security-review-blackbox | `mizchi/security-review/skills/security-review-blackbox` | OWASP ZAP baseline + optional authenticated active scan against a localhost target |
+| security-review-exploit | `mizchi/security-review/skills/security-review-exploit` | Confirming whitebox hypotheses via live HTTP probes or PoC |
 
 ---
 
