@@ -35,7 +35,13 @@ waxa keeps the same eval / task YAML schema and adds the policy layer:
 ## Install
 
 ```bash
-# published on npm (verified on Node 20+, ESM-only, built with dnt 0.42.3)
+# run with npx (no install needed; npx caches after first call)
+npx @mizchi/waxa <path/to/eval.yaml>
+
+# pin a version when reproducibility matters
+npx @mizchi/waxa@0.1.0 <path/to/eval.yaml>
+
+# install globally if you call waxa frequently and startup latency matters
 npm i -g @mizchi/waxa
 
 # or run from source via Deno
@@ -46,7 +52,7 @@ deno task run -- ../path/to/eval.yaml
 
 Requirements:
 
-- Node.js 20+ (for the published npm CLI)
+- Node.js 20+ (for the published npm CLI; verified on 20+, ESM-only, built with dnt 0.42.3)
 - `claude` CLI on `PATH` and authenticated (OAuth login or
   `ANTHROPIC_API_KEY`) — waxa shells out to `claude -p` for the
   bias-suppressed executor
@@ -55,17 +61,19 @@ Requirements:
 
 ```bash
 # single run
-waxa <path/to/eval.yaml> [--task <task-id>]
+npx @mizchi/waxa <path/to/eval.yaml> [--task <task-id>]
 
 # iteration loop with cumulative ledger
-waxa iterate <path/to/eval.yaml> [--max 5] [--task <task-id>]
+npx @mizchi/waxa iterate <path/to/eval.yaml> [--max 5] [--task <task-id>]
 
 # multi-model comparison (objective axes only — no LLM A-vs-B judge)
-waxa compare <path/to/eval.yaml> --models claude-sonnet-4-6,claude-opus-4-7
+npx @mizchi/waxa compare <path/to/eval.yaml> --models claude-sonnet-4-6,claude-opus-4-7
 
 # skill A/B variant exploration (e.g. current vs experimental rewrite)
-waxa variant <path/to/eval.yaml> --base skill-current --candidate skill-rewritten
+npx @mizchi/waxa variant <path/to/eval.yaml> --base skill-current --candidate skill-rewritten
 ```
+
+Once `npm i -g @mizchi/waxa` is done, the same commands work without the `npx @mizchi/waxa` prefix (`waxa <eval.yaml>` etc.).
 
 To run tasks within an eval in parallel, set `config.parallel: true` and
 optionally `config.workers: <N>` (default 2) in the eval file. claude

@@ -88,15 +88,21 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 
 Lives at [`tools/waxa/`](tools/waxa/) and is published as [`@mizchi/waxa`](https://www.npmjs.com/package/@mizchi/waxa). Used by the `waxa-eval` skill, and forms the adoption gate of `skill-finder`.
 
-Install (npm, recommended):
+Run via `npx` (no global install needed):
 
 ```sh
-npm i -g @mizchi/waxa
+npx @mizchi/waxa <eval.yaml>
 ```
 
-Or run from source (requires Deno 2+):
+`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.1.0` when reproducibility matters.
+
+Alternatives:
 
 ```sh
+# install globally (when calling waxa frequently)
+npm i -g @mizchi/waxa
+
+# run from source (requires Deno 2+)
 git clone https://github.com/mizchi/skills.git
 cd skills/tools/waxa
 deno task run -- path/to/eval.yaml
@@ -107,10 +113,10 @@ Requirements: `claude` CLI on `PATH` and authenticated (OAuth login or `ANTHROPI
 Quick reference:
 
 ```sh
-waxa <eval.yaml>                                   # single run
-waxa iterate <eval.yaml> [--max N]                 # iteration loop with ledger
-waxa compare <eval.yaml> --models <m1>,<m2>        # multi-model objective comparison
-waxa variant <eval.yaml> --base <skill-a> --candidate <skill-b>  # A/B exploration
+npx @mizchi/waxa <eval.yaml>                                       # single run
+npx @mizchi/waxa iterate <eval.yaml> [--max N]                     # iteration loop with ledger
+npx @mizchi/waxa compare <eval.yaml> --models <m1>,<m2>            # multi-model objective comparison
+npx @mizchi/waxa variant <eval.yaml> --base <skill-a> --candidate <skill-b>  # A/B exploration
 ```
 
 Full reference: [`tools/waxa/README.md`](tools/waxa/README.md).
@@ -135,8 +141,9 @@ dependencies:
 Then:
 
 ```sh
-apm install                # installs the skills under .claude/skills/
-npm i -g @mizchi/waxa      # installs the waxa CLI for the eval loop
+apm install                                # installs the skills under .claude/skills/
+npx @mizchi/waxa --help                    # cache the waxa CLI on first call
+# (or `npm i -g @mizchi/waxa` if you call waxa often enough that startup matters)
 ```
 
 The skill-selection / discovery / evaluation flow then proceeds as: `skill-selector` (catalog pre-flight) → if no fit, `skill-finder` (Tier 1-4 sweep) → adoption gated by `waxa-eval` running `waxa iterate` against a `evals/<skill>/` directory you author. `empirical-prompt-tuning` covers what `waxa` cannot reach (the Iter 0 description / body consistency check, `tool_uses`-based skill self-containment diagnosis, and the `[critical]`-tagged requirements checklist that gives binary success judgment).
