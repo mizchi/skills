@@ -1,0 +1,79 @@
+id: nix-setup-devbox-default-001
+name: Devbox default for a standard TS+pnpm project
+description: |
+  Median case — the project's needs are fully covered by stock nixpkgs
+  packages. The Decision matrix says: pick devbox.
+
+tags:
+  - devbox
+  - typescript
+  - decision-matrix
+
+inputs:
+  prompt: |
+    新規 TypeScript Web アプリを始める:
+    - Node.js 24 + pnpm
+    - Vite + React frontend
+    - ESLint + Prettier + Vitest
+    - 標準的な npm package で完結 (custom Nix derivation や overlay は不要)
+    - GitHub Actions で CI を回す
+    - チーム全員 macOS / Linux で direnv 利用可能
+
+    "再現可能な dev 環境をセットアップしてほしい。何をどこに置けば動く?"
+
+expected:
+  output_contains:
+    - "devbox"
+    - "devbox.json"
+  require_self_report: true
+
+graders:
+  - name: chose_devbox
+    type: text
+    config:
+      regex_match:
+        - "(?i)devbox\\.json"
+        - "(?i)nodejs"
+
+  - name: not_overengineered_to_flake
+    type: text
+    config:
+      # standard nixpkgs need => no buildNpmPackage / overlay / flake.lock
+      # mention as the chosen path. flake.nix may be mentioned as
+      # "alternative", but should not be the recommended path.
+      regex_not_match:
+        - "(?i)buildNpmPackage"
+        - "(?i)rust-overlay"
+
+  - name: github_actions_devbox_install
+    type: text
+    config:
+      regex_match:
+        - "(?i)devbox-install-action|jetify-com/devbox-install-action"
+
+  - name: direnv_mentioned
+    type: text
+    config:
+      regex_match:
+        - "(?i)direnv|\\.envrc"
+
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_unclear: 0
+      max_retries: 2
+
+  - name: decision_path_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次をすべて満たしているか?
+        1. nix-setup の "Decision matrix" を踏まえて **devbox** を選ぶ判断を明示している (理由: 標準 nixpkgs で足り、overlay や custom derivation 不要)
+        2. `devbox.json` の最小構成 (packages に nodejs / pnpm 等) を具体的に提示
+        3. devbox の基本コマンド (`devbox shell`, `devbox add`, `devbox run` のいずれか) を言及
+        4. GitHub Actions に `jetify-com/devbox-install-action` を使う形を提示
+        5. direnv 連携 (`use devbox` または `devbox generate direnv --print-envrc`) を言及
+        6. pure flake.nix を強く推さない (項目 1 の判断と整合)
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

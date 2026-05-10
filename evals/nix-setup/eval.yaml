@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
+name: nix-setup-eval
+description: |
+  Evaluation suite for nix-setup (the merged devbox + pure-flake skill).
+  Tests whether the executor reads the Decision matrix correctly and
+  produces a setup that matches the project signals:
+  - default to devbox for standard nixpkgs packages
+  - escalate to pure flake.nix for overlays / custom derivations / buildNpmPackage
+  Verifies that the executor cites the right Quick-start commands and
+  GitHub Actions integration for the chosen path.
+
+skill: nix-setup
+version: "1.0"
+
+config:
+  trials_per_task: 2
+  timeout_seconds: 300
+  parallel: false
+  executor: mock
+  model: claude-sonnet-4-6
+
+graders:
+  - type: code
+    name: has_proposal
+    config:
+      assertions:
+        - "len(output) > 200"
+
+tasks:
+  - "tasks/*.yaml"
