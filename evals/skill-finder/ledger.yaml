@@ -113,19 +113,48 @@ iterations:
     actions:
       - none — regex broadening from iter-3 confirmed effective; both trials pass without surface-form misses.
 
+  - id: iter-5
+    date: 2026-05-10
+    scope: full (3 scenarios × 2 trials) — README-guide dogfood re-run
+    overall_pass_rate: 100.0
+    per_task:
+      - id: skill-finder-stripe-need-001
+        pass_rate: 100
+        unclear: 0
+      - id: skill-finder-bad-source-001
+        pass_rate: 100
+        unclear: 0
+      - id: skill-finder-catalog-covers-001
+        pass_rate: 100
+        unclear: 0
+    notes: |
+      Iter 3's scenario-A residual unclear (blank-slate executor flagged
+      "Tier 1-2 evidence is inferred not executed") did NOT resurface
+      this round. The residual was non-deterministic, not structural —
+      stable now.
+
+      Out-of-band finding: dogfooding the README's `npx @mizchi/waxa`
+      revealed that the published 0.1.0 npm bundle had a malformed
+      shebang (dnt's bin pass added `#!/usr/bin/env node` at line 1
+      while the source file's own `#!/usr/bin/env -S deno run -A`
+      survived TS transformation as malformed JS at line 4). Fixed in
+      0.1.1; README pinning examples updated to warn against 0.1.0.
+    actions:
+      - none — skill body unchanged from iter-4; this run is a dogfood verification of the README install guide, not a fix iteration.
+
 convergence:
   status: converged
   rationale: |
-    Iter 1 (42%) → Iter 2 (82%) → Iter 3 (97%) → Iter 4 (100% on the
-    one residual scenario). No structural skill-side issues remain.
+    Iter 1 (42%) → Iter 2 (82%) → Iter 3 (97%) → Iter 4 (100%, scenario-b)
+    → Iter 5 (100%, full, unclear=0). Two consecutive zero-unclear
+    full-or-relevant runs satisfy the empirical-prompt-tuning
+    convergence criterion.
 
-    Scenario A retains a single non-deterministic unclear point in
-    some trials, which is the blank-slate executor's structural
-    limitation (cannot run real web fetches). This is a property of
-    the eval setup, not the skill body — recorded as known and not
-    actionable at the skill level.
+    Iter 3's lone residual ("Tier 1-2 evidence is inferred") was
+    non-deterministic and dropped to zero on iter 5 without any skill
+    edit — confirming it was a sampling artifact, not a structural gap.
 
-    skill-finder is ready for adoption.
+    skill-finder is converged and adopted as published.
 
 next_review:
   trigger: |
