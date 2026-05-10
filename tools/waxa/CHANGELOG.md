@@ -5,6 +5,18 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-05-10
+
+### Fixed
+
+- Broken shebang in the published npm bundle: dnt's bin-entry pass
+  injects `#!/usr/bin/env node` at line 1, but the source file's own
+  Deno shebang (`#!/usr/bin/env -S deno run -A`) survived TypeScript
+  transformation and reappeared at line 4 as malformed JavaScript
+  (`!/usr/bin / env - S; deno; run - A;`), causing `npx @mizchi/waxa`
+  to crash before parsing argv. Removed the source-side shebang;
+  `deno task run` and `deno run -A src/cli.ts` continue to work.
+
 ## [0.1.0] - 2026-05-09
 
 Initial public release. Skill evaluation CLI with the waza eval / task

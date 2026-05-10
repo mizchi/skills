@@ -1,4 +1,3 @@
-#!/usr/bin/env -S deno run -A
 /**
  * waxa — skill evaluation CLI (waza-schema-compatible + empirical-prompt-tuning
  * methodology on top).
