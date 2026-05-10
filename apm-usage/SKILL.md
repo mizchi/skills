@@ -55,6 +55,11 @@ apm install --dry-run
 ```yaml
 name: my-project
 version: 1.0.0
+# Deployment targets. APM 0.12+ requires this when no marker directory
+# (.claude/ / .github/ / etc.) exists at the repo root. Declare it
+# unconditionally to make the install reproducible.
+targets:
+  - claude
 dependencies:
   apm:
     # GitHub shorthand
@@ -200,7 +205,7 @@ Users install individually: `apm install owner/my-org-skills/skill-a`
 
 ## Target detection
 
-APM auto-detects deployment targets from project structure:
+APM tries to auto-detect deployment targets from project structure:
 
 | Directory exists | Target | Skills deployed to |
 |-----------------|--------|-------------------|
@@ -209,7 +214,19 @@ APM auto-detects deployment targets from project structure:
 | `.cursor/` | cursor | `.cursor/skills/` (if supported) |
 | `.codex/` | codex | `.agents/skills/` |
 
-Override with `--target claude` or set `target:` in apm.yml.
+**APM 0.12+ no longer falls back to `copilot` when no marker directory exists** — the previous default was removed and `apm install` now errors out asking for an explicit target. **Always declare `targets:` in `apm.yml`** so the install never depends on the working tree's directory layout:
+
+```yaml
+name: my-project
+version: 1.0.0
+targets:
+  - claude
+dependencies:
+  apm:
+    - owner/repo
+```
+
+Or override per command with `--target claude`.
 
 ## Global vs project scope
 

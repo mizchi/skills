@@ -47,6 +47,7 @@ Workflow:
 4. Install via APM. **Read `apm-usage` first** to confirm the exact `apm.yml` syntax — the manifest format is non-trivial and field names should not be inferred from this skill alone.
    - Project scope: edit `apm.yml`, run `apm install`. Commit `apm.lock.yaml`.
    - Global scope: `apm install -g <repo>/<path>`, verify in `~/.apm/apm.yml`.
+   - **`targets:` declaration is required.** APM 0.12+ does not fall back to a default target when no marker directory (`.claude/` / `.github/` / etc.) exists at the repo root — `apm install` errors out asking for an explicit choice. Write `targets: [claude]` (or whatever the host harness is) in `apm.yml` unconditionally; do not rely on directory auto-detection.
    - Pinning: catalog entries do not carry tags. Resolve a concrete tag or SHA via `apm view <repo>` (or check the upstream repo's release page) before committing `apm.yml`. Floating refs are listed under Common mistakes.
 5. If a need is unmet, escalate to Phase 2. Do not skip Phase 1 — even if a search query is already forming in your head, scanning the catalog is cheaper.
 
