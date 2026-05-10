@@ -57,8 +57,9 @@ Priority tiers. Always start at the top and only escalate when the tier above ha
 0. **Pre-flight catalog check (see above).** If `skill-selector/references/catalog.md` has a fit, stop and defer to `skill-selector`. Only continue past step 0 when no catalog row matches.
 1. **State the recurring need.** A skill is justified only by a recurring task type. If the user cannot name one, do not adopt — solve inline.
 2. **Sweep top-down.** Hit Tier 1 first. Stop at the first usable hit; do not survey lower tiers when Tier 1 already matches. Capture per candidate: skill name, resolved GitHub URL, one-line description, last-update date, license.
-3. **Apply the rubric.** A candidate passes only if all six axes are acceptable:
+3. **Apply the rubric.** A candidate passes only if all seven axes are acceptable:
    - **Fit** — does the skill's "Use when..." actually match the project task? Re-read the description, not the title.
+   - **Non-redundancy** — does the project's already-installed skill set cover this need? A "Fit ✓" candidate that overlaps with skills already in the stack should still be rejected (or at most project-pinned to one project that genuinely lacks the coverage). Common overlap pairs: skill-creation skills vs `superpowers:writing-skills` + `empirical-prompt-tuning` + `waxa-eval`; testing skills vs `playwright-test`; dotfile skills vs `chezmoi-management`. A redundant skill costs context every conversation without a unique payoff.
    - **Maintenance** — last commit recent? Visible upstream activity?
    - **License** — SPDX present and compatible with the consuming project?
    - **Frontmatter health** — `name` matches dir; description ≤1024 chars and triggering-condition-shaped (per `superpowers:writing-skills` CSO).
@@ -73,7 +74,7 @@ Priority tiers. Always start at the top and only escalate when the tier above ha
 5. **Decide and pin.** Adoption is always pinned; pinning is non-negotiable.
    - **Catalog-promote** — passes eval AND used in 2+ projects without issue → propose addition to `skill-selector/references/catalog.md` with the project signal that should trigger it.
    - **Project-pin** — fits one project; add to that project's `apm.yml` with a **tag or SHA** resolved via `apm view <repo>` (or the upstream release page). Pin to the exact ref the waxa eval passed against — adopt after eval, pin the ref that was eval'd. Floating refs (`main`, `master`, `HEAD`) are forbidden for production projects.
-   - **Reject** — record the reason in `docs/skills-rejected.md` (or equivalent) so the same candidate is not re-evaluated quarterly.
+   - **Reject** — record the reason in `references/rejection-log.md` (this skill) and / or the project's own `docs/skills-rejected.md` so the same candidate is not re-evaluated quarterly. Common reject reasons: license absent, body quality below floor, **non-redundancy axis fails (already covered by installed stack)**, or maintenance signal too weak.
 6. **Fork-and-fix path.** If a candidate is close-but-not-quite, prefer forking it into `mizchi/skills/<name>` (or the project's local skills dir) and reshaping it, over working around its shortcomings at call sites. Document the divergence so an upstream PR can converge.
 
 ## Source-specific resolution notes
@@ -135,6 +136,8 @@ Working references in this repo: `evals/skill-selector/eval.yaml`, `evals/nix-se
 |---|---|
 | Surveying every tier in parallel | Top-down. Stop at first fit. |
 | Skipping the pre-flight catalog check | Always check `skill-selector/references/catalog.md` first. If it covers the need, defer immediately — do not proceed into Tier 1+ surveys. The `playwright-test` / `cloudflare-deploy` / `gh-fix-ci` rows are the most common false-escalations to watch for. |
+| Adopting because "Fit ✓" alone | Non-redundancy is a separate axis. A skill that fits the user's stated need but overlaps with skills already installed (e.g. anthropic's `skill-creator` overlapping with `superpowers:writing-skills` + `empirical-prompt-tuning` + `waxa-eval`) is a reject. The cost is context per conversation; the payoff has to be unique. |
+| Skipping `references/rejection-log.md` on reject | Recording the reason takes 30 seconds and prevents re-evaluating the same candidate in 3 months when its star count grows. The log is the durable artifact of the skill-finder run, mirroring how the eval ledger works for waxa-eval. |
 | Citing `agent-skills.cc` as a recommendation | Source is SEO scrape; only use it for alias-lookups to GitHub. Never as a primary recommendation. |
 | Skipping waxa eval ("the README looks fine") | Forbidden. Adoption-without-eval is the exact failure this skill prevents. |
 | Pinning to `main` / `master` | Resolve a tag or SHA via `apm view <repo>` and pin that explicitly. |

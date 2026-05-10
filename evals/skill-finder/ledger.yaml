@@ -142,19 +142,64 @@ iterations:
     actions:
       - none — skill body unchanged from iter-4; this run is a dogfood verification of the README install guide, not a fix iteration.
 
+  - id: iter-6
+    date: 2026-05-10
+    scope: full (3 scenarios × 2 trials) — regression check after rubric expansion
+    overall_pass_rate: 100.0
+    per_task:
+      - id: skill-finder-stripe-need-001
+        pass_rate: 100
+        unclear: 0
+      - id: skill-finder-bad-source-001
+        pass_rate: 100
+        unclear: 0
+      - id: skill-finder-catalog-covers-001
+        pass_rate: 100
+        unclear: 0
+    notes: |
+      Triggered by the catalog-promotion dogfood on `anthropics/skills/skills/skill-creator`,
+      which surfaced a missing rubric axis: a Tier-1 candidate can pass
+      Fit / Maintenance / License / Frontmatter / Body / Footprint AND
+      still be the wrong choice if the project's existing skill set
+      already covers the need. Added "Non-redundancy" as a 7th rubric
+      axis with examples (skill-creation overlap with superpowers:writing-skills
+      + empirical-prompt-tuning + waxa-eval), updated Decide-and-pin
+      Reject branch to mention non-redundancy, added two new Common
+      Mistakes rows ("Adopting because Fit ✓ alone" and "Skipping
+      rejection-log on reject"), and created `references/rejection-log.md`
+      with the skill-creator entry as the seed.
+
+      Re-running the eval after these changes yields the same 100% /
+      unclear=0 across all three scenarios — no regression. The 7th
+      axis is additive, not in conflict with the scenarios authored
+      against the 6-axis form.
+    actions:
+      - SKILL.md rubric: added "Non-redundancy" as 7th axis with explicit overlap-pair examples
+      - SKILL.md "Decide and pin" Reject branch: added non-redundancy reason
+      - SKILL.md Common mistakes: added "Adopting because Fit ✓ alone" and "Skipping rejection-log on reject"
+      - references/rejection-log.md: new — skill-creator as seed entry
+
 convergence:
   status: converged
   rationale: |
     Iter 1 (42%) → Iter 2 (82%) → Iter 3 (97%) → Iter 4 (100%, scenario-b)
-    → Iter 5 (100%, full, unclear=0). Two consecutive zero-unclear
-    full-or-relevant runs satisfy the empirical-prompt-tuning
-    convergence criterion.
+    → Iter 5 (100%, full, unclear=0) → Iter 6 (100%, full, unclear=0
+    after 7th-axis addition). Three consecutive zero-unclear runs across
+    iter-4/5/6 — well past the empirical-prompt-tuning convergence
+    criterion of two consecutive.
 
     Iter 3's lone residual ("Tier 1-2 evidence is inferred") was
     non-deterministic and dropped to zero on iter 5 without any skill
     edit — confirming it was a sampling artifact, not a structural gap.
 
-    skill-finder is converged and adopted as published.
+    Iter 6 confirms that the 7th rubric axis (Non-redundancy) is
+    additive: the existing scenarios continue to pass and the new axis
+    activates on dogfood candidates that were absent from the eval
+    suite.
+
+    skill-finder is converged and adopted as published; future iters
+    should be triggered by new failure shapes encountered in real
+    candidate evaluations, not by routine re-running.
 
 next_review:
   trigger: |
