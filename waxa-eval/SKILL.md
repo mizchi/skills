@@ -204,9 +204,37 @@ Per-iteration cost (claude-sonnet-4-6, 3 scenarios × 2 trials): ~3-5 minutes wa
 | Iterating past 4 without re-reading the skill | If you're past iter 4 and still chasing failures, the skill body has a structural gap. Stop iterating; rewrite the section. |
 | Not committing the ledger | The ledger is the durable artifact. Future evals build on past General Fix Rules. Lose it and you lose the institutional memory. |
 
+## Scope vs `empirical-prompt-tuning`
+
+This skill is the **implementation guide**; `empirical-prompt-tuning` is the **methodology**. They are complementary — neither subsumes the other, because the dispatch mechanisms differ (Task-tool subagent vs external CLI process).
+
+| Concern | waxa-eval | empirical-prompt-tuning |
+|---|---|---|
+| Methodology / first principles (bias-free executor, Self-report rationale) | (referenced) | **owns** |
+| CLI operation (`waxa run` / `iterate` / `variant` / `compare`) | **owns** | n/a |
+| Scenario YAML authoring | **owns** | n/a |
+| Grader selection (text / code / self-report / llm) | **owns** | n/a |
+| Iter pattern derived from real iter loops (4-stage signature) | **owns** | n/a |
+| Ledger schema (`ledger.yaml`) and General Fix Rule extraction | **owns** | shared |
+| Convergence definition (2 consecutive zero-unclear) | shared | **owns the canonical version** |
+| Iter 0 description / body consistency check (static, no dispatch) | n/a | **owns** |
+| `tool_uses` relative-value analysis (only possible via Task-tool subagent) | n/a | **owns** |
+| `[critical]` tag in the requirements checklist | n/a | **owns** |
+| Fix-propagation patterns (conservative / overshoot / zero-shoot) | n/a | **owns** |
+| Pairwise-comparison caveats (counterbalance ordering) | (referenced) | **owns** |
+| Structural review mode (text consistency only, not execution) | n/a | **owns** |
+| Environment constraints (Task tool unavailable in current session) | n/a | **owns** |
+| Red-flag table (self-reread rationalization, etc.) | n/a | **owns** |
+
+**Use `empirical-prompt-tuning` when:** evaluating inside a Claude Code session via Task-tool subagent dispatch; needing `tool_uses` measurement of the executor; running the Iter 0 static consistency check; writing the `[critical]`-tagged requirements checklist.
+
+**Use `waxa-eval` (this skill) when:** running the eval as an external CLI process; persisting iteration history as YAML for repeatability or CI; encoding scenarios that re-run after every skill edit; gating an external skill candidate before adoption (cf. `skill-finder`).
+
+A real flow often uses both: `empirical` for the in-session Iter 0 + first dispatch to confirm direction, then `waxa-eval` for the iter loop and durable ledger.
+
 ## Related
 
-- `empirical-prompt-tuning` — methodology this skill operationalizes (convergence definition, Self-report contract)
+- `empirical-prompt-tuning` — methodology this skill operationalizes; see scope table above for responsibility split
 - `superpowers:writing-skills` — TDD framing for skills; pairs with this skill (write skill → eval → iterate)
 - `skill-finder` — uses waxa-eval as the adoption gate for cross-source candidates
 - `tools/waxa/README.md` — CLI argument reference
