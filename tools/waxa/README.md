@@ -1,5 +1,8 @@
 # @mizchi/waxa
 
+[![npm version](https://img.shields.io/npm/v/@mizchi/waxa.svg)](https://www.npmjs.com/package/@mizchi/waxa)
+[![license](https://img.shields.io/npm/l/@mizchi/waxa.svg)](./LICENSE)
+
 Skill evaluation CLI. **waza-schema-compatible** runner with the
 **empirical-prompt-tuning** iteration loop, structured self-report grader, and
 LLM-as-Judge layered on top.
@@ -32,7 +35,7 @@ waxa keeps the same eval / task YAML schema and adds the policy layer:
 ## Install
 
 ```bash
-# from npm (after publish)
+# published on npm (verified on Node 20+, ESM-only, built with dnt 0.42.3)
 npm i -g @mizchi/waxa
 
 # or run from source via Deno
