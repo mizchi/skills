@@ -1,19 +1,36 @@
 ---
 name: nix-setup
-description: Set up Nix flakes for dev environments. Templates for MoonBit, Rust, TypeScript+pnpm, Python+uv preloaded with just / ast-grep / apm. Covers buildNpmPackage, direnv, GitHub Actions, and bootstrapping in sandboxed envs (Claude Code web). Use when starting, adding, or troubleshooting a Nix setup.
+description: Set up reproducible dev environments via devbox (Nix-backed) or pure Nix flakes. Templates for MoonBit, Rust, TypeScript+pnpm, Python+uv, Haskell, OCaml, OxCaml preloaded with just / ast-grep / apm. Covers devbox.json, buildNpmPackage, direnv, GitHub Actions, and bootstrapping in sandboxed envs (Claude Code web). Use when starting, adding, or troubleshooting a Nix or devbox setup.
 ---
 
 # Nix Setup Skill
 
-Reference for setting up development environments that assume Nix flakes (flakes + `nix-command`). Per-language templates are collected under `assets/` so you can drop them in with a single `cp`.
+Reference for setting up reproducible development environments. Two paths share the same Nix backend:
+
+- **devbox** — thin layer over Nix; `devbox.json` is concise JSON. Default for new projects.
+- **pure flake.nix** — full Nix expression power; per-language templates ship under `assets/` for `cp`-and-go bootstrap.
+
+## Decision: devbox or pure flake?
+
+`devbox` runs on top of Nix (uses Nix store + nixpkgs internally), so picking one or the other is a UX choice, not a stack choice. Defaults for mizchi/<repo>:
+
+| When | Use |
+|---|---|
+| New project, standard nixpkgs packages cover the need | **devbox** |
+| Need a custom derivation, input override, overlay, or `buildNpmPackage` | **flake.nix** |
+| Need `flake.lock` as the authoritative reproducibility source (vs `devbox.lock`) | **flake.nix** |
+| Targeting Claude Code web / sandboxed env where the devbox installer is too heavy | **flake.nix** with `setup_nix.sh` |
+| Already own a working flake; team uses direnv | **flake.nix** |
+
+`devbox.json` packages map near-1:1 to nixpkgs attribute paths, so switching to flake.nix later is straightforward.
 
 ## When to use
 
-- "Create a nix dev shell" / "Write a flake.nix"
-- "Add nix to a new project"
+- "Create a nix dev shell" / "Write a flake.nix" / "Set up devbox"
+- "Add a reproducible env to a new project"
 - "Make nix work on claude code web / in a container"
-- General questions about `flake.nix` / `flake.lock` / `.envrc`
-- Troubleshooting `nix develop` / `nix build`
+- General questions about `flake.nix` / `flake.lock` / `.envrc` / `devbox.json`
+- Troubleshooting `nix develop` / `nix build` / `devbox shell`
 
 ## What's in `assets/`
 
@@ -41,6 +58,102 @@ Every template ships with **`just`**, **`ast-grep`**, and **`apm`** (shared oper
 The templates assume you place `flake.nix` + `apm.nix` side-by-side at the project root. If you want to swap out the language side, `apm.nix` is reusable as-is.
 
 **`apm.nix` is optional**: you can delete it for projects that don't use the APM skill. In that case, remove both `apm = import ./apm.nix ...` and the `apm` entry inside `packages` from `flake.nix`. If you only want to keep `just` / `ast-grep`, leave it alone.
+
+`assets/devbox/` carries a `devbox.json` template and a GitHub Actions snippet for the devbox path.
+
+## Using devbox
+
+`devbox` provides isolated, reproducible environments per project on top of Nix without writing Nix expressions.
+
+### Install
+
+```bash
+curl -fsSL https://get.jetify.com/devbox | bash
+```
+
+### Basic commands
+
+```bash
+devbox init                       # creates devbox.json
+devbox add nodejs@20              # add packages by name@version
+devbox add python@3.12 go@1.22
+devbox rm nodejs                  # remove
+devbox shell                      # enter the env shell
+devbox run -- npm test            # run a one-shot command
+devbox run test                   # run a named script
+devbox services start             # start process-compose services
+devbox search nodejs              # search packages
+```
+
+Package search index: <https://www.nixhub.io>.
+
+### `devbox.json` shape
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/main/.schema/devbox.schema.json",
+  "packages": [
+    "nodejs@20",
+    "python@3.12",
+    "github:NixOS/nixpkgs#hello"
+  ],
+  "env": {
+    "DATABASE_URL": "postgresql://localhost:5432/dev",
+    "NODE_ENV": "development"
+  },
+  "shell": {
+    "init_hook": [
+      "export API_KEY=$(<.api_key)"
+    ],
+    "scripts": {
+      "test": "npm test",
+      "dev": "npm run dev",
+      "lint": ["eslint .", "prettier --check ."]
+    }
+  }
+}
+```
+
+### Services (`process-compose.yaml`)
+
+```yaml
+processes:
+  web:
+    command: npm run dev
+  db:
+    command: postgres -D /tmp/pgdata
+```
+
+```bash
+devbox services start | stop | ls
+```
+
+### GitHub Actions
+
+Use `jetify-com/devbox-install-action`. A complete workflow lives in `assets/devbox/gh_action_example.yaml`.
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - uses: jetify-com/devbox-install-action@v0.12.0
+    # with:
+    #   enable-cache: true   # caches the Nix store
+  - run: devbox run test
+```
+
+### Common flags
+
+| Flag | Description |
+|---|---|
+| `--config <path>` | Path to a non-default `devbox.json` |
+| `--quiet` | Suppress output |
+| `--print-env` | Print the env this devbox would set up |
+
+### Devbox references
+
+- <https://github.com/jetify-com/devbox>
+- <https://www.jetify.com/devbox/docs/>
+- <https://www.nixhub.io>
 
 ## Quick install
 

@@ -37,10 +37,9 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [chezmoi-management](chezmoi-management/) | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
 | [cloudflare-deploy](cloudflare-deploy/) | Deploy applications to Cloudflare Workers / Pages and related platform services. |
 | [conventional-changelog](conventional-changelog/) | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
-| [devbox](devbox/) | Nix-based devbox reference with GitHub Actions examples. |
 | [dotenvx](dotenvx/) | dotenvx env-var management reference (encryption, multi-env, CI). |
 | [justfile](justfile/) | `just` command runner reference with GitHub Actions examples. |
-| [nix-setup](nix-setup/) | Bootstrap Nix flakes for MoonBit / Rust / TypeScript / Python projects. |
+| [nix-setup](nix-setup/) | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates (MoonBit / Rust / TS+pnpm / Python+uv / Haskell / OCaml / OxCaml), direnv, GitHub Actions, devbox.json + `setup_nix.sh` for sandbox bootstrap. |
 | [gh-fix-ci](gh-fix-ci/) | Debug and fix failing GitHub Actions PR checks via `gh`. |
 | [node-sqlite-vec](node-sqlite-vec/) | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
 | [pi-coding-agent](pi-coding-agent/) | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |

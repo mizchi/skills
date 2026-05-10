@@ -58,8 +58,7 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | justfile | `mizchi/skills/justfile` | Project uses or considers `just` as task runner |
-| devbox | `mizchi/skills/devbox` | Project uses devbox (Nix-based reproducible env) |
-| nix-setup | `mizchi/skills/nix-setup` | Bootstrapping Nix flakes (MoonBit / Rust / TypeScript+pnpm / Python+uv) |
+| nix-setup | `mizchi/skills/nix-setup` | Reproducible dev environment via devbox (Nix-backed, default) or pure Nix flakes (cutting-edge customization). Includes per-language flake templates and a devbox.json template |
 
 ### Static analysis / lint
 **Signals**: `sgconfig.yml`, ad-hoc lint requirements that ESLint/biome can't express
