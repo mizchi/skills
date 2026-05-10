@@ -1,6 +1,6 @@
 ---
 name: skill-selector
-description: 'Use when initializing a project, or mid-stream when a missing capability is detected, to decide which skills to add via APM. Two-phase: pick from a curated catalog first; only escalate to broader search/evaluation when the catalog has no fit. Avoids the failure mode of impulse-installing skills you never use or hand-searching GitHub when a vetted answer already exists.'
+description: 'Meta-skill for picking project skills via APM. Invoke ONLY when the user explicitly asks to set up apm.yml, choose which skills a project needs, or evaluate a catalog match — do NOT auto-invoke on routine project-init or apm-management tasks. Two-phase: pick from a curated catalog first; only escalate to broader search/evaluation when the catalog has no fit. Avoids the failure mode of impulse-installing skills you never use or hand-searching GitHub when a vetted answer already exists.'
 ---
 
 # Skill Selector

@@ -1,6 +1,6 @@
 ---
 name: apm-usage
-description: Use APM (Agent Package Manager) to manage agent skills and dependencies. Use when adding, removing, or updating skills in a project or globally, creating skills for a repository, or configuring apm.yml.
+description: Reference for APM (Agent Package Manager) — apm.yml syntax, install / uninstall / update commands, target detection, lockfile workflow. Read when you need exact field names, but do NOT auto-invoke on every apm-related task; user prompts about projects with installed skills can be handled with general APM knowledge. Invoke explicitly when the user mentions APM by name, asks to author or audit an apm.yml, or runs into an unfamiliar APM command / error.
 ---
 
 # APM (Agent Package Manager)
