@@ -1,0 +1,29 @@
+eval: nix-setup-eval
+skill: nix-setup
+patterns:
+  - rule: >-
+      外部パッケージを `buildNpmPackage` でラップする際は必ず `"bin"` フィールドを確認し、`apps.*.program`
+      のパスと突合してから提示する
+    seen_in:
+      - 2
+    representative_issue: '`tools/cli/` の binary 名が不明'
+iterations:
+  - iter: 1
+    timestamp: '2026-05-10T08:24:24.610Z'
+    overall_pass_rate: 0.875
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+  - iter: 2
+    timestamp: '2026-05-10T08:30:37.053Z'
+    overall_pass_rate: 0.75
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        外部パッケージを `buildNpmPackage` でラップする際は必ず `"bin"` フィールドを確認し、`apps.*.program`
+        のパスと突合してから提示する
+    reseen_rules: []
