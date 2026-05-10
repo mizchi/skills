@@ -1,0 +1,7 @@
+paths:
+  skills: skills/
+  evals: evals/
+  results: results/
+defaults:
+  model: claude-sonnet-4-6
+  timeout: 60

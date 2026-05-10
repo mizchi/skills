@@ -1,0 +1,26 @@
+name: echo-skill-eval
+skill: echo-skill
+version: "0.1"
+
+config:
+  trials_per_task: 2     # average over LLM non-determinism
+  timeout_seconds: 60
+  parallel: false
+
+graders:
+  - name: prefix_present
+    type: text
+    config:
+      regex_match: ["^ECHO: "]
+
+  - name: no_extra_prose
+    type: code
+    config:
+      assertions:
+        # Tolerate the appended Self-report block by counting only the
+        # deliverable lines (everything before "## Self-report"). The
+        # echo-skill should be a single line of output.
+        - "(output.split('## Self-report')[0]).trim().split('\\n').length === 1"
+
+tasks:
+  - "tasks/*.yaml"

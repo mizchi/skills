@@ -1,0 +1,21 @@
+id: echo-hello
+name: Echo a single greeting
+description: Smoke test — single line in, single line out, with the ECHO prefix.
+tags:
+  - smoke
+
+inputs:
+  prompt: |
+    hello world
+
+expected:
+  output_contains: ["ECHO: hello world"]
+  require_self_report: true
+
+graders:
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_all_phases_ok: true
+      max_unclear: 0
+      max_retries: 0

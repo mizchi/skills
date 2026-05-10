@@ -104,6 +104,163 @@ defaults:
   timeout: 300
 ```
 
+## Tutorial: your first waxa eval
+
+A complete walk-through that produces a working evaluation in a minute,
+using a deliberately trivial skill so you can see waxa's machinery
+without it being drowned out by skill content. A larger real-world
+example (the `skill-selector` eval) lives in
+[mizchi/skills:evals/skill-selector/](https://github.com/mizchi/skills/tree/main/evals/skill-selector).
+
+A ready-made copy of all the files below is in
+[`tools/waxa/examples/echo-skill/`](./examples/echo-skill/).
+
+### 1. Project layout
+
+```bash
+mkdir my-eval && cd my-eval
+git init
+mkdir -p skills/echo-skill evals/echo-skill/tasks
+```
+
+### 2. `.waxa.yaml` (project root)
+
+```yaml
+paths:
+  skills: skills/
+  evals: evals/
+  results: results/
+defaults:
+  model: claude-sonnet-4-6
+  timeout: 60
+```
+
+### 3. The skill under test (`skills/echo-skill/SKILL.md`)
+
+```markdown
+---
+name: echo-skill
+description: Use when the user provides an arbitrary line of text and you must echo it back verbatim, prefixed with "ECHO:".
+---
+
+# echo-skill
+
+When invoked, return the user's input verbatim with the literal prefix
+`ECHO: ` and nothing else. Do not add commentary, formatting, or
+clarification.
+```
+
+### 4. Eval suite (`evals/echo-skill/eval.yaml`)
+
+```yaml
+name: echo-skill-eval
+skill: echo-skill
+config:
+  trials_per_task: 2     # average over LLM non-determinism
+  timeout_seconds: 60
+  parallel: false
+
+graders:
+  - name: prefix_present
+    type: text
+    config:
+      regex_match: ["^ECHO: "]
+
+  - name: no_extra_prose
+    type: code
+    config:
+      assertions:
+        # The reply should be a single line. Tolerate the appended
+        # Self-report block by counting lines before "## Self-report".
+        - "len(output.split('## Self-report')[0].trim().split('\\n')) == 1"
+
+tasks:
+  - "tasks/*.yaml"
+```
+
+### 5. A task (`evals/echo-skill/tasks/hello.yaml`)
+
+```yaml
+id: echo-hello
+name: Echo a single greeting
+inputs:
+  prompt: |
+    hello world
+expected:
+  output_contains: ["ECHO: hello world"]
+  require_self_report: true
+
+graders:
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_all_phases_ok: true
+      max_unclear: 0
+```
+
+### 6. Run
+
+```bash
+# single run (2 trials, both displayed + aggregate)
+waxa evals/echo-skill/eval.yaml
+```
+
+You should see something like:
+
+```
+[1/1] Echo a single greeting
+  -- trial 1/2 --
+    ✓ _output_contains   ✓ prefix_present   ✓ no_extra_prose   ✓ self_report_complete
+    self-report: phases=all OK, unclear=0, retries=0
+    trial pass_rate=100% (3.4s)
+  -- trial 2/2 --
+    ...
+  AGGREGATE: mean_pass_rate=100% across 2 trials, total_unclear=0
+```
+
+### 7. When the skill is wrong: iterate
+
+Edit `SKILL.md` to make it ambiguous (e.g., remove the "no commentary"
+clause), then run:
+
+```bash
+waxa iterate evals/echo-skill/eval.yaml --max 3
+```
+
+waxa will:
+
+1. Run all trials of all tasks each iteration.
+2. Aggregate executor self-reports across trials → `evals/echo-skill/ledger.yaml`.
+3. Stop with `[CONVERGED]` when 2 consecutive iters have zero new
+   unclear points, or `[DIVERGENCE-SIGNAL]` after 3 iters with
+   non-decreasing unclear counts (= "stop patching, rewrite the
+   structure").
+
+### 8. Other workflows
+
+- **Compare models** (objective axes only — no LLM A-vs-B):
+
+  ```bash
+  waxa compare evals/echo-skill/eval.yaml --models claude-sonnet-4-6,claude-haiku-4-5-20251001
+  ```
+
+- **A/B a candidate skill rewrite**:
+
+  ```bash
+  cp -r skills/echo-skill skills/echo-skill-v2
+  # edit echo-skill-v2/SKILL.md ...
+  waxa variant evals/echo-skill/eval.yaml \
+    --base echo-skill --candidate echo-skill-v2
+  ```
+
+  ranks by accuracy → unclear → duration and prints a recommendation.
+
+- **Pick one task** (any subcommand):
+
+  ```bash
+  waxa evals/echo-skill/eval.yaml --task echo-hello
+  ```
+
 ## Grader types
 
 | Type | Description |

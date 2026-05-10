@@ -1,0 +1,21 @@
+id: echo-symbols
+name: Echo with symbols
+description: Edge — non-alphabetic characters and a leading space.
+tags:
+  - edge
+
+inputs:
+  prompt: |
+     1 + 1 = 2
+
+expected:
+  output_contains: ["ECHO:  1 + 1 = 2"]
+  require_self_report: true
+
+graders:
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_all_phases_ok: true
+      max_unclear: 0
+      max_retries: 0
