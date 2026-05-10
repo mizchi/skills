@@ -94,7 +94,7 @@ Run via `npx` (no global install needed):
 npx @mizchi/waxa <eval.yaml>
 ```
 
-`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.1.0` when reproducibility matters.
+`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.1.1` when reproducibility matters (do not pin `0.1.0` — that release shipped a broken shebang and crashes before argv parsing).
 
 Alternatives:
 

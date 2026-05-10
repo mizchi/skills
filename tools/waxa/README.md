@@ -39,7 +39,8 @@ waxa keeps the same eval / task YAML schema and adds the policy layer:
 npx @mizchi/waxa <path/to/eval.yaml>
 
 # pin a version when reproducibility matters
-npx @mizchi/waxa@0.1.0 <path/to/eval.yaml>
+# (do NOT pin 0.1.0 — broken shebang, use 0.1.1+)
+npx @mizchi/waxa@0.1.1 <path/to/eval.yaml>
 
 # install globally if you call waxa frequently and startup latency matters
 npm i -g @mizchi/waxa
