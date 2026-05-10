@@ -16,9 +16,11 @@ inputs:
     新規 Rust プロジェクトを立ち上げる:
     - Rust stable channel を pin したい (rust-overlay 経由)
     - cargo-nextest と cargo-watch を環境に含める
-    - リポジトリに含まれる Node.js 製の internal CLI (`tools/cli/`) を
-      `buildNpmPackage` で Nix derivation に wrap して、`nix run` で
-      呼べるようにしたい
+    - リポジトリに含まれる Node.js 製の internal CLI を
+      `buildNpmPackage` で Nix derivation に wrap して、
+      `nix run .#my-cli` で呼べるようにしたい
+      (CLI のソースは `tools/cli/`、`package.json` の `bin` に
+      `my-cli` が登録されている前提)
     - flake.lock を authoritative reproducibility source として team
       で共有したい
     - direnv 利用可

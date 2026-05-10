@@ -24,6 +24,8 @@ Reference for setting up reproducible development environments. Two paths share 
 
 `devbox.json` packages map near-1:1 to nixpkgs attribute paths, so switching to flake.nix later is straightforward.
 
+**When picking pure flake.nix, write the reason `devbox is rejected` into the proposal (one short line).** Example: "Choosing pure flake.nix here because rust-overlay's input override cannot be expressed in `devbox.json`." This keeps reviewers from having to re-derive why the heavier flake path was chosen, and forces the matrix to be applied consciously rather than by reflex.
+
 ## When to use
 
 - "Create a nix dev shell" / "Write a flake.nix" / "Set up devbox"
