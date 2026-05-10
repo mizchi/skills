@@ -1,0 +1,63 @@
+# Scenario C (edge) — skill-selector catalog already covers the need.
+# skill-finder must recognize that this is a Phase 1 / skill-selector case
+# and defer instead of running its own discovery sweep.
+id: skill-finder-catalog-covers-001
+name: Defer to skill-selector when catalog already covers
+description: |
+  User asks for "a Playwright skill". The skill-selector catalog already has
+  playwright-test. skill-finder should not duplicate the catalog scan;
+  it should redirect to skill-selector Phase 1.
+
+tags:
+  - edge
+  - phase-boundary
+  - non-escalation
+
+inputs:
+  prompt: |
+    Playwright で E2E テストを書きたいので、 skill を探して入れてほしい。
+
+expected:
+  output_contains:
+    - "playwright-test"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: redirects_to_skill_selector
+    type: text
+    config:
+      regex_match:
+        - "(?i)(skill-selector|phase\\s*1|catalog\\s*(scan|already|covers))"
+
+  - name: catalog_skill_named
+    type: text
+    config:
+      regex_match:
+        - "playwright-test"
+
+  - name: no_premature_search
+    type: text
+    config:
+      forbidden_match:
+        - "(?i)tier\\s*[2-4]\\s*search"
+        - "(?i)github\\s*topic\\s*search"
+        - "(?i)agent-skills\\.cc"
+
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  - name: deferral_semantic
+    type: llm
+    config:
+      rubric: |
+        Output は次をすべて満たすか?
+        1. catalog が既に対応 skill (playwright-test) を持つことを述べる
+        2. skill-finder ではなく skill-selector の Phase 1 を使うべきと redirect する
+        3. 自身では Tier 1-4 の sweep を始めない (= 「まず skill-selector を呼んで」と返すか、
+           skill-selector の workflow を簡潔になぞる)
+        全 3 項を満たすときのみ PASS: yes。

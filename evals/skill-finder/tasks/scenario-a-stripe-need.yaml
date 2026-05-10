@@ -1,0 +1,75 @@
+# Scenario A (median) — discovery for an out-of-catalog domain (Stripe).
+# The catalog has nothing for Stripe. skill-finder should sweep tiers
+# top-down, propose candidates from Tier 1-2, and require the waxa eval
+# gate before adoption.
+id: skill-finder-stripe-need-001
+name: Stripe payment skill discovery
+description: |
+  User wants a Stripe-related skill for a Node.js project.
+  Catalog has no Stripe entry — this is a Phase 2 / skill-finder case.
+
+tags:
+  - discovery
+  - tier-1-2
+  - waxa-gate
+  - external-domain
+
+inputs:
+  prompt: |
+    Node.js (pnpm + TypeScript) のプロジェクトで Stripe 決済を統合したい。
+    Stripe 関連の skill を探して、入れる候補を提案してほしい。
+    実際のネット検索や `apm view` コマンドは実行できなくて構わない。
+    Tier 1 から順に当たる workflow を述べ、 期待される候補名を 1-2 件挙げて、
+    rubric の適用ポイントと waxa eval / pinning の方針を一緒に書いてくれれば良い。
+
+expected:
+  output_contains:
+    - "anthropics"
+    - "waxa"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: tier1_first
+    type: text
+    config:
+      regex_match:
+        - "(?i)tier\\s*1|anthropics/(skills|claude-plugins-official)"
+
+  - name: waxa_gate_mentioned
+    type: text
+    config:
+      regex_match:
+        - "(?i)waxa\\s*(eval|gate|run|iterate)"
+
+  - name: rubric_axes
+    type: text
+    config:
+      regex_match:
+        - "(?i)(fit|maintenance|license|frontmatter|footprint)"
+
+  - name: pinning_or_eval_before_adopt
+    type: text
+    config:
+      regex_match:
+        - "(?i)(pin(ned|ning)?\\s*(to|via|with)?\\s*(a\\s+)?(tag|sha|ref|version))|(eval.*before.*adopt)|(adopt.*after.*eval)|(apm\\s+view)"
+
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  - name: workflow_semantic
+    type: llm
+    config:
+      rubric: |
+        Output は skill-finder の workflow に沿っているか?
+        1. Tier 1 (anthropics/skills, anthropics/claude-plugins-official) を最初に当たる
+        2. Tier 1 で fit がなければ Tier 2 (majiayu000/claude-skill-registry, VoltAgent/awesome-agent-skills) に進む
+        3. 最低 1 件、 Stripe 関連の具体的な candidate (repo URL or owner/repo) を提示している
+        4. rubric (fit / maintenance / license / frontmatter / body / footprint のうち 2+ 項目) が言及されている
+        5. waxa eval gate を adoption 前に必須として明記している
+        6. pin (tag/SHA) について言及がある
+        全 6 項を満たすときのみ PASS: yes。

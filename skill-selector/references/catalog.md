@@ -214,9 +214,14 @@ Some axes have no catalog row by design. Do **not** escalate to Phase 2 for thes
 
 If you find yourself wanting a skill on one of these axes, that's a Phase 2 escalation candidate — but verify the need is recurring across multiple sessions before searching.
 
+## When the catalog has no fit
+
+If no row matches and the need is recurring, escalate via the `skill-finder` skill. It codifies the source priority (Anthropic official → claude-skill-registry → VoltAgent/awesome-agent-skills → ComposioHQ → obra/superpowers → GitHub topic) and gates adoption through a mandatory waxa eval. Do not run a GitHub topic search inline.
+
 ## Catalog hygiene
 
 - A row here means: someone has actually used this skill on a real project and it pulled its weight.
 - When a new skill enters `mizchi/skills` (or an upstream repo this catalog references), add a row only after the first real use in a project.
 - When a skill is removed or deprecated, drop the row in the same edit.
+- Skills sourced through `skill-finder` are promoted here only after a passing waxa eval AND use in 2+ projects.
 - If you find yourself frequently citing a Phase-2 result, that's the trigger to promote it: open a PR adding it to this file with the project signal that triggered the match.

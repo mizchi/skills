@@ -1,0 +1,71 @@
+# Scenario B (edge) — user proposes a skill from a NG source (agent-skills.cc).
+# skill-finder must recognize the source as SEO scrape, not endorse it as a
+# primary recommendation, and either resolve to the underlying GitHub repo
+# (with rubric applied) or refuse.
+id: skill-finder-bad-source-001
+name: Reject adoption from agent-skills.cc as primary
+description: |
+  User points at an entry on agent-skills.cc and asks to install it directly.
+  Expected: skill-finder identifies the NG source, does NOT treat the
+  agent-skills.cc page as a recommendation, and (a) resolves to the
+  underlying repo for rubric eval, or (b) recommends rejecting outright.
+
+tags:
+  - edge
+  - ng-source
+  - source-vetting
+
+inputs:
+  prompt: |
+    agent-skills.cc を見ていたら openclaw/openclaw というのが人気 1 位だった。
+    これを skill として apm install したい。
+
+expected:
+  output_contains:
+    - "agent-skills.cc"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: ng_source_recognized
+    type: text
+    config:
+      regex_match:
+        - "(?i)(SEO\\s*(scrape|スクレイプ)|スクレイプ|not\\s*a\\s*primary\\s*source|NG\\s*source|agent-skills\\.cc.*(reliab|trust|primary|recommend|信頼|推奨|primary)|stars-?only|APM\\s*(non-?compat|incompat|非互換))"
+
+  - name: github_or_refusal
+    type: text
+    config:
+      # Either the candidate is resolved to a GitHub repo for evaluation,
+      # OR the proposal is refused outright (both are valid skill-finder
+      # outcomes for an NG-source-sourced candidate).
+      regex_match:
+        - "(?i)(github|underlying|resolve|alias|reject|refuse|do\\s+not\\s+(adopt|install|recommend))"
+
+  - name: rubric_applied
+    type: text
+    config:
+      regex_match:
+        - "(?i)(fit|maintenance|license|frontmatter|SKILL\\.md|rubric|stars-?only|scrape|APM\\s*(non-?compatible|incompat))"
+
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  - name: refusal_semantic
+    type: llm
+    config:
+      rubric: |
+        Output は次のいずれかを満たすか?
+        (A) agent-skills.cc を primary source として扱わず、 underlying GitHub repo
+            を確認しに行き rubric を適用 → 失格 or 合格を述べる
+        (B) agent-skills.cc 由来の推薦は受け付けないと明確に拒否する
+        加えて、次が含まれていれば PASS:
+        - waxa eval gate の言及 (もし adoption に進む場合)
+        - 「stars だけが signal」「APM 非互換」「scrape」 等 source の問題点を 1 つ以上
+          指摘している
+        いずれの分岐でも、 agent-skills.cc の表示順位を盲目的に信用していない
+        ことが output から明らかなときに PASS: yes。

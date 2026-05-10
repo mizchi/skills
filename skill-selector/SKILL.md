@@ -51,9 +51,9 @@ Workflow:
    - Pinning: catalog entries do not carry tags. Resolve a concrete tag or SHA via `apm view <repo>` (or check the upstream repo's release page) before committing `apm.yml`. Floating refs are listed under Common mistakes.
 5. If a need is unmet, escalate to Phase 2. Do not skip Phase 1 — even if a search query is already forming in your head, scanning the catalog is cheaper.
 
-## Phase 2 — Search and evaluate
+## Phase 2 — Search and evaluate (delegated to `skill-finder`)
 
-Trigger Phase 2 only when **all** of the following are true:
+Phase 2 is owned by the `skill-finder` skill. Trigger it only when **all** of the following are true:
 
 - Phase 1 has no candidate (catalog scanned, no row matched within ~30 seconds).
 - The need is **recurring**, not a one-off setup task. One-off scaffolding (Vite/React init, single-shot config conversion, ad-hoc data migration) belongs inline.
@@ -61,25 +61,7 @@ Trigger Phase 2 only when **all** of the following are true:
 
 If any of the three is false, do nothing. Re-read the "When NOT to use" section above before escalating.
 
-Workflow:
-
-1. **Search**:
-   - GitHub: `topic:claude-skill`, `path:**/SKILL.md`, `org:apm-sh`, the user's own orgs
-   - APM registry / index pages
-   - Cross-references inside skills already installed — they often point at compatible peers
-2. **Evaluate** each candidate against the rubric:
-   - **Fit**: does the description's "Use when..." actually match the project? Re-read the description, not the title.
-   - **Maintenance**: last update recent? Visible activity in the upstream repo?
-   - **License**: SPDX identifier present? Compatible with consuming project?
-   - **Frontmatter health**: `name` matches directory name; description under 1024 chars and triggering-condition-shaped (not workflow-summary — see `superpowers:writing-skills` CSO section).
-   - **Body quality**: explicit "When NOT to use"? Concrete examples vs vague advice?
-   - **Footprint**: heavy always-loaded vs demand-loaded? Prefer demand-loaded.
-   - **Cross-reference cost**: skills marked as REQUIRED dependencies pull additional load.
-3. **Reject by default**. A skill that fails fit / license / maintenance is not borderline — it's a no.
-4. **Test before pinning**: install the candidate temporarily, run a representative scenario through a fresh subagent, judge by the executor's self-report (see `empirical-prompt-tuning`).
-5. **Decide**:
-   - Adopt → pin to a tag or SHA in `apm.yml`. Avoid floating refs for production projects.
-   - Reject → record the reason in a project note (e.g., `docs/skills-rejected.md` or a CLAUDE.md line). Don't re-evaluate the same skill three months later.
+To run Phase 2: tell the user "Phase 1 catalog has no fit; want me to invoke `skill-finder` for a cross-source search?" and only proceed on explicit go-ahead. `skill-finder` performs the cross-source survey (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic), applies the same rubric, and gates adoption through a mandatory waxa eval. Do not duplicate that workflow inline.
 
 ## Phase boundary — do not blur
 
@@ -95,8 +77,8 @@ Reverse failure: forcing a Phase 1 fit when the catalog truly has nothing suitab
 ## Maintenance of the catalog
 
 - Catalog is part of this skill. Keep it in sync when `mizchi/skills` (and upstream skill repos referenced) gain or lose skills.
-- A skill discovered through Phase 2 may be promoted into the catalog after it has been used in 2+ projects without issue.
-- If the catalog feels stale, cross-check against [`mizchi/skills` README](https://github.com/mizchi/skills) before falling back to Phase 2.
+- A skill discovered through Phase 2 (`skill-finder`) may be promoted into the catalog after it has been used in 2+ projects without issue and after passing its waxa eval.
+- If the catalog feels stale, cross-check against [`mizchi/skills` README](https://github.com/mizchi/skills) before falling back to `skill-finder`.
 
 ## Common mistakes
 
@@ -104,13 +86,14 @@ Reverse failure: forcing a Phase 1 fit when the catalog truly has nothing suitab
 |---|---|
 | Installing skills "just in case" | Don't. Each one costs context per conversation. Install only when there's a near-term task that needs it. |
 | Skipping the catalog and going straight to GitHub search | Re-read the catalog first. It exists to avoid this. |
-| Adopting a Phase 2 skill without testing | Run an empirical scenario via a subagent first. Descriptions can lie. |
+| Adopting a Phase 2 skill without testing | `skill-finder` requires a waxa eval gate before adoption. Don't bypass it — descriptions can lie. |
 | Floating refs in `apm.yml` for project scope | Pin to a tag or SHA. Drift mid-feature is its own debugging hell. |
 | Re-evaluating the same rejected skill quarterly | Record the rejection reason in-repo. Don't re-search ground already covered. |
 | Treating Phase 1 catalog as exhaustive | If nothing matches in ~30 seconds, escalate to Phase 2. Don't shoehorn. |
 
 ## Related
 
+- `skill-finder` — Phase 2 owner; cross-source survey + waxa eval gate when the catalog has no fit
 - `apm-usage` — actual `apm install` syntax and manifest format
 - `empirical-prompt-tuning` — how to test a candidate skill before adopting it
 - `superpowers:writing-skills` — when no existing skill fits, write one instead of adopting a poor match

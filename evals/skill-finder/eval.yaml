@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
+name: skill-finder-eval
+description: |
+  Evaluation suite for skill-finder.
+  Verifies the cross-source discovery workflow:
+  - Tier-1 sources are surveyed before Tier-2+ (no premature GitHub topic search).
+  - agent-skills.cc is recognized as a non-primary source.
+  - waxa eval gate is mandatory before adoption.
+  - When skill-selector Phase 1 already covers the need, skill-finder defers
+    instead of duplicating the catalog scan.
+
+skill: skill-finder
+version: "0.1"
+
+config:
+  trials_per_task: 2
+  timeout_seconds: 360
+  parallel: false
+  # mock for smoke verification of the YAML structure; switch to claude-cli
+  # for real evaluation runs (model: claude-sonnet-4-6).
+  executor: mock
+  model: claude-sonnet-4-6
+
+tasks:
+  - "tasks/*.yaml"
