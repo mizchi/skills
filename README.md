@@ -75,10 +75,71 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | --- | --- |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [retrospective-codify](retrospective-codify/) | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
-| [skill-selector](skill-selector/) | Decide which skills to add to a project — Phase 1 picks from a curated catalog, Phase 2 searches and evaluates outside-catalog candidates. |
+| [skill-selector](skill-selector/) | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
+| [skill-finder](skill-finder/) | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
+| [waxa-eval](waxa-eval/) | Operating manual for the `waxa` CLI — scenario authoring, grader selection, ledger schema, the four-stage iteration pattern, convergence rules. |
 | [extract-glossary](extract-glossary/) | Extract domain-specific terms, repository implementation maps, and onboarding Mermaid diagrams from one or more repos / GitHub orgs. |
 | [mizchi-blog-style](mizchi-blog-style/) | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
 | [tech-article-reproducibility](tech-article-reproducibility/) | Simulate a first-time reader reproducing a technical article and list missing information. |
+
+## Tools
+
+### `waxa` — skill evaluation CLI
+
+Lives at [`tools/waxa/`](tools/waxa/) and is published as [`@mizchi/waxa`](https://www.npmjs.com/package/@mizchi/waxa). Used by the `waxa-eval` skill, and forms the adoption gate of `skill-finder`.
+
+Install (npm, recommended):
+
+```sh
+npm i -g @mizchi/waxa
+```
+
+Or run from source (requires Deno 2+):
+
+```sh
+git clone https://github.com/mizchi/skills.git
+cd skills/tools/waxa
+deno task run -- path/to/eval.yaml
+```
+
+Requirements: `claude` CLI on `PATH` and authenticated (OAuth login or `ANTHROPIC_API_KEY`).
+
+Quick reference:
+
+```sh
+waxa <eval.yaml>                                   # single run
+waxa iterate <eval.yaml> [--max N]                 # iteration loop with ledger
+waxa compare <eval.yaml> --models <m1>,<m2>        # multi-model objective comparison
+waxa variant <eval.yaml> --base <skill-a> --candidate <skill-b>  # A/B exploration
+```
+
+Full reference: [`tools/waxa/README.md`](tools/waxa/README.md).
+
+## Recommended starter set
+
+If you are setting up a new project that will produce or consume skills, this combination covers selection, discovery, and iteration:
+
+```yaml
+# apm.yml
+targets:
+  - claude
+dependencies:
+  apm:
+    - mizchi/skills/apm-usage          # APM manifest reference
+    - mizchi/skills/skill-selector     # Phase 1: pick from curated catalog
+    - mizchi/skills/skill-finder       # Phase 2: cross-source discovery + waxa eval gate
+    - mizchi/skills/waxa-eval          # waxa CLI operating manual
+    - mizchi/skills/empirical-prompt-tuning  # methodology / Iter 0 / [critical]-tag checklist
+```
+
+Then:
+
+```sh
+apm install                # installs the skills under .claude/skills/
+npm i -g @mizchi/waxa      # installs the waxa CLI for the eval loop
+```
+
+The skill-selection / discovery / evaluation flow then proceeds as: `skill-selector` (catalog pre-flight) → if no fit, `skill-finder` (Tier 1-4 sweep) → adoption gated by `waxa-eval` running `waxa iterate` against a `evals/<skill>/` directory you author. `empirical-prompt-tuning` covers what `waxa` cannot reach (the Iter 0 description / body consistency check, `tool_uses`-based skill self-containment diagnosis, and the `[critical]`-tagged requirements checklist that gives binary success judgment).
 
 ## Language
 
