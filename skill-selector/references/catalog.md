@@ -156,6 +156,8 @@ The "Install" column may also be:
 | Skill | Install | Use when |
 |---|---|---|
 | apm-usage | `mizchi/skills/apm-usage` | Adding / removing / updating skills via APM (always pair with `skill-selector`) |
+| skill-finder | `mizchi/skills/skill-finder` | Cross-source survey + waxa eval gate when the catalog has no fit (Phase 2 of the selection flow) |
+| waxa-eval | `mizchi/skills/waxa-eval` | Iterating on a skill's prompt with the waxa CLI — scenarios, graders, ledger, convergence |
 | empirical-prompt-tuning | `mizchi/skills/empirical-prompt-tuning` | Iteratively improving an agent-facing instruction via subagent execution |
 | retrospective-codify | `mizchi/skills/retrospective-codify` | Converting trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules |
 | extract-glossary | `mizchi/skills/extract-glossary` | Extracting domain-specific terms / repo implementation maps / onboarding Mermaid diagrams from one or more repos / GitHub orgs |
