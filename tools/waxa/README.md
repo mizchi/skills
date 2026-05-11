@@ -61,20 +61,25 @@ Requirements:
 ## Quick start
 
 ```bash
-# scaffold evals/<skill>/ with eval.yaml + tasks/scenario-{typical,edge}.yaml
-# (run inside the skill's own dir, or pass --skill <name>)
+# Scaffold <cwd>/evals/ with eval.yaml + tasks/scenario-{typical,edge}.yaml.
+# Run from inside the skill's own directory (the basename gives the skill name),
+# or pass --skill <name>.
 npx @mizchi/waxa init [--skill <name>] [--force]
 
-# single run
+# Single run.
 npx @mizchi/waxa <path/to/eval.yaml> [--task <task-id>]
 
-# iteration loop with cumulative ledger
+# Single run with baseline comparison (with_skill vs without_skill).
+# Reports a Delta line and writes both configs into iteration-N/.
+npx @mizchi/waxa <path/to/eval.yaml> --baseline
+
+# Iteration loop with cumulative ledger.
 npx @mizchi/waxa iterate <path/to/eval.yaml> [--max 5] [--task <task-id>]
 
-# multi-model comparison (objective axes only — no LLM A-vs-B judge)
+# Multi-model comparison (objective axes only — no LLM A-vs-B judge).
 npx @mizchi/waxa compare <path/to/eval.yaml> --models claude-sonnet-4-6,claude-opus-4-7
 
-# skill A/B variant exploration (e.g. current vs experimental rewrite)
+# Skill A/B variant exploration (current vs experimental rewrite).
 npx @mizchi/waxa variant <path/to/eval.yaml> --base skill-current --candidate skill-rewritten
 ```
 
@@ -86,23 +91,44 @@ The npm package ships with `references/empirical-prompt-tuning.md` (the full met
 
 ## Test layout convention
 
-`waxa init` writes the layout `waxa <eval.yaml>` expects:
+From 0.2.0, eval files live **inside the skill directory**, mirroring agentskills.io's [evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills) layout. `waxa init` writes:
 
 ```
-<repo-root>/
-├── .waxa.yaml                            # marker for repo-root resolution
-├── <skill>/                              # the skill being evaluated (SKILL.md lives here)
-│   └── SKILL.md
+<skill>/                                  # the skill being evaluated
+├── SKILL.md
 └── evals/
-    └── <skill>/
-        ├── eval.yaml                     # config, graders, task glob
-        ├── ledger.yaml                   # iter history (created on first `waxa iterate`)
-        └── tasks/
-            ├── scenario-typical.yaml     # median case — should pass at convergence
-            └── scenario-edge.yaml        # known failure mode — exercises the rule the skill encodes
+    ├── eval.yaml                         # config, graders, task glob
+    ├── ledger.yaml                       # iter history (created on first `waxa iterate`)
+    └── tasks/
+        ├── scenario-typical.yaml         # median case — should pass at convergence
+        └── scenario-edge.yaml            # known failure mode — exercises the rule the skill encodes
 ```
+
+Workspace (per-iteration outputs) lands at:
+
+```
+<workspace-root>/results/<skill>/iteration-N/
+├── <task-id>/
+│   ├── with_skill/
+│   │   ├── output-trial-1.txt
+│   │   ├── output-trial-2.txt
+│   │   ├── timing.json
+│   │   └── grading.json
+│   └── without_skill/                    # only when --baseline was passed
+│       ├── output-trial-1.txt
+│       ├── output-trial-2.txt
+│       ├── timing.json
+│       └── grading.json
+└── benchmark.json                        # aggregated mean / stddev / delta
+```
+
+`<workspace-root>` is the directory containing `.waxa.yaml` / `.waza.yaml` when present, otherwise the skill directory's parent. Add `results/` to `.gitignore` — it accumulates as you iterate.
 
 Authoring patterns: at least 2 tasks (typical + edge), `trials_per_task: 2` to average over LLM non-determinism, pair every surface grader (`text` regex) with a semantic LLM grader (`llm` rubric). See the bundled `references/empirical-prompt-tuning.md` for the methodology.
+
+### Backward compatibility
+
+The monorepo-legacy layout (`<repo-root>/evals/<skill>/eval.yaml` plus `<repo-root>/<skill>/SKILL.md`) is still detected and runs, so existing eval suites continue working during migration. New evals should use skill-local.
 
 To run tasks within an eval in parallel, set `config.parallel: true` and
 optionally `config.workers: <N>` (default 2) in the eval file. claude

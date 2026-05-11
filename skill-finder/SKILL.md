@@ -67,7 +67,7 @@ Priority tiers. Always start at the top and only escalate when the tier above ha
    - **Footprint** — body length, demand-loaded vs always-loaded references, cross-skill dependencies.
 4. **waxa eval gate (mandatory).** Adoption without empirical evaluation is the failure mode this skill exists to prevent. For each shortlisted candidate:
    - Install temporarily: `apm install <owner>/<repo>/skills/<name>` into a sandbox project (or symlink for local audit).
-   - Author 1-2 representative `tasks/*.yaml` matching the project's actual recurring task. See `evals/skill-selector/` and `evals/nix-setup/` for working templates.
+   - Author 1-2 representative `tasks/*.yaml` matching the project's actual recurring task. See `skill-selector/evals/` and `nix-setup/evals/` (skill-local layout from waxa 0.2.0) for working templates.
    - Run `waxa run` with `trials_per_task: 2` minimum.
    - Iterate (`waxa iterate`) until the ledger converges. Convergence = 2 consecutive runs with zero unclear-points (cf. `empirical-prompt-tuning`).
    - If unclear-points persist across 2 iterations with no decreasing trend → treat as **divergent**, reject.
@@ -128,7 +128,7 @@ tasks:
   - "tasks/*.yaml"
 ```
 
-Working references in this repo: `evals/skill-selector/eval.yaml`, `evals/nix-setup/eval.yaml`.
+Working references in this repo: `skill-selector/evals/eval.yaml`, `nix-setup/evals/eval.yaml` (skill-local layout from waxa 0.2.0).
 
 ## Common mistakes
 

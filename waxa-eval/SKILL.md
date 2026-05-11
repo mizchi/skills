@@ -176,42 +176,51 @@ convergence:
 
 ## Test layout convention
 
-`waxa init` writes the layout the runner expects. Files go at the repo root, not inside the skill directory, so the skill body and its eval evolve independently:
+From waxa 0.2.0, eval files live **inside the skill directory**, mirroring [agentskills.io's evaluating-skills layout](https://agentskills.io/skill-creation/evaluating-skills). This lets a single skill repo carry its own eval suite and ship as a self-contained unit:
 
 ```
-<repo-root>/
-├── .waxa.yaml                        # marker for repo-root resolution
-├── <skill>/SKILL.md                  # the target skill
-└── evals/<skill>/
-    ├── eval.yaml                     # config + top-level graders + task glob
-    ├── ledger.yaml                   # iter history (created on first `iterate` run)
+<skill>/                                # the target skill (distribution unit)
+├── SKILL.md
+└── evals/
+    ├── eval.yaml                       # config + top-level graders + task glob
+    ├── ledger.yaml                     # iter history (created on first `iterate` run)
     └── tasks/
-        ├── scenario-typical.yaml     # median — passes at convergence
-        └── scenario-edge.yaml        # known failure mode — exercises the rule
+        ├── scenario-typical.yaml       # median — passes at convergence
+        └── scenario-edge.yaml          # known failure mode — exercises the rule
 ```
+
+Workspace (per-iteration runs) lands outside the skill at `<workspace-root>/results/<skill>/iteration-N/<task-id>/<with_skill|without_skill>/{output-trial-*.txt, timing.json, grading.json}` plus `benchmark.json`. `<workspace-root>` is the `.waxa.yaml` / `.waza.yaml` directory when present, otherwise the skill directory's parent. Add `results/` to `.gitignore`.
 
 `waxa init` scaffolds eval.yaml and the two task templates with TODO markers; ledger.yaml is generated when iteration starts.
+
+The pre-0.2.0 monorepo layout (`<repo-root>/evals/<skill>/eval.yaml` + `<repo-root>/<skill>/SKILL.md`) is still auto-detected, so old evals keep working; new ones should use skill-local.
 
 ## Running the loop
 
 Bare minimum:
 
 ```bash
-# Scaffold the eval skeleton (run inside the skill's own dir, or pass --skill)
+# Scaffold the eval skeleton (run inside the skill's own dir).
 npx @mizchi/waxa init [--skill <name>] [--force]
-# (equivalent from source: deno run -A tools/waxa/src/cli.ts init ...)
 
-# Single eval pass
-npx @mizchi/waxa evals/<skill>/eval.yaml
+# Single eval pass.
+npx @mizchi/waxa <skill>/evals/eval.yaml
 
-# Single task
-npx @mizchi/waxa evals/<skill>/eval.yaml --task <task-id>
+# Single task.
+npx @mizchi/waxa <skill>/evals/eval.yaml --task <task-id>
 
-# Iteration loop (auto re-runs while pass rate improves)
-npx @mizchi/waxa iterate evals/<skill>/eval.yaml --max 4
+# Single eval with baseline (with_skill vs without_skill, reports Delta).
+npx @mizchi/waxa <skill>/evals/eval.yaml --baseline
+
+# Iteration loop (auto re-runs while pass rate improves; writes ledger.yaml).
+npx @mizchi/waxa iterate <skill>/evals/eval.yaml --max 4
 ```
 
 The npm package bundles `references/empirical-prompt-tuning.md` so the methodology is on disk wherever waxa is installed. After `npx @mizchi/waxa` first runs, the file lives at `<node_modules>/@mizchi/waxa/references/empirical-prompt-tuning.md`.
+
+### `--baseline` — is the skill earning its keep?
+
+`--baseline` runs every task twice per trial (with_skill and without_skill), then prints a Delta line and writes both configs into `iteration-N/<task-id>/`. This is the agentskills.io-style "does the skill body actually improve over a blank-slate model?" check. Skills that add tokens / latency without moving pass rate are visible here in a way they aren't in single-config runs.
 
 Per-iteration cost (claude-sonnet-4-6, 3 scenarios × 2 trials): ~3-5 minutes wall time. Run iterations sequentially; do not launch parallel `waxa` processes against the same eval (they fight for the API and the lockfile). Single-task runs (`--task <id>`) are useful for confirming a small change without re-running the whole suite.
 

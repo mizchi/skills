@@ -5,6 +5,51 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-05-11
+
+Layout shift to align with [agentskills.io's eval-driven iteration](https://agentskills.io/skill-creation/evaluating-skills) (skill-local evals, baseline comparison, iteration-N workspace).
+
+### Breaking
+
+- **eval files now live inside the skill directory** (`<skill>/evals/eval.yaml`)
+  instead of at the repo root (`<repo-root>/evals/<skill>/eval.yaml`).
+  The runner auto-detects skill-local layout when the eval.yaml's parent
+  directory is named `evals` and `../SKILL.md` exists. Monorepo legacy
+  layout (`<repo-root>/evals/<skill>/`) still resolves via
+  `.waxa.yaml` / `.waza.yaml` lookup, but new evals should use
+  skill-local.
+- **`waxa init` now scaffolds into `<cwd>/evals/`** (skill-local) instead
+  of `<repo-root>/evals/<skill>/`. Run it from inside the skill's
+  directory; the skill name is inferred from the basename of cwd.
+- **`results/` layout completely changed** from one JSONL file per run to
+  a `results/<skill>/iteration-N/<task-id>/<config>/` directory tree.
+  Old `<repo-root>/results/*.jsonl` files are no longer produced and
+  should be deleted manually. Per-run artifacts:
+  - `output-trial-<n>.txt` — raw executor output, one file per trial
+  - `timing.json` — per-trial and aggregate duration
+  - `grading.json` — assertion-style results with evidence
+
+### Added
+
+- **`waxa <eval.yaml> --baseline`**: runs each scenario twice per trial —
+  once with the skill body injected (`with_skill/`), once without
+  (`without_skill/`). Reports a Delta line at the end of the run so
+  you can see how much pass-rate the skill actually buys. Adapted from
+  agentskills.io's with-skill / without-skill comparison.
+- **`iteration-N/benchmark.json`**: aggregated statistics per iteration
+  (mean + stddev for pass rate and duration_ms, plus delta vs baseline
+  when `--baseline` was used).
+- **Layout detection**: `resolveLayout()` picks skill-local or
+  monorepo-legacy based on file system state, so existing evals continue
+  to run during the migration period.
+
+### Notes
+
+- `--baseline` forces serial execution; parallel + baseline is a future
+  optimization.
+- Token capture is still best-effort (claude CLI's plain-text output
+  doesn't expose it); only `duration_ms` is reliable in `timing.json`.
+
 ## [0.1.2] - 2026-05-11
 
 ### Added

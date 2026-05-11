@@ -139,6 +139,98 @@ async function loadSkillBody(repoRoot: string, skillName: string): Promise<strin
   return await Deno.readTextFile(join(repoRoot, skillName, "SKILL.md"));
 }
 
+/**
+ * Resolve the directory layout for a given eval.yaml. Supports two forms:
+ *
+ *   1. skill-local (preferred from 0.2.0):
+ *        <skill>/SKILL.md
+ *        <skill>/evals/eval.yaml
+ *        <skill>/evals/tasks/*.yaml
+ *      Detected when the eval.yaml's parent directory is named `evals`
+ *      and `../SKILL.md` exists.
+ *
+ *   2. monorepo legacy (pre-0.2.0):
+ *        <repo-root>/<skill>/SKILL.md
+ *        <repo-root>/evals/<skill>/eval.yaml
+ *      Detected when skill-local form doesn't apply but
+ *      `findRepoRoot` succeeds; SKILL.md is then read from
+ *      `<repo-root>/<skill>/SKILL.md`.
+ *
+ * Workspace (per-iteration outputs) lives at:
+ *   <workspaceRoot>/results/<skill>/iteration-N/
+ *
+ * where `workspaceRoot` is the `.waxa.yaml`/`.waza.yaml` directory when
+ * present, otherwise the skill directory's parent.
+ */
+interface LayoutPaths {
+  baseDir: string; // dirname(evalPath)
+  skillDir: string; // directory containing SKILL.md
+  skillMdPath: string;
+  workspaceRoot: string; // for results/<skill>/iteration-N/
+  resultsDir: string; // <workspaceRoot>/results/<skill>/
+  layout: "skill-local" | "monorepo-legacy";
+}
+
+async function resolveLayout(
+  evalPath: string,
+  evalCfg: EvalConfig,
+): Promise<LayoutPaths> {
+  const absEval = resolve(evalPath);
+  const baseDir = dirname(absEval);
+  const baseName = baseDir.split("/").filter(Boolean).pop() ?? "";
+
+  // skill-local form: <skill>/evals/eval.yaml
+  if (baseName === "evals") {
+    const skillDir = dirname(baseDir);
+    const skillMdPath = join(skillDir, "SKILL.md");
+    try {
+      await Deno.stat(skillMdPath);
+      let workspaceRoot: string;
+      try {
+        workspaceRoot = await findRepoRoot(skillDir);
+      } catch (_) {
+        workspaceRoot = dirname(skillDir);
+      }
+      return {
+        baseDir,
+        skillDir,
+        skillMdPath,
+        workspaceRoot,
+        resultsDir: join(workspaceRoot, "results", evalCfg.skill),
+        layout: "skill-local",
+      };
+    } catch (_) {
+      // SKILL.md missing → fall through to legacy resolution
+    }
+  }
+
+  // monorepo legacy: <repo-root>/<skill>/SKILL.md
+  const workspaceRoot = await findRepoRoot(baseDir);
+  const skillDir = join(workspaceRoot, evalCfg.skill);
+  return {
+    baseDir,
+    skillDir,
+    skillMdPath: join(skillDir, "SKILL.md"),
+    workspaceRoot,
+    resultsDir: join(workspaceRoot, "results", evalCfg.skill),
+    layout: "monorepo-legacy",
+  };
+}
+
+async function nextIterationNumber(resultsDir: string): Promise<number> {
+  try {
+    let max = 0;
+    for await (const entry of Deno.readDir(resultsDir)) {
+      if (!entry.isDirectory) continue;
+      const m = entry.name.match(/^iteration-(\d+)$/);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    }
+    return max + 1;
+  } catch (_) {
+    return 1;
+  }
+}
+
 // ---- Executor ------------------------------------------------------------
 
 async function executeClaude(
@@ -459,31 +551,46 @@ async function runOneTrial(
   timeout: number,
   requireSelfReport: boolean,
   totalTrials: number,
+  withSkill = true,
 ): Promise<TaskTrial> {
   const start = performance.now();
-  const prompt = [
-    `以下の skill 本文を blank-slate executor として読み、続く scenario を実行して deliverable を返せ。`,
-    ``,
-    `# 対象 skill: ${evalCfg.skill}`,
-    ``,
-    skillBody,
-    ``,
-    `---`,
-    ``,
-    `# scenario`,
-    ``,
-    task.inputs.prompt,
-    ``,
-    `# 指示`,
-    `- 上の skill の指示通りに scenario を実行する`,
-    `- まず deliverable を返答する (前置き・自己紹介・冗長な確認は不要)`,
-    `- 内部で skill を読んだ前提で書く`,
-    requireSelfReport ? SELF_REPORT_REQUEST : "",
-  ].join("\n");
+  const prompt = withSkill
+    ? [
+      `以下の skill 本文を blank-slate executor として読み、続く scenario を実行して deliverable を返せ。`,
+      ``,
+      `# 対象 skill: ${evalCfg.skill}`,
+      ``,
+      skillBody,
+      ``,
+      `---`,
+      ``,
+      `# scenario`,
+      ``,
+      task.inputs.prompt,
+      ``,
+      `# 指示`,
+      `- 上の skill の指示通りに scenario を実行する`,
+      `- まず deliverable を返答する (前置き・自己紹介・冗長な確認は不要)`,
+      `- 内部で skill を読んだ前提で書く`,
+      requireSelfReport ? SELF_REPORT_REQUEST : "",
+    ].join("\n")
+    : [
+      // baseline: scenario only, no skill injection. Lets us measure the
+      // delta the skill body actually buys.
+      `# scenario`,
+      ``,
+      task.inputs.prompt,
+      ``,
+      `# 指示`,
+      `- scenario を blank-slate のまま実行する (補助 skill を読まない前提)`,
+      `- まず deliverable を返答する (前置き・自己紹介・冗長な確認は不要)`,
+      requireSelfReport ? SELF_REPORT_REQUEST : "",
+    ].join("\n");
 
+  const cfgLabel = withSkill ? "" : " [baseline]";
   const trialLabel = totalTrials > 1 ? ` trial ${trialNum}/${totalTrials}` : "";
   console.log(
-    `  [${task.id}]${trialLabel} executing claude (model=${model}, timeout=${timeout}s)...`,
+    `  [${task.id}]${cfgLabel}${trialLabel} executing claude (model=${model}, timeout=${timeout}s)...`,
   );
   let output = "";
   try {
@@ -530,8 +637,9 @@ async function runTask(
   repoRoot: string,
   evalCfg: EvalConfig,
   task: Task,
+  skillBody: string,
+  withSkill = true,
 ): Promise<TaskResult> {
-  const skillBody = await loadSkillBody(repoRoot, evalCfg.skill);
   const model = evalCfg.config?.model ?? "claude-sonnet-4-6";
   const timeout = evalCfg.config?.timeout_seconds ?? 300;
   const requireSelfReport = task.expected?.require_self_report !== false;
@@ -549,6 +657,7 @@ async function runTask(
       timeout,
       requireSelfReport,
       trialsPerTask,
+      withSkill,
     );
     trials.push(trial);
   }
@@ -622,39 +731,111 @@ function printTaskResult(idx: number, total: number, r: TaskResult) {
   console.log("");
 }
 
-async function persistJsonl(
-  repoRoot: string,
-  evalName: string,
-  results: TaskResult[],
-  iterTag?: string,
-): Promise<string> {
-  const resultsDir = join(repoRoot, "results");
-  await Deno.mkdir(resultsDir, { recursive: true });
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const suffix = iterTag ? `-${iterTag}` : "";
-  const outFile = join(resultsDir, `${evalName}${suffix}-${stamp}.jsonl`);
-  // One JSONL line per trial (so multi-trial runs can be analyzed
-  // trial-by-trial). The aggregate is duplicated on each row for grep-
-  // ability; readers that want unique aggregates can dedupe by task_id.
-  const lines = results.flatMap((r) =>
-    r.trials.map((t) =>
-      JSON.stringify({
-        eval: evalName,
-        task_id: r.taskId,
-        task_name: r.taskName,
-        trial: t.trial,
-        of_trials: r.trials.length,
-        trial_pass_rate: t.passRate,
-        trial_duration_ms: t.durationMs,
-        task_mean_pass_rate: r.passRate,
-        task_total_duration_ms: r.durationMs,
-        graders: t.graders,
-        self_report: t.selfReport,
-        output: t.output,
-      })
-    )
+// per-task / per-config result writer (agentskills.io workspace shape).
+// Layout:
+//   <iterDir>/<task.id>/<with_skill|without_skill>/
+//     ├── output-trial-<n>.txt
+//     ├── timing.json
+//     └── grading.json
+async function persistTaskOutputs(
+  iterDir: string,
+  task: Task,
+  result: TaskResult,
+  config: "with_skill" | "without_skill",
+): Promise<void> {
+  const taskDir = join(iterDir, task.id, config);
+  await Deno.mkdir(taskDir, { recursive: true });
+
+  for (const trial of result.trials) {
+    await Deno.writeTextFile(
+      join(taskDir, `output-trial-${trial.trial}.txt`),
+      trial.output,
+    );
+  }
+
+  const durations = result.trials.map((t) => t.durationMs);
+  const timingMean = durations.reduce((a, x) => a + x, 0) / Math.max(1, durations.length);
+  await Deno.writeTextFile(
+    join(taskDir, "timing.json"),
+    JSON.stringify(
+      {
+        duration_ms_mean: Math.round(timingMean),
+        trials: result.trials.map((t) => ({ trial: t.trial, duration_ms: t.durationMs })),
+      },
+      null,
+      2,
+    ) + "\n",
   );
-  await Deno.writeTextFile(outFile, lines.join("\n") + "\n");
+
+  const assertion_results = result.trials.flatMap((t) =>
+    t.graders.map((g) => ({
+      trial: t.trial,
+      text: g.name,
+      passed: g.pass,
+      score: g.score,
+      evidence: g.message ?? "",
+    }))
+  );
+  const passed = assertion_results.filter((a) => a.passed).length;
+  await Deno.writeTextFile(
+    join(taskDir, "grading.json"),
+    JSON.stringify(
+      {
+        assertion_results,
+        summary: {
+          passed,
+          failed: assertion_results.length - passed,
+          total: assertion_results.length,
+          pass_rate: assertion_results.length ? passed / assertion_results.length : 1,
+        },
+      },
+      null,
+      2,
+    ) + "\n",
+  );
+}
+
+function stats(rs: TaskResult[]) {
+  const passes = rs.map((r) => r.passRate);
+  const durs = rs.flatMap((r) => r.trials.map((t) => t.durationMs));
+  const mean = (xs: number[]) =>
+    xs.length === 0 ? 0 : xs.reduce((a, x) => a + x, 0) / xs.length;
+  const stddev = (xs: number[]) => {
+    if (xs.length === 0) return 0;
+    const m = mean(xs);
+    return Math.sqrt(mean(xs.map((x) => (x - m) ** 2)));
+  };
+  return {
+    pass_rate: {
+      mean: Number(mean(passes).toFixed(3)),
+      stddev: Number(stddev(passes).toFixed(3)),
+    },
+    duration_ms: {
+      mean: Math.round(mean(durs)),
+      stddev: Math.round(stddev(durs)),
+    },
+  };
+}
+
+async function writeBenchmark(
+  iterDir: string,
+  withSkill: TaskResult[],
+  baseline?: TaskResult[],
+): Promise<string> {
+  const ws = stats(withSkill);
+  const benchmark: Record<string, unknown> = {
+    run_summary: { with_skill: ws },
+  };
+  if (baseline) {
+    const bs = stats(baseline);
+    (benchmark.run_summary as Record<string, unknown>).without_skill = bs;
+    benchmark.delta = {
+      pass_rate: Number((ws.pass_rate.mean - bs.pass_rate.mean).toFixed(3)),
+      duration_ms: ws.duration_ms.mean - bs.duration_ms.mean,
+    };
+  }
+  const outFile = join(iterDir, "benchmark.json");
+  await Deno.writeTextFile(outFile, JSON.stringify(benchmark, null, 2) + "\n");
   return outFile;
 }
 
@@ -663,13 +844,22 @@ interface RunEvalOptions {
   iterTag?: string;
   modelOverride?: string;
   skillOverride?: string;
+  withBaseline?: boolean;
+}
+
+interface RunEvalResult {
+  evalCfg: EvalConfig;
+  layout: LayoutPaths;
+  iterDir: string;
+  results: TaskResult[];
+  baselineResults?: TaskResult[];
 }
 
 async function runEval(
   evalPath: string,
   opts: RunEvalOptions = {},
-): Promise<{ evalCfg: EvalConfig; evalDir: string; repoRoot: string; results: TaskResult[] }> {
-  const { taskFilter, iterTag, modelOverride, skillOverride } = opts;
+): Promise<RunEvalResult> {
+  const { taskFilter, iterTag, modelOverride, skillOverride, withBaseline = false } = opts;
   const evalCfgRaw = await loadYaml<EvalConfig>(evalPath);
   const evalCfg: EvalConfig = {
     ...evalCfgRaw,
@@ -679,24 +869,34 @@ async function runEval(
       ...(modelOverride ? { model: modelOverride } : {}),
     },
   };
-  const evalDir = dirname(resolve(evalPath));
-  const repoRoot = await findRepoRoot(evalDir);
+  const layout = await resolveLayout(evalPath, evalCfg);
+  const skillBody = await Deno.readTextFile(layout.skillMdPath);
 
   console.log(`Eval: ${evalCfg.name}`);
   console.log(`Skill: ${evalCfg.skill}`);
-  if (iterTag) console.log(`Iteration: ${iterTag}`);
-  console.log(`Repo root: ${repoRoot}`);
+  console.log(`Layout: ${layout.layout}`);
+  console.log(`Skill body: ${layout.skillMdPath}`);
+  if (iterTag) console.log(`Iteration tag: ${iterTag}`);
+  if (withBaseline) console.log(`Baseline: enabled (with_skill vs without_skill)`);
   console.log("");
 
-  const tasks = await loadTasks(evalCfg, evalDir, taskFilter);
+  const tasks = await loadTasks(evalCfg, layout.baseDir, taskFilter);
   if (tasks.length === 0) {
     console.error("No tasks matched.");
     Deno.exit(2);
   }
 
-  const parallel = evalCfg.config?.parallel === true;
+  const iterN = await nextIterationNumber(layout.resultsDir);
+  const iterDir = join(layout.resultsDir, `iteration-${iterN}`);
+  await Deno.mkdir(iterDir, { recursive: true });
+
+  // Baseline mode forces serial execution to keep claude rate limits
+  // and process count predictable; parallel-with-baseline is a future
+  // optimization. Single-config runs honor evalCfg.config.parallel.
+  const parallel = !withBaseline && evalCfg.config?.parallel === true;
   const workers = Math.max(1, evalCfg.config?.workers ?? 2);
   const results: TaskResult[] = [];
+  const baselineResults: TaskResult[] = [];
 
   if (parallel && tasks.length > 1) {
     console.log(`[parallel] running ${tasks.length} tasks with up to ${workers} workers`);
@@ -708,29 +908,60 @@ async function runEval(
         const slot = nextIdx++;
         if (slot >= numbered.length) return;
         const { idx, task } = numbered[slot];
-        const r = await runTask(repoRoot, evalCfg, task);
+        const r = await runTask(layout.workspaceRoot, evalCfg, task, skillBody, true);
         results[idx] = r;
         printTaskResult(idx + 1, tasks.length, r);
+        await persistTaskOutputs(iterDir, task, r, "with_skill");
       }
     }
     await Promise.all(Array.from({ length: Math.min(workers, tasks.length) }, () => worker()));
   } else {
     for (const task of tasks) {
-      const r = await runTask(repoRoot, evalCfg, task);
+      const r = await runTask(layout.workspaceRoot, evalCfg, task, skillBody, true);
       results.push(r);
       printTaskResult(results.length, tasks.length, r);
+      await persistTaskOutputs(iterDir, task, r, "with_skill");
+
+      if (withBaseline) {
+        const rb = await runTask(layout.workspaceRoot, evalCfg, task, skillBody, false);
+        baselineResults.push(rb);
+        printTaskResult(results.length, tasks.length, rb);
+        await persistTaskOutputs(iterDir, task, rb, "without_skill");
+      }
     }
   }
 
   const overall = results.reduce((a, r) => a + r.passRate, 0) / results.length;
   console.log("===========================================");
-  console.log(`Overall pass rate: ${(overall * 100).toFixed(1)}% (${results.length} task(s))`);
+  console.log(
+    `Overall pass rate (with skill): ${(overall * 100).toFixed(1)}% (${results.length} task(s))`,
+  );
+  if (withBaseline && baselineResults.length) {
+    const overallBase = baselineResults.reduce((a, r) => a + r.passRate, 0) /
+      baselineResults.length;
+    const delta = (overall - overallBase) * 100;
+    console.log(`Overall pass rate (baseline):   ${(overallBase * 100).toFixed(1)}%`);
+    console.log(
+      `Delta:                          ${delta >= 0 ? "+" : ""}${delta.toFixed(1)} pt`,
+    );
+  }
   console.log("===========================================");
 
-  const outFile = await persistJsonl(repoRoot, evalCfg.name, results, iterTag);
-  console.log(`Results written: ${outFile}`);
+  const benchPath = await writeBenchmark(
+    iterDir,
+    results,
+    baselineResults.length ? baselineResults : undefined,
+  );
+  console.log(`Iteration written: ${iterDir}`);
+  console.log(`Benchmark:        ${benchPath}`);
 
-  return { evalCfg, evalDir, repoRoot, results };
+  return {
+    evalCfg,
+    layout,
+    iterDir,
+    results,
+    baselineResults: baselineResults.length ? baselineResults : undefined,
+  };
 }
 
 // ---- Iteration / Failure-pattern ledger ---------------------------------
@@ -1100,28 +1331,27 @@ async function runInit(args: string[]) {
     : undefined;
   const cwd = Deno.cwd();
 
-  // Locate repo root via .waxa.yaml / .waza.yaml so the eval lands in
-  // the conventional `<repo-root>/evals/<skill>/` layout.
-  let repoRoot: string;
-  try {
-    repoRoot = await findRepoRoot(cwd);
-  } catch (_) {
-    console.error(
-      "no .waxa.yaml / .waza.yaml found walking up from " + cwd +
-        "\nplace one at the repo root before running `waxa init`.",
-    );
-    Deno.exit(2);
-  }
-
-  // Resolve skill name: --skill flag wins; otherwise derive from cwd's
-  // basename (typical when run inside the skill's own directory).
+  // 0.2.0 layout: scaffold `<cwd>/evals/` (skill-local). The user
+  // typically runs `waxa init` from inside the skill's own directory,
+  // so cwd's basename gives the skill name. SKILL.md is expected at
+  // `<cwd>/SKILL.md` (the runner resolves it via resolveLayout()).
   const skill = skillFromFlag ?? cwd.split("/").filter(Boolean).pop();
   if (!skill) {
     console.error("could not infer skill name; pass --skill <name>");
     Deno.exit(2);
   }
 
-  const evalDir = join(repoRoot, "evals", skill);
+  // SKILL.md sanity check (warn only, don't block — the user may be
+  // scaffolding the eval before authoring the skill body).
+  try {
+    await Deno.stat(join(cwd, "SKILL.md"));
+  } catch (_) {
+    console.error(
+      `[warn] ${cwd}/SKILL.md not found; \`waxa <eval.yaml>\` will fail until it exists.`,
+    );
+  }
+
+  const evalDir = join(cwd, "evals");
   const tasksDir = join(evalDir, "tasks");
   await Deno.mkdir(tasksDir, { recursive: true });
 
@@ -1152,8 +1382,8 @@ async function runInit(args: string[]) {
     console.log(`${exists ? "wrote (forced)" : "created"}: ${path}`);
   }
 
-  console.log(`\nNext: edit ${join(evalDir, "tasks")} to fill in scenarios,`);
-  console.log(`then run \`waxa ${join("evals", skill, "eval.yaml")}\`.`);
+  console.log(`\nNext: edit ${tasksDir} to fill in scenarios,`);
+  console.log(`then run \`waxa evals/eval.yaml\` from inside ${cwd}.`);
 }
 
 // ---- Main ----------------------------------------------------------------
@@ -1162,8 +1392,8 @@ async function main() {
   const sub = Deno.args[0];
   if (!sub || sub === "-h" || sub === "--help") {
     console.error("Usage:");
-    console.error("  waxa init [--skill <name>] [--force]                          scaffold evals/<skill>/");
-    console.error("  waxa <eval.yaml> [--task <id>]                                 single run");
+    console.error("  waxa init [--skill <name>] [--force]                          scaffold <skill>/evals/");
+    console.error("  waxa <eval.yaml> [--task <id>] [--baseline]                   single run (--baseline runs with_skill + without_skill)");
     console.error("  waxa iterate <eval.yaml> [--max N] [--task <id>]              iteration loop");
     console.error("  waxa compare <eval.yaml> --models <csv> [--task <id>]         multi-model comparison");
     console.error("  waxa variant <eval.yaml> --base <skill> --candidate <skill>   skill A/B exploration");
@@ -1191,7 +1421,8 @@ async function main() {
   const taskFilter = Deno.args.includes("--task")
     ? Deno.args[Deno.args.indexOf("--task") + 1]
     : undefined;
-  const { results } = await runEval(sub, { taskFilter });
+  const withBaseline = Deno.args.includes("--baseline");
+  const { results } = await runEval(sub, { taskFilter, withBaseline });
   Deno.exit(results.every((r) => r.passRate === 1) ? 0 : 1);
 }
 
