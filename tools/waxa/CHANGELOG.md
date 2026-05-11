@@ -5,6 +5,25 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-05-11
+
+Stops positioning waxa as a waza-compatibility layer. waza becomes a reference implementation we cite, not an API we follow.
+
+### Breaking
+
+- `.waza.yaml` is no longer accepted as a repo-root marker; only `.waxa.yaml` is recognized. Rename your existing file (`git mv .waza.yaml .waxa.yaml`) before upgrading.
+- Generated eval templates no longer carry the `# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/...` line. Existing eval.yaml files that still reference the waza schema URL keep validating against an external schema you may want to drop; waxa itself ignores the directive.
+
+### Changed
+
+- README reframed: removed "waza-schema-compatible" framing; added a **Reference implementations** section pointing at microsoft/waza and agentskills.io/evaluating-skills as sources of inspiration rather than compatibility targets.
+- npm package description updated.
+- `pythonToJs()` comment no longer claims waza-compat purpose; it's a Python-idiom convenience shim.
+
+### Removed
+
+- `tools/waxa/RFC-waza.md` (the draft RFC proposing to upstream empirical-prompt-tuning into waza). Out of scope now that waxa is an independent tool.
+
 ## [0.2.0] - 2026-05-11
 
 Layout shift to align with [agentskills.io's eval-driven iteration](https://agentskills.io/skill-creation/evaluating-skills) (skill-local evals, baseline comparison, iteration-N workspace).

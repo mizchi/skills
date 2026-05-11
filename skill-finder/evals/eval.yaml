@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
 name: skill-finder-eval
 description: |
   Evaluation suite for skill-finder.

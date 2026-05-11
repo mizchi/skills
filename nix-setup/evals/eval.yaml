@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
 name: nix-setup-eval
 description: |
   Evaluation suite for nix-setup (the merged devbox + pure-flake skill).

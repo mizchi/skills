@@ -22,7 +22,7 @@ await build({
     name: "@mizchi/waxa",
     version,
     description:
-      "Skill evaluation CLI — waza-schema-compatible runner with empirical-prompt-tuning iteration loop, structured self-report grader, and LLM-as-Judge.",
+      "Skill evaluation CLI with the empirical-prompt-tuning iteration loop, structured self-report grader, LLM-as-Judge, and with_skill / without_skill baseline comparison. Inspired by microsoft/waza and agentskills.io.",
     license: "MIT",
     author: "mizchi",
     repository: {

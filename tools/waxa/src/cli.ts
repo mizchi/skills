@@ -1,9 +1,9 @@
 /**
- * waxa — skill evaluation CLI (waza-schema-compatible + empirical-prompt-tuning
- * methodology on top).
+ * waxa — skill evaluation CLI. Conceptually inspired by microsoft/waza and
+ * agentskills.io's evaluating-skills layout; ships as an independent tool
+ * with the empirical-prompt-tuning iteration loop layered on top.
  *
- * - Reads waza-shaped eval.yaml + tasks/*.yaml. Repo-root config is `.waxa.yaml`
- *   first, falling back to `.waza.yaml` so waza can coexist.
+ * - Reads waxa-shaped eval.yaml + tasks/*.yaml. Repo-root marker is `.waxa.yaml`.
  * - Executes via `claude -p --system-prompt --disable-slash-commands` so the
  *   executor is bias-suppressed (no skill auto-discovery, no CLAUDE.md
  *   auto-merge), with the target skill's body injected into the user prompt.
@@ -120,18 +120,16 @@ async function loadYaml<T>(path: string): Promise<T> {
 async function findRepoRoot(start: string): Promise<string> {
   let dir = resolve(start);
   for (let i = 0; i < 8; i++) {
-    for (const candidate of [".waxa.yaml", ".waza.yaml"]) {
-      try {
-        await Deno.stat(join(dir, candidate));
-        return dir;
-      } catch (_) { /* try next candidate */ }
-    }
+    try {
+      await Deno.stat(join(dir, ".waxa.yaml"));
+      return dir;
+    } catch (_) { /* walk up */ }
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
   throw new Error(
-    `could not locate repo root (.waxa.yaml or .waza.yaml) walking up from ${start}`,
+    `could not locate repo root (.waxa.yaml) walking up from ${start}`,
   );
 }
 
@@ -159,8 +157,8 @@ async function loadSkillBody(repoRoot: string, skillName: string): Promise<strin
  * Workspace (per-iteration outputs) lives at:
  *   <workspaceRoot>/results/<skill>/iteration-N/
  *
- * where `workspaceRoot` is the `.waxa.yaml`/`.waza.yaml` directory when
- * present, otherwise the skill directory's parent.
+ * where `workspaceRoot` is the `.waxa.yaml` directory when present,
+ * otherwise the skill directory's parent.
  */
 interface LayoutPaths {
   baseDir: string; // dirname(evalPath)
@@ -396,8 +394,9 @@ function gradeText(grader: Grader, output: string): GraderResult {
 }
 
 function pythonToJs(expr: string): string {
-  // Best-effort waza-compat shim. Translates a few Python membership idioms
-  // to JS so basic assertions work with `new Function`. Intentionally narrow:
+  // Best-effort shim for Python-style assertion idioms users may carry
+  // over from other eval frameworks. Translates a few patterns to JS so
+  // basic assertions work with `new Function`. Intentionally narrow:
   // - `len(x)` → `(x).length`
   // - `'a' in x` / `'a' not in x` → `x.includes('a')` / `!x.includes('a')`
   //
@@ -1223,8 +1222,7 @@ async function runVariant(args: string[]) {
 
 // ---- Scaffolding (`waxa init`) ------------------------------------------
 
-const EVAL_TEMPLATE = `# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
-name: __SKILL__-eval
+const EVAL_TEMPLATE = `name: __SKILL__-eval
 description: |
   Evaluation suite for __SKILL__.
   Convergence target: 2 consecutive runs with zero unclear-points

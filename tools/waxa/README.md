@@ -3,34 +3,24 @@
 [![npm version](https://img.shields.io/npm/v/@mizchi/waxa.svg)](https://www.npmjs.com/package/@mizchi/waxa)
 [![license](https://img.shields.io/npm/l/@mizchi/waxa.svg)](./LICENSE)
 
-Skill evaluation CLI. **waza-schema-compatible** runner with the
-**empirical-prompt-tuning** iteration loop, structured self-report grader, and
-LLM-as-Judge layered on top.
+Skill evaluation CLI with an empirical-prompt-tuning iteration loop, structured self-report grader, LLM-as-Judge, and with_skill / without_skill baseline comparison.
 
 > Status: 0.x — API subject to change. Used in [mizchi/skills](https://github.com/mizchi/skills) to evaluate the agent skills published from that repo.
 
-## Why waxa
+## What waxa does
 
-[microsoft/waza](https://github.com/microsoft/waza) provides a clean
-declarative YAML schema (`eval.yaml` + `tasks/*.yaml`) and a `text` / `code`
-grader system for benchmarking agent skills. waza alone leaves the
-**judgment policy layer** (how to iterate, how to recognize convergence /
-divergence, how to capture the executor's *own* report on what was
-ambiguous) up to the operator.
+- **`type: self-report` grader** — forces a structured tail block (`Phase trace`, `Unclear points` (Issue / Cause / General Fix Rule), `Discretionary fill-ins`, `Retries`) at the executor's output and grades it.
+- **`type: llm` grader** — LLM-as-Judge with a per-task rubric, so semantic equivalents (e.g. `apm view` implies `apm-usage` knowledge) aren't missed by surface-literal regex / code graders.
+- **`waxa iterate`** — RED/GREEN/REFACTOR loop with cumulative `ledger.yaml` tracking new vs re-seen General Fix Rules per iteration.
+- **`waxa <eval.yaml> --baseline`** — with_skill vs without_skill comparison + Delta on every run; tells you whether the skill body actually earns its keep.
+- **Convergence** — 2 consecutive zero-unclear → stop. **Divergence** — 3+ iterations with non-decreasing new-unclear count → rewrite the prompt structure rather than patch.
 
-waxa keeps the same eval / task YAML schema and adds the policy layer:
+### Reference implementations
 
-- `type: self-report` grader — forces a structured tail block (`Phase trace`,
-  `Unclear points` (Issue / Cause / General Fix Rule), `Discretionary
-  fill-ins`, `Retries`) at the executor's output and grades it
-- `type: llm` grader — LLM-as-Judge with a per-task rubric, so semantic
-  equivalents (e.g. `apm view` implies `apm-usage` knowledge) aren't missed
-  by surface-literal regex / code graders
-- `waxa iterate` sub-command — RED/GREEN/REFACTOR loop with cumulative
-  `ledger.yaml` tracking new vs reseen General Fix Rules per iteration
-- Convergence detection (2 consecutive zero-unclear → stop)
-- Divergence signal (3+ iterations with non-decreasing new-unclear count →
-  rewrite the prompt structure rather than patch)
+waxa is an independent tool, not a fork or compatibility layer. The concepts it operationalizes come from two sources, both worth reading directly:
+
+- [microsoft/waza](https://github.com/microsoft/waza) — original declarative YAML schema (`eval.yaml` + `tasks/*.yaml`) and the `text` / `code` grader split. waxa was originally schema-compatible with waza but diverged from 0.2.0 onward; if you have a waza eval suite, port the few schema-level fields by hand rather than expecting drop-in support.
+- [agentskills.io / evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills) — the workspace structure (`iteration-N/<task>/<config>/`), the baseline-comparison idea (`with_skill` vs `without_skill`), and the assertion / grading / benchmark JSON shapes adopted in 0.2.0.
 
 ## Install
 
@@ -122,7 +112,7 @@ Workspace (per-iteration outputs) lands at:
 └── benchmark.json                        # aggregated mean / stddev / delta
 ```
 
-`<workspace-root>` is the directory containing `.waxa.yaml` / `.waza.yaml` when present, otherwise the skill directory's parent. Add `results/` to `.gitignore` — it accumulates as you iterate.
+`<workspace-root>` is the directory containing `.waxa.yaml` when present, otherwise the skill directory's parent. Add `results/` to `.gitignore` — it accumulates as you iterate.
 
 Authoring patterns: at least 2 tasks (typical + edge), `trials_per_task: 2` to average over LLM non-determinism, pair every surface grader (`text` regex) with a semantic LLM grader (`llm` rubric). See the bundled `references/empirical-prompt-tuning.md` for the methodology.
 
@@ -142,30 +132,9 @@ mean across trials, and the iterate ledger collects unclear points from
 runs to count as a stable signal. N=2 is the recommended baseline; higher
 N raises cost linearly.
 
-Project layout (a working example lives in
-[`mizchi/skills:evals/skill-selector/`](https://github.com/mizchi/skills/tree/main/evals/skill-selector)):
+See the **Test layout convention** section above for the canonical 0.2.0 directory tree. A `.waxa.yaml` is only required at the repo root in monorepo-legacy installs (to mark where `results/<skill>/` should land); for new skill-local installs the file is optional and waxa falls back to the skill directory's parent as the workspace root.
 
-```
-your-repo/
-├── .waxa.yaml                       # config (.waza.yaml is also accepted)
-└── evals/
-    └── <skill>/
-        ├── eval.yaml
-        └── tasks/
-            └── *.yaml
-```
-
-`.waxa.yaml` minimum:
-
-```yaml
-paths:
-  skills: .          # or "skills/" if you keep skills under a sub-directory
-  evals: evals/
-  results: results/
-defaults:
-  model: claude-sonnet-4-6
-  timeout: 300
-```
+A working example lives at [`mizchi/skills:skill-selector/evals/`](https://github.com/mizchi/skills/tree/main/skill-selector/evals).
 
 ## Tutorial: your first waxa eval
 
@@ -173,7 +142,7 @@ A complete walk-through that produces a working evaluation in a minute,
 using a deliberately trivial skill so you can see waxa's machinery
 without it being drowned out by skill content. A larger real-world
 example (the `skill-selector` eval) lives in
-[mizchi/skills:evals/skill-selector/](https://github.com/mizchi/skills/tree/main/evals/skill-selector).
+[mizchi/skills:skill-selector/evals/](https://github.com/mizchi/skills/tree/main/skill-selector/evals).
 
 A ready-made copy of all the files below is in
 [`tools/waxa/examples/echo-skill/`](./examples/echo-skill/).
@@ -329,7 +298,7 @@ waxa will:
 | Type | Description |
 |---|---|
 | `text` | Regex match / not-match against the output. `(?i)`-style inline flags supported. |
-| `code` | JS expression evaluated against `output` (string). Python-style `len(x)` and `'a' in x` are auto-translated for waza-config compatibility. |
+| `code` | JS expression evaluated against `output` (string). Python-style `len(x)` and `'a' in x` are auto-translated as a convenience for users carrying assertions over from Python-based eval frameworks. |
 | `self-report` | Structural assertions on the executor's appended Self-report block. Knobs: `require_present`, `require_all_phases_ok`, `max_unclear`, `max_retries`. |
 | `llm` | LLM-as-Judge against a free-form `rubric`. Returns `PASS / SCORE / REASON`. Honors `model` (default: eval-level model) and optional `pass_threshold`. |
 
