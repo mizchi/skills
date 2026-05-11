@@ -174,20 +174,44 @@ convergence:
     Residual <name> is <reason it does not block adoption>.
 ```
 
+## Test layout convention
+
+`waxa init` writes the layout the runner expects. Files go at the repo root, not inside the skill directory, so the skill body and its eval evolve independently:
+
+```
+<repo-root>/
+├── .waxa.yaml                        # marker for repo-root resolution
+├── <skill>/SKILL.md                  # the target skill
+└── evals/<skill>/
+    ├── eval.yaml                     # config + top-level graders + task glob
+    ├── ledger.yaml                   # iter history (created on first `iterate` run)
+    └── tasks/
+        ├── scenario-typical.yaml     # median — passes at convergence
+        └── scenario-edge.yaml        # known failure mode — exercises the rule
+```
+
+`waxa init` scaffolds eval.yaml and the two task templates with TODO markers; ledger.yaml is generated when iteration starts.
+
 ## Running the loop
 
 Bare minimum:
 
 ```bash
+# Scaffold the eval skeleton (run inside the skill's own dir, or pass --skill)
+npx @mizchi/waxa init [--skill <name>] [--force]
+# (equivalent from source: deno run -A tools/waxa/src/cli.ts init ...)
+
 # Single eval pass
-deno run -A tools/waxa/src/cli.ts evals/<skill>/eval.yaml
+npx @mizchi/waxa evals/<skill>/eval.yaml
 
 # Single task
-deno run -A tools/waxa/src/cli.ts evals/<skill>/eval.yaml --task <task-id>
+npx @mizchi/waxa evals/<skill>/eval.yaml --task <task-id>
 
 # Iteration loop (auto re-runs while pass rate improves)
-deno run -A tools/waxa/src/cli.ts iterate evals/<skill>/eval.yaml --max 4
+npx @mizchi/waxa iterate evals/<skill>/eval.yaml --max 4
 ```
+
+The npm package bundles `references/empirical-prompt-tuning.md` so the methodology is on disk wherever waxa is installed. After `npx @mizchi/waxa` first runs, the file lives at `<node_modules>/@mizchi/waxa/references/empirical-prompt-tuning.md`.
 
 Per-iteration cost (claude-sonnet-4-6, 3 scenarios × 2 trials): ~3-5 minutes wall time. Run iterations sequentially; do not launch parallel `waxa` processes against the same eval (they fight for the API and the lockfile). Single-task runs (`--task <id>`) are useful for confirming a small change without re-running the whole suite.
 

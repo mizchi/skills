@@ -61,6 +61,10 @@ Requirements:
 ## Quick start
 
 ```bash
+# scaffold evals/<skill>/ with eval.yaml + tasks/scenario-{typical,edge}.yaml
+# (run inside the skill's own dir, or pass --skill <name>)
+npx @mizchi/waxa init [--skill <name>] [--force]
+
 # single run
 npx @mizchi/waxa <path/to/eval.yaml> [--task <task-id>]
 
@@ -75,6 +79,30 @@ npx @mizchi/waxa variant <path/to/eval.yaml> --base skill-current --candidate sk
 ```
 
 Once `npm i -g @mizchi/waxa` is done, the same commands work without the `npx @mizchi/waxa` prefix (`waxa <eval.yaml>` etc.).
+
+### Bundled methodology
+
+The npm package ships with `references/empirical-prompt-tuning.md` (the full methodology document) so the runtime, the iter / convergence semantics, and the Self-report contract live in one place — no need to clone `mizchi/skills` separately. After install, find it at `<node_modules>/@mizchi/waxa/references/empirical-prompt-tuning.md`.
+
+## Test layout convention
+
+`waxa init` writes the layout `waxa <eval.yaml>` expects:
+
+```
+<repo-root>/
+├── .waxa.yaml                            # marker for repo-root resolution
+├── <skill>/                              # the skill being evaluated (SKILL.md lives here)
+│   └── SKILL.md
+└── evals/
+    └── <skill>/
+        ├── eval.yaml                     # config, graders, task glob
+        ├── ledger.yaml                   # iter history (created on first `waxa iterate`)
+        └── tasks/
+            ├── scenario-typical.yaml     # median case — should pass at convergence
+            └── scenario-edge.yaml        # known failure mode — exercises the rule the skill encodes
+```
+
+Authoring patterns: at least 2 tasks (typical + edge), `trials_per_task: 2` to average over LLM non-determinism, pair every surface grader (`text` regex) with a semantic LLM grader (`llm` rubric). See the bundled `references/empirical-prompt-tuning.md` for the methodology.
 
 To run tasks within an eval in parallel, set `config.parallel: true` and
 optionally `config.workers: <N>` (default 2) in the eval file. claude

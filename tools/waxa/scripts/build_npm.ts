@@ -51,6 +51,19 @@ await build({
     } catch (_) {
       // Top-level repo may not have LICENSE.txt; ignore.
     }
+    // Bundle empirical-prompt-tuning as a reference so the npm package
+    // is methodologically self-contained — users running `npx
+    // @mizchi/waxa` get the iter / convergence semantics on disk
+    // alongside the CLI.
+    try {
+      Deno.mkdirSync("npm/references", { recursive: true });
+      Deno.copyFileSync(
+        "../../empirical-prompt-tuning/SKILL.md",
+        "npm/references/empirical-prompt-tuning.md",
+      );
+    } catch (e) {
+      console.warn("[warn] empirical-prompt-tuning not bundled:", e);
+    }
   },
   test: false,
   // Type checking is done via `deno task check` against the source. The

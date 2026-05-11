@@ -990,12 +990,179 @@ async function runVariant(args: string[]) {
   console.log(`\nRecommended: ${ranked[0].label} (${ranked[0].skill})`);
 }
 
+// ---- Scaffolding (`waxa init`) ------------------------------------------
+
+const EVAL_TEMPLATE = `# yaml-language-server: $schema=https://raw.githubusercontent.com/microsoft/waza/main/schemas/eval.schema.json
+name: __SKILL__-eval
+description: |
+  Evaluation suite for __SKILL__.
+  Convergence target: 2 consecutive runs with zero unclear-points
+  (cf. empirical-prompt-tuning — bundled at
+  references/empirical-prompt-tuning.md inside this npm package).
+
+skill: __SKILL__
+version: "0.1"
+
+config:
+  # 2 trials averages over LLM non-determinism; bump higher only when a
+  # critical axis is suspected to be unstable.
+  trials_per_task: 2
+  timeout_seconds: 240
+  parallel: false
+  executor: claude
+  model: claude-sonnet-4-6
+
+tasks:
+  - "tasks/*.yaml"
+`;
+
+const TASK_TYPICAL_TEMPLATE = `# Median scenario — the most common shape of the user request this skill
+# is meant to handle. Should pass at convergence.
+id: __SKILL__-typical-001
+name: __SKILL__ typical scenario
+description: |
+  TODO: one paragraph describing the situation the executor faces.
+
+tags:
+  - typical
+
+inputs:
+  prompt: |
+    TODO: the user request as it would arrive in a real session.
+
+expected:
+  output_contains:
+    - "TODO"   # remove or replace with literal tokens the deliverable must mention
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  # Add surface + semantic grader pairs per behavioral axis. See
+  # references/empirical-prompt-tuning.md (bundled) for the rationale.
+  #
+  # - name: <axis>_surface
+  #   type: text
+  #   config:
+  #     regex_match:
+  #       - "(?i)<broad-alternation>"
+  #
+  # - name: <axis>_semantic
+  #   type: llm
+  #   config:
+  #     rubric: |
+  #       <multi-clause rubric>
+`;
+
+const TASK_EDGE_TEMPLATE = `# Edge scenario — a known failure mode the skill is supposed to handle.
+# Examples: an out-of-scope request the skill should refuse, a sibling
+# skill's territory the skill should defer to, a stress prompt that
+# exercises the rule the skill encodes.
+id: __SKILL__-edge-001
+name: __SKILL__ edge scenario
+description: |
+  TODO: one paragraph describing the edge case.
+
+tags:
+  - edge
+
+inputs:
+  prompt: |
+    TODO: the user request that exercises the edge case.
+
+expected:
+  output_contains:
+    - "TODO"
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: self_report_complete
+    type: self-report
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_retries: 2
+
+  # TODO: graders verifying the edge behavior is honored.
+`;
+
+async function runInit(args: string[]) {
+  const force = args.includes("--force");
+  const skillFromFlag = args.includes("--skill")
+    ? args[args.indexOf("--skill") + 1]
+    : undefined;
+  const cwd = Deno.cwd();
+
+  // Locate repo root via .waxa.yaml / .waza.yaml so the eval lands in
+  // the conventional `<repo-root>/evals/<skill>/` layout.
+  let repoRoot: string;
+  try {
+    repoRoot = await findRepoRoot(cwd);
+  } catch (_) {
+    console.error(
+      "no .waxa.yaml / .waza.yaml found walking up from " + cwd +
+        "\nplace one at the repo root before running `waxa init`.",
+    );
+    Deno.exit(2);
+  }
+
+  // Resolve skill name: --skill flag wins; otherwise derive from cwd's
+  // basename (typical when run inside the skill's own directory).
+  const skill = skillFromFlag ?? cwd.split("/").filter(Boolean).pop();
+  if (!skill) {
+    console.error("could not infer skill name; pass --skill <name>");
+    Deno.exit(2);
+  }
+
+  const evalDir = join(repoRoot, "evals", skill);
+  const tasksDir = join(evalDir, "tasks");
+  await Deno.mkdir(tasksDir, { recursive: true });
+
+  const writes: Array<[string, string]> = [
+    [join(evalDir, "eval.yaml"), EVAL_TEMPLATE.replaceAll("__SKILL__", skill)],
+    [
+      join(tasksDir, "scenario-typical.yaml"),
+      TASK_TYPICAL_TEMPLATE.replaceAll("__SKILL__", skill),
+    ],
+    [
+      join(tasksDir, "scenario-edge.yaml"),
+      TASK_EDGE_TEMPLATE.replaceAll("__SKILL__", skill),
+    ],
+  ];
+
+  for (const [path, body] of writes) {
+    let exists = true;
+    try {
+      await Deno.stat(path);
+    } catch (_) {
+      exists = false;
+    }
+    if (exists && !force) {
+      console.error(`skip (exists): ${path}    — pass --force to overwrite`);
+      continue;
+    }
+    await Deno.writeTextFile(path, body);
+    console.log(`${exists ? "wrote (forced)" : "created"}: ${path}`);
+  }
+
+  console.log(`\nNext: edit ${join(evalDir, "tasks")} to fill in scenarios,`);
+  console.log(`then run \`waxa ${join("evals", skill, "eval.yaml")}\`.`);
+}
+
 // ---- Main ----------------------------------------------------------------
 
 async function main() {
   const sub = Deno.args[0];
   if (!sub || sub === "-h" || sub === "--help") {
     console.error("Usage:");
+    console.error("  waxa init [--skill <name>] [--force]                          scaffold evals/<skill>/");
     console.error("  waxa <eval.yaml> [--task <id>]                                 single run");
     console.error("  waxa iterate <eval.yaml> [--max N] [--task <id>]              iteration loop");
     console.error("  waxa compare <eval.yaml> --models <csv> [--task <id>]         multi-model comparison");
@@ -1003,6 +1170,10 @@ async function main() {
     Deno.exit(sub ? 0 : 1);
   }
 
+  if (sub === "init") {
+    await runInit(Deno.args.slice(1));
+    return;
+  }
   if (sub === "iterate") {
     await runIterate(Deno.args.slice(1));
     return;

@@ -113,11 +113,14 @@ Requirements: `claude` CLI on `PATH` and authenticated (OAuth login or `ANTHROPI
 Quick reference:
 
 ```sh
+npx @mizchi/waxa init [--skill <name>] [--force]                   # scaffold evals/<skill>/
 npx @mizchi/waxa <eval.yaml>                                       # single run
 npx @mizchi/waxa iterate <eval.yaml> [--max N]                     # iteration loop with ledger
 npx @mizchi/waxa compare <eval.yaml> --models <m1>,<m2>            # multi-model objective comparison
 npx @mizchi/waxa variant <eval.yaml> --base <skill-a> --candidate <skill-b>  # A/B exploration
 ```
+
+The npm package bundles `references/empirical-prompt-tuning.md` (the full methodology document), so the iter / convergence semantics live alongside the CLI without needing to clone this repo separately.
 
 Full reference: [`tools/waxa/README.md`](tools/waxa/README.md).
 

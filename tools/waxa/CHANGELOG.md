@@ -5,6 +5,22 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-05-11
+
+### Added
+
+- `waxa init [--skill <name>] [--force]` sub-command: scaffolds
+  `evals/<skill>/eval.yaml` plus `tasks/scenario-typical.yaml` and
+  `tasks/scenario-edge.yaml` with TODO-marked templates. Skill name
+  defaults to the basename of the current directory; pass `--skill` to
+  override. Existing files are skipped unless `--force` is given.
+  Resolves the repo root via `.waxa.yaml` / `.waza.yaml` (same
+  lookup as the run sub-commands).
+- npm package now bundles `references/empirical-prompt-tuning.md` (the
+  full methodology SKILL.md), so `npx @mizchi/waxa` users get the
+  iter / convergence / Self-report semantics on disk alongside the CLI
+  without needing to clone mizchi/skills separately.
+
 ## [0.1.1] - 2026-05-10
 
 ### Fixed

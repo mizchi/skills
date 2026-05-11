@@ -1,6 +1,6 @@
 {
   "name": "@mizchi/waxa",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "exports": "./src/cli.ts",
   "tasks": {
     "run": "deno run -A src/cli.ts",
