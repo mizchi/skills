@@ -214,6 +214,11 @@ npx @mizchi/waxa <skill>/evals/eval.yaml --baseline
 
 # Iteration loop (auto re-runs while pass rate improves; writes ledger.yaml).
 npx @mizchi/waxa iterate <skill>/evals/eval.yaml --max 4
+
+# Audit a skill directory (apm audit hidden-Unicode scan + waxa native
+# quality checks: frontmatter, body length, When-NOT-to-use, suspicious
+# scripts, LICENSE).
+npx @mizchi/waxa audit <skill>/ [--no-apm] [--json]
 ```
 
 The npm package bundles `references/empirical-prompt-tuning.md` so the methodology is on disk wherever waxa is installed. After `npx @mizchi/waxa` first runs, the file lives at `<node_modules>/@mizchi/waxa/references/empirical-prompt-tuning.md`.

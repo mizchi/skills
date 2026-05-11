@@ -65,17 +65,18 @@ Priority tiers. Always start at the top and only escalate when the tier above ha
    - **Frontmatter health** — `name` matches dir; description ≤1024 chars and triggering-condition-shaped (per `superpowers:writing-skills` CSO).
    - **Body quality** — explicit "When NOT to use"? Concrete patterns vs vague advice?
    - **Footprint** — body length, demand-loaded vs always-loaded references, cross-skill dependencies.
-4. **waxa eval gate (mandatory).** Adoption without empirical evaluation is the failure mode this skill exists to prevent. For each shortlisted candidate:
+4. **waxa audit (recommended).** Before spending the eval-gate budget, run `npx @mizchi/waxa audit <candidate-skill-dir>` to surface structural problems cheaply: frontmatter shape, body length, missing "When NOT to use", suspicious scripts, missing LICENSE, plus `apm audit`'s hidden-Unicode (prompt-injection) scan. A candidate with audit errors is a probable Reject without spending LLM time on the eval gate.
+5. **waxa eval gate (mandatory).** Adoption without empirical evaluation is the failure mode this skill exists to prevent. For each shortlisted candidate:
    - Install temporarily: `apm install <owner>/<repo>/skills/<name>` into a sandbox project (or symlink for local audit).
    - Author 1-2 representative `tasks/*.yaml` matching the project's actual recurring task. See `skill-selector/evals/` and `nix-setup/evals/` (skill-local layout from waxa 0.2.0) for working templates.
    - Run `waxa run` with `trials_per_task: 2` minimum.
    - Iterate (`waxa iterate`) until the ledger converges. Convergence = 2 consecutive runs with zero unclear-points (cf. `empirical-prompt-tuning`).
    - If unclear-points persist across 2 iterations with no decreasing trend → treat as **divergent**, reject.
-5. **Decide and pin.** Adoption is always pinned; pinning is non-negotiable.
+6. **Decide and pin.** Adoption is always pinned; pinning is non-negotiable.
    - **Catalog-promote** — passes eval AND used in 2+ projects without issue → propose addition to `skill-selector/references/catalog.md` with the project signal that should trigger it.
    - **Project-pin** — fits one project; add to that project's `apm.yml` with a **tag or SHA** resolved via `apm view <repo>` (or the upstream release page). Pin to the exact ref the waxa eval passed against — adopt after eval, pin the ref that was eval'd. Floating refs (`main`, `master`, `HEAD`) are forbidden for production projects.
    - **Reject** — record the reason in `references/rejection-log.md` (this skill) and / or the project's own `docs/skills-rejected.md` so the same candidate is not re-evaluated quarterly. Common reject reasons: license absent, body quality below floor, **non-redundancy axis fails (already covered by installed stack)**, or maintenance signal too weak.
-6. **Fork-and-fix path.** If a candidate is close-but-not-quite, prefer forking it into `mizchi/skills/<name>` (or the project's local skills dir) and reshaping it, over working around its shortcomings at call sites. Document the divergence so an upstream PR can converge.
+7. **Fork-and-fix path.** If a candidate is close-but-not-quite, prefer forking it into `mizchi/skills/<name>` (or the project's local skills dir) and reshaping it, over working around its shortcomings at call sites. Document the divergence so an upstream PR can converge.
 
 ## Source-specific resolution notes
 

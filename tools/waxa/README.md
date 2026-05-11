@@ -56,6 +56,12 @@ Requirements:
 # or pass --skill <name>.
 npx @mizchi/waxa init [--skill <name>] [--force]
 
+# Audit a skill directory: composes `apm audit` (hidden-Unicode scan when
+# apm is on PATH) with waxa-native quality checks (frontmatter, body
+# length, When-NOT-to-use, suspicious scripts, LICENSE). Use --json for
+# machine-readable output.
+npx @mizchi/waxa audit <skill-dir> [--no-apm] [--json]
+
 # Single run.
 npx @mizchi/waxa <path/to/eval.yaml> [--task <task-id>]
 

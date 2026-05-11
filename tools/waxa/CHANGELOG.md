@@ -5,6 +5,24 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-05-12
+
+### Added
+
+- **`waxa audit <skill-dir>` sub-command** — composition of two layers, so adoption checks have a single CLI surface even though the underlying concerns belong to different tools:
+  - **apm audit (delegated)**: `apm audit --file <SKILL.md> --format json` is invoked as a subprocess when `apm` is on `PATH`, picking up hidden-Unicode / prompt-injection scanning. The JSON output is normalized into waxa's finding shape so it appears alongside skill-quality results. If `apm` is absent, this layer is silently skipped (use `--no-apm` to force-skip).
+  - **waxa skill-quality (native)**:
+    - Frontmatter validation: `name` shape (lowercase + hyphens, no leading/trailing/double), `description` length (≤1024 chars), `description` triggering-condition shape ("Use when..." / "When..." / "After...").
+    - Body length warning (>500 lines suggests moving reference material to `references/`).
+    - "When NOT to use" / "When NOT to invoke" section detection (matches both `## When NOT to use` markdown headers and plain-text section markers).
+    - `scripts/` suspicious patterns: pipe-to-shell (`curl|wget|fetch ... | sh|bash|zsh`), `eval(` calls, hardcoded OpenAI / Anthropic / Bearer credentials.
+    - LICENSE existence (info-only — skill-finder rubric's license axis will fail when missing).
+- `--json` flag for machine-readable output (skill-finder's adoption gate can pipe waxa audit into its rubric without text-parsing).
+
+### Notes
+
+- `apm audit` (as of APM 0.12.4) specifically scans for hidden Unicode characters used in prompt-injection attacks; it does not currently cover license / supply-chain checks. waxa's skill-quality layer fills the SKILL.md-shape concerns that apm audit doesn't touch.
+
 ## [0.2.1] - 2026-05-11
 
 Stops positioning waxa as a waza-compatibility layer. waza becomes a reference implementation we cite, not an API we follow.
