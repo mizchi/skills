@@ -1,6 +1,6 @@
 ---
 name: chezmoi-management
-description: "Meta-skill for mizchi's chezmoi dotfiles. Invoke ONLY when the user explicitly asks to manage / diff / apply chezmoi sources, add a skill to dotfiles, audit the APM vs chezmoi boundary, or initialize a new machine. Covers source location, diff/apply flow, skill addition, pre-commit (prek + secretlint). Do NOT auto-invoke when the task only happens to touch a path under ~/.claude/, ~/.config/, or ~/.zshrc — consult only on explicit dotfile-management intent."
+description: "Meta-skill for mizchi's chezmoi dotfiles. Invoke ONLY when the user explicitly asks to manage / diff / apply chezmoi sources, add a skill to dotfiles, audit the APM vs chezmoi boundary, or initialize a new machine. Covers source location, diff/apply flow, skill addition, pre-push (pkfire + secretlint). Do NOT auto-invoke when the task only happens to touch a path under ~/.claude/, ~/.config/, or ~/.zshrc — consult only on explicit dotfile-management intent."
 ---
 
 # chezmoi Management (mizchi personal)
@@ -15,7 +15,7 @@ Personal dotfiles operations notes. The official chezmoi docs are already suffic
 | Remote | `https://github.com/mizchi/chezmoi-dotfiles.git` |
 | Branch | `main` |
 | Packages / `programs.*` | **nix home-manager** via `dot_config/home-manager/flake.nix` (= `home-manager` standalone or `nix-darwin` integrated mode) |
-| pre-commit | [prek](https://github.com/j178/prek) + [secretlint](https://github.com/secretlint/secretlint) |
+| pre-push | [pkfire](https://github.com/mizchi/pkfire) (`Taskfile.pkl` + `pkf hooks install`) + [secretlint](https://github.com/secretlint/secretlint) |
 | Post-apply hook | `run_after_apm-install.sh` → `apm install --global --target claude` |
 
 ### Responsibility split with nix home-manager
@@ -120,9 +120,9 @@ nix run nix-darwin -- switch --flake ~/.config/home-manager#macos
 # (or for standalone HM without system-layer changes:
 #  nix run home-manager/master -- switch --flake ~/.config/home-manager#macos)
 
-# 4. Enable pre-commit on this repo's source.
+# 4. Arm the pre-push gate on this repo's source.
 cd $(chezmoi source-path)
-prek install
+pkf hooks install   # writes .git/hooks/pre-push (secretlint over outgoing diff)
 
 # 5. apm install -g already fired via run_after_apm-install.sh during step 2.
 #    To pick up upstream updates later: apm install -g --update
@@ -210,9 +210,11 @@ Rather than rewriting the tmpl itself to a hard-coded value, put the variable in
 
 It's more flexible to preserve tmpl structures like `{{ .claude_default_mode | default "acceptEdits" }}` as-is and switch only the values per-host via `[data]` (leaves room to vary settings across machines).
 
-## pre-commit (prek + secretlint)
+## pre-push (pkfire + secretlint)
 
-Before commit, `secretlint` runs via `prek`, and diffs containing API keys or tokens are rejected.
+`secretlint` runs on `git push` via pkfire (`Taskfile.pkl` → `pkf hooks install` → `.git/hooks/pre-push`), scoped to the diff range about to be pushed. Diffs containing API keys or tokens are rejected.
+
+The previous `prek` + `.pre-commit-config.yaml` setup was retired in favor of the pkfire-first ecosystem CLAUDE.md mandates. Re-arm the hook on a fresh checkout with `pkf hooks install`. Emergency bypass: `git push --no-verify`.
 
 **Common false positives**:
 - Example sha256 / hex strings (can trip when length resembles aws keys / github tokens)
