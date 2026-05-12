@@ -14,8 +14,19 @@ Personal dotfiles operations notes. The official chezmoi docs are already suffic
 | Source directory | `~/.local/share/chezmoi/` |
 | Remote | `https://github.com/mizchi/chezmoi-dotfiles.git` |
 | Branch | `main` |
+| Packages / `programs.*` | **nix home-manager** via `dot_config/home-manager/flake.nix` (= `home-manager` standalone or `nix-darwin` integrated mode) |
 | pre-commit | [prek](https://github.com/j178/prek) + [secretlint](https://github.com/secretlint/secretlint) |
 | Post-apply hook | `run_after_apm-install.sh` → `apm install --global --target claude` |
+
+### Responsibility split with nix home-manager
+
+This repo runs **alongside** home-manager — neither is a superset of the other:
+
+- **home-manager owns**: CLI packages (`home.packages`), `programs.*` wrappers (git / direnv / zsh / etc), and tool installs that flow through Nix derivations (e.g. `pkfire`, `pkl`, `actionlint`, `awscli2`, `pkgs.go`). Edit `dot_config/home-manager/common.nix` then `darwin-rebuild switch --flake .#macos` (or `home-manager switch`).
+- **chezmoi owns**: dotfile content that `programs.*` can't shape — `~/.claude/`, `~/.codex/`, `~/.apm/`, ad-hoc `~/.config/<editor-or-shell>/`, `~/.zshrc`, kept-templated paths.
+- **APM owns**: public Claude Code skills under `~/.claude/skills/<name>/`. `.chezmoiignore` lists each APM-managed skill so chezmoi never re-deploys over `apm install -g`.
+
+**Rule**: if a `programs.*` wrapper exists in home-manager for a tool, configure it there — do not also stage the dotfile via chezmoi. Mixing creates two source-of-truth conflicts that surface as "I edited the file but my change keeps reverting".
 
 ## Layout cheat sheet
 
@@ -28,9 +39,11 @@ Personal dotfiles operations notes. The official chezmoi docs are already suffic
 │   ├── rules/
 │   └── skills/       → ~/.claude/skills/   (self-authored skills)
 ├── dot_codex/        → ~/.codex/
-├── dot_config/       → ~/.config/   (helix, mise, sheldon, starship, zellij, zsh)
+├── dot_config/       → ~/.config/   (helix, mise, sheldon, starship, zellij, zsh, home-manager)
+│   └── home-manager/ → ~/.config/home-manager/  (flake.nix / common.nix / darwin.nix — Nix-evaluated; chezmoi only stages the files, Nix does the actual install)
 ├── dot_zshrc         → ~/.zshrc
-└── run_after_apm-install.sh  (scripts/run_after_* run every time after apply)
+├── run_once_before_install-brew.sh   (bootstrap: clone Homebrew prefix to ~/brew before nix-darwin first activation)
+└── run_after_apm-install.sh          (every apply: apm install --global --target claude)
 ```
 
 ### Meaning of filename prefixes
@@ -93,16 +106,26 @@ chezmoi cd                              # cd to source dir
 
 ## New machine initialization
 
+Install order is **nix → chezmoi → apm**. brew prefix is bootstrapped by chezmoi's `run_once_before_install-brew.sh` so `nix-darwin`'s `homebrew` module can reference `~/brew` on first activation.
+
 ```bash
-# chezmoi itself: brew install chezmoi, etc.
+# 1. Install Nix (Determinate Systems installer recommended).
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 
+# 2. Bootstrap chezmoi (clones repo + applies; the brew script runs once here).
 chezmoi init https://github.com/mizchi/chezmoi-dotfiles.git --apply
-# ↑ does clone + apply. run_after_apm-install.sh runs and
-#   external skills are installed via apm install --global --target claude
 
-# Enable pre-commit (once per new machine)
+# 3. Switch home-manager / nix-darwin (installs pkfire, pkl, awscli2, …).
+nix run nix-darwin -- switch --flake ~/.config/home-manager#macos
+# (or for standalone HM without system-layer changes:
+#  nix run home-manager/master -- switch --flake ~/.config/home-manager#macos)
+
+# 4. Enable pre-commit on this repo's source.
 cd $(chezmoi source-path)
 prek install
+
+# 5. apm install -g already fired via run_after_apm-install.sh during step 2.
+#    To pick up upstream updates later: apm install -g --update
 ```
 
 ## Skill-addition flow (my personal routine)
