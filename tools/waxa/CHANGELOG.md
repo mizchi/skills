@@ -5,6 +5,26 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-05-12
+
+### Changed
+
+- `waxa audit` recognizes more trigger phrasings — driven by self-audit
+  of the new `optimizing-descriptions` skill, which is a Meta-track skill
+  whose description uses `Invoke ONLY when ...` and whose body uses
+  `Do NOT use for:` instead of a `When NOT to use` markdown header.
+- `frontmatter-description-trigger` check now accepts `Invoke when ...`,
+  `Invoke ONLY when ...`, `Activate during ...`, `Consult when ...`,
+  `Read when ...` in addition to the existing `Use when ...` / `Use ONLY
+  when ...` / `When ...` / `After ...` forms. Covers the Meta-track
+  imperative used by skills like `skill-finder`, `skill-selector`,
+  `optimizing-descriptions`.
+- `missing-when-not-to-use` check now also passes when the body contains
+  `Do NOT use ...`, `Do NOT invoke ...`, `Do NOT activate ...`, or
+  `Do NOT auto-invoke ...` lines (with or without a markdown header).
+  Picks up the Meta-skill anti-trigger phrasing that doesn't need a
+  formal "When NOT to use" section.
+
 ## [0.3.0] - 2026-05-12
 
 ### Added

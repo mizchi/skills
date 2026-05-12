@@ -1482,8 +1482,13 @@ async function checkWaxaQuality(skillDir: string): Promise<AuditFinding[]> {
           path: skillMdPath,
         });
       }
-      // Accept "Use when", "Use ONLY when", "Use after", "When ...", "After ..."
-      if (!/\buse(\s+\w+)*\s+(when|after)\b|^when\s|^after\s/i.test(meta.description)) {
+      // Accept project-track trigger phrases ("Use when", "Use ONLY when",
+      // "Use after", "When ...", "After ...") and meta-track equivalents
+      // ("Invoke ONLY when", "Activate during", "Consult when", "Read when").
+      if (
+        !/\b(use|invoke|activate|consult|read)(\s+\w+)*\s+(when|after|during|to)\b|^(when|after|during)\s/i
+          .test(meta.description)
+      ) {
         findings.push({
           level: "warn",
           source: "waxa",
@@ -1507,9 +1512,15 @@ async function checkWaxaQuality(skillDir: string): Promise<AuditFinding[]> {
     });
   }
 
-  // "When NOT to use" section detection — accept both markdown headers
-  // (`## When NOT to use`) and plain-text section markers (`When NOT to use:`).
-  if (!/^(#+\s*)?when\s+not\s+to\s+(use|invoke):?$/im.test(body)) {
+  // "When NOT to use" section detection — accept markdown headers
+  // (`## When NOT to use`), plain-text section markers (`When NOT to use:`),
+  // and Meta-skill anti-trigger phrasings (`Do NOT use for:`,
+  // `Do NOT auto-invoke ...`, `Do NOT use this skill for ...`).
+  const hasWhenNot = /^(#+\s*)?when\s+not\s+to\s+(use|invoke|activate):?$/im.test(body);
+  const hasDoNot =
+    /^(#+\s*)?do\s+not\s+(use|invoke|activate|auto-invoke)\b/im.test(body) ||
+    /^do\s+not\s+(use|invoke|activate|auto-invoke)\b/im.test(body);
+  if (!hasWhenNot && !hasDoNot) {
     findings.push({
       level: "warn",
       source: "waxa",
