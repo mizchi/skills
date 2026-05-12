@@ -1,6 +1,6 @@
 ---
 name: chezmoi-management
-description: mizchi 個人の chezmoi dotfiles 運用メモ。ソース位置、ディレクトリ命名規則、日常の diff/apply フロー、スキル追加手順、APM と chezmoi の境界、pre-commit (prek + secretlint)、トラブルシュートをまとめる。~/.claude/, ~/.config/, ~/.zshrc を触るとき・新マシン初期化時・新規スキル追加時に参照する。
+description: mizchi 個人の chezmoi dotfiles 運用メモ (Meta-skill)。 ~/.claude/, ~/.config/, ~/.zshrc などの chezmoi source の diff / apply、 skill 追加、 APM と chezmoi の境界、 pre-push (pkfire + secretlint)、 新マシン初期化を扱う。 ユーザーが明示的に「chezmoi で〜」 「dotfiles を〜」 と依頼した時のみ起動する。 単に ~/.claude/ 配下のパスに触るタスクでは auto-invoke しない。
 ---
 
 # chezmoi Management (mizchi personal)
@@ -14,7 +14,7 @@ description: mizchi 個人の chezmoi dotfiles 運用メモ。ソース位置、
 | ソースディレクトリ | `~/.local/share/chezmoi/` |
 | リモート | `https://github.com/mizchi/chezmoi-dotfiles.git` |
 | ブランチ | `main` |
-| pre-commit | [prek](https://github.com/j178/prek) + [secretlint](https://github.com/secretlint/secretlint) |
+| pre-push | [pkfire](https://github.com/mizchi/pkfire) (`Taskfile.pkl` + `pkf hooks install`) + [secretlint](https://github.com/secretlint/secretlint) |
 | apply 後フック | `run_after_apm-install.sh` → `apm install --global --target claude` |
 
 ## レイアウト早見表
@@ -100,9 +100,9 @@ chezmoi init https://github.com/mizchi/chezmoi-dotfiles.git --apply
 # ↑ clone + apply までやる。run_after_apm-install.sh が走って
 #   apm install --global --target claude で外部スキルが入る
 
-# pre-commit 有効化（新マシンで一度だけ）
+# pre-push gate を有効化（新マシンで一度だけ）
 cd $(chezmoi source-path)
-prek install
+pkf hooks install   # .git/hooks/pre-push を書き出す (outgoing diff に secretlint)
 ```
 
 ## スキル追加フロー（自分向け定型）
@@ -187,9 +187,11 @@ tmpl 自体をハードコードに書き換えるのではなく、`~/.config/c
 
 `{{ .claude_default_mode | default "acceptEdits" }}` のような tmpl 構造はそのまま保ち、ホスト別に `[data]` で値だけ切り替える方が柔軟（マシン間で設定を変える余地を残せる）。
 
-## pre-commit (prek + secretlint)
+## pre-push (pkfire + secretlint)
 
-コミット前に `prek` 経由で `secretlint` が走り、API キー・トークンが含まれた差分は reject される。
+`git push` 時に pkfire (`Taskfile.pkl` → `pkf hooks install` → `.git/hooks/pre-push`) 経由で `secretlint` が走り、 push 予定の diff range をスキャンする。 API キー・トークンを含む差分は reject される。
+
+新マシン初期化時は `pkf hooks install` で hook を arm する。 緊急時の bypass は `git push --no-verify`。
 
 **よくある誤検出**:
 - 例示の sha256 / hex 文字列（長さが aws key / github token と似ていると引っかかることがある）

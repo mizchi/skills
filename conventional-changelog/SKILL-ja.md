@@ -394,7 +394,7 @@ module.exports = { extends: ['@commitlint/config-conventional'] };
 ```
 
 ```yaml
-# .pre-commit-config.yaml (prek / pre-commit)
+# .pre-commit-config.yaml (pre-commit framework)
 - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
   rev: v9.16.0
   hooks:
@@ -405,7 +405,7 @@ module.exports = { extends: ['@commitlint/config-conventional'] };
 
 **罠**: `additional_dependencies` を付けないと hook 実行時に `config-conventional` が解決できず `Cannot find module` で落ちる。`commitlint.config.js` で `extends` しているだけでは不足、hook の isolated 環境にも明示する必要がある。
 
-**prek vs pre-commit**: `prek` は Rust 製の pre-commit 互換実装（https://github.com/j178/prek）。設定ファイル (`.pre-commit-config.yaml`) と hook 仕様は共通、実行速度が 5-10x 速い。コマンドは `prek install` / `prek run`。mizchi 環境では prek を使用（chezmoi-management skill 参照）。
+mizchi default の pkfire ecosystem では commitlint も `Taskfile.pkl` の task に組み込む — 詳細は `chezmoi-management` / `pkfire` skill 参照。
 
 ### commitizen（対話的 commit 作成）
 

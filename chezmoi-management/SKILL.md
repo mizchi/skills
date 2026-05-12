@@ -214,7 +214,7 @@ It's more flexible to preserve tmpl structures like `{{ .claude_default_mode | d
 
 `secretlint` runs on `git push` via pkfire (`Taskfile.pkl` → `pkf hooks install` → `.git/hooks/pre-push`), scoped to the diff range about to be pushed. Diffs containing API keys or tokens are rejected.
 
-The previous `prek` + `.pre-commit-config.yaml` setup was retired in favor of the pkfire-first ecosystem CLAUDE.md mandates. Re-arm the hook on a fresh checkout with `pkf hooks install`. Emergency bypass: `git push --no-verify`.
+Re-arm the hook on a fresh checkout with `pkf hooks install`. Emergency bypass: `git push --no-verify`.
 
 **Common false positives**:
 - Example sha256 / hex strings (can trip when length resembles aws keys / github tokens)
