@@ -1,6 +1,6 @@
 ---
 name: esbuild-otel-instrumentation
-description: esbuild ESM bundle (`--format=esm`) で `@opentelemetry/instrumentation-*` の auto-instrumentation が無音失敗する問題と回避策。trace / span が一切送信されないとき。
+description: Use when esbuild ESM bundle (`--format=esm`) を出力したアプリで `@opentelemetry/instrumentation-*` の auto-instrumentation が無音失敗し、 trace / span が一切送信されない症状が出るとき。 OTel が configure はされているのに Tempo / Jaeger / collector に何も届かない、 SDK init log は出るのに span が出ない、 等の報告から起動 (user が esbuild bundling と症状を結び付けていなくても OK)。
 ---
 
 # esbuild ESM bundle で OTel auto-instrumentation が動かない

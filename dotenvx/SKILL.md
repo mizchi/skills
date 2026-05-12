@@ -1,6 +1,6 @@
 ---
 name: dotenvx
-description: Reference for the dotenvx environment variable management tool. Covers encryption, multi-environment support, and GitHub Actions usage examples.
+description: Use when working with the `dotenvx` env-var management tool — encrypting .env files, juggling multiple environments (.env.production / .env.staging / .env.ci), committing encrypted secrets to git with `.env.vault` / `.env.keys` / `.env.encrypted`, or wiring dotenvx into GitHub Actions. Trigger on `.env.vault` / `.env.keys` / `dotenvx` commands or symptoms (env-var leak risk, env per-stage management, encrypted secrets workflow) even if the user does not say "dotenvx" by name.
 ---
 
 # dotenvx Skill

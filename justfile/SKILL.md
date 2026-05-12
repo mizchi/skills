@@ -1,6 +1,6 @@
 ---
 name: justfile
-description: Reference for just command runner. Provides justfile syntax and GitHub Actions examples.
+description: Reference for the `just` command runner — justfile syntax and GitHub Actions integration. Use when an existing repo already has a `justfile` and tasks must be added, modified, or audited. For new mizchi-owned repos, prefer the `pkfire` skill (`Taskfile.pkl` + `pkf`) instead; justfile is kept only for compatibility with existing repos.
 ---
 
 # justfile Skill

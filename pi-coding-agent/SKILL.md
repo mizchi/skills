@@ -1,6 +1,6 @@
 ---
 name: pi-coding-agent
-description: Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.registerCommand` / `pi.on`, package and `pi install` from npm/git, and pick between the SDK and `pi --mode rpc` for non-Node hosts. Covers session setup, the cwd × tools factory trap, TypeBox tool schemas, and the `peerDependencies` rule.
+description: Use when embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, writing pi extensions (plugins) with `pi.registerTool` / `pi.registerCommand` / `pi.on`, packaging and `pi install` from npm/git, or picking between the SDK and `pi --mode rpc` for non-Node hosts. Covers session setup, the cwd × tools factory trap, TypeBox tool schemas, and the `peerDependencies` rule. Trigger on `pi-coding-agent`, `pi.registerTool`, `pi install`, or "embed a coding agent into Node" descriptions even when pi is not named.
 ---
 
 # pi-coding-agent

@@ -1,6 +1,6 @@
 ---
 name: aws-vault-mfa-iam
-description: AWS account の IAM API が MFA 必須 policy で弾かれる場面の診断と aws-vault 設定。`sts:GetCallerIdentity` は通るのに `iam:*` が `InvalidClientTokenId` で拒否されるとき、または FIDO2 passkey で MFA が CLI から使えないとき。
+description: Use when AWS account の IAM API が MFA 必須 policy で弾かれて、 `sts:GetCallerIdentity` は通るのに `iam:*` が `InvalidClientTokenId` で拒否されるとき、 または FIDO2 passkey で MFA が CLI から使えないとき。 aws-vault / aws-cli / MFA / passkey 関連で「アクセス拒否」 「token expired」 「IAM 操作のみ失敗」 等の症状から起動 (user が aws-vault を名指しでなくても OK)。
 ---
 
 # aws-vault に virtual MFA (TOTP) を設定する

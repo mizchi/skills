@@ -1,6 +1,6 @@
 ---
 name: chezmoi-management
-description: "mizchi's chezmoi dotfiles operations: source location, diff/apply flow, skill addition, the APM vs chezmoi boundary, pre-commit (prek + secretlint). Consult when touching ~/.claude/, ~/.config/, or ~/.zshrc, or initializing a new machine."
+description: "Meta-skill for mizchi's chezmoi dotfiles. Invoke ONLY when the user explicitly asks to manage / diff / apply chezmoi sources, add a skill to dotfiles, audit the APM vs chezmoi boundary, or initialize a new machine. Covers source location, diff/apply flow, skill addition, pre-commit (prek + secretlint). Do NOT auto-invoke when the task only happens to touch a path under ~/.claude/, ~/.config/, or ~/.zshrc — consult only on explicit dotfile-management intent."
 ---
 
 # chezmoi Management (mizchi personal)
