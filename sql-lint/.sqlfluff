@@ -1,0 +1,24 @@
+; sqlfluff config tuned for sqlc-style query catalogs targeting SQLite / D1.
+; Run via `uvx sqlfluff lint --config skills/sql-lint/.sqlfluff <file>`.
+
+[sqlfluff]
+dialect = sqlite
+templater = raw
+exclude_rules =
+  AM04,   ; SELECT * — handled by catalog-lint with better context.
+  CP02,   ; Inconsistent capitalisation of identifiers — too noisy on quoted JSON refs.
+  L009,   ; Files must end with a single trailing newline — git enforces.
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:layout.long_lines]
+max_line_length = 200
+
+[sqlfluff:rules:ambiguous.column_count]
+; Disabled: many of our queries SELECT specific columns whose count is
+; intentional; sqlfluff cannot tell that.
+disabled = true
