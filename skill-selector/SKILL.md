@@ -48,8 +48,14 @@ Workflow:
    - Project scope: edit `apm.yml`, run `apm install`. Commit `apm.lock.yaml`.
    - Global scope: `apm install -g <repo>/<path>`, verify in `~/.apm/apm.yml`.
    - **`targets:` declaration is required.** APM 0.12+ does not fall back to a default target when no marker directory (`.claude/` / `.github/` / etc.) exists at the repo root — `apm install` errors out asking for an explicit choice. Write `targets: [claude]` (or whatever the host harness is) in `apm.yml` unconditionally; do not rely on directory auto-detection.
+   - **`targets:` does not strictly gate deploy directories.** Even with `targets: [claude]`, APM 0.12+ may also write to `.agents/skills/` alongside `.claude/skills/`. Inspect the `apm install` output (`Skill integrated -> ...`) and treat every listed path as a deploy target for the gitignore decision below.
    - Pinning: catalog entries do not carry tags. Resolve a concrete tag or SHA via `apm view <repo>` (or check the upstream repo's release page) before committing `apm.yml`. Floating refs are listed under Common mistakes.
-5. If a need is unmet, escalate to Phase 2. Do not skip Phase 1 — even if a search query is already forming in your head, scanning the catalog is cheaper.
+5. **Decide the gitignore policy before the first commit.** `apm install` auto-adds `apm_modules/` to `.gitignore` but does NOT add the deploy targets. Pick one and stick to it:
+   - **Commit deploy targets** (`.claude/skills/`, `.agents/skills/`, …): repo is self-contained, teammates / CI can clone without running `apm install`. Cost: file count balloons (7 skills ≈ 700 files in a recent utels install). Choose when teammates may not have APM, or when you want skill content reviewable in PRs.
+   - **Gitignore deploy targets**: leaner repo; teammates run `apm install --frozen-lockfile` after clone. Add the exact paths emitted by `apm install` (e.g., `.claude/skills/`, `.agents/skills/`). Caveat: if the project also keeps local skills under the same directory (`.claude/skills/<local-skill>/`), gitignore only the APM-managed subpaths, not the whole directory.
+   - Always commit `apm.yml` and `apm.lock.yaml` regardless. Without the lockfile the install is not reproducible — the deploy-target gitignore choice only changes whether the *generated* artifacts live in git.
+   - Propose the choice to the user when the install lands the first APM skills in the repo. Don't silently pick — file-count bloat vs. clone-time install are both legitimate but the trade-off is repo-specific.
+6. If a need is unmet, escalate to Phase 2. Do not skip Phase 1 — even if a search query is already forming in your head, scanning the catalog is cheaper.
 
 ## Phase 2 — Search and evaluate (delegated to `skill-finder`)
 
@@ -89,6 +95,8 @@ Reverse failure: forcing a Phase 1 fit when the catalog truly has nothing suitab
 | Adopting a Phase 2 skill without testing | `skill-finder` requires a waxa eval gate before adoption. Don't bypass it — descriptions can lie. |
 | Floating refs in `apm.yml` for project scope | Pin to a tag or SHA. Drift mid-feature is its own debugging hell. |
 | Re-evaluating the same rejected skill quarterly | Record the rejection reason in-repo. Don't re-search ground already covered. |
+| Silently committing (or silently gitignoring) the APM deploy targets | Surface the choice — see step 5. Default-commit can balloon the repo; default-ignore can break teammates without APM. |
+| Assuming `targets: [claude]` keeps deploy paths under `.claude/skills/` only | APM 0.12+ may also write to `.agents/skills/`. Read the `apm install` output and treat every path it lists as a deploy target. |
 | Treating Phase 1 catalog as exhaustive | If nothing matches in ~30 seconds, escalate to Phase 2. Don't shoehorn. |
 
 ## Related
