@@ -42,6 +42,11 @@ rely on Node's `--experimental-strip-types` (default-on at 24+).
 installing. Use `nvm install 24 && nvm use 24` (or `fnm` / `volta` /
 your preferred manager) to upgrade.
 
+**Pre-flight check**: run `bash scripts/doctor.sh` (in this skill's
+directory after `apm install`) to verify Node version, Playwright
+Chromium, optional API keys, and installed sub-skills in one pass.
+Exits 0 when basic CLI use is ready.
+
 ```bash
 # CLI (global)
 pnpm add -g @mizchi/vrt
