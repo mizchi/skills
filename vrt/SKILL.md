@@ -36,6 +36,12 @@ old-CLI-to-new-CLI mapping: [`CHANGELOG.md`](https://github.com/mizchi/vrt/blob/
 
 ## Install
 
+**Prerequisite: Node 24+.** The CLI and the workspace packages all
+rely on Node's `--experimental-strip-types` (default-on at 24+).
+**Node 22 will not work** — verify with `node --version` before
+installing. Use `nvm install 24 && nvm use 24` (or `fnm` / `volta` /
+your preferred manager) to upgrade.
+
 ```bash
 # CLI (global)
 pnpm add -g @mizchi/vrt
@@ -43,20 +49,25 @@ pnpm add -g @mizchi/vrt
 pnpm add -D @mizchi/vrt
 npx playwright install chromium
 
-# Library packages (deep imports via .ts source — Node 24+ required)
+# Library packages (deep imports via .ts source)
 pnpm add @mizchi/vrt-core @mizchi/vrt-capture @mizchi/vrt-markup @mizchi/vrt-ai
 ```
 
-Required: **Node 24+**. The workspace packages ship raw `.ts` and rely
-on Node's `--experimental-strip-types` (default on 24+) to load.
-
 ## CLI cheatsheet (0.5.0 verb groups)
+
+**I/O conventions used below**: `--output <dir>` always takes a
+**directory** path (the engine writes `diff-report.json` + per-viewport
+PNGs into it). `vrt diff agent` writes Markdown to **stdout** by
+default; pass `--out <path>` to write to a file instead.
+Commands taking two positional args (e.g. `vrt diff html <baseline>
+<variant>`) accept **either two local file paths or two URLs**; use
+`--url`/`--current-url` if you want to be explicit.
 
 ```bash
 # Diff
-vrt diff html <baseline> <variant> --output reports/        # HTML/URL pair → report.json + PNGs
-vrt diff agent reports/diff-report.json                     # Markdown for the calling agent
-vrt diff png  base.png current.png                          # Direct PNG diff
+vrt diff html <baseline> <variant> --output reports/        # → reports/diff-report.json + PNGs (dir output)
+vrt diff agent reports/diff-report.json [--out diff.md]     # → stdout (default) or --out path
+vrt diff png  base.png current.png                          # Direct PNG diff (positional files)
 vrt diff elements --selector .card …                        # Element-level shift isolation
 vrt diff browsers <url>                                     # Chromium / Firefox / WebKit parity
 vrt diff runs <dirs...>                                     # Aggregate N VRT runs
@@ -79,8 +90,12 @@ vrt stress  i18n|media  <html>
 vrt scan    component|breakpoints  <…>
 vrt build   component <target.png> <current.html>           # Markup-from-screenshot loop
 
-# Migration (framework / CSS-library swap audit)
-vrt migration compare|blind|subagent <baseline> <variant>
+# Migration (framework / CSS-library swap audit). Three modes:
+#   compare  — deterministic side-by-side audit; the default. Start here.
+#   blind    — variant agent never sees baseline pixels (forces convergence from spec text alone).
+#   subagent — dispatched subagent runs `compare` + writes a verdict.
+# `--mask` and `--output` work identically across all three modes.
+vrt migration compare|blind|subagent <baseline> <variant> --output reports/
 
 # Long-running / stateful
 vrt watch       <baseline> <variant>                        # File-watcher inner loop
@@ -96,7 +111,11 @@ one-line hint and forward.
 ## Sub-skill routing
 
 The vrt repo ships five detailed sub-skills under
-`.claude/skills/`. Install via APM:
+`.claude/skills/`. **The CLI is fully functional without any sub-skill
+installed** — sub-skills are agent-facing reference material that
+deepens the routing for a specific task shape. Install only when an
+agent needs the extra context; end users running `vrt` from the
+command line never need them.
 
 ```bash
 apm install mizchi/vrt/.claude/skills/<skill-name>
