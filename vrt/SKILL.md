@@ -42,10 +42,21 @@ rely on Node's `--experimental-strip-types` (default-on at 24+).
 installing. Use `nvm install 24 && nvm use 24` (or `fnm` / `volta` /
 your preferred manager) to upgrade.
 
-**Pre-flight check**: run `bash scripts/doctor.sh` (in this skill's
-directory after `apm install`) to verify Node version, Playwright
-Chromium, optional API keys, and installed sub-skills in one pass.
-Exits 0 when basic CLI use is ready.
+**Pre-flight check**: run `scripts/doctor.sh` to verify Node version,
+Playwright Chromium, optional API keys, and installed sub-skills in
+one pass. Two invocation forms by setup phase:
+
+- **Pre-install (no apm yet)**: one-shot via curl —
+  `bash <(curl -sSL https://raw.githubusercontent.com/mizchi/skills/main/vrt/scripts/doctor.sh)`
+- **Post-install (`apm install -g mizchi/skills/vrt` done)**: local
+  copy — `bash ~/.claude/skills/vrt/scripts/doctor.sh`
+
+Severity rules: only **Node 24+** and **Playwright Chromium** are
+FAIL-class (block exit 0). Everything else — including `vrt` CLI not
+yet on PATH — is WARN by design, because the script is meant to be
+runnable mid-install (a WARN on `vrt CLI` is expected the first time
+through; resolve all FAILs first, install vrt, re-run, and the WARN
+clears).
 
 ```bash
 # CLI (global)
@@ -115,12 +126,25 @@ one-line hint and forward.
 
 ## Sub-skill routing
 
-The vrt repo ships five detailed sub-skills under
-`.claude/skills/`. **The CLI is fully functional without any sub-skill
-installed** — sub-skills are agent-facing reference material that
-deepens the routing for a specific task shape. Install only when an
-agent needs the extra context; end users running `vrt` from the
-command line never need them.
+**Two repos, by design**: this orient skill lives in
+[`mizchi/skills`](https://github.com/mizchi/skills) (general-purpose
+skills); the five vrt-specific sub-skills live in
+[`mizchi/vrt`](https://github.com/mizchi/vrt) under
+`.claude/skills/`. The two `apm install` paths below look different
+because they target different repos — that is intentional, not a typo.
+
+**The CLI is fully functional without any sub-skill installed** —
+sub-skills are agent-facing reference material that deepens the routing
+for a specific task shape. Install only when an agent needs the extra
+context; end users running `vrt` from the command line never need
+them.
+
+**Scope boundary**: this orient skill stops at *routing*. Once you know
+which sub-skill to load, deeper operational detail — full flag lists,
+persistence paths (e.g. `.vrt/last-diff-for-agent.json` for regression
+watch), per-mode semantics, output schema — lives in the corresponding
+sub-skill. Install it via the `apm` command above when an agent needs
+that depth.
 
 ```bash
 apm install mizchi/vrt/.claude/skills/<skill-name>
