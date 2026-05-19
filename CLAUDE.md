@@ -19,6 +19,8 @@ After a batch of edits, commit + push here, then the next `apm install -g --upda
 
 ## Before committing
 
+- Run `pkf hooks install` once per checkout. The `pre-commit` hook runs `pkf run pre-commit`, which validates YAML frontmatter in tracked `SKILL.md` files.
+- Use `pkf run test` to run the frontmatter validator tests plus the repository frontmatter check.
 - Skill directory name must match the `name:` in its `SKILL.md` frontmatter.
 - Do not commit MoonBit build artifacts (`_build/`, `.mooncakes/`) or `node_modules/` — `.gitignore` covers them.
 - If a skill gains security-sensitive detail, move it to chezmoi-local and remove from this repo (see how `npm-release` is handled).

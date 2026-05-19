@@ -1,6 +1,6 @@
 ---
 name: sql-security
-description: SQL injection screening for host code (MoonBit / TS / Rust) plus secretlint setup notes. Flags any template-literal or string-concat SQL builder, regardless of value source — the scanner does not trace data flow, so every hit needs a manual review or an explicit `// sql-security: ok` opt-out.
+description: "SQL injection screening for host code (MoonBit / TS / Rust) plus secretlint setup notes. Flags any template-literal or string-concat SQL builder, regardless of value source — the scanner does not trace data flow, so every hit needs a manual review or an explicit `// sql-security: ok` opt-out."
 version: 0.1.0
 metadata:
   hermes:

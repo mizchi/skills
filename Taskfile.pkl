@@ -1,0 +1,49 @@
+amends "package://pkg.pkl-lang.org/github.com/mizchi/pkfire/pkfire@0.9.0#/Taskfile.pkl"
+
+local skillFrontmatterSources: Listing<String> = new {
+  "**/SKILL.md"
+  "scripts/validate-skill-frontmatter.rb"
+}
+
+local checkFrontmatter: Task = new {
+  name = "check:frontmatter"
+  description = "Validate YAML frontmatter in tracked SKILL.md files"
+  cmd = "ruby scripts/validate-skill-frontmatter.rb"
+  inputs = skillFrontmatterSources
+}
+
+local testFrontmatter: Task = new {
+  name = "test:frontmatter"
+  description = "Run tests for the SKILL.md frontmatter validator"
+  cmd = "ruby scripts/validate-skill-frontmatter_test.rb"
+  inputs {
+    "scripts/validate-skill-frontmatter.rb"
+    "scripts/validate-skill-frontmatter_test.rb"
+  }
+}
+
+local test: Task = new {
+  name = "test"
+  description = "Run repository checks"
+  deps {
+    testFrontmatter
+    checkFrontmatter
+  }
+}
+
+local preCommit: Task = new {
+  name = "pre-commit"
+  description = "Pre-commit gate for skill metadata"
+  cmd = "echo pre-commit ok"
+  cache = false
+  deps {
+    checkFrontmatter
+  }
+}
+
+tasks {
+  checkFrontmatter
+  testFrontmatter
+  test
+  preCommit
+}
