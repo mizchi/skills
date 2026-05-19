@@ -1,0 +1,285 @@
+name: deploy
+
+# Reusable deploy workflow. Captures the currently-deployed version_id
+# before deploying, applies D1 migrations, builds + deploys, runs smoke,
+# auto-rolls-back on smoke failure, and reports a summary.
+#
+# Called from cd-staging.yml (push to main → staging) and
+# cd-production.yml (push to release → production). Also available via
+# workflow_dispatch for manual hot fixes.
+#
+# .env.cloudflare is the single source of truth for Cloudflare creds.
+# It's committed encrypted via dotenvx; the only repo secret needed is
+# DOTENV_PRIVATE_KEY_CLOUDFLARE. Rotating one key rotates every cred.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: "production"
+        options:
+          - production
+          - staging
+      message:
+        description: "Deploy message (appears in wrangler deployments list)"
+        required: false
+        default: ""
+      skip_smoke:
+        description: "Skip post-deploy smoke (emergency hot fix only)"
+        required: true
+        type: boolean
+        default: false
+      skip_rollback:
+        description: "Don't auto-rollback on smoke failure"
+        required: true
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      message:
+        required: false
+        type: string
+        default: ""
+      skip_smoke:
+        required: false
+        type: boolean
+        default: false
+      skip_rollback:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DOTENV_PRIVATE_KEY_CLOUDFLARE:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOTENV_PRIVATE_KEY_CLOUDFLARE: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - name: Get pnpm store path
+        id: pnpm-cache
+        run: echo "store=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.store }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Node.js dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install MoonBit toolchain
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Cache MoonBit packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.moon
+          key: ${{ runner.os }}-moon-${{ hashFiles('moon.mod.json') }}
+          restore-keys: |
+            ${{ runner.os }}-moon-
+
+      - name: Update MoonBit package index
+        run: moon update
+
+      - name: Install MoonBit dependencies
+        run: moon install
+
+      - name: Resolve environment flags
+        id: env
+        # Top-level wrangler.jsonc is the production config; only pass
+        # --env when targeting a named environment.
+        run: |
+          set -euo pipefail
+          target="${{ inputs.environment }}"
+          if [ "$target" = "production" ]; then
+            echo "wrangler_env_flag=" >> "$GITHUB_OUTPUT"
+            echo "smoke_base=https://cf-mbt-app.${{ vars.WORKERS_SUBDOMAIN || 'YOUR-SUBDOMAIN' }}.workers.dev" >> "$GITHUB_OUTPUT"
+          else
+            echo "wrangler_env_flag=--env $target" >> "$GITHUB_OUTPUT"
+            echo "smoke_base=https://cf-mbt-app-staging.${{ vars.WORKERS_SUBDOMAIN || 'YOUR-SUBDOMAIN' }}.workers.dev" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Target env: $target"
+
+      - name: Capture currently-deployed version_id (rollback target)
+        id: pre_deploy
+        run: |
+          # `wrangler deployments list` (v4) prints oldest first, newest
+          # last. Each entry ends with `Version(s):  (100%) <UUID>`. Take
+          # the trailing UUID via $NF on the LAST Version(s) line.
+          #
+          # First-time deploy edge case: if the Worker doesn't exist on
+          # the account yet (initial bring-up), wrangler returns 10007 /
+          # "This Worker does not exist on your account". Treat that as
+          # "no rollback target" — emit an empty version_id and a flag
+          # the rollback step checks.
+          #
+          # GitHub Actions default is `bash -e`, which would kill the
+          # step before we capture rc + log. `set +e` so wrangler's
+          # non-zero exit is observable.
+          set +e
+          set -uo pipefail
+          tmp=/tmp/deployments.log
+          npx -y @dotenvx/dotenvx@latest run -f .env.cloudflare --quiet -- \
+            pnpm exec wrangler deployments list ${{ steps.env.outputs.wrangler_env_flag }} > "$tmp" 2>&1
+          rc=$?
+          cat "$tmp" >&2
+          if [ "$rc" -ne 0 ]; then
+            if grep -q "This Worker does not exist" "$tmp"; then
+              echo "::notice::Worker does not exist yet — first deploy on this env; rollback target unavailable."
+              echo "version_id=" >> "$GITHUB_OUTPUT"
+              echo "first_deploy=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "::error::wrangler deployments list failed (exit $rc); see log above"
+            exit "$rc"
+          fi
+          version_id=$(awk '/^Version\(s\):/ { last=$NF } END { print last }' "$tmp")
+          if [ -z "$version_id" ]; then
+            echo "::error::could not parse current version_id from wrangler deployments list"
+            exit 1
+          fi
+          echo "version_id=$version_id" >> "$GITHUB_OUTPUT"
+          echo "first_deploy=false" >> "$GITHUB_OUTPUT"
+          echo "Captured pre-deploy version_id: $version_id"
+
+      - name: Apply D1 migrations
+        # `wrangler d1 migrations apply` auto-skips the interactive
+        # prompt in CI; no `--yes` flag exists (it would print help and
+        # exit 1). The DB names come straight from wrangler.jsonc's env
+        # block, so they stay in sync with the runtime config.
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            DBS="cf-mbt-app"
+          else
+            DBS="cf-mbt-app-staging"
+          fi
+          for db in $DBS; do
+            echo "→ migrations apply: $db"
+            npx -y @dotenvx/dotenvx@latest run -f .env.cloudflare --quiet -- \
+              pnpm exec wrangler d1 migrations apply "$db" \
+                --remote ${{ steps.env.outputs.wrangler_env_flag }}
+          done
+
+      - name: Build worker bundle
+        run: pnpm run build
+
+      - name: Deploy to Cloudflare Workers
+        id: deploy
+        run: |
+          set -euo pipefail
+          short_sha=$(git rev-parse --short HEAD)
+          msg="${{ inputs.message }}"
+          if [ -z "$msg" ]; then
+            msg="ci-deploy $short_sha"
+          else
+            msg="$msg ($short_sha)"
+          fi
+          npx -y @dotenvx/dotenvx@latest run -f .env.cloudflare --quiet -- \
+            pnpm exec wrangler deploy ${{ steps.env.outputs.wrangler_env_flag }} --message "$msg" 2>&1 | tee /tmp/deploy.log
+          new_version_id=$(awk '/Current Version ID:/ { print $NF; exit }' /tmp/deploy.log)
+          if [ -z "$new_version_id" ]; then
+            echo "::error::could not parse new version_id from wrangler deploy output"
+            exit 1
+          fi
+          echo "new_version_id=$new_version_id" >> "$GITHUB_OUTPUT"
+          echo "Deployed version_id: $new_version_id"
+
+      - name: Run post-deploy smoke
+        id: smoke
+        if: ${{ inputs.skip_smoke == false }}
+        # continue-on-error so the rollback step gets a chance to react.
+        continue-on-error: true
+        env:
+          SMOKE_BASE_URL: ${{ steps.env.outputs.smoke_base }}
+        # Access creds (CF_ACCESS_CLIENT_ID/SECRET) come from
+        # .env.cloudflare via dotenvx, with *_STAGING entries remapped
+        # onto canonical names when targeting staging.
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            access_id_var=CF_ACCESS_CLIENT_ID_STAGING
+            access_secret_var=CF_ACCESS_CLIENT_SECRET_STAGING
+          else
+            access_id_var=CF_ACCESS_CLIENT_ID
+            access_secret_var=CF_ACCESS_CLIENT_SECRET
+          fi
+          npx -y @dotenvx/dotenvx@latest run -f .env.cloudflare --quiet -- \
+            bash -c "
+              export CF_ACCESS_CLIENT_ID=\"\${$access_id_var:-}\"
+              export CF_ACCESS_CLIENT_SECRET=\"\${$access_secret_var:-}\"
+              pnpm run smoke
+            "
+
+      - name: Auto-rollback on smoke failure
+        if: ${{ inputs.skip_smoke == false && steps.smoke.outcome == 'failure' && inputs.skip_rollback == false && steps.pre_deploy.outputs.first_deploy != 'true' }}
+        run: |
+          set -euo pipefail
+          target="${{ steps.pre_deploy.outputs.version_id }}"
+          echo "::warning::Smoke FAILED on version ${{ steps.deploy.outputs.new_version_id }}; rolling back to $target"
+          npx -y @dotenvx/dotenvx@latest run -f .env.cloudflare --quiet -- \
+            pnpm exec wrangler rollback "$target" ${{ steps.env.outputs.wrangler_env_flag }} --message "auto-rollback (smoke failed for ${{ steps.deploy.outputs.new_version_id }})"
+          echo "Rollback complete; ${{ inputs.environment }} now on $target"
+
+      - name: "Note: no rollback target on first deploy"
+        if: ${{ inputs.skip_smoke == false && steps.smoke.outcome == 'failure' && steps.pre_deploy.outputs.first_deploy == 'true' }}
+        run: |
+          echo "::warning::Smoke failed on the first deploy for this env; no prior version exists to roll back to. Investigate the new version directly: ${{ steps.deploy.outputs.new_version_id }}"
+
+      - name: Report deploy result
+        if: ${{ always() }}
+        run: |
+          smoke_outcome="${{ steps.smoke.outcome }}"
+          if [ "${{ inputs.skip_smoke }}" = "true" ]; then
+            smoke_outcome="skipped"
+          fi
+          pre_id="${{ steps.pre_deploy.outputs.version_id }}"
+          if [ -z "$pre_id" ]; then
+            pre_id="(none — first deploy on this env)"
+          fi
+          echo "## Deploy result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: \`${{ inputs.environment }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Pre-deploy version_id: \`$pre_id\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployed version_id: \`${{ steps.deploy.outputs.new_version_id || 'failed-before-deploy' }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Smoke: $smoke_outcome" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$smoke_outcome" = "failure" ] && [ "${{ inputs.skip_rollback }}" = "false" ]; then
+            echo "- Auto-rollback: TRIGGERED" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fail the workflow if smoke failed
+        if: ${{ inputs.skip_smoke == false && steps.smoke.outcome == 'failure' }}
+        run: |
+          echo "Smoke failed — see previous steps. Workflow marked failed."
+          exit 1

@@ -1,0 +1,107 @@
+// Pre-bundle step for a MoonBit Cloudflare Worker. Two responsibilities:
+//   1. Read the moon-built JS at `_build/js/release/build/<package>.js`,
+//      apply the two required FFI rewrites (event_loop reschedule
+//      rename + module-scope random seed neutralization), and write
+//      the result to `src/_generated/<package>-core.js`.
+//   2. (Optional) walk a Vite output under `dist/<frontend>/` and emit
+//      `src/_generated/<frontend>-runtime.mjs` that registers
+//      `globalThis.__appMaybeHandleAsset` at module-load time.
+//
+// The worker entry (`src/worker.ts`) side-effect-imports both
+// generated files plus the TS telemetry wrappers. wrangler bundles
+// src/worker.ts via its esbuild integration on deploy — there's no
+// hand-written `dist/worker.mjs` shim.
+//
+// TEMPLATE NOTES — replace before use:
+//   <PKG>         = moon package name from moon.mod.json
+//   <FRONTEND>    = name of the Vite output directory under dist/
+//                   (omit if no frontend)
+
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = dirname(fileURLToPath(import.meta.url));
+const projectRoot = join(root, "..");
+const generatedDir = join(projectRoot, "src/_generated");
+const moonOutput = join(
+  projectRoot,
+  "_build/js/release/build/<PKG>.js",
+);
+
+await mkdir(generatedDir, { recursive: true });
+const moonCore = await readFile(moonOutput, "utf8");
+
+// `String.replaceAll` silently no-ops when the target string is
+// absent. That is exactly how the 2026-05-17 production hang in
+// mnemo shipped: the toolchain renamed the rewrite target and the
+// replace became a no-op, leaving the worker calling an undefined
+// symbol on the first awaited Promise. requiredReplace fails loud.
+function requiredReplace(
+  source: string,
+  before: string,
+  after: string,
+  reason: string,
+): string {
+  if (!source.includes(before)) {
+    console.error(
+      `prepare-worker: required rewrite did not match. ${reason}\n` +
+        `  expected to find: ${JSON.stringify(before).slice(0, 120)}\n` +
+        `  in the moon JS output. If the toolchain renamed the target, ` +
+        `update this script (and document the new target).`,
+    );
+    process.exit(2);
+  }
+  return source.replaceAll(before, after);
+}
+
+let workerCore = moonCore;
+
+// FFI rewrite 1: event_loop reschedule rename.
+//
+// moonbitlang/async renamed the recursive event-loop reschedule entry
+// point. The old `coroutine.reschedule()` only drains the deque once
+// and does not re-arm the event loop, so awaited Promises (Promise.wait,
+// Promise::from_async) never resume after the first batch — leaving
+// the worker hung on every request that crosses an await boundary
+// beyond startup.
+//
+// The mangled target name (`_M0FP411moonbitlang5async8internal11event__loop10reschedule`)
+// may change again with future moonbitlang/async releases. If the
+// requiredReplace below fails after a moon update, run:
+//   grep -o '_M0FP[0-9]\+moonbitlang5async[0-9a-z_]\+reschedule' _build/js/release/build/<PKG>.js
+// to find the new mangled name and update this rewrite.
+workerCore = requiredReplace(
+  workerCore,
+  "moonbitlang$async$internal$event_loop$$reschedule();",
+  "_M0FP411moonbitlang5async8internal11event__loop10reschedule();",
+  "ffi__reschedule rewrite — without it, every await past startup hangs.",
+);
+
+// FFI rewrite 2: module-scope random seed.
+//
+// Cloudflare Workers reject random generation in module global
+// scope. MoonBit uses this seed for runtime hashing. A deterministic
+// seed is acceptable for the Worker because all random I/O lives
+// inside handlers anyway. Replace the random seed call with a
+// constant.
+//
+// The seed value (`0x6d6e656d` in mnemo's case spells "mnem" in
+// ASCII; pick any non-zero 32-bit constant) does not matter for
+// correctness — only that it's deterministic at module-init time.
+workerCore = requiredReplace(
+  workerCore,
+  "const _M0FPB4seed = _M0FPB12random__seed();",
+  "const _M0FPB4seed = 0x6d6e656d;",
+  "Module-scope random seed rewrite — Workers reject random in module init.",
+);
+
+await writeFile(
+  join(generatedDir, "<PKG>-core.js"),
+  workerCore,
+);
+
+// If you have a Vite frontend whose output you want to serve from
+// the same Worker (under `/assets/<FRONTEND>/`), add the
+// editor-assets-runtime generator here. Example from mnemo:
+// https://github.com/mizchi/mnemo/blob/main/mnemo-server/scripts/prepare-worker.mjs

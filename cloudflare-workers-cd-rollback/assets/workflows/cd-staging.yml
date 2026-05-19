@@ -1,0 +1,65 @@
+name: CD staging
+
+# Auto-deploy every merge to main to staging. The reusable deploy.yml
+# applies migrations, builds, deploys, runs smoke, and auto-rolls-back
+# on smoke failure.
+#
+# Path filter: only run when changes can affect the worker. Docs-only
+# commits skip the deploy cycle.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "db/**"
+      - "scripts/**"
+      - ".github/workflows/cd-staging.yml"
+      - ".github/workflows/deploy.yml"
+      - ".env.cloudflare"
+      - "wrangler.jsonc"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "moon.mod.json"
+
+permissions:
+  contents: read
+
+jobs:
+  # Skip the deploy in the upstream starter-kit repo (and any fork that
+  # hasn't configured the dotenvx key yet) — both lack the secret that
+  # decrypts .env.cloudflare, so the called deploy job would fail at
+  # the first wrangler call. We can't reference `secrets.X` directly in
+  # `jobs.<id>.if:`, so a precheck job materializes the boolean into a
+  # job output.
+  precheck:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          KEY: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
+        run: |
+          if [ -n "$KEY" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::DOTENV_PRIVATE_KEY_CLOUDFLARE is not set on this repo — skipping deploy. Configure the secret (see docs/cd-overview.md) to enable staging CD."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: precheck
+    if: needs.precheck.outputs.ready == 'true'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
+      # Avoid passing `github.event.head_commit.message` here — commit
+      # bodies contain newlines and YAML-interpolating them into a
+      # shell string is unsafe (one repro leaked the words `--yes` and
+      # `wrangler` from a commit body into a shell command). The sha
+      # is enough; the deploy step adds a short sha already.
+      message: "cd-staging ${{ github.sha }}"
+    secrets:
+      DOTENV_PRIVATE_KEY_CLOUDFLARE: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
