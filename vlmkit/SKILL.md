@@ -1,19 +1,19 @@
 ---
-name: vrt
-description: Entry-point for the `@mizchi/vrt` toolkit — visual regression testing for HTML/URL pairs across viewports, with agent-readable Markdown diff reports, computed-style breakpoint analysis, snapshot-based regression watch, framework-swap migration audits, and an optional VLM-driven CSS auto-repair loop. Use when a coding agent has edited HTML/CSS and needs to know whether the visible output changed, where it changed, and which CSS properties drove the change. This skill orients you to the 5 detailed sub-skills (visual-diff / migration-eval / markup-synth / regression-watch / css-fix-loop) and the verb-group CLI; pick the matching sub-skill once the task shape is clear.
+name: vlmkit
+description: Entry-point for the `@mizchi/vlmkit` toolkit — VLM-driven frontend kit covering visual regression (snapshot / diff / regression-watch), markup synthesis from screenshots, design-token / theme / a11y / i18n audits, and a 2-stage VLM + LLM CSS auto-repair loop. Use when a coding agent has edited HTML/CSS and needs to know whether the visible output changed, where it changed, and which CSS properties drove the change — or when the task is markup-from-image / token / theme audit / fix-loop driven by VLM. This skill orients you to the 5 detailed sub-skills (vrt-visual-diff / vrt-migration-eval / vrt-markup-synth / vrt-regression-watch / vrt-css-fix-loop) and the verb-group CLI; pick the matching sub-skill once the task shape is clear.
 ---
 
 # vrt
 
-`vrt` is a TypeScript visual-regression toolkit built on Playwright +
+`vlmkit` is a TypeScript visual-regression toolkit built on Playwright +
 pixelmatch. Beyond raw pixel diffs, it surfaces **agent-friendly
 signal**: computed-style deltas split into universal vs.
 breakpoint-gated, per-section diffRatio against component bboxes,
 worst-viewport screenshot paths inline, and (optionally) VLM-emitted
 CHANGE lists feeding an LLM CSS-fix step.
 
-Source: <https://github.com/mizchi/vrt>. CHANGELOG +
-old-CLI-to-new-CLI mapping: [`CHANGELOG.md`](https://github.com/mizchi/vrt/blob/main/CHANGELOG.md).
+Source: <https://github.com/mizchi/vlmkit>. CHANGELOG +
+old-CLI-to-new-CLI mapping: [`CHANGELOG.md`](https://github.com/mizchi/vlmkit/blob/main/CHANGELOG.md).
 
 ## When to invoke this skill
 
@@ -47,14 +47,14 @@ Playwright Chromium, optional API keys, and installed sub-skills in
 one pass. Two invocation forms by setup phase:
 
 - **Pre-install (no apm yet)**: one-shot via curl —
-  `bash <(curl -sSL https://raw.githubusercontent.com/mizchi/skills/main/vrt/scripts/doctor.sh)`
-- **Post-install (`apm install -g mizchi/skills/vrt` done)**: local
-  copy — `bash ~/.claude/skills/vrt/scripts/doctor.sh`
+  `bash <(curl -sSL https://raw.githubusercontent.com/mizchi/skills/main/vlmkit/scripts/doctor.sh)`
+- **Post-install (`apm install -g mizchi/skills/vlmkit/vlmkit` done)**: local
+  copy — `bash ~/.claude/skills/vlmkit/scripts/doctor.sh`
 
 Severity rules: only **Node 24+** and **Playwright Chromium** are
 FAIL-class (block exit 0). Everything else — including `vrt` CLI not
 yet on PATH — is WARN by design, because the script is meant to be
-runnable mid-install (a WARN on `vrt CLI` is expected the first time
+runnable mid-install (a WARN on `vlmkit CLI` is expected the first time
 through; resolve all FAILs first, install vrt, re-run, and the WARN
 clears).
 
@@ -66,58 +66,58 @@ pnpm add -D @mizchi/vrt
 npx playwright install chromium
 
 # Library packages (deep imports via .ts source)
-pnpm add @mizchi/vrt-core @mizchi/vrt-capture @mizchi/vrt-markup @mizchi/vrt-ai
+pnpm add @mizchi/vlmkit-core @mizchi/vlmkit-capture @mizchi/vlmkit-markup @mizchi/vlmkit-ai
 ```
 
 ## CLI cheatsheet (0.5.0 verb groups)
 
 **I/O conventions used below**: `--output <dir>` always takes a
 **directory** path (the engine writes `diff-report.json` + per-viewport
-PNGs into it). `vrt diff agent` writes Markdown to **stdout** by
+PNGs into it). `vlmkit diff agent` writes Markdown to **stdout** by
 default; pass `--out <path>` to write to a file instead.
-Commands taking two positional args (e.g. `vrt diff html <baseline>
+Commands taking two positional args (e.g. `vlmkit diff html <baseline>
 <variant>`) accept **either two local file paths or two URLs**; use
 `--url`/`--current-url` if you want to be explicit.
 
 ```bash
 # Diff
-vrt diff html <baseline> <variant> --output reports/        # → reports/diff-report.json + PNGs (dir output)
-vrt diff agent reports/diff-report.json [--out diff.md]     # → stdout (default) or --out path
-vrt diff png  base.png current.png                          # Direct PNG diff (positional files)
-vrt diff elements --selector .card …                        # Element-level shift isolation
-vrt diff browsers <url>                                     # Chromium / Firefox / WebKit parity
-vrt diff runs <dirs...>                                     # Aggregate N VRT runs
+vlmkit diff html <baseline> <variant> --output reports/        # → reports/diff-report.json + PNGs (dir output)
+vlmkit diff agent reports/diff-report.json [--out diff.md]     # → stdout (default) or --out path
+vlmkit diff png  base.png current.png                          # Direct PNG diff (positional files)
+vlmkit diff elements --selector .card …                        # Element-level shift isolation
+vlmkit diff browsers <url>                                     # Chromium / Firefox / WebKit parity
+vlmkit diff runs <dirs...>                                     # Aggregate N VRT runs
 
 # Snapshot (baseline + diff lifecycle)
-vrt snapshot <url1> [url2]... --output snapshots/
-vrt snapshot approve                                        # Promote current → baseline
-vrt snapshot stability <url...> --iterations 5              # FP-rate measurement
-vrt snapshot flipbook --output snapshots/                   # Embed PNGs in a self-contained HTML
+vlmkit snapshot <url1> [url2]... --output snapshots/
+vlmkit snapshot approve                                        # Promote current → baseline
+vlmkit snapshot stability <url...> --iterations 5              # FP-rate measurement
+vlmkit snapshot flipbook --output snapshots/                   # Embed PNGs in a self-contained HTML
 
 # Check (CI gates)
-vrt check a11y contrast|touch|focus <html>                  # WCAG scans
-vrt check tokens <html>                                     # Design-token scale conformance
-vrt check theme  <html>                                     # prefers-color-scheme parity
-vrt check perf   <html>                                     # CLS / LCP / FCP
+vlmkit check a11y contrast|touch|focus <html>                  # WCAG scans
+vlmkit check tokens <html>                                     # Design-token scale conformance
+vlmkit check theme  <html>                                     # prefers-color-scheme parity
+vlmkit check perf   <html>                                     # CLS / LCP / FCP
 
 # Inspect / Stress / Scan / Build
-vrt inspect interact|explore|smoke <html|url>
-vrt stress  i18n|media  <html>
-vrt scan    component|breakpoints  <…>
-vrt build   component <target.png> <current.html>           # Markup-from-screenshot loop
+vlmkit inspect interact|explore|smoke <html|url>
+vlmkit stress  i18n|media  <html>
+vlmkit scan    component|breakpoints  <…>
+vlmkit build   component <target.png> <current.html>           # Markup-from-screenshot loop
 
 # Migration (framework / CSS-library swap audit). Three modes:
 #   compare  — deterministic side-by-side audit; the default. Start here.
 #   blind    — variant agent never sees baseline pixels (forces convergence from spec text alone).
 #   subagent — dispatched subagent runs `compare` + writes a verdict.
 # `--mask` and `--output` work identically across all three modes.
-vrt migration compare|blind|subagent <baseline> <variant> --output reports/
+vlmkit migration compare|blind|subagent <baseline> <variant> --output reports/
 
 # Long-running / stateful
-vrt watch       <baseline> <variant>                        # File-watcher inner loop
-vrt manifest    add|list|rm|check                           # Approval rules
-vrt diff-pr     pin|verify|post                             # PR CI gate
-vrt baseline    pin|verify|post|list|rm                     # Canonical alias of diff-pr
+vlmkit watch       <baseline> <variant>                        # File-watcher inner loop
+vlmkit manifest    add|list|rm|check                           # Approval rules
+vlmkit diff-pr     pin|verify|post                             # PR CI gate
+vlmkit baseline    pin|verify|post|list|rm                     # Canonical alias of diff-pr
 ```
 
 The single-token commands from 0.4.x (`vrt compare`, `vrt png-diff`,
@@ -129,7 +129,7 @@ one-line hint and forward.
 **Two repos, by design**: this orient skill lives in
 [`mizchi/skills`](https://github.com/mizchi/skills) (general-purpose
 skills); the five vrt-specific sub-skills live in
-[`mizchi/vrt`](https://github.com/mizchi/vrt) under
+[`mizchi/vlmkit/vlmkit`](https://github.com/mizchi/vrt) under
 `.claude/skills/`. The two `apm install` paths below look different
 because they target different repos — that is intentional, not a typo.
 
@@ -147,17 +147,17 @@ sub-skill. Install it via the `apm` command above when an agent needs
 that depth.
 
 ```bash
-apm install mizchi/vrt/.claude/skills/<skill-name>
+apm install mizchi/vlmkit/.claude/skills/<skill-name>
 ```
 
 Pick by task shape:
 
 | Sub-skill | Use when | Entry workflow |
 |---|---|---|
-| `vrt-visual-diff` | One-shot "did this CSS edit change pixels, and where?" | `vrt diff html` → `vrt diff agent` |
-| `vrt-regression-watch` | CI gate / scheduled drift detection across runs | `vrt diff agent --previous --fail-on-regression` |
-| `vrt-migration-eval` | Framework / CSS-lib / build-system swap audit (deliberate large diff) | `vrt migration compare\|blind\|subagent` |
-| `vrt-markup-synth` | Screenshot → HTML/CSS, token / theme / i18n / a11y audits | `vrt build\|scan\|check\|stress` |
+| `vrt-visual-diff` | One-shot "did this CSS edit change pixels, and where?" | `vlmkit diff html` → `vlmkit diff agent` |
+| `vrt-regression-watch` | CI gate / scheduled drift detection across runs | `vlmkit diff agent --previous --fail-on-regression` |
+| `vrt-migration-eval` | Framework / CSS-lib / build-system swap audit (deliberate large diff) | `vlmkit migration compare\|blind\|subagent` |
+| `vrt-markup-synth` | Screenshot → HTML/CSS, token / theme / i18n / a11y audits | `vlmkit build\|scan\|check\|stress` |
 | `vrt-css-fix-loop` | Automated CSS-repair loop with VLM + LLM | `fix-loop.ts` (VRT_VLM_MODEL=…) |
 
 **Routing heuristic** (ask yourself once the user states the task):
@@ -174,7 +174,7 @@ Is the markup deliberately different (rewrite / framework swap)?
 
 ## Output anatomy
 
-`vrt diff html` writes:
+`vlmkit diff html` writes:
 
 ```
 <output>/
@@ -185,7 +185,7 @@ Is the markup deliberately different (rewrite / framework swap)?
 └── diff-wide.png
 ```
 
-`vrt diff agent <report.json>` then emits Markdown structured as:
+`vlmkit diff agent <report.json>` then emits Markdown structured as:
 
 ```
 # VRT diff (for agent)
@@ -214,13 +214,13 @@ Per-section.
   not a real regression.
 - **Output is a directory, not a file.** `--output reports/` makes
   `reports/diff-report.json` + PNGs. Feed the JSON path (not the dir)
-  to `vrt diff agent`.
+  to `vlmkit diff agent`.
 - **Playwright must be installed.** First run errors with "browser not
   found" → `npx playwright install chromium`.
 - **Self-comparing the same URL with no mask is the false-positive
   baseline.** Use this to verify `--mask` actually catches every
   flapping element before relying on diff% threshold.
-- **The dist binary is bundled.** `dist/vrt.mjs` ships with all leaves
+- **The dist binary is bundled.** `dist/vlmkit.mjs` ships with all leaves
   code-split. There is no source dependency at install time.
 
 ## Environment variables
@@ -239,19 +239,19 @@ Per-section.
 When the CLI surface isn't enough, deep-import the relevant package:
 
 ```ts
-import { compareScreenshots } from "@mizchi/vrt-core/heatmap.ts";
-import { discoverViewports }  from "@mizchi/vrt-capture/viewport-discovery.ts";
-import { extractComponents }  from "@mizchi/vrt-markup/component/component-extract.ts";
-import { askVlm }             from "@mizchi/vrt-ai";
+import { compareScreenshots } from "@mizchi/vlmkit-core/heatmap.ts";
+import { discoverViewports }  from "@mizchi/vlmkit-capture/viewport-discovery.ts";
+import { extractComponents }  from "@mizchi/vlmkit-markup/component/component-extract.ts";
+import { askVlm }             from "@mizchi/vlmkit-ai";
 ```
 
-`@mizchi/vrt-core` has no Playwright dependency for the lightweight
+`@mizchi/vlmkit-core` has no Playwright dependency for the lightweight
 surface (image / DOM / a11y primitives). The other three pull in
 Playwright transitively.
 
 ## Reporting issues / contributing
 
-- Issues / feature requests: <https://github.com/mizchi/vrt/issues>
-- Source: <https://github.com/mizchi/vrt>
+- Issues / feature requests: <https://github.com/mizchi/vlmkit/issues>
+- Source: <https://github.com/mizchi/vlmkit>
 - Smoke gate before PRs: `bash scripts/smoke-dist.sh` (strict, 11
-  probes against the bundled `dist/vrt.mjs`).
+  probes against the bundled `dist/vlmkit.mjs`).

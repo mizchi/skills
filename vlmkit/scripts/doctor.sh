@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# scripts/doctor.sh — pre-flight environment check for @mizchi/vrt.
+# scripts/doctor.sh — pre-flight environment check for @mizchi/vlmkit.
 #
-# Runs without depending on the vrt CLI itself; safe to invoke as the
+# Runs without depending on the vlmkit CLI itself; safe to invoke as the
 # very first thing on a new machine before installing anything. Echoes
 # PASS / WARN / FAIL per check, then a one-line verdict.
 #
@@ -10,9 +10,9 @@
 #   1 — at least one REQUIRED check is FAIL
 #
 # Usage:
-#   bash <(curl -sSL https://raw.githubusercontent.com/mizchi/skills/main/vrt/scripts/doctor.sh)
+#   bash <(curl -sSL https://raw.githubusercontent.com/mizchi/skills/main/vlmkit/scripts/doctor.sh)
 #   or after apm install:
-#   bash ~/.claude/skills/vrt/scripts/doctor.sh
+#   bash ~/.claude/skills/vlmkit/scripts/doctor.sh
 
 set -u
 
@@ -45,7 +45,7 @@ if command -v node >/dev/null 2>&1; then
   if [ "$major" -ge 24 ]; then
     pass "Node ($ver)" "≥ 24 required"
   else
-    fail "Node ($ver)" "vrt requires Node 24+; upgrade via nvm/fnm/volta"
+    fail "Node ($ver)" "vlmkit requires Node 24+; upgrade via nvm/fnm/volta"
   fi
 else
   fail "Node" "not found on PATH"
@@ -59,15 +59,15 @@ else
   fail "pnpm / npm" "no Node package manager found"
 fi
 
-# ---- vrt CLI --------------------------------------------------------------
+# ---- vlmkit CLI --------------------------------------------------------------
 
-section "vrt CLI"
+section "vlmkit CLI"
 
-if command -v vrt >/dev/null 2>&1; then
-  ver=$(vrt --version 2>/dev/null | head -1)
-  pass "vrt installed" "${ver:-(version not parseable)}"
+if command -v vlmkit >/dev/null 2>&1; then
+  ver=$(vlmkit --version 2>/dev/null | head -1)
+  pass "vlmkit installed" "${ver:-(version not parseable)}"
 else
-  warn "vrt CLI" "not found on PATH — install with: pnpm add -g @mizchi/vrt"
+  warn "vlmkit CLI" "not found on PATH — install with: pnpm add -g @mizchi/vlmkit"
 fi
 
 # ---- Playwright Chromium ---------------------------------------------------
@@ -114,7 +114,7 @@ for kv in "OPENROUTER_API_KEY:OpenRouter (default provider)" "ANTHROPIC_API_KEY:
 done
 
 if [ "$any_key" -eq 0 ]; then
-  warn "VLM features" "no provider key set; vrt diff/snapshot still work, but fix-loop / vlm-bench / migration subagent need at least one"
+  warn "VLM features" "no provider key set; vlmkit diff/snapshot still work, but fix-loop / vlm-bench / migration subagent need at least one"
 fi
 
 # ---- APM + sub-skills (optional) ------------------------------------------
@@ -134,7 +134,7 @@ if command -v apm >/dev/null 2>&1; then
     done
   done
   if [ "$found_sub" -eq 0 ]; then
-    warn "sub-skills" "none of the 5 installed; run: apm install -g mizchi/vrt/.claude/skills/<name>"
+    warn "sub-skills" "none of the 5 installed; run: apm install -g mizchi/vlmkit/.claude/skills/<name>"
   fi
 else
   warn "apm CLI" "not found; sub-skills are optional anyway"

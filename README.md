@@ -55,7 +55,7 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 | [playwright-cli](playwright-cli/) | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
 | [playwright-test](playwright-test/) | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
 | [review-image](review-image/) | Review screenshots or generated images with OpenRouter vision models via Deno scripts; includes a strict CI `pass|fail` wrapper for VRT prechecks. |
-| [vrt](vrt/) | Entry-point for `@mizchi/vrt` — visual regression testing (pixel + computed-style diff, agent-readable Markdown, regression watch, framework-swap audit, VLM-driven CSS auto-repair). Routes to 5 detailed sub-skills shipped under the vrt repo's `.claude/skills/`. |
+| [vlmkit](vlmkit/) | Entry-point for `@mizchi/vlmkit` — VLM-driven frontend toolkit (visual regression, markup synthesis from screenshots, design-token / theme / a11y / i18n audits, 2-stage VLM+LLM CSS auto-repair). Routes to 5 detailed sub-skills shipped under the vlmkit repo's `.claude/skills/`. |
 
 ### MoonBit
 
