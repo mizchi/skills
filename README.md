@@ -1,6 +1,6 @@
 # mizchi/skills
 
-A collection of agent skills maintained by [@mizchi](https://github.com/mizchi), distributed via [APM](https://github.com/apm-sh/apm) (Agent Package Manager).
+A collection of agent skills maintained by [@mizchi](https://github.com/mizchi), distributed via [APM](https://github.com/microsoft/apm) (Agent Package Manager).
 
 Each directory is a standalone skill following the [agentskills.io](https://agentskills.io/specification) open standard.
 
