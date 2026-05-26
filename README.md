@@ -28,6 +28,28 @@ apm install -g mizchi/skills/<skill-name>#v0.1.0
 
 ## Skills
 
+### Frontend Review
+
+A toolkit for frontend consulting engagements. Install skills from `mizchi/skills/frontend/<skill-name>`.
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [frontend-review-triage](frontend/review-triage/) | `frontend/review-triage` | Day 0 initial assessment — scorecard, top 3 risks, app classification. |
+| [frontend-review-ci](frontend/review-ci/) | `frontend/review-ci` | CI timing analysis — bottleneck identification, sharding/cache/concurrency recommendations. |
+| [frontend-review-hygiene](frontend/review-hygiene/) | `frontend/review-hygiene` | Code quality — TypeScript strictness, lint, dead code, duplication. |
+| [frontend-review-deps](frontend/review-deps/) | `frontend/review-deps` | Dependency health — freshness, CVE triage with attack-vector weighting, Tier 1/2/3 library detection. |
+| [frontend-review-testing](frontend/review-testing/) | `frontend/review-testing` | Testing posture — vitest coverage, Playwright config, VRT setup. |
+| [frontend-review-security](frontend/review-security/) | `frontend/review-security` | Security review — HTML sinks, auth/token storage, route guards, env var exposure, AI self-pentest. |
+| [frontend-review-state](frontend/review-state/) | `frontend/review-state` | State management architecture — server/URL/form/UI classification, Jotai/Zustand/Redux anti-patterns. |
+| [frontend-review-performance](frontend/review-performance/) | `frontend/review-performance` | Rendering performance — profiler-first, memo correctness, virtual scroll, useTransition. |
+| [frontend-review-weekly](frontend/review-weekly/) | `frontend/review-weekly` | Weekly orchestrator — runs all domain skills, diffs KPIs, files repeat-finding issues. |
+
+Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-perspectives/{frontend-expert,react-expert,performance-expert,security-expert,frontend-ops-expert}`.
+
+### Node.js
+
+> Skills will be added as they are created. See [`node/README.md`](node/).
+
 ### Tooling / Infra
 
 | Skill | Description |
