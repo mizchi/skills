@@ -139,6 +139,14 @@ The "Install" column may also be:
 | T3 | upstream-fix-and-pin | `mizchi/skills/tooling/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
 | T2 | npm-release | `(out-of-band)` | Setting up npm publishing via release-please + OIDC. chezmoi-local; ask mizchi |
 
+### Dependency management
+**Signals**: `pnpm outdated` results, security alert, major ecosystem release, annual maintenance
+
+| T | Skill | Install | Use when |
+|---|---|---|---|
+| T1 | dep-review | `mizchi/skills/tooling/dep-review` | Auditing and updating dependencies — patch/minor/major batching, CVE attack-vector triage, deprecated package detection, validation checklist |
+| T3 | tech-watch | `mizchi/skills/tooling/tech-watch` | Annual tech-stack review using State of JS/CSS + Thoughtworks Tech Radar — satisfaction×usage matrix, ADOPT/TRIAL/ASSESS/HOLD mapping, migration roadmap |
+
 ### SQL / Database
 **Signals**: `sqlc.yaml`, `*.sql` query catalog, SQLite / D1 schema, `sqlc-gen-moonbit`
 
