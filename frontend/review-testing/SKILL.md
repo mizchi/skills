@@ -30,6 +30,31 @@ Write `<client-repo>/.frontend-review/report/latest/md/testing-review.md` with:
 - **Recommended PRs** (3-5 max): each with title, affected files, expected coverage delta
 - **Branch coverage checklist** for the router/controller branches that should get the first E2E tests
 
+## Component Testing — Testing Library First
+
+For React component tests, prefer `@testing-library/react` over testing internal implementation:
+
+- **Query by role / label / text** (`getByRole`, `getByLabelText`, `getByText`) rather than by class name or component internals.
+- **User interactions** via `@testing-library/user-event` — `userEvent.click`, `userEvent.type` — not direct DOM event dispatch.
+- **Async assertions** via `waitFor` / `findBy*` for state updates after async operations.
+
+```tsx
+// Bad: testing implementation details
+const wrapper = render(<LoginForm />);
+wrapper.find('button.submit').simulate('click');
+expect(wrapper.state('isLoading')).toBe(true);
+
+// Good: testing observable behaviour
+render(<LoginForm />);
+await userEvent.type(screen.getByLabelText('Email'), 'user@example.com');
+await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+expect(await screen.findByText('Welcome')).toBeInTheDocument();
+```
+
+When `@testing-library/react` is absent from `package.json`, flag it as a gap and recommend adding it alongside `@testing-library/user-event` and `@testing-library/jest-dom` (or `@testing-library/vitest-dom`).
+
+For atom / store tests, use the library's own test utilities (e.g. Jotai `createStore()`) rather than rendering a component — keep component tests and state logic tests separate.
+
 ## In-Source Testing Pattern
 
 For logic-heavy `.ts` files, co-locating tests in the same file (via `if (import.meta.vitest)` in Vite projects, or a build-time dead-code strip equivalent) is often preferable to separate test files:
