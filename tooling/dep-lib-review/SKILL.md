@@ -95,6 +95,7 @@ Flag any package that matches:
 - `webpack` → migrate to Vite
 - `mocha`/`chai` → migrate to vitest
 - CJS-only packages in an ESM project (check `exports` field in their `package.json`)
+- `@types/<pkg>` marked deprecated → the base package likely ships its own types now. Verify: `cat node_modules/<pkg>/package.json | jq '.types, .typings'`. If non-null, remove the `@types/<pkg>` devDep — zero migration cost.
 
 ## Step 3 — Execute updates
 
@@ -127,11 +128,25 @@ pnpm add -D <package>@latest
 
 Then:
 1. Read the official migration guide / CHANGELOG for breaking changes.
-2. Run `grep -r "deprecated API" src/` or use ast-grep for changed APIs.
-3. Fix any breakage.
-4. Validate: `pnpm typecheck && pnpm test:ci && pnpm lint`.
-5. If VRT snapshots exist, regenerate in Linux container after UI-touching upgrades.
-6. Commit as standalone PR: `chore: upgrade <package> to v<N>`.
+2. Check whether an official **codemod** exists (e.g. `@tailwindcss/upgrade`, React codemods). Run it first — it handles ~80-90% of mechanical changes automatically.
+   - After a codemod, audit `package.json` for misplacements: some codemods add build-time packages to `dependencies` instead of `devDependencies`. Move them if needed.
+   - Codemods may not fully migrate when complex plugins are involved. Check the output log for "could not be automatically migrated" warnings and handle manually.
+3. Run `grep -r "deprecated API" src/` or use ast-grep for changed APIs.
+4. Fix any breakage.
+5. Validate: `pnpm typecheck && pnpm test:ci && pnpm lint`.
+6. If VRT snapshots exist, regenerate in Linux container after UI-touching upgrades.
+7. Commit as standalone PR: `chore: upgrade <package> to v<N>`.
+
+### pnpm troubleshooting for major upgrades
+
+If `pnpm install` fails after editing `package.json`:
+
+| Error | Cause | Fix |
+|---|---|---|
+| `ERR_PNPM_MISSING_TIME` | Stale metadata in pnpm store | `pnpm store prune` then retry |
+| `ERR_PNPM_NO_MATCHING_VERSION` for a package that exists on the registry | Stale lockfile entries conflict with new transitive deps | Delete `pnpm-lock.yaml`, then `pnpm install` for a fresh resolution |
+
+After deleting the lockfile, commit the new lockfile alongside the `package.json` change in the same PR.
 
 ## Step 4 — Validation checklist
 
