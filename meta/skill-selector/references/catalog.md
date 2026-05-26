@@ -53,10 +53,11 @@ The "Install" column may also be:
 ## Tooling / Infra
 
 ### Build / task running
-**Signals**: `justfile`, `devbox.json`, `flake.nix`, `Taskfile.yml`
+**Signals**: `justfile`, `devbox.json`, `flake.nix`, `Taskfile.yml`, `Taskfile.pkl`
 
 | Skill | Install | Use when |
 |---|---|---|
+| pkfire | `mizchi/pkfire/skills/pkfire` | Adding, editing, or troubleshooting tasks in a project that uses `pkf` / `Taskfile.pkl`; choosing pkfire over just / Taskfile.yml |
 | justfile | `mizchi/skills/tooling/justfile` | Project uses or considers `just` as task runner |
 | nix-setup | `mizchi/skills/tooling/nix-setup` | Reproducible dev environment via devbox (Nix-backed, default) or pure Nix flakes (cutting-edge customization). Includes per-language flake templates and a devbox.json template |
 
@@ -89,14 +90,34 @@ The "Install" column may also be:
 | actrun-init | `mizchi/actrun/.claude/skills/actrun-init` | Introducing actrun to a project — install, `actrun.toml`, workflow adjustments |
 | actrun-debug | `mizchi/actrun/.claude/skills/actrun-debug` | Diagnosing actrun execution failures — log analysis, root-cause, fix suggestions |
 
-### Cloud deployment
-**Signals**: `wrangler.toml`, Cloudflare-related configs, ECS task / Fargate, AWS account access
+### Cloudflare
+**Signals**: `wrangler.toml`, Cloudflare account, Workers / Pages deploy
 
 | Skill | Install | Use when |
 |---|---|---|
-| cloudflare-deploy | `mizchi/skills/cloudflare/deploy` | Deploying to Cloudflare Workers / Pages |
+| cloudflare-deploy | `mizchi/skills/cloudflare/deploy` | Deploying to Cloudflare Workers / Pages — wrangler commands, secrets, custom domains |
+| cloudflare-access-app-setup | `mizchi/skills/cloudflare/access-app-setup` | Gating a Worker behind Cloudflare Access via API in one shot — app + email allowlist + service token |
+| cloudflare-workers-cd-rollback | `mizchi/skills/cloudflare/workers-cd-rollback` | Adding push-to-deploy + automatic rollback on smoke failure to a Workers GitHub Actions pipeline |
+| cloudflare-workers-otel-utels | `mizchi/skills/cloudflare/workers-otel-utels` | Adding OTLP tracing / metrics / logs and utels error tracking to a Worker without touching handler code |
+| cloudflare-mbt-worker-bundle | `mizchi/skills/cloudflare/mbt-worker-bundle` | Bundling a Worker that combines a MoonBit moon-built JS module with a TypeScript entry via wrangler |
+| utels-project-bootstrap | `mizchi/skills/tooling/utels-project-bootstrap` | Registering a new utels.dev project and writing the returned ingest token into a wrangler secret in one shot |
+
+### AWS
+**Signals**: ECS / Fargate service, GitHub Actions → AWS OIDC, aws-vault MFA error
+
+| Skill | Install | Use when |
+|---|---|---|
+| aws-github-oidc-scoped-role | `mizchi/skills/aws/github-oidc-scoped-role` | Wiring GitHub Actions to AWS via OIDC — `job_workflow_ref` scoping, Bedrock cross-region ARNs, `aws-marketplace` permissions, ReadOnlyAccess + Deny for AI agent roles |
+| aws-ecs-codedeploy-blue-green | `mizchi/skills/aws/ecs-codedeploy-blue-green` | ECS blue/green — choosing ALB-native weighted routing (recommended) or debugging existing CodeDeploy blue/green setup |
 | aws-ecs-service-connect-ipv6 | `mizchi/skills/aws/ecs-service-connect-ipv6` | ECS Service Connect alias resolves to IPv6 in IPv4-only Fargate task; `network is unreachable` |
 | aws-vault-mfa-iam | `mizchi/skills/aws/vault-mfa-iam` | aws-vault session blocked by IAM MFA-required policy; `iam:*` rejected with `InvalidClientTokenId` |
+
+### Kubernetes
+**Signals**: `k8s/`, CRD YAML, zod/TypeBox/Valibot schema to CRD conversion
+
+| Skill | Install | Use when |
+|---|---|---|
+| k8s-crd-from-typed-schema | `mizchi/skills/k8s/crd-from-typed-schema` | Generating CRDs from a typed schema source (zod / TypeBox / Valibot) — Structural Schema dialect restrictions, `/status` subresource trap, metadata-prohibition rule |
 
 ### Release / changelog
 **Signals**: `CHANGELOG.md`, release-please config, `.changeset/`, version-tag-driven release
@@ -106,6 +127,19 @@ The "Install" column may also be:
 | conventional-changelog | `mizchi/skills/tooling/conventional-changelog` | Setting up or unifying a release flow with Conventional Commits + auto changelog |
 | upstream-fix-and-pin | `mizchi/skills/tooling/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
 | npm-release | `(out-of-band)` | Setting up npm publishing via release-please + OIDC. chezmoi-local; ask mizchi |
+
+### SQL / Database
+**Signals**: `sqlc.yaml`, `*.sql` query catalog, SQLite / D1 schema, `sqlc-gen-moonbit`
+
+| Skill | Install | Use when |
+|---|---|---|
+| sql-lint | `mizchi/skills/sql/lint` | Static lint pass on a sqlc-style SQL catalog — duplicate query names, missing semicolons, `SELECT *`, double-wildcard `LIKE` |
+| sql-plan-audit | `mizchi/skills/sql/plan-audit` | `EXPLAIN QUERY PLAN` baseline diff on a sqlc catalog — detect new full-table SCANs or `TEMP B-TREE` sorts introduced by a PR |
+| sql-schema-audit | `mizchi/skills/sql/schema-audit` | Index coverage + N+1 review for a SQLite/D1 schema — unused indexes, unindexed scans, `for`-loop query calls |
+| sql-security | `mizchi/skills/sql/security` | SQL injection screening in MoonBit / TS / Rust host code — flags template-literal / string-concat SQL builders |
+| sqlc-gen-moonbit-safety | `mizchi/skills/sql/sqlc-gen-moonbit-safety` | Post-generation safety gate for `sqlc-gen-moonbit` + Cloudflare D1 — BigInt-bind hang (D1 1101) and placeholder mix checks |
+| codegen-apply-verify | `mizchi/mnemo/skills/codegen-apply-verify` | Adding a `--verify` CI gate to any code-generation step — exits non-zero if generated output has drifted from committed patches |
+| d1-query-telemetry | `mizchi/mnemo/skills/d1-query-telemetry` | Adding per-D1-query OTEL child spans and slow-query `console.warn` to a Cloudflare Worker via a transparent `Proxy` wrapper |
 
 ---
 
@@ -121,21 +155,24 @@ The "Install" column may also be:
 | vrt | `mizchi/vrt` | Visual Regression Testing + a11y semantic verification CLI (`vrt-test`, `vrt`, `vrt-update`, `vrt compare`, `vrt snapshot`, fix-loop, VLM model selection). Repo-root SKILL.md; verify with `apm view` |
 
 ### Frontend review (suite)
-**Signals**: a frontend project where someone wants a structured review pass (CI / hygiene / testing / security / weekly cadence)
+**Signals**: a frontend project where someone wants a structured review pass (CI / hygiene / deps / testing / security / state / performance / weekly cadence)
 
 | Skill | Install | Use when |
 |---|---|---|
-| frontend-review-weekly | `mizchi/frontend-review/skills/frontend-review-weekly` | **Orchestrator** for the weekly AI review — dispatches triage / ci / hygiene / testing / security and the 5 perspective sub-skills |
-| frontend-review-triage | `mizchi/frontend-review/skills/frontend-review-triage` | Initial frontend-review assessment ("triage", day-1) |
-| frontend-review-ci | `mizchi/frontend-review/skills/frontend-review-ci` | CI is slow (>10 min), flaky, or you want to optimize GitHub Actions for a frontend project |
-| frontend-review-hygiene | `mizchi/frontend-review/skills/frontend-review-hygiene` | Code-hygiene audit — dependency freshness, TypeScript strictness, lint, dead code, duplication |
-| frontend-review-security | `mizchi/frontend-review/skills/frontend-review-security` | Frontend security review — `pnpm audit`, risky-pattern detection, AI self-pentest |
-| frontend-review-testing | `mizchi/frontend-review/skills/frontend-review-testing` | Test-infrastructure audit — vitest coverage, playwright config, VRT setup, coverage merging |
-| frontend-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/frontend-expert` | Frontend-architect perspective sub-skill (component design, state, DOM usage) |
-| frontend-ops-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/frontend-ops-expert` | Frontend-Ops perspective sub-skill (CI/CD, scheduler, KPI ratchet, release process) |
-| performance-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/performance-expert` | Performance perspective sub-skill (bundle size, LCP / CLS / INP, avoidable work) |
-| react-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/react-expert` | React-specialist perspective sub-skill (hooks, re-rendering, Suspense / RSC) |
-| security-expert | `mizchi/frontend-review/skills/frontend-review-perspectives/security-expert` | Security-specialist perspective sub-skill (XSS / CSRF, authz boundaries, input validation) |
+| frontend-review-weekly | `mizchi/skills/frontend/review-weekly` | **Orchestrator** for the weekly AI review — dispatches all 8 domain skills and the 5 perspective sub-skills |
+| frontend-review-triage | `mizchi/skills/frontend/review-triage` | Initial frontend-review assessment ("triage", day-1) — scorecard, top-3 risks, app classification |
+| frontend-review-ci | `mizchi/skills/frontend/review-ci` | CI is slow (>10 min), flaky, or you want to optimize GitHub Actions for a frontend project |
+| frontend-review-hygiene | `mizchi/skills/frontend/review-hygiene` | Code-hygiene audit — TypeScript strictness, lint, dead code, duplication |
+| frontend-review-deps | `mizchi/skills/frontend/review-deps` | Dependency health — freshness, CVE triage with attack-vector weighting, Tier 1/2/3 library detection |
+| frontend-review-testing | `mizchi/skills/frontend/review-testing` | Test-infrastructure audit — vitest coverage, playwright config, Testing Library usage, VRT setup |
+| frontend-review-security | `mizchi/skills/frontend/review-security` | Frontend security review — HTML sinks, auth/token storage, route guards, env var exposure, AI self-pentest |
+| frontend-review-state | `mizchi/skills/frontend/review-state` | State management architecture review — server/URL/form/UI classification, Jotai/Zustand/Redux anti-patterns |
+| frontend-review-performance | `mizchi/skills/frontend/review-performance` | Rendering performance review — profiler-first, memo correctness, virtual scroll, `useTransition` |
+| frontend-expert | `mizchi/skills/frontend/review-perspectives/frontend-expert` | Frontend-architect perspective sub-skill (component design, state, DOM usage) |
+| frontend-ops-expert | `mizchi/skills/frontend/review-perspectives/frontend-ops-expert` | Frontend-Ops perspective sub-skill (CI/CD, scheduler, KPI ratchet, release process) |
+| performance-expert | `mizchi/skills/frontend/review-perspectives/performance-expert` | Performance perspective sub-skill (bundle size, LCP / CLS / INP, avoidable work) |
+| react-expert | `mizchi/skills/frontend/review-perspectives/react-expert` | React-specialist perspective sub-skill (hooks, re-rendering, Suspense / RSC) |
+| security-expert | `mizchi/skills/frontend/review-perspectives/security-expert` | Security-specialist perspective sub-skill (XSS / CSRF, authz boundaries, input validation) |
 
 ---
 
@@ -187,10 +224,13 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| mnemo-cmd | `mizchi/mnemo/skills/tools/mnemo-cmd` | Using the `mnemo` command entrypoint to inspect and mutate mnemo memory / sessions / skills / prompts |
-| mnemo-memory | `mizchi/mnemo/skills/memory/mnemo-memory` | `mnemo` as persistent agent memory — read context, record durable facts, update stale notes |
+| mnemo-cmd | `mizchi/mnemo/skills/mnemo-cmd` | Using the `mnemo` command entrypoint to inspect and mutate mnemo memory / sessions / skills / prompts |
+| mnemo-retrospective | `mizchi/mnemo/skills/mnemo-retrospective` | Capturing a task-completion retrospective — at the end of a substantial coding / debug / research / deploy task when a reusable lesson was learned |
+| mnemo-article-to-skill | `mizchi/mnemo/skills/mnemo-article-to-skill` | Turning an article, blog post, paper, or pasted long-form note into a hosted mnemo skill draft |
 | mnemo-session-journal | `mizchi/mnemo/skills/session/mnemo-session-journal` | `mnemo` for creating / appending / inspecting / resolving / searching session records |
-| mnemo-skill-select | `mizchi/mnemo/skills/tools/mnemo-skill-select` | Selecting agent skills from hosted mnemo (list / search uploaded skills, then load matching local) |
+| mnemo-skill-select | `mizchi/mnemo/skills/mnemo-skill-select` | Selecting agent skills from hosted mnemo (list / search uploaded skills, then load matching local) |
+| dotenvx-in-actions | `mizchi/mnemo/skills/dotenvx-in-actions` | Sourcing secrets in GitHub Actions from a dotenvx-encrypted `.env` committed to the repo — gated by a single repo secret (private key) |
+| worker-deploy-auto-rollback | `mizchi/mnemo/skills/worker-deploy-auto-rollback` | GitHub Actions manual-trigger CD for a Cloudflare Worker with automatic rollback on smoke failure |
 
 ### Security review (suite)
 **Signals**: user asks for a security review of a web application repository
