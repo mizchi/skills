@@ -24,7 +24,8 @@ The "Install" column may also be:
 | node-sqlite-vec | `mizchi/skills/node/sqlite-vec` | Project uses Node 24+ `node:sqlite` with `sqlite-vec` extension for vectors / RAG |
 | pi-coding-agent | `mizchi/skills/node/pi-coding-agent` | Embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts |
 | dotenvx | `mizchi/skills/tooling/dotenvx` | Repo uses or considers `dotenvx` for env-var encryption / multi-env |
-| esbuild-otel-instrumentation | `mizchi/skills/node/esbuild-otel-instrumentation` | esbuild ESM bundle silently drops `@opentelemetry/instrumentation-*` auto-instrumentation; no spans sent |
+| opentelemetry | `mizchi/skills/devops/opentelemetry` | Signal design (traces/metrics/logs), span naming, context propagation, sampling strategy, OTLP exporter config — read before writing any OTel code |
+| otel-node | `mizchi/skills/devops/otel-node` | Node.js OTel SDK setup; esbuild ESM bundle silently drops `instrumentation-*` auto-instrumentation — use when spans don't arrive after bundling |
 
 ### MoonBit
 **Signals**: `moon.mod.json`, `moon.pkg.json`, `_build/`, `.mooncakes/`
@@ -79,7 +80,7 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| gh-fix-ci | `mizchi/skills/tooling/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
+| gh-fix-ci | `mizchi/skills/devops/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
 
 ### Local CI runner
 **Signals**: `actrun.toml`, running GitHub Actions workflows locally
@@ -97,7 +98,7 @@ The "Install" column may also be:
 |---|---|---|
 | cloudflare-deploy | `mizchi/skills/cloudflare/deploy` | Deploying to Cloudflare Workers / Pages — wrangler commands, secrets, custom domains |
 | cloudflare-access-app-setup | `mizchi/skills/cloudflare/access-app-setup` | Gating a Worker behind Cloudflare Access via API in one shot — app + email allowlist + service token |
-| cloudflare-workers-cd-rollback | `mizchi/skills/cloudflare/workers-cd-rollback` | Adding push-to-deploy + automatic rollback on smoke failure to a Workers GitHub Actions pipeline |
+| workers-cd-rollback | `mizchi/skills/devops/workers-cd-rollback` | Adding push-to-deploy + automatic rollback on smoke failure to a Workers GitHub Actions pipeline |
 | cloudflare-workers-otel-utels | `mizchi/skills/cloudflare/workers-otel-utels` | Adding OTLP tracing / metrics / logs and utels error tracking to a Worker without touching handler code |
 | cloudflare-mbt-worker-bundle | `mizchi/skills/cloudflare/mbt-worker-bundle` | Bundling a Worker that combines a MoonBit moon-built JS module with a TypeScript entry via wrangler |
 | utels-project-bootstrap | `mizchi/skills/tooling/utels-project-bootstrap` | Registering a new utels.dev project and writing the returned ingest token into a wrangler secret in one shot |
@@ -182,7 +183,7 @@ The "Install" column may also be:
 |---|---|---|
 | flaker-setup | `mizchi/flaker/skills/flaker-setup` | Introducing `@mizchi/flaker` to a repo for flaky-test detection / GitHub Actions integration |
 | flaker-management | `mizchi/flaker/skills/flaker-management` | Operating `@mizchi/flaker` after setup — day-to-day runs, sampling / quarantine review, KPI ratchet |
-| flaker-storage-cache-on-ci | `mizchi/skills/tooling/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
+| flaker-storage-cache-on-ci | `mizchi/skills/devops/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
 
 ---
 

@@ -51,7 +51,6 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | Skill | Install path | Description |
 | --- | --- | --- |
 | [node-sqlite-vec](node/sqlite-vec/) | `node/sqlite-vec` | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
-| [esbuild-otel-instrumentation](node/esbuild-otel-instrumentation/) | `node/esbuild-otel-instrumentation` | Workaround for `@opentelemetry/instrumentation-*` silently failing under esbuild ESM bundles (no traces sent). |
 | [pi-coding-agent](node/pi-coding-agent/) | `node/pi-coding-agent` | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |
 
 ### AWS
@@ -69,7 +68,6 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | --- | --- | --- |
 | [cloudflare-deploy](cloudflare/deploy/) | `cloudflare/deploy` | Deploy applications to Cloudflare Workers / Pages and related platform services. |
 | [cloudflare-access-app-setup](cloudflare/access-app-setup/) | `cloudflare/access-app-setup` | One-shot Cloudflare Access self-hosted application provisioning via the API — app + email allowlist policy + service token. |
-| [cloudflare-workers-cd-rollback](cloudflare/workers-cd-rollback/) | `cloudflare/workers-cd-rollback` | GitHub Actions CD for a Cloudflare Worker with auto-rollback on smoke failure. |
 | [cloudflare-workers-otel-utels](cloudflare/workers-otel-utels/) | `cloudflare/workers-otel-utels` | Cloudflare Worker telemetry — OTLP traces / metrics / logs + utels error tracking + D1 Proxy slow-query warnings. |
 | [cloudflare-mbt-worker-bundle](cloudflare/mbt-worker-bundle/) | `cloudflare/mbt-worker-bundle` | Bundle a Cloudflare Worker that combines MoonBit core code with a TypeScript entry. |
 
@@ -115,10 +113,8 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | [chezmoi-management](tooling/chezmoi-management/) | `tooling/chezmoi-management` | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
 | [conventional-changelog](tooling/conventional-changelog/) | `tooling/conventional-changelog` | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
 | [dotenvx](tooling/dotenvx/) | `tooling/dotenvx` | dotenvx env-var management reference (encryption, multi-env, CI). |
-| [gh-fix-ci](tooling/gh-fix-ci/) | `tooling/gh-fix-ci` | Debug and fix failing GitHub Actions PR checks via `gh`. |
 | [justfile](tooling/justfile/) | `tooling/justfile` | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](tooling/nix-setup/) | `tooling/nix-setup` | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates, direnv, GitHub Actions. |
-| [flaker-storage-cache-on-ci](tooling/flaker-storage-cache-on-ci/) | `tooling/flaker-storage-cache-on-ci` | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key. |
 | [upstream-fix-and-pin](tooling/upstream-fix-and-pin/) | `tooling/upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
 | [utels-project-bootstrap](tooling/utels-project-bootstrap/) | `tooling/utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a wrangler secret. |
 
@@ -127,6 +123,16 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | Skill | Install path | Description |
 | --- | --- | --- |
 | [k8s-crd-from-typed-schema](k8s/crd-from-typed-schema/) | `k8s/crd-from-typed-schema` | Generate Kubernetes CRDs from a typed schema source (zod / TypeBox / Valibot / json-schema) — Structural Schema dialect, /status subresource trap, metadata-prohibition rule. |
+
+### DevOps
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [opentelemetry](devops/opentelemetry/) | `devops/opentelemetry` | Platform-agnostic OTel reference — signal selection, span design, context propagation, sampling, OTLP exporter config. |
+| [otel-node](devops/otel-node/) | `devops/otel-node` | Node.js OTel setup — SDK init, auto-instrumentation, and the esbuild ESM silent-failure gotcha. |
+| [gh-fix-ci](devops/gh-fix-ci/) | `devops/gh-fix-ci` | Debug and fix failing GitHub Actions PR checks via `gh`. |
+| [flaker-storage-cache-on-ci](devops/flaker-storage-cache-on-ci/) | `devops/flaker-storage-cache-on-ci` | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key. |
+| [workers-cd-rollback](devops/workers-cd-rollback/) | `devops/workers-cd-rollback` | GitHub Actions CD for a Cloudflare Worker with auto-rollback on smoke failure. |
 
 ### Process / Meta
 
