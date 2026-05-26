@@ -153,8 +153,8 @@ Write a review doc with:
 
 - **Annual**: Run full review aligned with State of JS/CSS release (typically November–January).
 - **Quarterly**: Check Tech Radar new volume for changes to existing stack items.
-- **On-demand (new adoption)**: Run Step 3 (Radar only) when evaluating whether to add a new library.
-- **On-demand (replacement decision)**: Run Steps 2–5 for both the current tool and the candidate. Omit Step 1 stack inventory and Step 6 full output doc — produce a single migration evaluation instead.
+- **On-demand (new adoption)**: Run Step 3 (Radar only) when evaluating whether to add a new library with no existing incumbent.
+- **On-demand (replacement decision)**: Run Steps 2–5 for both the current tool and the candidate. Omit Step 1 stack inventory and Step 6 full output doc — produce a single migration evaluation instead. Use this path when the question has an incumbent ("should we switch from X to Y?" or "should we add Y or keep X?").
 
 ## Boundaries
 
