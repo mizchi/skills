@@ -68,12 +68,19 @@ pnpm audit --prod --json 2>/dev/null | jq -r '
 Identify the category for each outdated package:
 
 ```bash
-# Categorize outdated packages
+# Categorize outdated packages (deprecated / major / minor / patch)
 pnpm outdated --json 2>/dev/null | jq -r '
   to_entries[] |
   (.value.current // "none") as $cur |
   (.value.latest // "none") as $lat |
-  { name: .key, current: $cur, latest: $lat }'
+  (.value.dependencyType // "dependencies") as $t |
+  ($cur | split(".")[0]) as $curMaj |
+  ($lat | split(".")[0]) as $latMaj |
+  (if .value.isDeprecated then "deprecated"
+   elif $curMaj != $latMaj then "major"
+   elif ($cur | split(".")[1]) != ($lat | split(".")[1]) then "minor"
+   else "patch" end) as $category |
+  "\($category)\t\(.key)\t\($cur) → \($lat)\t\($t)"' | sort
 ```
 
 ### Trend watch (manual check)
