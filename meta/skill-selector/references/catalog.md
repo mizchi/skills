@@ -21,18 +21,18 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| node-sqlite-vec | `mizchi/skills/node-sqlite-vec` | Project uses Node 24+ `node:sqlite` with `sqlite-vec` extension for vectors / RAG |
-| pi-coding-agent | `mizchi/skills/pi-coding-agent` | Embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts |
-| dotenvx | `mizchi/skills/dotenvx` | Repo uses or considers `dotenvx` for env-var encryption / multi-env |
-| esbuild-otel-instrumentation | `mizchi/skills/esbuild-otel-instrumentation` | esbuild ESM bundle silently drops `@opentelemetry/instrumentation-*` auto-instrumentation; no spans sent |
+| node-sqlite-vec | `mizchi/skills/node/sqlite-vec` | Project uses Node 24+ `node:sqlite` with `sqlite-vec` extension for vectors / RAG |
+| pi-coding-agent | `mizchi/skills/node/pi-coding-agent` | Embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts |
+| dotenvx | `mizchi/skills/tooling/dotenvx` | Repo uses or considers `dotenvx` for env-var encryption / multi-env |
+| esbuild-otel-instrumentation | `mizchi/skills/node/esbuild-otel-instrumentation` | esbuild ESM bundle silently drops `@opentelemetry/instrumentation-*` auto-instrumentation; no spans sent |
 
 ### MoonBit
 **Signals**: `moon.mod.json`, `moon.pkg.json`, `_build/`, `.mooncakes/`
 
 | Skill | Install | Use when |
 |---|---|---|
-| moonbit-practice | `mizchi/skills/moonbit-practice` | Writing or reviewing MoonBit code (general best practices) |
-| moonbit-js-binding | `mizchi/skills/moonbit-js-binding` | MoonBit project needs JS FFI (`extern "js"`) for browser / Node / npm packages |
+| moonbit-practice | `mizchi/skills/lang/moonbit-practice` | Writing or reviewing MoonBit code (general best practices) |
+| moonbit-js-binding | `mizchi/skills/lang/moonbit-js-binding` | MoonBit project needs JS FFI (`extern "js"`) for browser / Node / npm packages |
 | moonbit-agent-guide | `moonbitlang/moonbit-agent-guide/moonbit-agent-guide` | First-time MoonBit project setup — moon tooling, layout conventions |
 | moonbit-refactoring | `moonbitlang/moonbit-agent-guide/moonbit-refactoring` | Refactoring an existing MoonBit package idiomatically |
 | moonbit-c-binding | `moonbitlang/moonbit-agent-guide/moonbit-c-binding` | MoonBit project links a C library via native FFI |
@@ -46,7 +46,7 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| gleam-practice | `mizchi/skills/gleam-practice` | Building or reviewing Gleam projects on the Erlang target (Wisp + Mist, OTP) |
+| gleam-practice | `mizchi/skills/lang/gleam-practice` | Building or reviewing Gleam projects on the Erlang target (Wisp + Mist, OTP) |
 
 ---
 
@@ -57,15 +57,15 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| justfile | `mizchi/skills/justfile` | Project uses or considers `just` as task runner |
-| nix-setup | `mizchi/skills/nix-setup` | Reproducible dev environment via devbox (Nix-backed, default) or pure Nix flakes (cutting-edge customization). Includes per-language flake templates and a devbox.json template |
+| justfile | `mizchi/skills/tooling/justfile` | Project uses or considers `just` as task runner |
+| nix-setup | `mizchi/skills/tooling/nix-setup` | Reproducible dev environment via devbox (Nix-backed, default) or pure Nix flakes (cutting-edge customization). Includes per-language flake templates and a devbox.json template |
 
 ### Static analysis / lint
 **Signals**: `sgconfig.yml`, ad-hoc lint requirements that ESLint/biome can't express
 
 | Skill | Install | Use when |
 |---|---|---|
-| ast-grep-practice | `mizchi/skills/ast-grep-practice` | Operating ast-grep as a project lint tool (rules, fix, CI) |
+| ast-grep-practice | `mizchi/skills/tooling/ast-grep-practice` | Operating ast-grep as a project lint tool (rules, fix, CI) |
 | ast-grep | `ast-grep/agent-skill/ast-grep` | Writing ast-grep rules / structural search (general guide) |
 | check-similarity | `mizchi/similarity/.claude/skills/check-similarity` | Detect duplicate code via AST-based similarity; auto-selects per-language tool |
 | check-similarity-mbt | `mizchi/similarity/.claude/skills/check-similarity-mbt` | Same, MoonBit (`.mbt`) only |
@@ -78,7 +78,7 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| gh-fix-ci | `mizchi/skills/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
+| gh-fix-ci | `mizchi/skills/tooling/gh-fix-ci` | Debugging or fixing failing GitHub Actions PR checks via `gh` |
 
 ### Local CI runner
 **Signals**: `actrun.toml`, running GitHub Actions workflows locally
@@ -94,17 +94,17 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| cloudflare-deploy | `mizchi/skills/cloudflare-deploy` | Deploying to Cloudflare Workers / Pages |
-| aws-ecs-service-connect-ipv6 | `mizchi/skills/aws-ecs-service-connect-ipv6` | ECS Service Connect alias resolves to IPv6 in IPv4-only Fargate task; `network is unreachable` |
-| aws-vault-mfa-iam | `mizchi/skills/aws-vault-mfa-iam` | aws-vault session blocked by IAM MFA-required policy; `iam:*` rejected with `InvalidClientTokenId` |
+| cloudflare-deploy | `mizchi/skills/cloudflare/deploy` | Deploying to Cloudflare Workers / Pages |
+| aws-ecs-service-connect-ipv6 | `mizchi/skills/aws/ecs-service-connect-ipv6` | ECS Service Connect alias resolves to IPv6 in IPv4-only Fargate task; `network is unreachable` |
+| aws-vault-mfa-iam | `mizchi/skills/aws/vault-mfa-iam` | aws-vault session blocked by IAM MFA-required policy; `iam:*` rejected with `InvalidClientTokenId` |
 
 ### Release / changelog
 **Signals**: `CHANGELOG.md`, release-please config, `.changeset/`, version-tag-driven release
 
 | Skill | Install | Use when |
 |---|---|---|
-| conventional-changelog | `mizchi/skills/conventional-changelog` | Setting up or unifying a release flow with Conventional Commits + auto changelog |
-| upstream-fix-and-pin | `mizchi/skills/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
+| conventional-changelog | `mizchi/skills/tooling/conventional-changelog` | Setting up or unifying a release flow with Conventional Commits + auto changelog |
+| upstream-fix-and-pin | `mizchi/skills/tooling/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
 | npm-release | `(out-of-band)` | Setting up npm publishing via release-please + OIDC. chezmoi-local; ask mizchi |
 
 ---
@@ -115,9 +115,9 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| playwright-test | `mizchi/skills/playwright-test` | **Primary** for any Playwright project. Writing / reviewing E2E tests — no fixed waits, network triggers |
-| playwright-cli | `mizchi/skills/playwright-cli` | **Secondary** — add only when CI sharding, codegen, or one-off `screenshot/pdf` matters. Skip when test authoring is the only concern |
-| review-image | `mizchi/skills/review-image` | Reviewing screenshots / generated images via OpenRouter vision models, VRT prechecks |
+| playwright-test | `mizchi/skills/testing/playwright-test` | **Primary** for any Playwright project. Writing / reviewing E2E tests — no fixed waits, network triggers |
+| playwright-cli | `mizchi/skills/testing/playwright-cli` | **Secondary** — add only when CI sharding, codegen, or one-off `screenshot/pdf` matters. Skip when test authoring is the only concern |
+| review-image | `mizchi/skills/ai/review-image` | Reviewing screenshots / generated images via OpenRouter vision models, VRT prechecks |
 | vrt | `mizchi/vrt` | Visual Regression Testing + a11y semantic verification CLI (`vrt-test`, `vrt`, `vrt-update`, `vrt compare`, `vrt snapshot`, fix-loop, VLM model selection). Repo-root SKILL.md; verify with `apm view` |
 
 ### Frontend review (suite)
@@ -145,7 +145,7 @@ The "Install" column may also be:
 |---|---|---|
 | flaker-setup | `mizchi/flaker/skills/flaker-setup` | Introducing `@mizchi/flaker` to a repo for flaky-test detection / GitHub Actions integration |
 | flaker-management | `mizchi/flaker/skills/flaker-management` | Operating `@mizchi/flaker` after setup — day-to-day runs, sampling / quarantine review, KPI ratchet |
-| flaker-storage-cache-on-ci | `mizchi/skills/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
+| flaker-storage-cache-on-ci | `mizchi/skills/tooling/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
 
 ---
 
@@ -155,32 +155,32 @@ The "Install" column may also be:
 
 | Skill | Install | Use when |
 |---|---|---|
-| apm-usage | `mizchi/skills/apm-usage` | Adding / removing / updating skills via APM (always pair with `skill-selector`) |
-| skill-finder | `mizchi/skills/skill-finder` | Cross-source survey + waxa eval gate when the catalog has no fit (Phase 2 of the selection flow) |
-| waxa-eval | `mizchi/skills/waxa-eval` | Iterating on a skill's prompt with the waxa CLI — scenarios, graders, ledger, convergence |
-| optimizing-descriptions | `mizchi/skills/optimizing-descriptions` | Audit + rewrite SKILL.md `description` fields per agentskills.io framework + mizchi's two-track (Meta / Project) trigger policy |
-| empirical-prompt-tuning | `mizchi/skills/empirical-prompt-tuning` | Iteratively improving an agent-facing instruction via subagent execution |
-| retrospective-codify | `mizchi/skills/retrospective-codify` | Converting trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules |
-| extract-glossary | `mizchi/skills/extract-glossary` | Extracting domain-specific terms / repo implementation maps / onboarding Mermaid diagrams from one or more repos / GitHub orgs |
+| apm-usage | `mizchi/skills/tooling/apm-usage` | Adding / removing / updating skills via APM (always pair with `skill-selector`) |
+| skill-finder | `mizchi/skills/meta/skill-finder` | Cross-source survey + waxa eval gate when the catalog has no fit (Phase 2 of the selection flow) |
+| waxa-eval | `mizchi/skills/meta/waxa-eval` | Iterating on a skill's prompt with the waxa CLI — scenarios, graders, ledger, convergence |
+| optimizing-descriptions | `mizchi/skills/meta/optimizing-descriptions` | Audit + rewrite SKILL.md `description` fields per agentskills.io framework + mizchi's two-track (Meta / Project) trigger policy |
+| empirical-prompt-tuning | `mizchi/skills/meta/empirical-prompt-tuning` | Iteratively improving an agent-facing instruction via subagent execution |
+| retrospective-codify | `mizchi/skills/meta/retrospective-codify` | Converting trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules |
+| extract-glossary | `mizchi/skills/meta/extract-glossary` | Extracting domain-specific terms / repo implementation maps / onboarding Mermaid diagrams from one or more repos / GitHub orgs |
 
 ### Personal / dotfiles
 
 | Skill | Install | Use when |
 |---|---|---|
-| chezmoi-management | `mizchi/skills/chezmoi-management` | Touching mizchi's chezmoi-managed dotfiles (`~/.claude/`, `~/.config/`, `~/.zshrc`) |
+| chezmoi-management | `mizchi/skills/tooling/chezmoi-management` | Touching mizchi's chezmoi-managed dotfiles (`~/.claude/`, `~/.config/`, `~/.zshrc`) |
 
 ### Writing / publishing
 
 | Skill | Install | Use when |
 |---|---|---|
-| mizchi-blog-style | `mizchi/skills/mizchi-blog-style` | Drafting a blog post to be published as mizchi (zenn / dev.to). Style + AI-smell detection |
-| tech-article-reproducibility | `mizchi/skills/tech-article-reproducibility` | Final reproducibility check on a tech article draft before publication |
+| mizchi-blog-style | `mizchi/skills/meta/mizchi-blog-style` | Drafting a blog post to be published as mizchi (zenn / dev.to). Style + AI-smell detection |
+| tech-article-reproducibility | `mizchi/skills/meta/tech-article-reproducibility` | Final reproducibility check on a tech article draft before publication |
 
 ### Migration / porting
 
 | Skill | Install | Use when |
 |---|---|---|
-| translate-programming-language | `mizchi/skills/translate-programming-language` | Porting modules / services / APIs between programming languages with behavior parity |
+| translate-programming-language | `mizchi/skills/lang/translate-programming-language` | Porting modules / services / APIs between programming languages with behavior parity |
 
 ### Memory / session (mnemo)
 **Signals**: agent needs persistent cross-session memory or session journaling; `mnemo` CLI on PATH
