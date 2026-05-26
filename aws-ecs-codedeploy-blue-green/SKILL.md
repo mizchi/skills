@@ -1,11 +1,97 @@
 ---
 name: aws-ecs-codedeploy-blue-green
-description: OpenTofu/Terraform pattern for CodeDeploy ECS blue/green deployments. Covers the non-obvious `lifecycle.ignore_changes = [default_action]` requirement on ALB listeners, alarm-triggered auto-rollback, and the Canary/Linear/AllAtOnce traffic shift config names. Use when writing or debugging ECS CodeDeploy infrastructure.
+description: ECS blue/green deployment patterns. Recommends ALB-native weighted target groups as the simpler default; covers CodeDeploy as a reference for teams that already use it or need pipeline-integrated rollback. Use when choosing or debugging ECS blue/green infrastructure.
 ---
 
-# AWS ECS CodeDeploy Blue/Green
+# AWS ECS Blue/Green Deployments
 
-## The Critical Non-Obvious Part
+## Recommendation: ALB-Native Weighted Routing (Preferred)
+
+CodeDeploy adds IAM roles, appspec.json wiring, and a separate control plane. For most ECS blue/green needs, **ALB weighted target groups** achieve the same result with less setup.
+
+### How it works
+
+Define two target groups (blue/green) and a single listener rule that splits traffic by weight:
+
+```hcl
+resource "aws_lb_target_group" "blue" {
+  name        = "myapp-blue"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/health"
+    interval            = 15
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+}
+
+resource "aws_lb_target_group" "green" {
+  # identical to blue
+  name = "myapp-green"
+  # ...
+}
+
+resource "aws_lb_listener_rule" "weighted" {
+  listener_arn = aws_lb_listener.main.arn
+  priority     = 100
+
+  condition {
+    path_pattern { values = ["/*"] }
+  }
+
+  action {
+    type = "forward"
+    forward {
+      target_group {
+        arn    = aws_lb_target_group.blue.arn
+        weight = 100
+      }
+      target_group {
+        arn    = aws_lb_target_group.green.arn
+        weight = 0
+      }
+      stickiness {
+        enabled  = true
+        duration = 300  # keep users on the same TG during rollout
+      }
+    }
+  }
+}
+```
+
+### Traffic shift procedure
+
+```bash
+# Canary: send 10% to green
+aws elbv2 modify-rule --rule-arn <rule-arn> \
+  --actions '[{"Type":"forward","ForwardConfig":{"TargetGroups":[{"TargetGroupArn":"<blue-arn>","Weight":90},{"TargetGroupArn":"<green-arn>","Weight":10}]}}]'
+
+# Full cutover
+aws elbv2 modify-rule --rule-arn <rule-arn> \
+  --actions '[{"Type":"forward","ForwardConfig":{"TargetGroups":[{"TargetGroupArn":"<blue-arn>","Weight":0},{"TargetGroupArn":"<green-arn>","Weight":100}]}}]'
+
+# Rollback: flip back to blue
+aws elbv2 modify-rule --rule-arn <rule-arn> \
+  --actions '[{"Type":"forward","ForwardConfig":{"TargetGroups":[{"TargetGroupArn":"<blue-arn>","Weight":100},{"TargetGroupArn":"<green-arn>","Weight":0}]}}]'
+```
+
+Or update weights via Terraform and apply. No appspec, no CodeDeploy IAM role, no separate control plane.
+
+### When to use CodeDeploy instead
+
+- Your team already has a CodeDeploy pipeline and wants to keep it
+- You need automatic rollback triggered by CloudWatch alarms *without* custom scripts
+- You need hooks (BeforeInstall, AfterInstall, AfterAllowTraffic) for migration/smoke steps
+
+---
+
+## CodeDeploy ECS Blue/Green (Reference)
+
+### The Critical Non-Obvious Part: `lifecycle.ignore_changes`
 
 When using CodeDeploy to manage ECS blue/green deployments, CodeDeploy **dynamically swaps the ALB listener's `default_action.target_group_arn`** between the blue and green target groups. If you don't suppress this in OpenTofu/Terraform, every subsequent `tofu plan` will show drift and try to restore the original target group — fighting with CodeDeploy on every deployment.
 
@@ -30,9 +116,9 @@ resource "aws_lb_listener" "bg_demo" {
 }
 ```
 
-## Full Pattern
+### Full Pattern
 
-### Two Target Groups (blue and green)
+#### Two Target Groups (blue and green)
 
 ```hcl
 resource "aws_lb_target_group" "bg_demo_blue" {
@@ -59,7 +145,7 @@ resource "aws_lb_target_group" "bg_demo_green" {
 }
 ```
 
-### CodeDeploy App + Deployment Group
+#### CodeDeploy App + Deployment Group
 
 ```hcl
 resource "aws_iam_role" "codedeploy_ecs" {
@@ -133,7 +219,7 @@ resource "aws_codedeploy_deployment_group" "app" {
 }
 ```
 
-### CloudWatch Alarms for Auto-Rollback
+#### CloudWatch Alarms for Auto-Rollback
 
 When `DEPLOYMENT_STOP_ON_ALARM` is set, CodeDeploy monitors these alarms during the canary phase. If any alarm fires, the deployment stops and rolls back.
 
@@ -157,7 +243,7 @@ resource "aws_cloudwatch_metric_alarm" "blue_5xx" {
 # identical for green
 ```
 
-## Deployment Trigger (appspec.json)
+### Deployment Trigger (appspec.json)
 
 CodeDeploy needs an `appspec.json` that points to the new task definition. This is passed at deploy time, not managed by Terraform:
 
@@ -186,7 +272,7 @@ aws deploy create-deployment \
   --revision revisionType=AppSpecContent,appSpecContent={content="$(cat appspec.json)"}
 ```
 
-## Common Pitfalls
+### Common Pitfalls
 
 - **`prod_traffic_route.listener_arns` must be a listener ARN, not a listener rule ARN.** Using a rule ARN here causes CodeDeploy to fail silently or with a confusing error.
 - **Both blue and green target groups must have identical health check configuration.** Mismatched `healthy_threshold` / `unhealthy_threshold` values will cause one TG to always be considered unhealthy.
