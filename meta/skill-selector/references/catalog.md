@@ -144,8 +144,8 @@ The "Install" column may also be:
 
 | T | Skill | Install | Use when |
 |---|---|---|---|
-| T1 | dep-review | `mizchi/skills/tooling/dep-review` | Auditing and updating dependencies — patch/minor/major batching, CVE attack-vector triage, deprecated package detection, validation checklist |
-| T3 | tech-watch | `mizchi/skills/tooling/tech-watch` | Annual tech-stack review using State of JS/CSS + Thoughtworks Tech Radar — satisfaction×usage matrix, ADOPT/TRIAL/ASSESS/HOLD mapping, migration roadmap |
+| T1 | dep-lib-review | `mizchi/skills/tooling/dep-lib-review` | Auditing and updating library dependencies — patch/minor/major batching, CVE attack-vector triage, deprecated package detection, validation checklist |
+| T3 | tech-trend-watch | `mizchi/skills/tooling/tech-trend-watch` | Annual tech-stack review using State of JS/CSS + Thoughtworks Tech Radar — satisfaction×usage matrix, ADOPT/TRIAL/ASSESS/HOLD mapping, migration roadmap |
 
 ### SQL / Database
 **Signals**: `sqlc.yaml`, `*.sql` query catalog, SQLite / D1 schema, `sqlc-gen-moonbit`

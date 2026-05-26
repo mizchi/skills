@@ -1,5 +1,5 @@
 ---
-name: tech-watch
+name: tech-trend-watch
 description: Long-term technology stack review using State of JS, State of CSS, and Thoughtworks Technology Radar. Use when making architecture decisions, planning major migrations, or conducting annual tech stack audits. Outputs a prioritized watch list and migration roadmap.
 ---
 
