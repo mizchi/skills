@@ -16,7 +16,7 @@ node_modules/
 .claude/settings.local.json
 
 # Personal skills not tracked by this public repo
-chloe-chat/
+meta/chloe-chat/
 
 # waxa runtime artifacts
 results/

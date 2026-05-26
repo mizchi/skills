@@ -9,7 +9,7 @@ Each directory is a standalone skill following the [agentskills.io](https://agen
 Install an individual skill (global / user scope):
 
 ```sh
-apm install -g mizchi/skills/<skill-name>
+apm install -g mizchi/skills/<category>/<skill-name>
 ```
 
 Or add to a project's `apm.yml`:
@@ -17,18 +17,18 @@ Or add to a project's `apm.yml`:
 ```yaml
 dependencies:
   apm:
-    - mizchi/skills/<skill-name>
+    - mizchi/skills/<category>/<skill-name>
 ```
 
 Pin to a tag:
 
 ```sh
-apm install -g mizchi/skills/<skill-name>#v0.1.0
+apm install -g mizchi/skills/<category>/<skill-name>#v0.1.0
 ```
 
 ## Skills
 
-### Frontend Review
+### Frontend
 
 A toolkit for frontend consulting engagements. Install skills from `mizchi/skills/frontend/<skill-name>`.
 
@@ -48,64 +48,99 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 
 ### Node.js
 
-> Skills will be added as they are created. See [`node/README.md`](node/).
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [node-sqlite-vec](node/sqlite-vec/) | `node/sqlite-vec` | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
+| [esbuild-otel-instrumentation](node/esbuild-otel-instrumentation/) | `node/esbuild-otel-instrumentation` | Workaround for `@opentelemetry/instrumentation-*` silently failing under esbuild ESM bundles (no traces sent). |
+| [pi-coding-agent](node/pi-coding-agent/) | `node/pi-coding-agent` | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |
 
-### Tooling / Infra
+### AWS
 
-| Skill | Description |
-| --- | --- |
-| [apm-usage](apm-usage/) | Use APM (Agent Package Manager) to manage agent skills and dependencies. |
-| [ast-grep-practice](ast-grep-practice/) | Run ast-grep as a project lint tool — `sgconfig.yml`, fix/rewrite rules, constraints, CI. |
-| [chezmoi-management](chezmoi-management/) | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
-| [cloudflare-deploy](cloudflare-deploy/) | Deploy applications to Cloudflare Workers / Pages and related platform services. |
-| [conventional-changelog](conventional-changelog/) | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
-| [dotenvx](dotenvx/) | dotenvx env-var management reference (encryption, multi-env, CI). |
-| [justfile](justfile/) | `just` command runner reference with GitHub Actions examples. |
-| [nix-setup](nix-setup/) | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates (MoonBit / Rust / TS+pnpm / Python+uv / Haskell / OCaml / OxCaml), direnv, GitHub Actions, devbox.json + `setup_nix.sh` for sandbox bootstrap. |
-| [gh-fix-ci](gh-fix-ci/) | Debug and fix failing GitHub Actions PR checks via `gh`. |
-| [node-sqlite-vec](node-sqlite-vec/) | Combine Node 24+ `node:sqlite` with the `sqlite-vec` extension — extension load, vec0 BigInt rowids, why vitest fails, CLI shebang. |
-| [pi-coding-agent](pi-coding-agent/) | Embed `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts, write pi extensions (plugins) with `pi.registerTool` / `pi.on`, package and `pi install` from npm/git, SDK vs `pi --mode rpc`. |
-| [aws-ecs-codedeploy-blue-green](aws-ecs-codedeploy-blue-green/) | ECS CodeDeploy blue/green pattern — the non-obvious `lifecycle.ignore_changes = [default_action]` on ALB listeners, alarm-triggered auto-rollback, Canary/Linear/AllAtOnce config names. |
-| [aws-ecs-service-connect-ipv6](aws-ecs-service-connect-ipv6/) | Diagnose and work around ECS Service Connect DNS aliases returning IPv6 addresses to IPv4-only Fargate tasks. |
-| [aws-github-oidc-scoped-role](aws-github-oidc-scoped-role/) | GitHub Actions OIDC trust pattern — `job_workflow_ref` scoping vs `sub` alone, Bedrock cross-region inference ARNs, required `aws-marketplace` permissions, ReadOnlyAccess + explicit Deny for AI agent roles. |
-| [aws-vault-mfa-iam](aws-vault-mfa-iam/) | Configure aws-vault for IAM APIs blocked by MFA-required policies; FIDO2 passkey + virtual TOTP setup. |
-| [esbuild-otel-instrumentation](esbuild-otel-instrumentation/) | Workaround for `@opentelemetry/instrumentation-*` silently failing under esbuild ESM bundles (no traces sent). |
-| [flaker-storage-cache-on-ci](flaker-storage-cache-on-ci/) | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key, plus `--changed` derivation and ingest-source patterns. |
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [aws-ecs-codedeploy-blue-green](aws/ecs-codedeploy-blue-green/) | `aws/ecs-codedeploy-blue-green` | ECS blue/green — recommends ALB-native weighted routing; covers CodeDeploy for teams already using it. |
+| [aws-ecs-service-connect-ipv6](aws/ecs-service-connect-ipv6/) | `aws/ecs-service-connect-ipv6` | Diagnose and work around ECS Service Connect DNS aliases returning IPv6 addresses to IPv4-only Fargate tasks. |
+| [aws-github-oidc-scoped-role](aws/github-oidc-scoped-role/) | `aws/github-oidc-scoped-role` | GitHub Actions OIDC trust pattern — `job_workflow_ref` scoping vs `sub` alone, Bedrock cross-region inference ARNs, required `aws-marketplace` permissions, ReadOnlyAccess + explicit Deny for AI agent roles. |
+| [aws-vault-mfa-iam](aws/vault-mfa-iam/) | `aws/vault-mfa-iam` | Configure aws-vault for IAM APIs blocked by MFA-required policies; FIDO2 passkey + virtual TOTP setup. |
 
-### Testing / Browser
+### Cloudflare
 
-| Skill | Description |
-| --- | --- |
-| [playwright-cli](playwright-cli/) | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
-| [playwright-test](playwright-test/) | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
-| [review-image](review-image/) | Review screenshots or generated images with OpenRouter vision models via Deno scripts; includes a strict CI `pass|fail` wrapper for VRT prechecks. |
-| [vlmkit](vlmkit/) | Entry-point for `@mizchi/vlmkit` — VLM-driven frontend toolkit (visual regression, markup synthesis from screenshots, design-token / theme / a11y / i18n audits, 2-stage VLM+LLM CSS auto-repair). Routes to 5 detailed sub-skills shipped under the vlmkit repo's `.claude/skills/`. |
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [cloudflare-deploy](cloudflare/deploy/) | `cloudflare/deploy` | Deploy applications to Cloudflare Workers / Pages and related platform services. |
+| [cloudflare-access-app-setup](cloudflare/access-app-setup/) | `cloudflare/access-app-setup` | One-shot Cloudflare Access self-hosted application provisioning via the API — app + email allowlist policy + service token. |
+| [cloudflare-workers-cd-rollback](cloudflare/workers-cd-rollback/) | `cloudflare/workers-cd-rollback` | GitHub Actions CD for a Cloudflare Worker with auto-rollback on smoke failure. |
+| [cloudflare-workers-otel-utels](cloudflare/workers-otel-utels/) | `cloudflare/workers-otel-utels` | Cloudflare Worker telemetry — OTLP traces / metrics / logs + utels error tracking + D1 Proxy slow-query warnings. |
+| [cloudflare-mbt-worker-bundle](cloudflare/mbt-worker-bundle/) | `cloudflare/mbt-worker-bundle` | Bundle a Cloudflare Worker that combines MoonBit core code with a TypeScript entry. |
 
-### MoonBit
+### SQL
 
-| Skill | Description |
-| --- | --- |
-| [moonbit-practice](moonbit-practice/) | MoonBit code generation best practices — syntax, tests, benchmarks, FFI, Nix, mbtx. |
-| [moonbit-js-binding](moonbit-js-binding/) | Write MoonBit bindings to JavaScript with `extern "js"` (Promises, opaque types, esm/cjs/iife). |
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [sql-lint](sql/lint/) | `sql/lint` | Static lint for sqlc-style SQL catalogs — duplicate query names, missing semicolons, SELECT *, double-wildcard LIKE. |
+| [sql-plan-audit](sql/plan-audit/) | `sql/plan-audit` | Run EXPLAIN QUERY PLAN against every query in a sqlc catalog and diff plans against baseline. |
+| [sql-schema-audit](sql/schema-audit/) | `sql/schema-audit` | Index coverage and N+1 review aids for SQLite/D1 schemas with a sqlc catalog. |
+| [sql-security](sql/security/) | `sql/security` | SQL injection screening for host code (MoonBit / TS / Rust) plus secretlint setup notes. |
+| [sqlc-gen-moonbit-safety](sql/sqlc-gen-moonbit-safety/) | `sql/sqlc-gen-moonbit-safety` | Post-generation safety checks for sqlc-gen-moonbit + Cloudflare D1 — BigInt-bind hangs (D1 1101) and SQL placeholder mix. |
 
 ### Languages
 
-| Skill | Description |
-| --- | --- |
-| [gleam-practice](gleam-practice/) | Build and review Gleam projects on the Erlang target (Wisp + Mist, OTP, just, CI). |
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [moonbit-practice](lang/moonbit-practice/) | `lang/moonbit-practice` | MoonBit code generation best practices — syntax, tests, benchmarks, FFI, Nix, mbtx. |
+| [moonbit-js-binding](lang/moonbit-js-binding/) | `lang/moonbit-js-binding` | Write MoonBit bindings to JavaScript with `extern "js"` (Promises, opaque types, esm/cjs/iife). |
+| [gleam-practice](lang/gleam-practice/) | `lang/gleam-practice` | Build and review Gleam projects on the Erlang target (Wisp + Mist, OTP, just, CI). |
+| [translate-programming-language](lang/translate-programming-language/) | `lang/translate-programming-language` | Plan and execute language-to-language migrations with behavior parity — oracles, fixtures, parity tests, compatibility layers. |
+
+### Testing / Browser
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [playwright-cli](testing/playwright-cli/) | `testing/playwright-cli` | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
+| [playwright-test](testing/playwright-test/) | `testing/playwright-test` | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
+
+### AI / VLM
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [review-image](ai/review-image/) | `ai/review-image` | Review screenshots or generated images with OpenRouter vision models via Deno scripts; includes a strict CI `pass|fail` wrapper for VRT prechecks. |
+| [vlmkit](ai/vlmkit/) | `ai/vlmkit` | Entry-point for `@mizchi/vlmkit` — VLM-driven frontend toolkit (visual regression, markup synthesis from screenshots, design-token / theme / a11y / i18n audits, 2-stage VLM+LLM CSS auto-repair). Routes to 5 detailed sub-skills shipped under the vlmkit repo's `.claude/skills/`. |
+
+### Tooling / Infra
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [apm-usage](tooling/apm-usage/) | `tooling/apm-usage` | Use APM (Agent Package Manager) to manage agent skills and dependencies. |
+| [ast-grep-practice](tooling/ast-grep-practice/) | `tooling/ast-grep-practice` | Run ast-grep as a project lint tool — `sgconfig.yml`, fix/rewrite rules, constraints, CI. |
+| [chezmoi-management](tooling/chezmoi-management/) | `tooling/chezmoi-management` | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
+| [conventional-changelog](tooling/conventional-changelog/) | `tooling/conventional-changelog` | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
+| [dotenvx](tooling/dotenvx/) | `tooling/dotenvx` | dotenvx env-var management reference (encryption, multi-env, CI). |
+| [gh-fix-ci](tooling/gh-fix-ci/) | `tooling/gh-fix-ci` | Debug and fix failing GitHub Actions PR checks via `gh`. |
+| [justfile](tooling/justfile/) | `tooling/justfile` | `just` command runner reference with GitHub Actions examples. |
+| [nix-setup](tooling/nix-setup/) | `tooling/nix-setup` | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates, direnv, GitHub Actions. |
+| [flaker-storage-cache-on-ci](tooling/flaker-storage-cache-on-ci/) | `tooling/flaker-storage-cache-on-ci` | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key. |
+| [upstream-fix-and-pin](tooling/upstream-fix-and-pin/) | `tooling/upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
+| [utels-project-bootstrap](tooling/utels-project-bootstrap/) | `tooling/utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a wrangler secret. |
+
+### Kubernetes
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [k8s-crd-from-typed-schema](k8s/crd-from-typed-schema/) | `k8s/crd-from-typed-schema` | Generate Kubernetes CRDs from a typed schema source (zod / TypeBox / Valibot / json-schema) — Structural Schema dialect, /status subresource trap, metadata-prohibition rule. |
 
 ### Process / Meta
 
-| Skill | Description |
-| --- | --- |
-| [empirical-prompt-tuning](empirical-prompt-tuning/) | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
-| [retrospective-codify](retrospective-codify/) | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
-| [skill-selector](skill-selector/) | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
-| [skill-finder](skill-finder/) | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
-| [waxa-eval](waxa-eval/) | Operating manual for the `waxa` CLI — scenario authoring, grader selection, ledger schema, the four-stage iteration pattern, convergence rules. |
-| [extract-glossary](extract-glossary/) | Extract domain-specific terms, repository implementation maps, and onboarding Mermaid diagrams from one or more repos / GitHub orgs. |
-| [mizchi-blog-style](mizchi-blog-style/) | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
-| [tech-article-reproducibility](tech-article-reproducibility/) | Simulate a first-time reader reproducing a technical article and list missing information. |
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [empirical-prompt-tuning](meta/empirical-prompt-tuning/) | `meta/empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
+| [retrospective-codify](meta/retrospective-codify/) | `meta/retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
+| [skill-selector](meta/skill-selector/) | `meta/skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
+| [skill-finder](meta/skill-finder/) | `meta/skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
+| [waxa-eval](meta/waxa-eval/) | `meta/waxa-eval` | Operating manual for the `waxa` CLI — scenario authoring, grader selection, ledger schema, the four-stage iteration pattern, convergence rules. |
+| [extract-glossary](meta/extract-glossary/) | `meta/extract-glossary` | Extract domain-specific terms, repository implementation maps, and onboarding Mermaid diagrams from one or more repos / GitHub orgs. |
+| [optimizing-descriptions](meta/optimizing-descriptions/) | `meta/optimizing-descriptions` | Audit and rewrite SKILL.md `description` fields per the agentskills.io optimizing-descriptions framework. |
+| [mizchi-blog-style](meta/mizchi-blog-style/) | `meta/mizchi-blog-style` | Style guide and AI-smell detection for blog posts published as mizchi (zenn / dev.to). |
+| [tech-article-reproducibility](meta/tech-article-reproducibility/) | `meta/tech-article-reproducibility` | Simulate a first-time reader reproducing a technical article and list missing information. |
 
 ## Tools
 
@@ -160,11 +195,11 @@ targets:
   - claude
 dependencies:
   apm:
-    - mizchi/skills/apm-usage          # APM manifest reference
-    - mizchi/skills/skill-selector     # Phase 1: pick from curated catalog
-    - mizchi/skills/skill-finder       # Phase 2: cross-source discovery + waxa eval gate
-    - mizchi/skills/waxa-eval          # waxa CLI operating manual
-    - mizchi/skills/empirical-prompt-tuning  # methodology / Iter 0 / [critical]-tag checklist
+    - mizchi/skills/tooling/apm-usage          # APM manifest reference
+    - mizchi/skills/meta/skill-selector        # Phase 1: pick from curated catalog
+    - mizchi/skills/meta/skill-finder          # Phase 2: cross-source discovery + waxa eval gate
+    - mizchi/skills/meta/waxa-eval             # waxa CLI operating manual
+    - mizchi/skills/meta/empirical-prompt-tuning  # methodology / Iter 0 / [critical]-tag checklist
 ```
 
 Then:
