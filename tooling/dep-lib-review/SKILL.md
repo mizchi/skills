@@ -51,10 +51,12 @@ Do not use CVSS score alone. Apply attack-vector weight:
 
 ```bash
 # Exclude devDeps to focus on runtime CVEs
+# Fallback to plain text if jq parsing fails (pnpm JSON schema varies by version)
 pnpm audit --prod --json 2>/dev/null | jq -r '
   .vulnerabilities | to_entries[] |
   .value.via[] | select(type=="object") |
-  "\(.severity)\t\(.name)\t\(.title)"' | sort -k1
+  "\(.severity)\t\(.name)\t\(.title)"' 2>/dev/null | sort -k1 \
+  || pnpm audit --prod 2>/dev/null
 ```
 
 ### Version updates — batch strategy
@@ -161,7 +163,7 @@ Write a brief summary with:
 - <package> v<old> → v<new>: migration effort high, scheduled for <date>
 
 ### Trend watch
-- <package>: Tier 1 migration recommended → <alternative>
+- <package>: migration recommended → <alternative>
 ```
 
 ## Anti-patterns

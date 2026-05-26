@@ -1,6 +1,6 @@
 ---
 name: tech-trend-watch
-description: Long-term technology stack review using State of JS, State of CSS, and Thoughtworks Technology Radar. Use when making architecture decisions, planning major migrations, or conducting annual tech stack audits. Outputs a prioritized watch list and migration roadmap.
+description: Long-term technology stack review using State of JS, State of CSS, and Thoughtworks Technology Radar — satisfaction×usage matrix, ADOPT/TRIAL/ASSESS/HOLD mapping, P0–P3 migration priority. Use for annual stack audits, planning major migrations (jest→vitest, webpack→Vite, etc.), or on-demand replacement decisions. Not for general architecture design.
 ---
 
 # Long-Term Technology Watch
@@ -47,6 +47,8 @@ Low             │   AVOID        │    LEGACY      │
 satisfaction    │  (don't start) │  (plan exit)   │
                 └────────────────┴────────────────┘
 ```
+
+Thresholds (State of JS survey): **high** ≥ 70%, **low** ≤ 55%. Values between 55–70% are borderline — check year-over-year trend to break the tie.
 
 **STABLE** (high usage + high satisfaction): No action. Healthy ecosystem.
 
@@ -151,15 +153,16 @@ Write a review doc with:
 
 - **Annual**: Run full review aligned with State of JS/CSS release (typically November–January).
 - **Quarterly**: Check Tech Radar new volume for changes to existing stack items.
-- **On-demand**: Run Step 3 (Radar only) when making a new major library decision.
+- **On-demand (new adoption)**: Run Step 3 (Radar only) when evaluating whether to add a new library.
+- **On-demand (replacement decision)**: Run Steps 2–5 for both the current tool and the candidate. Omit Step 1 stack inventory and Step 6 full output doc — produce a single migration evaluation instead.
 
 ## Boundaries
 
-- This skill covers strategic decisions, not implementation. For executing updates, use `dep-review`.
+- This skill covers strategic decisions, not implementation. For executing updates, use `dep-lib-review`.
 - Do not use Tech Radar alone — it lags the JS ecosystem. Always cross-reference with State of JS/CSS.
 - "Everyone is migrating to X" is not sufficient reason to migrate. Evaluate migration cost vs. actual pain with the current tool.
 
 ## Related
 
-- `dep-review` — executes the actual update (patch/minor/major batching)
+- `dep-lib-review` — executes the actual update (patch/minor/major batching)
 - `frontend-review-deps` — operational dependency audit with CVE triage and trend-watch scripts
