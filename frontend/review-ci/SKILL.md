@@ -16,11 +16,13 @@ You are optimizing GitHub Actions CI for a frontend project. The target is **med
    gh run view <run-id> --log | grep -E '^\d{4}-' | head -200
    ```
 4. Inventory current workflows under `.github/workflows/` and note:
-   - Does `actions/setup-node` use `cache: pnpm`?
+   - Does **every job** (lint, build, test, coverage, etc.) use a pnpm/npm store cache? A common miss: `test.yml` has cache but `lint.yml` and `pages.yml` do not.
+   - Does `actions/setup-node` use `cache: pnpm`, or is there a manual `actions/cache` block for the pnpm store? Either is fine; the key must include `hashFiles('**/pnpm-lock.yaml')`.
    - Does `actions/cache` cache the Playwright browser store (`~/.cache/ms-playwright`)?
    - Is there a `concurrency:` block?
    - Are vitest / playwright sharded?
    - Are jobs serialized via `needs:` unnecessarily?
+   - Are `lint` and `typecheck` in the same serial job? They have no dependency on each other and should be separate parallel jobs.
 
 ## Output
 
@@ -66,7 +68,8 @@ The **PR CI total** target is the critical gate. CI slower than 5 minutes is rou
 
 | Area | Common fix |
 |---|---|
-| `install` | pnpm / npm store cache key, `--frozen-lockfile`, narrow `onlyBuiltDependencies` |
+| `install` | pnpm / npm store cache key, `--frozen-lockfile`, narrow `onlyBuiltDependencies`. **Audit every workflow file** — partial cache (only some jobs cached) is the most common oversight; `install` without cache is ~20-25 s, with cache hit it drops to ~2-3 s |
+| `lint + typecheck` | Split into two parallel jobs (no mutual dependency). On a project with ~170 TS files, this alone cuts the lint-job wall-clock in half |
 | `typecheck` | Project References split, `skipLibCheck: true`, resolve circular type imports |
 | `lint` | lint-staged for PR (changed files only), enable linter's own incremental cache |
 | `vitest` | `isolate: false`, tune `--pool` thread count, exclude test fixtures from coverage |
