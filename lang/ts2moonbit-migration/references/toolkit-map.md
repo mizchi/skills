@@ -59,7 +59,7 @@ moon add mizchi/cloudflare
 
 ## The `Any` escape hatch (mizchi/js/core)
 
-`Any` (`@core.Any`) mirrors TypeScript `any` and is how you make progress before every type is pinned. Verified API (mizchi/js 0.12.1):
+`Any` (`@core.Any`) mirrors TypeScript `any`. Treat it as a **boundary-only** tool — it belongs in adapter files, not the core (see `boundary-and-core.md`). Verified API (mizchi/js 0.12.1):
 
 ```mbt nocheck
 let a : @core.Any = @core.any(value)      // T -> Any
@@ -73,7 +73,7 @@ let r2 = fn_any._invoke([@core.any(x)])      // fn(x)
 
 Note: property access is the methods `_get` / `_set` / `_get_by_index`, **not** `obj["key"]` bracket syntax. In the `.d.ts`, an exported `@core.Any` surfaces as TypeScript `any`.
 
-Strategy: port with `Any` first to get it compiling, then tighten the hot paths and the public boundary to concrete types. The boundary (anything in `link.js.exports`) should end up fully typed so the generated `.d.ts` matches the contract.
+Strategy: port with `Any` first to get it compiling, then pull the logic down into typed idiomatic core modules and leave only marshalling in the adapter. The exported boundary should end up with concrete signatures so the generated `.d.ts` matches the contract; the core should have no `Any` at all.
 
 ## Picking layer by source import
 

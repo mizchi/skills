@@ -80,7 +80,7 @@ Match the Phase 0 error contract: if consumers `catch` an `Error` with a specifi
 
 ## Boundary-leak checklist (verify in Phase 6 `.d.ts` diff)
 
-These emit MoonBit-internal shapes into the generated `.d.ts` — fix at the boundary:
+These emit MoonBit-internal shapes into the generated `.d.ts`. Fix them in the boundary adapter — keep the rich type in the core and convert to a JS-friendly shape at the export (see `boundary-and-core.md`):
 
 1. `Int64`/`UInt64` in a signature → `.d.ts` shows `bigint`, not `number`.
 2. data-carrying `enum` → tagged-object type; replace with struct or constructor fns.

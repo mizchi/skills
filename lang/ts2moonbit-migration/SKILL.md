@@ -39,6 +39,15 @@ Concretely, before porting a single function:
 2. Snapshot the existing test suite — it becomes the parity gate, run against the MoonBit-built artifact.
 3. Decide the contract level per export: **byte-exact** (serializers, hashers), **structural** (objects/JSON), or **semantic** (a value that round-trips). Most exports are structural.
 
+## Architecture: JS-compatible boundary, idiomatic MoonBit core
+
+The contract governs **only the exported boundary**. Behind it, write the implementation as clean, idiomatic MoonBit — the code you'd be happy to show a MoonBit reviewer, not a transliteration of the TypeScript. Two layers, kept separate (details + verified example in `references/boundary-and-core.md`):
+
+- **Boundary adapter** (one thin file per exported surface, gated `["js"]`): the *only* place `@core.Any`, `_get`/`_set`/`cast`, `throw_error`, and `promisify*` appear. It parses JS values into core types, delegates, and marshals results back into the JS shapes the contract demands. It contains no business logic.
+- **Idiomatic core**: rich `enum` + `match`, `struct`, `Result`/`raise`, `Map`, `Option`, generics. **No JS types reach this layer.** It is backend-agnostic and tested directly against the Phase 0 fixtures (no Node round-trip).
+
+If `Any` or `_get`/`throw_error` shows up in a core module, the abstraction leaked — push it back out to the adapter. `Any` is a *bootstrapping and boundary* tool, never the destination: use it to get the port compiling, then pull the logic down into typed core modules. The boundary signatures are frozen by the contract; the core types are yours to refactor freely once parity holds.
+
 ## The mizchi Toolkit Map
 
 Pick the binding layer by *surface*, not by habit. Full install lines and import paths are in `references/toolkit-map.md`.
@@ -55,7 +64,7 @@ Pick the binding layer by *surface*, not by habit. Full install lines and import
 Rules of thumb:
 
 - **Reach for a binding before writing FFI.** Hand-rolled `extern "js"` is a last resort for APIs no package covers. When you do write it, follow `moonbit-js-binding`.
-- **`mizchi/js` is the `any`-friendly layer.** Its `Any` type + zero-cost casts (`any(x)`, `Any::cast`, property access `_get`/`_set`, method `_call`/`_invoke`) mirror TypeScript's `any` and let you make progress before every type is nailed down. Tighten types as you go.
+- **`mizchi/js`'s `Any` is a boundary tool, not the destination.** Its `Any` type + zero-cost casts (`any(x)`, `Any::cast`, property access `_get`/`_set`, method `_call`/`_invoke`) mirror TypeScript's `any` and let you get the port compiling. Keep them in the boundary adapter and replace them with typed core code as you go (see the Architecture section).
 - **`mizchi/x` is the cross-target backend.** If the TS service does process/fs/http/websocket work and you want it to also run on `--target native` later, port onto `mizchi/x` (which delegates to `moonbitlang/async` natively and to JS FFI on the js target) instead of binding `node:*` directly.
 
 ## Workflow
@@ -82,10 +91,11 @@ This is the TypeScript analog of the OCaml `string`-vs-`Bytes` hazard. Classify 
 - `T | null | undefined` unions → do **not** collapse to `T?`; split with `is_null`/`is_undefined`.
 - Object/record literals, discriminated unions, `Date`, `Promise<T>`, callbacks — see the reference table.
 
-### Phase 3 — Port leaf modules
+### Phase 3 — Port leaf modules (idiomatic core + thin adapter)
+Read `references/boundary-and-core.md`.
 - Port pure/leaf modules first, then shared helpers, then I/O adapters, then orchestration/entry.
-- Use `mizchi/js` (`Any`, builtins) for JS-value interaction; keep raw FFI behind safe typed wrappers.
-- Co-locate a MoonBit test per ported slice; assert against the Phase 0 fixtures.
+- Write the logic as **idiomatic MoonBit core** (`enum`/`match`, `struct`, `Result`/`raise`) with no JS types; keep `Any`/`_get`/`throw_error`/FFI confined to a **thin boundary adapter** file per exported surface.
+- Test the core directly against the Phase 0 fixtures (no Node round-trip needed); test the adapter through Node to confirm the contract.
 
 ### Phase 4 — Port backend / async I/O
 - Map `Promise<T>` to MoonBit `async fn` + `.wait()` (Promise bridging — `moonbit-js-binding`).
@@ -166,6 +176,7 @@ The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were v
 
 @references/contract-capture.md
 @references/toolkit-map.md
+@references/boundary-and-core.md
 @references/type-mapping.md
 @references/build-and-publish.md
 @references/parity-verification.md

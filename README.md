@@ -89,7 +89,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | [moonbit-js-binding](lang/moonbit-js-binding/) | `lang/moonbit-js-binding` | Write MoonBit bindings to JavaScript with `extern "js"` (Promises, opaque types, esm/cjs/iife). |
 | [gleam-practice](lang/gleam-practice/) | `lang/gleam-practice` | Build and review Gleam projects on the Erlang target (Wisp + Mist, OTP, just, CI). |
 | [translate-programming-language](lang/translate-programming-language/) | `lang/translate-programming-language` | Plan and execute language-to-language migrations with behavior parity — oracles, fixtures, parity tests, compatibility layers. |
-| [ts2moonbit-migration](lang/ts2moonbit-migration/) | `lang/ts2moonbit-migration` | Migrate TypeScript to MoonBit on the `js` target while keeping the same JS API contract — using mizchi/js, mizchi/x, mizchi/npm_typed; contract capture, type classification, `.d.ts` diff gate, parity verification. |
+| [ts2moonbit-migration](lang/ts2moonbit-migration/) | `lang/ts2moonbit-migration` | Migrate TypeScript to MoonBit on the `js` target — JS-compatible exported boundary over an idiomatic MoonBit core, using mizchi/js, mizchi/x, mizchi/npm_typed; contract capture, type classification, `.d.ts` diff gate, parity verification. |
 
 ### Testing / Browser
 
