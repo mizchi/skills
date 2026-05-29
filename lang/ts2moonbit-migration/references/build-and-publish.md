@@ -25,6 +25,7 @@ import {
 }
 
 options(
+  supported_targets: "js",   // app/leaf: silences the mizchi/js supported_targets warning
   link: {
     "js": {
       "exports": ["create_app:createApp", "parse", "stringify"],
@@ -42,21 +43,22 @@ options(
 
 ## Async exports — return a real Promise
 
-An exported MoonBit `async fn` cannot be awaited by a sync JS caller as-is. Wrap so JS receives a `Promise<T>` and the `.d.ts` shows `Promise<T>`:
+An exported MoonBit `async fn` cannot be awaited by a sync JS caller as-is. Wrap the internal async logic with `mizchi/js/core`'s `promisify*` (or `from_async`) so the export returns `@core.Promise[T]` and JS receives a real `Promise`. Verified pattern (mizchi/js 0.12.1):
 
 ```mbt nocheck
 // internal async logic
-async fn do_work_impl(x : Int) -> Int { ... }
+async fn do_work_impl(x : Int) -> Int {
+  @core.sleep(1)
+  x * 2
+}
 
-// exported boundary: kick off async from sync, hand JS a Promise
-pub fn do_work(x : Int) -> Promise[Int] {
-  // run_async / %async.run schedules the body; resolve into a Promise
-  // (full pattern in moonbit-js-binding: promise-bridging.md)
-  ...
+// exported boundary: hand JS a real Promise
+pub fn do_work(x : Int) -> @core.Promise[Int] {
+  (@core.promisify1(do_work_impl))(x)
 }
 ```
 
-List `do_work` in `exports`; the generated `.d.ts` will read `export function doWork(x: number): Promise<number>`.
+List `do_work` in `exports`. At runtime JS gets a genuine `Promise` (`p instanceof Promise === true`, `await p` works — verified). **But** the generated `.d.ts` types the return as `any`, not `Promise<number>`, because `@core.Promise[T]` is an external type. If consumers need the precise `Promise<T>` type, ship a small hand-maintained overlay `.d.ts` that re-declares the async exports, or wrap the package in a thin typed `index.ts`.
 
 ## Build
 
@@ -82,9 +84,9 @@ This is the hard contract check. Diff the generated declaration against the Phas
 
 ```bash
 moon build --release
-diff <(npx tsc --noEmit false /dev/null 2>/dev/null; cat contract/index.d.ts) \
-     _build/js/release/build/<pkg>.d.ts
-# or simply eyeball both files side by side
+diff contract/index.d.ts _build/js/release/build/<pkg>.d.ts
+# names/casing won't line up 1:1 (snake_case, MoonBit.* aliases) — read it,
+# don't expect a clean diff. The point is to catch type/shape regressions.
 ```
 
 Every difference is either a contract break to fix in MoonBit, or an intentional, documented change. Common offenders and fixes:

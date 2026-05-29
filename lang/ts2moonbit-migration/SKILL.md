@@ -55,7 +55,7 @@ Pick the binding layer by *surface*, not by habit. Full install lines and import
 Rules of thumb:
 
 - **Reach for a binding before writing FFI.** Hand-rolled `extern "js"` is a last resort for APIs no package covers. When you do write it, follow `moonbit-js-binding`.
-- **`mizchi/js` is the `any`-friendly layer.** Its `Any` type + zero-cost casts (`any(x)`, `Any::cast`, `obj["key"]`, method `_call`) mirror TypeScript's `any` and let you make progress before every type is nailed down. Tighten types as you go.
+- **`mizchi/js` is the `any`-friendly layer.** Its `Any` type + zero-cost casts (`any(x)`, `Any::cast`, property access `_get`/`_set`, method `_call`/`_invoke`) mirror TypeScript's `any` and let you make progress before every type is nailed down. Tighten types as you go.
 - **`mizchi/x` is the cross-target backend.** If the TS service does process/fs/http/websocket work and you want it to also run on `--target native` later, port onto `mizchi/x` (which delegates to `moonbitlang/async` natively and to JS FFI on the js target) instead of binding `node:*` directly.
 
 ## Workflow
@@ -126,7 +126,7 @@ Full table with edge cases in `references/type-mapping.md`.
 | discriminated union | `enum` | data-carrying enums are awkward from JS; prefer constructor fns |
 | `T \| undefined` | `T?` via `is_undefined` | — |
 | `T \| null` | `Nullable[T]` wrapper | `null ≠ undefined` |
-| `Promise<T>` | `async fn` + `.wait()` | exported async needs `run_async` |
+| `Promise<T>` | `async fn` + `.wait()`; export via `@core.promisify*` | exported async surfaces as `any` in `.d.ts`, not `Promise<T>` |
 | `(…) => R` callback | `FuncRef`/closure | — |
 | `Date` | `mizchi/js` `Date` binding | — |
 
@@ -141,7 +141,7 @@ Full table with edge cases in `references/type-mapping.md`.
 | Value can exceed 2^53 | `BigInt`/`Int64`, confirm against contract |
 | `string` is actually bytes | `Bytes` |
 | Union with both `null` and `undefined` | split, don't use `T?` alone |
-| Exported function is async | `async fn` + `run_async` at the export; `.d.ts` shows `Promise<T>` |
+| Exported function is async | return `@core.Promise[T]` via `@core.promisify*`/`from_async`; JS receives a real `Promise` (`.d.ts` type is `any`) |
 | Original package was dual ESM/CJS | dual-build; match `package.json` `exports` |
 | `.d.ts` signature changed after build | contract break — fix the MoonBit signature, don't patch the `.d.ts` |
 | Unsure a behavior matches | run the original TS test against the built `.js` |
@@ -154,9 +154,13 @@ Full table with edge cases in `references/type-mapping.md`.
 4. **Binding `node:*` directly when you wanted cross-target.** If the service should later run native, port onto `mizchi/x`, not hand-rolled `node:fs`/`node:http` FFI.
 5. **Leaking MoonBit internals in the `.d.ts`.** Passing `Map`, `Result`, data-carrying `enum`, or trait objects across the boundary emits MoonBit's internal runtime shape into the `.d.ts`. Expose plain structs / opaque `#external` types / pairs of constructor functions.
 6. **Wrong `link.js.format`.** Shipping ESM where the package was CJS (or vice-versa) breaks every consumer even if signatures match. Match Phase 0; dual-build if the original was dual.
-7. **Forgetting `run_async` on an exported async fn.** An exported MoonBit sync function can't `await`; wrap with `run_async` so JS receives a real `Promise`.
+7. **Exporting a raw `async fn`.** A sync JS caller can't `await` a bare MoonBit `async fn`. Wrap the internal async logic with `@core.promisify*` (or `from_async`) so the export returns `@core.Promise[T]` and JS receives a real `Promise`. Note the generated `.d.ts` types it as `any`, not `Promise<T>`.
 8. **Binding the whole npm library.** Bind only the surface you call. Over-binding wastes effort and bloats output.
 9. **Trusting unit parity alone.** Run the *original* TS suite against the built artifact and shadow real traffic before cutover (`translate-programming-language` gates).
+
+## Verified Against
+
+The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were verified end-to-end with **moon 0.1.20260522 / moonc v0.9.3** and **mizchi/js 0.12.1** (round-tripping objects and Promises through Node). Package boundaries and the `Any` method names (`_get`/`_set`/`_call`/`cast`) shift across releases — re-check against the resolved version in your `moon.mod.json` if a signature mismatches.
 
 ## References
 

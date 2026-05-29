@@ -10,10 +10,14 @@ The base layer. JavaScript built-ins (`Date`, `RegExp`, `Math`), Web Standard AP
 ```bash
 moon add mizchi/js
 ```
-```json
-// moon.pkg.json (or moon.pkg DSL import block)
-{ "import": ["mizchi/js/core", "mizchi/js"] }
 ```
+// src/moon.pkg (DSL form — verified)
+import {
+  "mizchi/js/core",
+  "mizchi/js",
+}
+```
+(The JSON form `moon.pkg.json` with `{ "import": ["mizchi/js/core", "mizchi/js"] }` works too. Pick one per package — don't mix.)
 
 Module sub-layout (import only what you use):
 - `mizchi/js/core` — `Any`, unsafe casts, the FFI primitives
@@ -55,15 +59,19 @@ moon add mizchi/cloudflare
 
 ## The `Any` escape hatch (mizchi/js/core)
 
-`Any` mirrors TypeScript `any` and is how you make progress before every type is pinned:
+`Any` (`@core.Any`) mirrors TypeScript `any` and is how you make progress before every type is pinned. Verified API (mizchi/js 0.12.1):
 
 ```mbt nocheck
-// zero-cost casts
-let a : Any = any(value)         // T -> Any
-let n : Int = obj["age"].cast()  // property access + cast
-obj["key"] = any(v)              // property set
-let r = obj._call("method", [any(x)])  // method call
+let a : @core.Any = @core.any(value)      // T -> Any
+let obj = @core.new_object()              // {} 
+obj._set("age", @core.any(30))            // obj.age = 30   (property set)
+let n : Int = obj._get("age").cast()      // obj.age + cast (property get)
+let first = arr._get_by_index(0)          // arr[0]
+let r = obj._call("method", [@core.any(x)])  // obj.method(x)
+let r2 = fn_any._invoke([@core.any(x)])      // fn(x)
 ```
+
+Note: property access is the methods `_get` / `_set` / `_get_by_index`, **not** `obj["key"]` bracket syntax. In the `.d.ts`, an exported `@core.Any` surfaces as TypeScript `any`.
 
 Strategy: port with `Any` first to get it compiling, then tighten the hot paths and the public boundary to concrete types. The boundary (anything in `link.js.exports`) should end up fully typed so the generated `.d.ts` matches the contract.
 
@@ -80,5 +88,7 @@ Strategy: port with `Any` first to get it compiling, then tighten the hot paths 
 | `Deno.*` / `Bun.*` | `mizchi/js_deno` / `mizchi/js_bun` |
 | `@cloudflare/workers-types` | `mizchi/cloudflare` |
 | anything with no binding | minimal `extern "js"` + `#module("pkg")` (see `moonbit-js-binding`) |
+
+> `supported_targets` warning: `mizchi/js` declares it, so `moon check` warns your package should too. For a leaf/app being migrated, declare it to silence the warning — in the `moon.pkg` DSL the verified syntax is the string expression form `supported_targets: "js"` (not `["js"]`, which warns "legacy array syntax"); in `moon.pkg.json` use `"supported-targets": ["js"]`. For a **library you republish**, prefer gating individual FFI files via `targets: { "f.mbt": ["js"] }` instead — a package-level `supported_targets` propagates and can block downstream consumers on other backends (see `moonbit-js-binding`).
 
 > Versioning note: package boundaries have shifted across releases (e.g. npm bindings moved out of `mizchi/js` into `mizchi/npm_typed` around v0.11; browser split into `mizchi/js_browser`). Run `moon add <pkg>` and check the resolved version in `moon.mod.json`; if an import path 404s, the binding likely lives in a sibling package now.

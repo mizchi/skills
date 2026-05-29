@@ -28,9 +28,15 @@ TypeScript distinguishes `T`, `T | undefined`, `T | null`, and `T | null | undef
 | `T \| null \| undefined` | dedicated 3-state, or `Nullish[T]` | split with both checks; never `Some(null)` |
 | optional property `x?: T` | `T?` field | absent property ≈ `undefined` |
 
+`mizchi/js/core` already provides these — don't hand-roll them:
+
 ```mbt nocheck
-pub extern "js" fn is_undefined(v : Any) -> Bool = #| (v) => v === undefined
-pub extern "js" fn is_null(v : Any) -> Bool = #| (v) => v === null
+@core.is_undefined(v)   // v === undefined
+@core.is_null(v)        // v === null
+@core.is_nullish(v)     // v == null  (null OR undefined)
+@core.nullable(opt)     // T? -> Any  (None becomes null/undefined per impl)
+@core.from_option(opt)  // T? -> Any
+@core.identity_option(v) // Any -> T?  (nullish-aware)
 ```
 
 If the contract never produces `null` (only `undefined`), `T?` is fine — confirm from the Phase 0 fixtures, don't assume.
@@ -79,4 +85,4 @@ These emit MoonBit-internal shapes into the generated `.d.ts` — fix at the bou
 1. `Int64`/`UInt64` in a signature → `.d.ts` shows `bigint`, not `number`.
 2. data-carrying `enum` → tagged-object type; replace with struct or constructor fns.
 3. `Map[K,V]`, `Result[_]`, `Json`, trait objects → internal runtime layout; convert to structs/arrays/`Any`.
-4. exported `async fn` → must show `Promise<T>` (needs `run_async` at the export — see `build-and-publish.md`).
+4. exported async returning `@core.Promise[T]` → `.d.ts` shows `any` (external type), even though JS receives a real `Promise`. Document the resolved type in a hand-maintained overlay `.d.ts` if consumers need `Promise<T>` (see `build-and-publish.md`).
