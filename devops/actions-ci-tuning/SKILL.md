@@ -198,10 +198,33 @@ on:
 - Use a comment with the human-readable version for readability:
 
 ```yaml
-uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 ```
 
 - Dependabot or Renovate can keep SHA pins up to date automatically. Check that `.github/dependabot.yml` includes the `github-actions` ecosystem.
+
+**Node.js 20 deprecation warning**: GitHub started issuing "Node.js 20 actions are deprecated" warnings in 2025/2026. This refers to the action's own runtime (`runs.using: node20`), not the project's Node version. Fix by upgrading to the first major version that uses `node24`:
+
+| action | node24-compatible version (as of 2026-05) |
+|---|---|
+| `actions/checkout` | v6.0.0+ |
+| `actions/setup-node` | v6.0.0+ |
+| `actions/cache` | v5.0.0+ |
+| `actions/upload-artifact` | v7.0.0+ |
+| `actions/download-artifact` | v8.0.0+ |
+| `aws-actions/configure-aws-credentials` | v6.0.0+ |
+
+Latest pinned SHAs (2026-05):
+```yaml
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+uses: aws-actions/configure-aws-credentials@99214aa6889fcddfa57764031d71add364327e59 # v6.1.3
+```
+
+Note: SHAs drift — always verify with `gh release view --repo <owner>/<action>` before pinning.
 
 ---
 
