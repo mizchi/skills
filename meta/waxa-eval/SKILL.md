@@ -227,7 +227,7 @@ The npm package bundles `references/empirical-prompt-tuning.md` so the methodolo
 
 `--baseline` runs every task twice per trial (with_skill and without_skill), then prints a Delta line and writes both configs into `iteration-N/<task-id>/`. This is the agentskills.io-style "does the skill body actually improve over a blank-slate model?" check. Skills that add tokens / latency without moving pass rate are visible here in a way they aren't in single-config runs.
 
-Per-iteration cost (claude-sonnet-4-6, 3 scenarios × 2 trials): ~3-5 minutes wall time. Run iterations sequentially; do not launch parallel `waxa` processes against the same eval (they fight for the API and the lockfile). Single-task runs (`--task <id>`) are useful for confirming a small change without re-running the whole suite.
+Per-iteration cost (claude-opus-4-8, 3 scenarios × 2 trials): ~3-5 minutes wall time. Run iterations sequentially; do not launch parallel `waxa` processes against the same eval (they fight for the API and the lockfile). Single-task runs (`--task <id>`) are useful for confirming a small change without re-running the whole suite.
 
 `trials_per_task: 2` is the floor — a single trial cannot distinguish "the skill is unstable" from "the LLM had a bad sample." Bump to 3 only if you suspect non-determinism on a critical axis.
 

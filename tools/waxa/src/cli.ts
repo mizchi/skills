@@ -639,7 +639,7 @@ async function runTask(
   skillBody: string,
   withSkill = true,
 ): Promise<TaskResult> {
-  const model = evalCfg.config?.model ?? "claude-sonnet-4-6";
+  const model = evalCfg.config?.model ?? "claude-opus-4-8";
   const timeout = evalCfg.config?.timeout_seconds ?? 300;
   const requireSelfReport = task.expected?.require_self_report !== false;
   const trialsPerTask = Math.max(1, evalCfg.config?.trials_per_task ?? 1);
@@ -1239,7 +1239,7 @@ config:
   timeout_seconds: 240
   parallel: false
   executor: claude
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
 
 tasks:
   - "tasks/*.yaml"

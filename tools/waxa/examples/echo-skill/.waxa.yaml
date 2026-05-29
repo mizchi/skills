@@ -3,5 +3,5 @@ paths:
   evals: evals/
   results: results/
 defaults:
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
   timeout: 60

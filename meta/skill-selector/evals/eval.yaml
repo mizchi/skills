@@ -24,7 +24,7 @@ config:
   # adapter once available) for real evaluation.
   executor: mock
   # claude CLI requires hyphenated form (waza tolerates dotted form).
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
 
 metrics:
   - name: phase1_first
