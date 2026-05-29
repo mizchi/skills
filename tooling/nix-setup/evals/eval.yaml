@@ -16,7 +16,7 @@ config:
   timeout_seconds: 300
   parallel: false
   executor: mock
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
 
 graders:
   - type: code

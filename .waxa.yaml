@@ -7,7 +7,7 @@ paths:
   results: results/
 defaults:
   engine: copilot-sdk
-  model: claude-sonnet-4.6
+  model: claude-opus-4-8
   timeout: 300
   parallel: false
   workers: 2

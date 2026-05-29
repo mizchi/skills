@@ -32,7 +32,7 @@ waxa iterate evals/echo-skill/eval.yaml --max 3
 
 # multi-model comparison (objective axes only — no LLM A-vs-B)
 waxa compare evals/echo-skill/eval.yaml \
-  --models claude-sonnet-4-6,claude-haiku-4-5-20251001
+  --models claude-opus-4-8,claude-haiku-4-5-20251001
 
 # A/B a candidate skill
 cp -r skills/echo-skill skills/echo-skill-v2

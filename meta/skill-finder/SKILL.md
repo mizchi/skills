@@ -118,7 +118,7 @@ config:
   timeout_seconds: 180
   parallel: false
   executor: claude-cli   # mock for smoke; claude-cli for real eval
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
 
 graders:
   - name: <task-specific>

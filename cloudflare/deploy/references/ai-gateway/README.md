@@ -50,7 +50,7 @@ const { text } = await generateText({
 const { text } = await generateText({
   model: gateway([
     openai('gpt-4o'),              // Try first
-    anthropic('claude-sonnet-4-5'), // Fallback
+    anthropic('claude-opus-4-8'), // Fallback
   ]),
   prompt: 'Hello'
 });
@@ -75,7 +75,7 @@ const client = new OpenAI({
 
 // Switch providers by changing model format: {provider}/{model}
 const response = await client.chat.completions.create({
-  model: 'openai/gpt-4o', // or 'anthropic/claude-sonnet-4-5'
+  model: 'openai/gpt-4o', // or 'anthropic/claude-opus-4-8'
   messages: [{ role: 'user', content: 'Hello!' }]
 });
 ```

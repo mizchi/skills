@@ -16,9 +16,9 @@ config:
   timeout_seconds: 360
   parallel: false
   # mock for smoke verification of the YAML structure; switch to claude-cli
-  # for real evaluation runs (model: claude-sonnet-4-6).
+  # for real evaluation runs (model: claude-opus-4-8).
   executor: mock
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
 
 tasks:
   - "tasks/*.yaml"

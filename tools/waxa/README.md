@@ -73,7 +73,7 @@ npx @mizchi/waxa <path/to/eval.yaml> --baseline
 npx @mizchi/waxa iterate <path/to/eval.yaml> [--max 5] [--task <task-id>]
 
 # Multi-model comparison (objective axes only — no LLM A-vs-B judge).
-npx @mizchi/waxa compare <path/to/eval.yaml> --models claude-sonnet-4-6,claude-opus-4-7
+npx @mizchi/waxa compare <path/to/eval.yaml> --models claude-opus-4-8,claude-opus-4-7
 
 # Skill A/B variant exploration (current vs experimental rewrite).
 npx @mizchi/waxa variant <path/to/eval.yaml> --base skill-current --candidate skill-rewritten
@@ -169,7 +169,7 @@ paths:
   evals: evals/
   results: results/
 defaults:
-  model: claude-sonnet-4-6
+  model: claude-opus-4-8
   timeout: 60
 ```
 
@@ -279,7 +279,7 @@ waxa will:
 - **Compare models** (objective axes only — no LLM A-vs-B):
 
   ```bash
-  waxa compare evals/echo-skill/eval.yaml --models claude-sonnet-4-6,claude-haiku-4-5-20251001
+  waxa compare evals/echo-skill/eval.yaml --models claude-opus-4-8,claude-haiku-4-5-20251001
   ```
 
 - **A/B a candidate skill rewrite**:
