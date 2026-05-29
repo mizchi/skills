@@ -106,3 +106,12 @@ shape_area({ kind: "tri", a: 1 });        // throws Error: unknown shape: tri
 - **Test the core directly** with ordinary MoonBit tests against the Phase 0 fixtures — no JS round-trip needed. Test the *adapter* through Node to confirm the contract.
 - **Keep the adapter dumb.** It marshals and delegates; it contains no business logic. If you're tempted to put a branch of real logic in the adapter, it belongs in the core.
 - **Refactor the core freely** once parity holds — its types are yours, not the contract's. Only the boundary signatures are frozen.
+
+## Worked examples (verified against the real npm packages)
+
+Two ports, run through this skill end-to-end, illustrate the two library classes from the triage step:
+
+- **semver (domain-logic → idiomatic core).** Core is `enum Ident { Num(Int); Alpha(String) }` + `struct SemVer` + a `match`-based `compare` implementing spec precedence; the boundary marshals `String`/`Any` only. **198/198** parity vs `semver@7.8.1` (full precedence chain, parse, valid, gt/lt/eq). Two lessons it surfaced, both now in the references:
+  - MoonBit `String` `<` orders by length, not lexicographically → prerelease comparison needed an explicit code-unit routine (`type-mapping.md`).
+  - The core method `SemVer::parse` collided with the exported boundary `parse`, producing a duplicate JS export → renamed the core method to `from_string` (`build-and-publish.md`).
+- **immer (runtime-mechanics → FFI wrapper).** Proxy copy-on-write lives entirely in an `extern "js"` body; the MoonBit layer is a thin `produce(base, recipe)` pass-through. **12/12** contract parity vs `immer@10`, including structural sharing (untouched subtrees keep referential identity) and recipe-return. There is essentially no idiomatic core to extract — and a MoonBit consumer wouldn't use immer at all, since `{ ..base, field: v }` is native. This is the triage signal that a library is runtime-mechanics: the port is correct but FFI-shaped, with nothing to pull down into typed core.

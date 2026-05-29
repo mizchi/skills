@@ -48,6 +48,21 @@ The contract governs **only the exported boundary**. Behind it, write the implem
 
 If `Any` or `_get`/`throw_error` shows up in a core module, the abstraction leaked — push it back out to the adapter. `Any` is a *bootstrapping and boundary* tool, never the destination: use it to get the port compiling, then pull the logic down into typed core modules. The boundary signatures are frozen by the contract; the core types are yours to refactor freely once parity holds.
 
+## Before You Port: Library Triage
+
+When the thing you're replacing is a *library*, run two checks before Phase 0 — they decide whether and how to port.
+
+**1. Does the library's reason-to-exist survive in MoonBit?** Many JS libraries exist to paper over a JS gap that MoonBit doesn't have (ergonomic immutable updates, structural deep-equal, tiny typed utilities). For a **MoonBit consumer**, the right move is often to *not port the library* and use the native idiom instead. Porting is justified when **existing JS consumers** must keep importing the same module — then you reproduce the contract even if MoonBit wouldn't need the library internally.
+
+**2. Classify the library — it predicts how much idiomatic core you'll get:**
+
+| Class | What it is | Port shape | Example (verified) |
+|---|---|---|---|
+| **Domain-logic** | parsing, algorithms, data transforms, validation | rich idiomatic core (`enum`/`match`/`struct`) + thin boundary — the Architecture pattern shines | **semver**: `enum Ident` / `struct SemVer` core + `match`-based precedence; 198/198 parity vs `semver@7.8.1` |
+| **Runtime-mechanics** | Proxy / getter-setter / prototype tricks, reflection, JS-engine behaviors | little-to-no idiomatic core; stays FFI-heavy in `extern "js"`. Consider whether to port at all | **immer**: Proxy copy-on-write in FFI; 12/12 contract parity (incl. structural sharing) vs `immer@10` — but no idiomatic core, and MoonBit needs no immer (`{ ..base, x: v }` is native) |
+
+If the library is runtime-mechanics **and** the consumer could be MoonBit, prefer exposing the native idiom over porting. If it's domain-logic, expect a clean core and proceed to Phase 0.
+
 ## The mizchi Toolkit Map
 
 Pick the binding layer by *surface*, not by habit. Full install lines and import paths are in `references/toolkit-map.md`.

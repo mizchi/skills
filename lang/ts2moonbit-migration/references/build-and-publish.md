@@ -98,6 +98,7 @@ Every difference is either a contract break to fix in MoonBit, or an intentional
 | `MoonBit`-prefixed internal type | leaked `Map`/`Result`/trait object | convert to plain struct / `Any` |
 | missing export | name not in `link.js.exports` | add it |
 | wrong export name | snake_case leaked | use `"snake:camel"` rename |
+| duplicate export (Node fails to load: `Duplicate export`) | an `exports` entry resolves to *both* a free `fn` and a same-named static method (e.g. `parse` matches boundary `parse` **and** `SemVer::parse`) | give the core method a distinct identifier (`SemVer::from_string`, `SemVer::cmp`) so only the boundary owns the exported name |
 
 ## npm packaging
 

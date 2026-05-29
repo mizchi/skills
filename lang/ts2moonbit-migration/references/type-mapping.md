@@ -11,9 +11,11 @@ Classify every field, parameter, and return by *meaning* before picking a MoonBi
 | `number` integer that can exceed 2^53 | `BigInt` (or `Int64`/`UInt64`) | ids, epoch-millis, bitfields. `Int64` surfaces in `.d.ts` as `bigint` |
 | `number` float | `Double` | use `Float` only if the contract is 32-bit |
 | `bigint` | `BigInt` / `Int64` | direct; `.d.ts` shows `bigint` |
-| `string` (human text / labels) | `String` | UTF-16; `String::length()` counts code units, not bytes |
+| `string` (human text / labels) | `String` | UTF-16; `String::length()` counts code units, not bytes. **`<`/`>` on `String` order by length first, not lexicographically** — see warning below |
 | `string` (binary, base64-decoded, protocol bytes) | `Bytes` | classify by meaning, not by TS type |
 | `Uint8Array` | `Bytes` / `FixedArray[Byte]` | no copy across the boundary |
+
+> **`String` comparison is not lexicographic.** MoonBit's `<`/`>`/`compare` on `String` order by **length first**, then content — so `"beta" < "alpha"` is `true` (4 < 5). JS string comparison (and most contracts: sort orders, semver identifiers, range keys) is lexicographic by code unit. When the contract depends on string ordering, write an explicit code-unit comparison (`a[i] < b[i]` over `UInt16`, shorter-is-less on a common prefix) instead of `<`. *(Found while porting `semver`: prerelease identifier precedence was inverted until switched to explicit comparison.)*
 
 > **`number` precision rule.** JS `number` is IEEE-754 double. `Int` is safe for `\|x\| < 2^31` arithmetic and round-trips for `\|x\| < 2^53`. Anything that can grow past 2^53 (snowflake ids, nanosecond timestamps) must be `BigInt` — but check the *contract*: if JS consumers pass/read a plain `number`, you may need to keep `Double` and document the precision ceiling rather than switch them to `bigint`.
 
