@@ -28,13 +28,16 @@ This skill ships **two** linters, with different cost / coverage trade-offs.
 - **select-star**: `SELECT *` (always over-fetch).
 - **double-wildcard-like**: `LIKE '%...%'` (full-table scan risk).
 
-Run:
+Run (this is the default first pass — start here before reaching for sqlfluff):
 
 ```bash
+# `scripts/` is relative to THIS skill's directory. From elsewhere, use the
+# absolute path, e.g. node "$CLAUDE_SKILLS_DIR/sql-lint/scripts/catalog-lint.mjs".
 node scripts/catalog-lint.mjs your-project/db/queries.sql
+echo "exit=$?"   # 0 = clean, 1 = findings — the exit code IS the pass/fail signal
 ```
 
-Exits 0 on clean / 1 on findings. Output is `file:line: [rule] message`, parseable by editor diagnostic gutters.
+Exits 0 on clean / 1 on findings. Output is `file:line: [rule] message`, parseable by editor diagnostic gutters. Note: for `select-star` and `double-wildcard-like`, the reported line is the query's `-- name:` header, not the offending SQL line.
 
 ### Layer 2: sqlfluff (optional, opt-in)
 
