@@ -1,6 +1,6 @@
 ---
 name: sql-security
-description: "SQL injection screening for host code (MoonBit / TS / Rust) plus secretlint setup notes. Flags any template-literal or string-concat SQL builder, regardless of value source — the scanner does not trace data flow, so every hit needs a manual review or an explicit `// sql-security: ok` opt-out."
+description: "SQL injection screening for host code (MoonBit / TS / Rust) plus secretlint setup notes. Flags single-line template-literal or string-concat SQL builders, regardless of value source — the scanner is line-based and does NOT trace data flow, so a clean scan is not proof of safety (multi-line template literals are missed) and every hit needs a manual review or an explicit `// sql-security: ok` opt-out."
 version: 0.1.0
 metadata:
   hermes:
@@ -30,6 +30,23 @@ The scanner walks the directory, ignores generated files (`db/gen/`, `sqlc_*.mbt
 The keyword match is **case-sensitive on purpose** — `from` / `where` / `join` appear constantly in English prose and would generate hundreds of false positives if matched case-insensitively.
 
 The scanner exits 1 on findings — every hit deserves a manual review even if it turns out to be safe.
+
+### Limitations — a clean scan is NOT proof of safety
+
+The scanner reads **one line at a time**. Its template-literal rule requires the opening backtick, the `${...}` placeholder, and the closing backtick to all sit on a **single physical line**. Consequences:
+
+- **Multi-line template literals are silently missed.** A query whose backtick opens on one line and whose `${value}` lands on a continuation line (a common formatting style) produces **zero findings and exit 0**, even though it is a genuine injection. Example the scanner does NOT catch:
+
+  ```ts
+  const sql = `
+    SELECT id FROM users
+    WHERE name = ${name}   // <-- real injection, not flagged
+  `;
+  ```
+
+- **Exit 0 means "no single-line hits found," never "safe."** When reviewing for SQL injection, also read any multi-line or programmatically-assembled SQL by hand; do not treat a clean scan as a pass. Fold a multi-line query onto one line if you want the scanner to see it.
+
+This is a deliberate cost/coverage trade-off (zero-dep, no parser), not a bug — but it is a blind spot you must compensate for in review.
 
 ## Reading the findings
 

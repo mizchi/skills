@@ -19,10 +19,13 @@ Use this for two recurring DBA review tasks:
 ## index-coverage.mjs
 
 ```bash
+# `scripts/` is relative to THIS skill's directory; from elsewhere use the
+# absolute path. `--out` is OPTIONAL — omit it and the report prints to stdout.
+# The printed report IS the deliverable; the file is just a persisted copy.
 node scripts/index-coverage.mjs \
   --schema your-project/db/schema.sql \
   --queries your-project/db/queries.sql \
-  --out your-project/.linters/index-coverage.txt
+  [--out your-project/.linters/index-coverage.txt]
 ```
 
 Output sections:
