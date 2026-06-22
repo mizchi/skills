@@ -28,8 +28,13 @@ apm install -g mizchi/skills/<category>/<skill-name>#v0.1.0
 
 These follow the open [Agent Skills](https://agentskills.io) format, so any
 compatible agent (Claude Code, Codex, opencode, Gemini CLI, Cursor, …) can use
-them without APM — each skill's README also shows a `npx degit` one-liner that
-drops the `SKILL.md` folder straight into the agent's skills directory.
+them without APM. Each skill's README shows a `npx skills add` command (the
+[`skills`](https://github.com/vercel-labs/skills) CLI, installs into every
+detected agent) and a raw `npx degit` folder copy as alternatives:
+
+```sh
+npx skills add mizchi/skills --skill <skill-name>
+```
 
 Every skill directory carries its own `README.md` with copy-paste install
 examples, generated from the skill's `SKILL.md` frontmatter. Regenerate them all

@@ -25,9 +25,16 @@ then run `apm install`.
 
 This is an [Agent Skills](https://agentskills.io) skill — a portable
 `SKILL.md` folder that works with Claude Code, Codex, opencode, Gemini CLI,
-Cursor, and other [compatible agents](https://agentskills.io/clients). Copy
-the folder into your agent's skills directory (`~/.claude/skills/` for user
-scope, `.claude/skills/` for a project):
+Cursor, and other [compatible agents](https://agentskills.io/clients).
+
+With the [`skills`](https://github.com/vercel-labs/skills) CLI (installs into
+every detected agent's skills directory):
+
+```bash
+npx skills add mizchi/skills --skill chezmoi-management
+```
+
+Or copy the folder in directly:
 
 ```bash
 npx degit mizchi/skills/tooling/chezmoi-management ~/.claude/skills/chezmoi-management
