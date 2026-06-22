@@ -26,6 +26,15 @@ Pin to a tag:
 apm install -g mizchi/skills/<category>/<skill-name>#v0.1.0
 ```
 
+Every skill directory carries its own `README.md` with a copy-paste install
+example, generated from the skill's `SKILL.md` frontmatter. Regenerate them all
+after editing any frontmatter:
+
+```sh
+pkf run gen:readme     # write / sync every skill README
+pkf run check:readme   # CI: verify they are in sync
+```
+
 ## Skills
 
 ### Frontend

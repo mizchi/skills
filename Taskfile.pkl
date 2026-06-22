@@ -22,12 +22,31 @@ local testFrontmatter: Task = new {
   }
 }
 
+local genReadme: Task = new {
+  name = "gen:readme"
+  description = "Generate / sync a boilerplate README.md next to each SKILL.md"
+  cmd = "ruby scripts/gen-skill-readme.rb"
+  cache = false
+}
+
+local checkReadme: Task = new {
+  name = "check:readme"
+  description = "Verify each skill README is in sync with its SKILL.md (CI)"
+  cmd = "ruby scripts/gen-skill-readme.rb --check"
+  inputs {
+    "**/SKILL.md"
+    "**/README.md"
+    "scripts/gen-skill-readme.rb"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
   deps {
     testFrontmatter
     checkFrontmatter
+    checkReadme
   }
 }
 
@@ -38,12 +57,15 @@ local preCommit: Task = new {
   cache = false
   deps {
     checkFrontmatter
+    checkReadme
   }
 }
 
 tasks {
   checkFrontmatter
   testFrontmatter
+  genReadme
+  checkReadme
   test
   preCommit
 }
