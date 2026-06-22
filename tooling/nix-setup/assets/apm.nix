@@ -42,6 +42,10 @@ stdenv.mkDerivation {
   buildInputs = lib.optionals stdenv.isLinux [
     stdenv.cc.cc.lib
     pkgs.zlib
+    # PyInstaller's bundled _ssl / _hashlib modules link libssl.so.3 /
+    # libcrypto.so.3. Without openssl here, autoPatchelf fails on Linux
+    # (macOS skips autoPatchelf so the gap is invisible there).
+    pkgs.openssl
   ];
 
   dontConfigure = true;

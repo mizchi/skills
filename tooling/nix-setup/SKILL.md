@@ -539,6 +539,11 @@ The Determinate installer is recommended. Doing it manually on Apple Silicon req
 
 Add `stdenv.cc.cc.lib` to `buildInputs`. The same fix used in `apm.nix`.
 
+For PyInstaller-bundled binaries (like apm), the embedded CPython `_ssl` /
+`_hashlib` modules also link `libssl.so.3` / `libcrypto.so.3` — add
+`pkgs.openssl` to `buildInputs` too. macOS skips `autoPatchelfHook`, so this
+gap only surfaces on Linux (e.g. in CI).
+
 ### Updating flake inputs
 
 ```bash
