@@ -26,8 +26,13 @@ Pin to a tag:
 apm install -g mizchi/skills/<category>/<skill-name>#v0.1.0
 ```
 
-Every skill directory carries its own `README.md` with a copy-paste install
-example, generated from the skill's `SKILL.md` frontmatter. Regenerate them all
+These follow the open [Agent Skills](https://agentskills.io) format, so any
+compatible agent (Claude Code, Codex, opencode, Gemini CLI, Cursor, …) can use
+them without APM — each skill's README also shows a `npx degit` one-liner that
+drops the `SKILL.md` folder straight into the agent's skills directory.
+
+Every skill directory carries its own `README.md` with copy-paste install
+examples, generated from the skill's `SKILL.md` frontmatter. Regenerate them all
 after editing any frontmatter:
 
 ```sh

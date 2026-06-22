@@ -5,11 +5,13 @@
 
 ## Install
 
+### APM (recommended)
+
 ```bash
 apm install mizchi/skills/frontend/review-state
 ```
 
-For a reproducible setup, declare it in `apm.yml` instead:
+Or declare it in `apm.yml` for a reproducible setup:
 
 ```yaml
 dependencies:
@@ -18,6 +20,18 @@ dependencies:
 ```
 
 then run `apm install`.
+
+### Any agentskills.io-compatible agent
+
+This is an [Agent Skills](https://agentskills.io) skill — a portable
+`SKILL.md` folder that works with Claude Code, Codex, opencode, Gemini CLI,
+Cursor, and other [compatible agents](https://agentskills.io/clients). Copy
+the folder into your agent's skills directory (`~/.claude/skills/` for user
+scope, `.claude/skills/` for a project):
+
+```bash
+npx degit mizchi/skills/frontend/review-state ~/.claude/skills/frontend-review-state
+```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.
 <!-- apm:readme:end -->
