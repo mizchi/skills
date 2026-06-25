@@ -38,7 +38,8 @@ moon ide outline src/parser.mbt
 ### Other Rules
 
 - Use `moon doc '<Type>'` to explore APIs before implementing
-- Check reference/configuration.md before editing moon.pkg.json / moon.mod.json
+- **Config format: prefer the DSL `moon.mod` / `moon.pkg`** over the deprecated-pending `moon.mod.json` / `moon.pkg.json`. `moon fmt` migrates JSON → DSL. Samples: `assets/moon.mod`, `assets/moon.pkg`. Check reference/configuration.md before editing either
+- **Multiple modules in one repo → use a workspace** (`moon.work`), not standalone modules. `moon work init <dirs>` creates the manifest; members share one build context and resolve each other locally. See reference/configuration.md "Workspace"
 - Check reference/language.md for detailed language feature examples (types, traits, pattern matching, etc.)
 - Check reference/mbtx.md for single-file `.mbtx` scripts (`moon run script.mbtx`, stdin via `moon run -`, inline `import { }` block; nightly only)
 
@@ -56,6 +57,11 @@ moon ide outline src/parser.mbt
 - **Legacy syntax**: `function_name!(...)` and `function_name(...)?` are deprecated
 - **`for { ... }` is deprecated** - use `for ;; { ... }` or `while true { ... }` for infinite loops
 - **Cross-package `.` syntax for `impl` removed** - `.` method call only works within the same package
+- **`trait`/`impl` methods now require the `fn` keyword (v0.10.0)** - `moon fmt` migrates old code; see "Traits and impl" below
+- **`try?` is deprecated (v0.10.0)** - use `Ok(expr) catch { e => Err(e) }` to get a `Result`
+- **Struct `fn new(..)` constructor removed (v0.10.0)** - use a user-defined constructor `fn Type::Type(..)`
+- **`immut/array` replaced by `immut/vector` (v0.9)** - update imports/deps; better performance
+- **`inspect` superseded by `debug_inspect` for snapshot tests (v0.9.2)** - `Show` for container types (`Array`/`Map`/`Set`/`Option`/`Result`/tuples) is deprecated; see "Snapshot Tests"
 
 ## Common Syntax Mistakes by AI
 
@@ -96,6 +102,62 @@ assert_true!(true)
 assert_true(true)
 ```
 
+### Traits and impl require `fn` (v0.10.0)
+
+```moonbit
+///| NG: method without fn (deprecated, warns then removed)
+trait I {
+  f(Self) -> Unit
+}
+impl I for Int with f(_) {}
+
+///| OK: fn keyword on both the trait method and the impl
+trait I {
+  fn f(Self) -> Unit
+}
+impl I for Int with fn f(_) {}
+```
+
+Polymorphic trait methods: the method's own type parameters go **after `fn`**,
+the impl's own type parameters stay after `impl`.
+
+```moonbit
+trait Logger {
+  fn[X : Show] write_object(Self, X) -> Unit
+}
+impl Logger for StringBuilder with fn write_object(self, x) {
+  self.write_string(x.to_string())
+}
+
+impl[A] Poly for Array[A] with fn[X] f(self, x : X) { ... }
+//   ^^^ impl type params                  ^^^ method type params
+```
+
+`moon fmt` rewrites old trait/impl syntax automatically.
+
+### Structs, Constructors, Methods
+
+The removed `fn new(..)` special form is replaced by a plain user-defined
+constructor `fn Type::Type(..)`. Methods take the receiver as `self : Self`.
+
+```moonbit
+///| Struct with derives
+struct Point {
+  x : Int
+  y : Int
+} derive(Eq, Debug)
+
+///| User-defined constructor (replaces removed `fn new`)
+fn Point::Point(x : Int, y : Int) -> Point {
+  { x, y }  // field-punning struct literal
+}
+
+///| Method: receiver `self : Self`, last expression is the return value
+fn Point::manhattan(self : Self) -> Int {
+  self.x.abs() + self.y.abs()
+}
+```
+
 ### Multi-line Text
 
 ```moonbit
@@ -122,19 +184,44 @@ Avoid consecutive `///|` at the file beginning as they create separate blocks.
 
 ## Snapshot Tests
 
-`moon test -u` auto-updates `content=""` in `inspect(val)`.
+`moon test -u` auto-fills the empty `content=""` of `inspect(val)` /
+`debug_inspect(val)`. **Which to use (v0.9.2+):**
+
+- **Primitives / strings** → `inspect` (`Show` is fine here)
+- **Container types** (`Array`/`Map`/`Set`/`Option`/`Result`/tuples) **and custom
+  types** → `debug_inspect`, because `Show` for these containers is deprecated and
+  `Debug` gives structured, indented output. Keep `Show` for human-facing
+  formatting only.
+
+Choose by the inspected expression's **static type**, not the runtime value:
+`Result[Int, _]` is a container even when it holds `Ok(123)`, and the rule
+propagates — to snapshot/assert a custom type (even nested inside a container) the
+custom type must `derive(Debug)`, and equality via `@debug.assert_eq` additionally
+needs `derive(Eq)`.
 
 ```moonbit
 test "snapshot" {
-  inspect([1, 2, 3], content="")  // auto-filled by moon test -u
+  inspect("hello", content="")          // primitive/string -> inspect
+  debug_inspect([1, 2, 3], content="")  // container -> debug_inspect
+}
+
+///| Custom type: derive Debug to snapshot, derive Eq to assert_eq
+struct P {
+  x : Int
+} derive(Eq, Debug)
+
+test "custom type" {
+  debug_inspect(P::{ x: 1 }, content="")
+  @debug.assert_eq(P::{ x: 1 }, P::{ x: 1 })
 }
 ```
 
-After running:
+After `moon test -u`:
 
 ```moonbit
 test "snapshot" {
-  inspect([1, 2, 3], content="[1, 2, 3]")
+  inspect("hello", content="hello")
+  debug_inspect([1, 2, 3], content="[1, 2, 3]")
 }
 ```
 
@@ -252,6 +339,50 @@ for x in xs; sum = 0 {
 for ;; { ... }
 ```
 
+## List Comprehensions (v0.9.2+)
+
+`[for .. => body]` builds an array; add `if <guard>` before `=>` to filter.
+The same shape typed as `Iter[T]` yields a lazy iterator instead of an array.
+
+```moonbit
+let evens = [for i in 0..<100 if i % 2 == 0 => i]
+
+///| With loop state (v0.10.0): carries p1/p2 across iterations
+let fibs = [
+  for _ in 0..<10
+      p1 = 1, p2 = 0
+      p1 = p1 + p2, p2 = p1 => p1
+]
+
+///| Typed as Iter -> lazy
+let fib_iter : Iter[Int] = [for p1 = 1, p2 = 0;; p1 = p1 + p2, p2 = p1 => p1]
+```
+
+## Template Write `<+` (v0.10.0)
+
+`buf <+ expr` appends to a `StringBuilder` — terser than `write_string`, pairs
+well with `$|` interpolation for building markup/strings.
+
+```moonbit
+let buf = StringBuilder()
+buf <+ "<ul>"
+for item in items {
+  buf <+ $|<li>\{item}</li>
+}
+buf <+ "</ul>"
+buf.to_string()
+```
+
+## Regex Match `=~` (v0.9+)
+
+Stable regex matching (`s =~ re"..."`) replaces the experimental `lexmatch?`,
+with different semantics — check `moon doc` / docs before relying on capture,
+prefix (`before~`), or suffix (`after~`) binding forms.
+
+```moonbit
+let matched = s =~ re"abc"
+```
+
 ## String Constants
 
 `const` supports string concatenation and interpolation (v0.8.3+):
@@ -282,13 +413,18 @@ fn parse(s: String) -> Int raise ParseError {
   ...
 }
 
-///| Convert to Result
-let result : Result[Int, ParseError] = try? parse(s)
+///| Convert to Result — `try?` is deprecated (v0.10.0)
+let result : Result[Int, ParseError] = Ok(parse(s)) catch { e => Err(e) }
 
-///| Handle with try-catch
-parse(s) catch {
+///| Single expression with a fallback: omit `try`
+let n = parse(s) catch { _ => 0 }
+
+///| Full form: `noraise` branch handles the success value
+let n = try parse(s) catch {
   ParseError::InvalidEof => -1
   _ => 0
+} noraise {
+  v => v
 }
 ```
 
@@ -310,6 +446,8 @@ See `assets/publish-to-npm.yaml` for a minimal release-triggered publish workflo
 
 ## Assets
 
+- `assets/moon.mod` — module config sample in the new DSL (replaces moon.mod.json)
+- `assets/moon.pkg` — package config sample in the new DSL (replaces moon.pkg.json)
 - `assets/ci.yaml` — GitHub Actions CI (curl installer)
 - `assets/ci-nix.yaml` — GitHub Actions CI with Nix (moonbit-overlay)
 - `assets/publish-to-npm.yaml` — release-triggered npm publish with MoonBit build and OIDC Trusted Publishing

@@ -1,0 +1,45 @@
+// moon.pkg — package configuration (new DSL, replaces the deprecated moon.pkg.json)
+//
+// One per package directory, alongside the .mbt files. Comments and trailing
+// commas are allowed. Convert an existing moon.pkg.json with `moon fmt`.
+
+// Normal imports. Add `@alias` after a path to import it under a short name.
+import {
+  "moonbitlang/core/builtin",
+  "username/project/util" @util,
+}
+
+// Test-only imports (the block may be empty). White-box variant: `for "wbtest"`.
+import {
+  "moonbitlang/core/test",
+} for "test"
+
+// Restrict this package to specific backends (optional, top-level)
+// supported_targets = "wasm"
+
+// Per-package warning tweaks (optional, top-level)
+// warnings = "-unused_value"
+
+options(
+  is_main: true,          // executable package containing `fn main`
+
+  // Conditional compilation: file -> backend conditions (and / or / not supported)
+  targets: {
+    "only_js.mbt": [ "js" ],
+    "native_only.mbt": [ "native" ],
+    "not_js.mbt": [ "not", "js" ],
+  },
+
+  // Backend link options
+  link: {
+    "js": {
+      "exports": [ "hello" ],
+      "format": "esm",       // esm (default) | cjs | iife
+    },
+  },
+
+  // Codegen step run before build (same shape as the legacy JSON form)
+  // "pre-build": [
+  //   { "input": "a.txt", "output": "a.mbt", "command": ":embed -i $input -o $output" },
+  // ],
+)

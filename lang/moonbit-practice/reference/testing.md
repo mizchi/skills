@@ -131,14 +131,12 @@ QuickCheck generates random test inputs automatically.
 
 ### Setup
 
-Add to `moon.pkg.json`:
+Add to `moon.pkg`:
 
-```json
-{
-  "test-import": [
-    "moonbitlang/quickcheck"
-  ]
-}
+```moonbit
+import {
+  "moonbitlang/quickcheck",
+} for "test"
 ```
 
 ### Basic Usage
