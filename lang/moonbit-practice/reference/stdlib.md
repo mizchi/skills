@@ -9,8 +9,8 @@ The standard library (`moonbitlang/core`) is **automatically available** - no ne
 ## Important Rules
 
 - ❌ **DO NOT** use `moon add moonbitlang/core/*`
-- ❌ **DO NOT** add to `"deps"` in `moon.mod.json`
-- ❌ **DO NOT** add to `"import"` in `moon.pkg.json`
+- ❌ **DO NOT** add it to the `import` block in `moon.mod` (module deps)
+- ❌ **DO NOT** add it to the `import` block in `moon.pkg` (package imports)
 - ✅ **DO** use directly: `@strconv.parse_int()`, `@json.parse()`, etc.
 
 ## Exploring the Standard Library
@@ -319,13 +319,11 @@ moon add moonbitlang/async
 
 ### Important: Import Required for async main/test
 
-To use `async fn main` or `async test`, you **must** import `moonbitlang/async` in your `moon.pkg.json`:
+To use `async fn main` or `async test`, you **must** import `moonbitlang/async` in your `moon.pkg`:
 
-```json
-{
-  "import": [
-    "moonbitlang/async"
-  ]
+```moonbit
+import {
+  "moonbitlang/async",
 }
 ```
 

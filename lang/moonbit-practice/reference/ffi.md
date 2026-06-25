@@ -167,7 +167,7 @@ extern "js" fn marked(input : String) -> String = "marked"
 
 #### Requirements
 
-- Must use `"format": "esm"` in `moon.pkg.json` link config
+- Must use `"format": "esm"` in the `moon.pkg` link config
 - Target must be JavaScript backend (`--target js`)
 
 #### Limitations
@@ -185,17 +185,17 @@ let cls = get_some_class()
 
 ## Exporting Functions
 
-Configure in `moon.pkg.json`:
+Configure in `moon.pkg`:
 
-```json
-{
-  "link": {
+```moonbit
+options(
+  link: {
     "js": {
-      "exports": ["add", "fib:fibonacci"],
-      "format": "esm"
-    }
-  }
-}
+      "exports": [ "add", "fib:fibonacci" ],
+      "format": "esm",
+    },
+  },
+)
 ```
 
 ## Callbacks

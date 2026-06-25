@@ -4,211 +4,171 @@ title: "MoonBit Configuration Reference"
 
 # MoonBit Configuration Reference
 
+> **Prefer the DSL formats `moon.mod` / `moon.pkg`.** The JSON formats
+> `moon.mod.json` / `moon.pkg.json` are deprecated-pending and kept only for
+> existing projects. New projects should use the DSL. Ready-to-copy samples live
+> at `assets/moon.mod` and `assets/moon.pkg`.
+
 ## File Structure
 
 ```
 my-project/
-├── moon.mod.json    # Module configuration (project-wide)
+├── moon.mod        # Module configuration, project-wide (new DSL)
 └── src/
-    ├── moon.pkg       # Package configuration (new format)
+    ├── moon.pkg    # Package configuration (new DSL)
     └── main.mbt
 ```
 
-## Migrating from moon.pkg.json to moon.pkg
+## Migrating from JSON to the DSL
 
-`moon.pkg.json` is being migrated to the custom syntax `moon.pkg`. Convert with:
+`moon fmt` converts both files to the DSL in place:
 
 ```bash
-NEW_MOON_PKG=1 moon fmt
+moon fmt          # converts moon.mod.json -> moon.mod and moon.pkg.json -> moon.pkg
 ```
 
-This converts `moon.pkg.json` to `moon.pkg`.
+The DSL adds comments, trailing commas, and a more concise syntax. Top-level
+settings use `key = value`; build-affecting settings go inside `options( ... )`.
 
-## moon.pkg (New Format)
+---
 
-Compared to JSON: supports comments, trailing commas, and more concise syntax.
-
-### Imports
+## moon.mod (Module Configuration, new DSL)
 
 ```moonbit
-// Basic import
+name = "username/project"
+
+version = "0.1.0"
+
+license = "MIT"
+
+repository = "https://github.com/username/project"
+
+description = "One-line description"
+
+keywords = [ "cli", "example" ]
+
+readme = "README.md"
+
+// Default backend: js | wasm | wasm-gc | native
+preferred_target = "js"
+
+// Warning/alert tweaks (- silences, + enables; by number or name)
+warnings = "-2"
+
+// Registry dependencies, version pinned inline with `@`
 import {
-  "moonbitlang/async/io",
-  "path/to/pkg" as @alias,
+  "moonbitlang/x@0.4.45",
 }
 
-// Test imports
-import "test" {
-  "path/to/pkg5",
-}
-
-// White-box test imports
-import "wbtest" {
-  "path/to/pkg7",
-}
-```
-
-### Options
-
-```moonbit
 options(
-  "is-main": true,
-  "bin-name": "name",
-  link: { "native": { "cc": "gcc" } },
+  source: "src",                              // source directory
+  // exclude: [ "examples", "_build" ],       // paths kept out of the published package
 )
 ```
 
-### Comparison with JSON
+Field mapping from the old JSON keys: `preferred-target` → `preferred_target`,
+`warn-list` → `warnings`, `source`/`deps` move into `options(...)` / the `import`
+block respectively.
 
-| Feature | JSON Format | moon.pkg Format |
-|---------|-------------|-----------------|
-| Comments | ❌ Not supported | ✅ Supported |
-| Trailing comma | ❌ Not supported | ✅ Supported |
-| Readability | Low (verbose) | High (concise) |
+### Path dependencies
 
-## moon.mod.json (Module Configuration)
+The JSON `"deps": { "myuser/mod2": { "path": "../mod2" } }` becomes a path entry in
+the `import` block; for cross-module work prefer a workspace (`moon.work`, below).
 
-### Required Fields
+---
+
+## moon.pkg (Package Configuration, new DSL)
+
+```moonbit
+// Imports; `@alias` after a path imports it under a short name
+import {
+  "moonbitlang/core/builtin",
+  "username/project/util" @util,
+}
+
+// Test-only imports (block may be empty). White-box variant: `for "wbtest"`.
+import {
+  "moonbitlang/core/test",
+} for "test"
+
+// Optional, top-level
+supported_targets = "wasm"
+warnings = "-unused_value"
+
+options(
+  is_main: true,                              // executable package with `fn main`
+
+  // Conditional compilation: file -> backend conditions
+  targets: {
+    "only_js.mbt": [ "js" ],
+    "not_js.mbt": [ "not", "js" ],
+    "js_release.mbt": [ "and", [ "js" ], [ "release" ] ],
+  },
+
+  // Backend link options
+  link: {
+    "js": { "exports": [ "hello" ], "format": "esm" },          // esm | cjs | iife
+    "wasm-gc": { "exports": [ "hello" ], "use-js-builtin-string": true },
+  },
+
+  // Codegen step before build (same shape as legacy JSON)
+  "pre-build": [
+    { "input": "a.txt", "output": "a.mbt", "command": ":embed -i $input -o $output" },
+  ],
+)
+```
+
+- Conditions: `wasm`, `wasm-gc`, `js`, `native`, `debug`, `release`. Operators:
+  `and`, `or`, `not`.
+- `is_main` and `"is-main"` are both accepted; prefer the unquoted `is_main`.
+- `:embed` converts a file to MoonBit source (`--text` / `--binary`, `--name`).
+
+---
+
+## Legacy JSON formats (existing projects only)
+
+Equivalent JSON for reference when reading older code. Run `moon fmt` to migrate.
+
+### moon.mod.json
 
 ```json
 {
   "name": "username/project-name",
-  "version": "0.1.0"
-}
-```
-
-### Dependencies
-
-```json
-{
+  "version": "0.1.0",
   "deps": {
     "moonbitlang/x": "0.4.6",
     "username/other": { "path": "../other" }
-  }
-}
-```
-
-### Metadata
-
-```json
-{
+  },
+  "source": "src",
   "license": "MIT",
   "repository": "https://github.com/...",
   "description": "...",
-  "keywords": ["example", "test"]
-}
-```
-
-### Source Directory
-
-```json
-{
-  "source": "src"
-}
-```
-
-### Target Specification
-
-```json
-{
-  "preferred-target": "js"
-}
-```
-
-### Warning Configuration
-
-```json
-{
+  "keywords": ["example"],
+  "preferred-target": "js",
   "warn-list": "-2-4",
   "alert-list": "-alert_1"
 }
 ```
 
-## moon.pkg.json (Package Configuration)
-
-### Main Package
+### moon.pkg.json
 
 ```json
 {
-  "is-main": true
-}
-```
-
-### Dependencies
-
-```json
-{
+  "is-main": true,
   "import": [
     "moonbitlang/quickcheck",
     { "path": "moonbitlang/x/encoding", "alias": "lib" }
   ],
-  "test-import": [...],
-  "wbtest-import": [...]
-}
-```
-
-### Conditional Compilation
-
-```json
-{
-  "targets": {
-    "only_js.mbt": ["js"],
-    "only_wasm.mbt": ["wasm"],
-    "not_js.mbt": ["not", "js"],
-    "debug_only.mbt": ["debug"],
-    "js_release.mbt": ["and", ["js"], ["release"]]
-  }
-}
-```
-
-Conditions: `wasm`, `wasm-gc`, `js`, `debug`, `release`
-Operators: `and`, `or`, `not`
-
-### Link Options
-
-#### JS Backend
-
-```json
-{
-  "link": {
-    "js": {
-      "exports": ["hello", "foo:bar"],
-      "format": "esm"
-    }
-  }
-}
-```
-
-format: `esm` (default), `cjs`, `iife`
-
-#### Wasm Backend
-
-```json
-{
-  "link": {
-    "wasm-gc": {
-      "exports": ["hello"],
-      "use-js-builtin-string": true
-    }
-  }
-}
-```
-
-### Pre-build
-
-```json
-{
+  "test-import": [],
+  "targets": { "only_js.mbt": ["js"] },
+  "link": { "js": { "exports": ["hello"], "format": "esm" } },
   "pre-build": [
-    {
-      "input": "a.txt",
-      "output": "a.mbt",
-      "command": ":embed -i $input -o $output"
-    }
+    { "input": "a.txt", "output": "a.mbt", "command": ":embed -i $input -o $output" }
   ]
 }
 ```
 
-`:embed` converts files to MoonBit source (`--text` or `--binary`)
+---
 
 ## Warning Numbers
 
@@ -221,25 +181,24 @@ Common ones:
 
 Check all: `moonc build-package -warn-help`
 
-## Workspace (moon.work)
+## Workspace (moon.work) — managing multiple modules
 
-Multiple modules can share a single build context via a workspace.
-
-### Workflow
+**When a repo holds more than one module, manage them with a workspace
+(`moon.work`)** instead of standalone modules. Members share one build context
+and `_build/` directory, resolve each other locally, and keep dependency versions
+in sync. See https://docs.moonbitlang.com/ja/latest/toolchain/moon/workspace.html
+(experimental).
 
 ```bash
-# 1. Create modules
-moon new --user myuser mod1
-moon new --user myuser mod2
+# Create the manifest with initial members in one step (paths are module dirs)
+moon work init mod1 mod2
 
-# 2. Initialize workspace (creates moon.work)
+# ...or init empty, then add members later
 moon work init
-
-# 3. Add modules to workspace
 moon work use mod1 mod2
 ```
 
-This generates `moon.work`:
+This generates `moon.work` at the repo root:
 
 ```
 members = [
@@ -248,48 +207,38 @@ members = [
 ]
 ```
 
+`moon check` / `moon test` / `moon build` run from the workspace root operate
+across all members.
+
+### Workspace commands (verified, moon 0.1.20260618)
+
+| Command | Description |
+|---------|-------------|
+| `moon work init [paths...]` | Create the `moon.work` manifest, optionally with initial member dirs |
+| `moon work use <paths...>` | Add module directories to the manifest |
+| `moon work sync` | Sync workspace dependency versions into member manifests |
+
 ### Cross-module imports
 
-Add a path dependency in the consumer's `moon.mod.json`:
-
-```json
-{
-  "deps": {
-    "myuser/mod2": { "path": "../mod2" }
-  }
-}
-```
-
-Then import in `moon.pkg`:
+Depend on a sibling member by its module name in the consumer's `moon.mod`
+`import` block, then import the package in `moon.pkg`:
 
 ```moonbit
+// in mod1/src/moon.pkg
 import {
   "myuser/mod2" @mod2,
 }
 ```
 
-Use in code:
-
 ```moonbit
-///|
 fn main {
   println(@mod2.hello())
 }
 ```
 
-Run with:
-
-```bash
-moon run mod1/cmd/main
-```
-
-### Workspace commands
-
-| Command | Description |
-|---------|-------------|
-| `moon work init` | Create `moon.work` manifest |
-| `moon work use <dirs>` | Add modules to workspace |
-| `moon work sync` | Sync dependency versions across members |
+Run a specific member from the workspace root with `moon run <member-dir>`
+(e.g. `moon run mod1`). Use `moon work sync` after changing versions to propagate
+them across members.
 
 ## References
 
