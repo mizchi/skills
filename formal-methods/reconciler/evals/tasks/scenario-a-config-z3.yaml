@@ -1,0 +1,84 @@
+# Scenario A (median) — campaign config consistency.
+id: formal-reconciler-config-z3-001
+name: Campaign targeting config consistency
+description: |
+  A product team has a trusted targeting document and a live config that appears
+  contradictory. The skill should select Z3/SMT, extract dead config and
+  boundary claims, and translate the result into PM/domain questions.
+
+tags:
+  - config
+  - z3
+  - smt
+  - dead-config
+
+inputs:
+  prompt: |
+    次の targeting 設定について、形式手法で何を確認すべきか整理して。
+
+    信頼してよい仕様ドキュメント:
+    - SummerPromo は「JP の 20-29 歳ユーザー」に出す。
+    - denylist に入っているユーザーには出さない。
+    - country が取れない/壊れている場合は fail-close。
+    - allowlist が空の場合の意味は未記載。
+
+    実装/config から観測できる挙動:
+    ```json
+    {
+      "campaign": "SummerPromo",
+      "include": { "country": ["JP"], "age": { "gte": 30, "lt": 30 } },
+      "exclude": { "country": ["JP"] },
+      "allowlist": []
+    }
+    ```
+
+    実際に Z3 のコード全部を書く必要はない。どの性質をどのツールで調べ、
+    反例/UNSAT が出たらドメインの言葉で何を確認するか、CI でどう守るかを出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: source_truth
+    type: text
+    config:
+      regex_match:
+        - "(仕様|ドキュメント|docs|expected|期待).*(config|実装|観測|implementation)|(config|実装|観測|implementation).*(仕様|ドキュメント|docs|expected|期待)"
+
+  - name: tool_choice_z3
+    type: text
+    config:
+      regex_match:
+        - "(Z3|SMT|satisfiability|充足|UNSAT)"
+
+  - name: detects_dead_config
+    type: text
+    config:
+      regex_match:
+        - "(dead config|充足不能|UNSAT|誰にも配信されない|到達不能|矛盾).*(JP|30|allowlist|deny|exclude)|(JP|30|allowlist|deny|exclude).*(dead config|充足不能|UNSAT|誰にも配信されない|到達不能|矛盾)"
+
+  - name: domain_questions
+    type: text
+    config:
+      regex_match:
+        - "(?is)(PM|domain|ドメイン|owner|オーナー|確認|質問|意図|未定義|決定).*?(20[-–]29|30|allowlist|denylist|fail-close|empty allowlist|空 allowlist)|(20[-–]29|30|allowlist|denylist|fail-close|empty allowlist|空 allowlist).*?(PM|domain|ドメイン|owner|オーナー|確認|質問|意図|未定義|決定)"
+
+  - name: ci_guard
+    type: text
+    config:
+      regex_match:
+        - "(?is)(CI|GitHub Actions|validator|検証|regression|回帰|guard|門番|property check|lint|schema).*?(Z3|SMT|config|設定|validator|schema)|(Z3|SMT|config|設定).*?(CI|GitHub Actions|validator|検証|regression|回帰|guard|門番|property check|lint|schema)"
+
+  - name: config_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. 信頼してよい仕様ドキュメントを期待契約、config/実装を観測事実として分けている
+        2. 入力->Bool の純粋述語/設定整合性なので Z3/SMT が適切だと選んでいる
+        3. TLA+ や Lean/Rocq を主道具にせず、使わない理由が少なくとも暗黙に正しい
+        4. `age.gte=30` かつ `age.lt=30`、include JP と exclude JP、空 allowlist の少なくとも 2 つを dead config/仕様未定義として扱っている
+        5. 「JP 20-29 に出すはずなのに誰にも出ない/JP が除外される」など、機械結果をドメインの言葉で説明している
+        6. CI の config validator、Z3 check、または regression guard として残す案がある
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

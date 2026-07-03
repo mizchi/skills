@@ -1,0 +1,82 @@
+# Scenario C (edge) — asynchronous idempotency and retry race.
+id: formal-reconciler-async-tla-p-001
+name: Payment idempotency under async record and retry
+description: |
+  An idempotency guarantee depends on operation ordering. The skill should
+  choose TLA+ or P, model interleavings, and translate the counterexample into a
+  product/platform decision.
+
+tags:
+  - tla
+  - p-language
+  - idempotency
+  - retry
+  - concurrency
+
+inputs:
+  prompt: |
+    決済 API の idempotency key について、ドキュメントと実装が噛み合っているかを形式手法で確認したい。
+
+    信頼してよい API ドキュメント:
+    - 同じ idempotency key の charge は at most once。
+    - タイムアウトしたクライアントが retry しても二重請求しない。
+    - サーバー再起動後も既に成功した charge は再実行しない。
+
+    実装から観測できる流れ:
+    1. request を受ける。
+    2. DB で idempotency key が記録済みか読む。
+    3. 未記録なら外部決済 provider に charge を送る。
+    4. provider 成功後、非同期 job が DB に key を記録する。
+    5. DB 記録前に client retry が来ることがある。
+    6. charge 成功後、記録 job の前に process crash することがある。
+
+    Z3 だけで済むのか、TLA+ や P が必要なのかも含めて判断して。
+    最小モデル、破れる不変条件、反例 trace をドメインの言葉でどう説明するか、回帰ガードを出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: source_truth
+    type: text
+    config:
+      regex_match:
+        - "(API ドキュメント|仕様|docs|expected|期待).*(実装|観測|implementation|flow)|(実装|観測|implementation|flow).*(API ドキュメント|仕様|docs|expected|期待)"
+
+  - name: tool_choice_temporal
+    type: text
+    config:
+      regex_match:
+        - "(TLA\\+|P 言語|P language|model check|モデル検査|interleaving|並行|時系列)"
+
+  - name: race_identified
+    type: text
+    config:
+      regex_match:
+        - "(TOCTOU|read-modify-write|race|レース|非同期|記録前|crash|retry).*(二重|double|at most once)|(二重|double|at most once).*(TOCTOU|read-modify-write|race|レース|非同期|記録前|crash|retry)"
+
+  - name: invariant_or_trace
+    type: text
+    config:
+      regex_match:
+        - "(AtMostOnce|at most once|不変条件|invariant|trace|反例).*(charge|請求|idempotency)"
+
+  - name: ci_guard
+    type: text
+    config:
+      regex_match:
+        - "(?is)(CI|GitHub Actions|regression|回帰|guard|検査|validator|property check).*?(TLA\\+|P 言語|P language|trace|モデル)|(TLA\\+|P 言語|P language|trace|モデル).*?(CI|GitHub Actions|regression|回帰|guard|検査|validator|property check)"
+
+  - name: async_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. API ドキュメントを期待契約、実装の流れを観測事実として分けている
+        2. retry/crash/非同期 job/interleaving の時間順序問題なので TLA+ または P を選んでいる
+        3. Z3 単独では「全順序・全 interleaving」の検査には不足すると説明している
+        4. Receive/ReadKey/ChargeProvider/RecordKey/Retry/Crash などの状態遷移または actor/message を最小モデルとして挙げている
+        5. AtMostOnceCharge が破れる trace を「初回 charge 成功、記録前 retry または crash、再 charge」のようにドメイン語で説明している
+        6. atomic conditional write、provider 側 idempotency key、transactional outbox、trace-checking、CI の model check のいずれかを regression guard/修正案として挙げている
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

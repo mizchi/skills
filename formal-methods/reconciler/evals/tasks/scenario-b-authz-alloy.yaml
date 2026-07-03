@@ -1,0 +1,86 @@
+# Scenario B (edge) — authorization relation sanity.
+id: formal-reconciler-authz-alloy-001
+name: Multi-tenant authorization relation sanity
+description: |
+  A role/action/resource implementation disagrees with docs. The skill should
+  treat docs as the expected contract, prefer Alloy or a relational SMT model,
+  and phrase counterexamples as domain-review questions.
+
+tags:
+  - authz
+  - alloy
+  - relation
+  - tenant-boundary
+
+inputs:
+  prompt: |
+    認可まわりの仕様と実装がずれていそう。形式手法でどう確認するか整理して。
+
+    信頼してよい仕様ドキュメント:
+    - Owner は自分の org 内の project と invoice を read できる。
+    - BillingAdmin は自分の org 内の invoice だけ read できる。
+    - BillingAdmin は project を read できない。
+    - Support override は請求調査用で、invoice read だけに限定する。
+    - どの role でも別 org の resource は read できない。
+
+    実装から観測できる擬似コード:
+    ```ts
+    function canRead(user, resource, action) {
+      if (user.role === "Owner") return true;
+      if (user.role === "BillingAdmin" &&
+          (action === "read_invoice" || action === "read_project")) return true;
+      if (user.supportOverride) return true;
+      return false;
+    }
+    ```
+
+    目的は「どのユーザーがどのリソースを読めるべきか」を人間が確認できる形にすること。
+    ツール選定、最小モデル、反例が出たときのドメイン質問、CI に残す性質を出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: source_truth
+    type: text
+    config:
+      regex_match:
+        - "(仕様|ドキュメント|docs|expected|期待).*(実装|観測|code|implementation)|(実装|観測|code|implementation).*(仕様|ドキュメント|docs|expected|期待)"
+
+  - name: tool_choice_relation
+    type: text
+    config:
+      regex_match:
+        - "(Alloy|relational|関係モデル|関係|Z3|SMT)"
+
+  - name: tenant_or_role_counterexample
+    type: text
+    config:
+      regex_match:
+        - "(BillingAdmin|Support|Owner).*(project|invoice|別 org|cross-tenant|tenant|org)|(project|invoice|別 org|cross-tenant|tenant|org).*(BillingAdmin|Support|Owner)"
+
+  - name: invariant_names
+    type: text
+    config:
+      regex_match:
+        - "(?is)(NoCrossTenant|No.*Billing|Only.*Invoice|invariant|不変条件|assert|P[1-4].*?(cross-org|billing|override|positive|org)|cross-org|override scope|billing/project|tenant)"
+
+  - name: ci_guard
+    type: text
+    config:
+      regex_match:
+        - "(?is)(CI|GitHub Actions|regression|回帰|guard|検査|validator|property check).*?(Alloy|Z3|認可|authz|policy)|(Alloy|Z3|認可|authz|policy).*?(CI|GitHub Actions|regression|回帰|guard|検査|validator|property check)"
+
+  - name: authz_semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. docs を期待契約、擬似コードを実装観測として分けている
+        2. user/role/action/resource/org の関係なので Alloy を第一候補、または Z3 の関係モデルを候補にしている
+        3. Lean/Rocq/Why3 のような定理証明支援をこの探索の第一候補にしていない
+        4. BillingAdmin が project を読める反例、Support override が invoice 以外や別 org を読める反例、Owner が別 org を読める反例のうち少なくとも 2 つを述べている
+        5. NoCrossTenantRead / NoBillingAdminProjectRead / SupportInvoiceOnly のようなドメイン語の性質名を提案している
+        6. ドメイン確認質問と CI/regression guard のどちらも含む
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

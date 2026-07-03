@@ -57,6 +57,16 @@ The core stance: the LLM proposes and repairs candidate models; the solver, mode
    - If unintended, file/fix a bug and keep the model/check in CI.
    - If unclear, produce the minimal witness and a domain-owner question.
 
+## Reporting Discipline
+
+Keep domain uncertainty separate from execution uncertainty:
+
+- Domain questions are part of the deliverable: undocumented empty values, missing fail-mode definitions, product-policy choices, or spec/code disagreements that need an owner decision.
+- Self-report unclear points are only for things that prevented you from applying this skill correctly, such as missing repository access, an unavailable referenced file, ambiguous user scope, or a verifier you could not run.
+- Do not mark an intentionally preserved domain question as a self-report unclear point. Put it in the ledger/domain-question section instead.
+- If the user asked for a model/check plan and did not provide a runnable repo or verifier runtime, planning the exact check is sufficient. Label traces or SAT/UNSAT expectations as planned/hand-derived, not machine-confirmed, and do not count the absence of an actual run as an unclear point.
+- If the user explicitly asked you to run the verifier and it is unavailable, then record that as a self-report unclear point or task blocker.
+
 ## LLM Role Boundary
 
 Use the LLM for:

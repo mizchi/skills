@@ -1,0 +1,152 @@
+eval: formal-methods-reconciler-eval
+skill: formal-methods-reconciler
+patterns:
+  - rule: >-
+      Keep domain uncertainty separate from executor uncertainty. Domain-owner
+      questions such as empty allowlist semantics or spec/code disagreement
+      belong in the deliverable ledger, not in self-report unclear points.
+    seen_in:
+      - 2
+      - 3
+      - 4
+    representative_issue: >-
+      Config and async scenarios initially counted intentional domain/runtime
+      gaps as unclear even when the requested deliverable was a plan.
+  - rule: >-
+      Surface graders for formal-methods outputs must allow equivalent domain
+      wording, property IDs, and English/Japanese variants; semantic LLM graders
+      decide whether the real contract is satisfied.
+    seen_in:
+      - 1
+      - 3
+      - 4
+    representative_issue: >-
+      Regex-only checks missed valid outputs such as "Domain questions",
+      "20–29", "P1 (cross-org)", and "SMT -> CI" ordering.
+  - rule: >-
+      For plan-only tasks without a runnable repo/toolchain, label traces or
+      SAT/UNSAT expectations as planned/hand-derived and provide exact commands
+      for CI; do not pretend the verifier was run.
+    seen_in:
+      - 4
+      - 6
+    representative_issue: >-
+      Async idempotency output correctly planned a TLA+ check, but one trial
+      treated the absence of a TLC run as executor uncertainty.
+iterations:
+  - iter: 0
+    timestamp: '2026-07-03T00:00:00.000Z'
+    scope: static description-body consistency and scenario authoring
+    overall_pass_rate: null
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Added real-use-case eval scenarios for config consistency, authz relations, and async idempotency.
+      - Checked that the skill description and body both require source-of-truth selection, tool choice, verifier boundary, and domain-language reconciliation.
+  - iter: 1
+    timestamp: '2026-07-03T06:03:00.000Z'
+    scope: baseline, config/Z3 scenario only
+    overall_pass_rate: 0.9
+    baseline_pass_rate: 1.0
+    delta: -0.1
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules:
+      - >-
+        Surface graders must not require CI/tool keywords in one fixed order or
+        one language when the semantic grader passes.
+    reseen_rules: []
+    actions:
+      - Broadened verifier-boundary and CI guard regexes to accept SAT/UNSAT, planned checks, and either word order.
+  - iter: 2
+    timestamp: '2026-07-03T06:12:00.000Z'
+    scope: baseline, config/Z3 scenario after grader repair
+    overall_pass_rate: 1.0
+    baseline_pass_rate: 0.85
+    delta: 0.15
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        Domain-owner questions are deliverable content, not executor unclear
+        points.
+    reseen_rules: []
+    actions:
+      - Added Reporting Discipline to SKILL.md so domain uncertainty is not counted as self-report uncertainty.
+  - iter: 3
+    timestamp: '2026-07-03T06:20:00.000Z'
+    scope: with_skill, config/Z3 scenario after reporting-discipline change
+    overall_pass_rate: 0.95
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules:
+      - >-
+        Domain-question regexes must accept English labels and typographic
+        ranges such as 20–29.
+    reseen_rules: []
+    actions:
+      - Broadened the config scenario domain-question grader.
+  - iter: 4
+    timestamp: '2026-07-03T06:27:00.000Z'
+    scope: with_skill, full three-scenario suite
+    overall_pass_rate: 0.983
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        Relation-policy outputs may name properties as P1/P2 with domain
+        labels instead of `NoCrossTenant*` identifiers.
+      - >-
+        Plan-only verifier tasks should distinguish planned traces from
+        machine-confirmed traces without treating the missing run as an
+        executor unclear point.
+    reseen_rules: []
+    actions:
+      - Broadened authz invariant/property-name grader.
+      - Added plan-only verifier reporting rule to SKILL.md.
+  - iter: 5
+    timestamp: '2026-07-03T06:31:00.000Z'
+    scope: with_skill, authz/Alloy targeted rerun
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed authz relation scenario passes 2/2 trials with unclear=0.
+  - iter: 6
+    timestamp: '2026-07-03T06:34:00.000Z'
+    scope: with_skill, async/TLA+/P targeted rerun
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed async idempotency scenario passes 2/2 trials with unclear=0.
+  - iter: 7
+    timestamp: '2026-07-03T06:48:00.000Z'
+    scope: with_skill, full three-scenario suite after all fixes
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed config/Z3, authz/relation, and async/TLA+/P scenarios all pass 2/2 trials in one full-suite run.
+convergence:
+  status: validated_once
+  rationale: >-
+    All three real-use-case scenarios pass in one full-suite run after fixes
+    with unclear=0. Run one more full suite and require another unclear=0 result
+    to satisfy the two-consecutive-run convergence rule.

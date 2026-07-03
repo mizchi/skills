@@ -1,0 +1,67 @@
+name: formal-methods-reconciler-eval
+description: |
+  Evaluation suite for formal-methods-reconciler.
+  Measures whether the skill turns realistic application correctness concerns
+  into:
+  - source-of-truth decisions
+  - extracted claims
+  - appropriate formal-methods tool choice
+  - minimum model/check plans
+  - verifier-as-oracle boundaries
+  - domain-language questions and regression guards
+
+skill: formal-methods-reconciler
+version: "1.0"
+
+config:
+  trials_per_task: 2
+  timeout_seconds: 420
+  parallel: false
+  executor: claude
+  model: claude-opus-4-8
+
+metrics:
+  - name: source_truth
+    weight: 0.15
+    threshold: 1.0
+    description: Trusted docs/specs and implementation observations are separated
+  - name: tool_choice
+    weight: 0.25
+    threshold: 1.0
+    description: The smallest appropriate formal tool is selected for the question shape
+  - name: minimum_model
+    weight: 0.20
+    threshold: 1.0
+    description: The proposed model strips plumbing and names claims/invariants/actions
+  - name: domain_translation
+    weight: 0.25
+    threshold: 1.0
+    description: Machine results are translated into domain-language counterexamples/questions
+  - name: lock_guard
+    weight: 0.15
+    threshold: 1.0
+    description: A regression guard or CI check is proposed
+
+graders:
+  - type: code
+    name: substantive_output
+    config:
+      assertions:
+        - "len(output) > 500"
+
+  - type: text
+    name: verifier_boundary
+    config:
+      regex_match:
+        - "(?is)(solver|model checker|verifier|prover|Z3|Alloy|TLA\\+|P 言語|P language|Dafny|MoonBit|Lean|Rocq|Why3|SAT|UNSAT|trace|反例|機械結果|機械).*?(decides|checks|verify|検査|判定|oracle|結果|返|見る|出力|証明)"
+
+  - type: self-report
+    name: self_report_complete
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_unclear: 1
+      max_retries: 2
+
+tasks:
+  - "tasks/*.yaml"
