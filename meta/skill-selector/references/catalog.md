@@ -205,6 +205,16 @@ The "Install" column may also be:
 
 ---
 
+## Formal Methods / Verification
+
+**Signals**: user asks about formal methods, Z3, Alloy, TLA+, P, Dafny, MoonBit prove, Lean, Rocq, specs-vs-code reconciliation, config consistency, authz soundness, model checking, proof obligations, or turning counterexamples into domain-owner questions
+
+| T | Skill | Install | Use when |
+|---|---|---|---|
+| T1 | formal-methods-reconciler | `mizchi/skills/formal-methods/reconciler` | Extract claims from docs/code/tests/config/logs, choose the smallest appropriate verifier/model checker/prover, and translate SAT/UNSAT/traces/proof failures into domain-language decisions and regression guards |
+
+---
+
 ## Process / Meta
 
 ### Skill / prompt authoring

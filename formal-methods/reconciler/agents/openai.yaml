@@ -1,0 +1,4 @@
+interface:
+  display_name: "Formal Methods Reconciler"
+  short_description: "仕様と実装の矛盾を形式手法で確認し台帳化するワークフロー"
+  default_prompt: "Use $formal-methods-reconciler to extract claims, choose a verification tool, and turn counterexamples into domain questions."

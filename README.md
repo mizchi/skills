@@ -124,6 +124,12 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | [review-image](ai/review-image/) | `ai/review-image` | Review screenshots or generated images with OpenRouter vision models via Deno scripts; includes a strict CI `pass|fail` wrapper for VRT prechecks. |
 | [vlmkit](ai/vlmkit/) | `ai/vlmkit` | Entry-point for `@mizchi/vlmkit` — VLM-driven frontend toolkit (visual regression, markup synthesis from screenshots, design-token / theme / a11y / i18n audits, 2-stage VLM+LLM CSS auto-repair). Routes to 5 detailed sub-skills shipped under the vlmkit repo's `.claude/skills/`. |
 
+### Formal Methods
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [formal-methods-reconciler](formal-methods/reconciler/) | `formal-methods/reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks; choose Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq and translate counterexamples into domain questions. |
+
 ### Tooling / Infra
 
 | Skill | Install path | Description |
