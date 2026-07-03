@@ -1,0 +1,95 @@
+id: formal-drift-config-code-001
+name: Config default changed in code but docs and Z3 model still say fail-close
+description: |
+  A config validator model says missing policy denies access. A code change
+  starts allowing access on missing policy. The skill should classify code drift
+  and translate the result into a domain question.
+
+tags:
+  - formal-methods
+  - drift
+  - config
+  - z3
+
+inputs:
+  prompt: |
+    既存の config model を維持する観点で drift を見たい。
+
+    claim_id: POLICY-MISSING-001
+
+    docs:
+    - policy document が missing / parse error / timeout の場合は fail-close。
+    - fail-close とは「対象 action を拒否する」こと。
+
+    Z3 model:
+    - `missingPolicy => allowed == false`
+    - expected result: UNSAT for `missingPolicy && allowed`
+
+    以前の CI:
+    - `z3 policy_model.py` は `UNSAT`。
+
+    今回の code diff:
+    ```ts
+    const policy = await loadPolicy(user)
+    if (!policy) {
+      return allow("temporary fallback")
+    }
+    return evaluate(policy, action)
+    ```
+
+    新しい model check:
+    - まだ走っていない。
+
+    ログ:
+    - `user=U1 action=export policy=missing decision=allow reason=temporary fallback`
+
+    これを仕様・コード・モデルの drift として分類し、ドメインの言葉で確認質問と
+    lock 更新案を出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: code_drift_classification
+    type: text
+    config:
+      regex_match:
+        - "(code-drift|実装.*drift|コード.*drift|implementation drift|regression)"
+
+  - name: fail_close_domain
+    type: text
+    config:
+      regex_match:
+        - "(?is)(missing|parse error|timeout|policy).*?(fail-close|拒否|deny)|(fail-close|拒否|deny).*?(missing|parse error|timeout|policy)"
+
+  - name: log_translation
+    type: text
+    config:
+      regex_match:
+        - "(?is)(U1|user).*?(export).*?(policy.*missing|missing policy).*?(allow|許可)|(allow|許可).*?(U1|user).*?(export)"
+
+  - name: not_run_status
+    type: text
+    config:
+      regex_match:
+        - "(not-run|未実行|log-confirmed|diff-inferred|machine-confirmed)"
+
+  - name: fix_target
+    type: text
+    config:
+      regex_match:
+        - "(?is)(意図しない|unintended|docs.*正|仕様.*正).*?(code|実装).*?(直す|fix)|(意図|intended).*?(docs|仕様|model|モデル).*?(更新|update)"
+
+  - name: semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. docs/Z3 model は fail-close、code/log は missing policy allow と分けている
+        2. model check は未実行なので machine-confirmed と言い切らず、log-confirmed/diff-inferred/not-run を分けている
+        3. code-drift または regression として分類している
+        4. "policy が missing の user が export を許可される" というドメイン文に翻訳している
+        5. temporary fallback を許すか、fail-close 契約を維持するかの domain question がある
+        6. Z3 check/CI/path filter/log replay/ledger のいずれかの lock 更新案がある
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

@@ -1,0 +1,62 @@
+name: formal-methods-drift-guard-eval
+description: |
+  Evaluation suite for formal-methods-drift-guard.
+  Measures whether the skill maintains an existing formal model by comparing
+  specs, code, and model artifacts, classifying drift, and translating machine
+  or diff evidence into domain-owner questions.
+
+skill: formal-methods-drift-guard
+version: "1.0"
+
+config:
+  trials_per_task: 2
+  timeout_seconds: 420
+  parallel: false
+  executor: claude
+  model: claude-opus-4-8
+
+metrics:
+  - name: triplet_mapping
+    weight: 0.20
+    threshold: 1.0
+    description: Spec, code, and model surfaces are mapped separately
+  - name: drift_classification
+    weight: 0.25
+    threshold: 1.0
+    description: Drift is classified before proposing fixes
+  - name: domain_translation
+    weight: 0.25
+    threshold: 1.0
+    description: Machine/diff results are translated into domain-language questions
+  - name: fix_target
+    weight: 0.15
+    threshold: 1.0
+    description: Proposed fix target preserves the source-of-truth boundary
+  - name: lock_update
+    weight: 0.15
+    threshold: 1.0
+    description: CI/ledger/expected-result maintenance is proposed
+
+graders:
+  - type: code
+    name: substantive_output
+    config:
+      assertions:
+        - "len(output) > 500"
+
+  - type: text
+    name: mentions_drift
+    config:
+      regex_match:
+        - "(?is)(spec|docs|仕様|code|実装|model|モデル).*?(drift|ズレ|乖離|stale|古い)|(drift|ズレ|乖離|stale|古い).*?(spec|docs|仕様|code|実装|model|モデル)"
+
+  - type: self-report
+    name: self_report_complete
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_unclear: 1
+      max_retries: 2
+
+tasks:
+  - "tasks/*.yaml"

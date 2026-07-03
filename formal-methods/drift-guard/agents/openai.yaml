@@ -1,0 +1,4 @@
+interface:
+  display_name: "Formal Methods Drift Guard"
+  short_description: "仕様・コード・モデルの drift を検出し台帳化"
+  default_prompt: "Use $formal-methods-drift-guard to compare specs, code, and formal models for drift and translate results into domain-owner questions."

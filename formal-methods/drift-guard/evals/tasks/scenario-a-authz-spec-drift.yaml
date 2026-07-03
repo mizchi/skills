@@ -1,0 +1,93 @@
+id: formal-drift-authz-spec-001
+name: Authz docs changed but model still encodes old settings rule
+description: |
+  A project already has an Alloy/Z3-style authz model and a CI job. Docs changed
+  to allow Support read-only settings access, but the model and code may not have
+  followed. The skill should classify drift and produce domain wording.
+
+tags:
+  - formal-methods
+  - drift
+  - authz
+  - alloy
+
+inputs:
+  prompt: |
+    すでに `AUTHZ-SETTINGS-001` というモデルと CI がある。
+    仕様・コード・モデルの drift を見て、ドメインオーナーに確認できる台帳にして。
+
+    以前の docs:
+    - Admin だけが Settings を開ける。
+
+    新しい docs diff:
+    - Support は read-only Settings を開ける。
+    - Support は write action はできない。
+
+    実装 diff:
+    ```ts
+    if (role === "Admin") return allow("settings:write")
+    if (role === "Support" && mode === "readonly") return allow("settings:read")
+    return deny()
+    ```
+
+    既存 model:
+    ```text
+    assertion NonAdminNeverAtSettings:
+      role != Admin => not Reachable(Settings)
+    expected: UNSAT
+    ```
+
+    CI 結果:
+    - `check NonAdminNeverAtSettings` が SAT に変わった。
+    - witness: `role = Support`, `mode = readonly`, `screen = Settings`
+
+    ここで、モデルをどう扱うべきか、仕様/コード/モデルのどこが drift したか、
+    ドメインの言葉で何を確認すべきかを出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: maps_triplet
+    type: text
+    config:
+      regex_match:
+        - "(?is)(以前の docs|新しい docs|仕様|spec).*?(実装|code).*?(model|モデル|CI)|(model|モデル|CI).*?(実装|code).*?(以前の docs|新しい docs|仕様|spec)"
+
+  - name: classifies_spec_or_model_drift
+    type: text
+    config:
+      regex_match:
+        - "(spec-drift|model-drift|decision-drift|仕様.*drift|モデル.*drift|drift class)"
+
+  - name: domain_wording_support
+    type: text
+    config:
+      regex_match:
+        - "(?is)(Support).*?(read-only|readonly|読み取り).*?(Settings|設定)|(Settings|設定).*?(Support).*?(read-only|readonly|読み取り)"
+
+  - name: does_not_silently_weaken
+    type: text
+    config:
+      regex_match:
+        - "(?is)(黙って|silently|単に).*?(弱め|weaken|緩め).*?(ない|do not|禁止)|domain owner|ドメインオーナー|確認"
+
+  - name: lock_update
+    type: text
+    config:
+      regex_match:
+        - "(?is)(CI|regression|guard|expected|台帳|ledger).*?(Support|read-only|readonly|Settings|設定)"
+
+  - name: semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. 仕様、実装、既存モデル/CI を分けて整理している
+        2. `NonAdminNeverAtSettings` が古い可能性を drift として扱っている
+        3. SAT witness を「Support が read-only Settings に到達できる」というドメイン文に翻訳している
+        4. その挙動が新 docs と一致するなら model を Support 例外付きに更新する、と判断している
+        5. write action は引き続き禁止すべき別 property として残す提案がある
+        6. CI/expected result/ledger の更新案がある
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

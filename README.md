@@ -129,6 +129,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | Skill | Install path | Description |
 | --- | --- | --- |
 | [formal-methods-reconciler](formal-methods/reconciler/) | `formal-methods/reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks; choose Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq and translate counterexamples into domain questions. |
+| [formal-methods-drift-guard](formal-methods/drift-guard/) | `formal-methods/drift-guard` | Maintain existing formal models by checking spec/code/model drift, classifying stale claims, and translating verifier changes into domain questions. |
 
 ### Tooling / Infra
 
