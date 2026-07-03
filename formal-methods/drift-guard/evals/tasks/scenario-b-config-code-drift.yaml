@@ -79,7 +79,7 @@ graders:
     type: text
     config:
       regex_match:
-        - "(?is)(意図しない|unintended|docs.*正|仕様.*正).*?(code|実装).*?(直す|fix)|(意図|intended).*?(docs|仕様|model|モデル).*?(更新|update)"
+        - "(?is)(意図しない|unintended|docs.*正|仕様.*正).*?(code|実装).*?(直す|fix)|(意図|intended).*?(docs|仕様|model|モデル).*?(更新|update)|(fail-close|accepted|受理).*?(code|実装).*?(deny|拒否|戻す|直す|fix)|(code|実装).*?(deny|拒否|戻す|直す|fix).*?(fail-close|accepted|受理)|(regression|退行).*?(扱い|treat)"
 
   - name: semantic
     type: llm

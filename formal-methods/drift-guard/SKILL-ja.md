@@ -36,6 +36,11 @@ property を黙って弱めて緑にしない。
    - model property: predicate、invariant、reachability、liveness、theorem、
      proof obligation のどれで表現しているか。
    - check command: その結果を決めるコマンドまたは CI job。
+   - domain rule が model より細かい粒度になった場合、それを executor
+     uncertainty として扱わない。`Reachable(Settings)` を `settings:read` と
+     `settings:write` に分けるのか、単一 state + capability relation にするのかを、
+     model/domain question として台帳に書く。owner が新しい抽象を受け入れるまで、
+     旧 coarse property は `model-drift` または `coverage-gap` として扱う。
 
 3. **安い drift check から走らせる。**
    - text/code diff: 関連 path の docs、code、model、fixture、expected result が変わったか。
@@ -56,6 +61,14 @@ property を黙って弱めて緑にしない。
    | `harness-drift` | tool version、CI、fixture、expected parser、path filter が壊れた | property を変えずに harness を直す |
    | `decision-drift` | 過去の domain decision が曖昧化または矛盾した | domain question を再オープン |
    | `coverage-gap` | claim が一面にしか存在しない | model/docs/tests/明示的 non-goal を追加 |
+
+   primary drift class は 1 つ選ぶ。基準は「どの surface が現在の accepted
+   domain rule から外れているか」であり、「どの surface が先に変わったか」
+   ではない。docs と code が新しい受理済みルールに同時に動き、model だけが
+   古いルールを encode しているなら、primary は `model-drift` とし、
+   spec/code の変更は driver として注記する。code だけが動き、docs と model が
+   まだ受理済みルールを encode しているなら `code-drift` とする。副次要因は
+   notes に書いてよいが、複数の primary class を並べて修正先を曖昧にしない。
 
 5. **機械結果をドメイン語へ翻訳する。**
    - 誰が何をできるのか、どの順序が受理されるのか、どの config が dead か、
@@ -108,6 +121,14 @@ epistemic_status:
 - 失敗コマンドや CI URL があるなら保存する。
 - domain uncertainty を self-report uncertainty に混ぜない。domain decision が
   無いことは成果物であり、この skill の失敗ではない。
+- model granularity の選択は、成果物で domain question として表現できるなら
+  self-report unclear point にしない。この skill を適用できない場合だけ self-report
+  を使い、model の抽象変更に review が必要な場合は ledger に書く。
+- verifier/check が明示的に未実行で、タスクが drift ledger を出すことなら、
+  それを self-report unclear point にしない。`current_machine_result: not-run` として
+  記録し、利用可能な証拠を `diff-inferred` / `log-confirmed` として分け、
+  実行すべき check を `lock_update` に書く。ユーザーが verifier 実行を明示的に求め、
+  その実行が失敗または不可能だった場合だけ self-report に置く。
 - model が赤いだけで古いと決めない。まず何が変わったか、その変更が意図かを問う。
 - verifier、trace-checker、test、明示 replay が確認していない限り、
   implementation が model を refine しているとは言わない。

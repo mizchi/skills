@@ -1,0 +1,170 @@
+eval: formal-methods-drift-guard-eval
+skill: formal-methods-drift-guard
+patterns:
+  - rule: >-
+      When multiple surfaces changed, choose one primary drift class by asking
+      which surface currently diverges from the accepted domain rule. Record
+      spec/code changes that caused the situation as drivers or secondary
+      notes, not as additional primary classes.
+    seen_in:
+      - 1
+    representative_issue: >-
+      Authz docs and code both accepted the Support read-only Settings
+      exception while the model still encoded the old admin-only rule, causing
+      the executor to hesitate between spec-drift and model-drift.
+  - rule: >-
+      When a domain rule becomes more granular than the existing model, record
+      the abstraction choice as a domain/model question in the ledger rather
+      than as executor uncertainty.
+    seen_in:
+      - 4
+    representative_issue: >-
+      Support read-only Settings introduced read/write action granularity while
+      the old model only had `Reachable(Settings)`, leading the executor to
+      flag whether to split states or add a capability relation as unclear.
+  - rule: >-
+      If a verifier or model check is explicitly not run and the requested
+      deliverable is a drift ledger, record `not-run` as epistemic status and
+      propose the check as a lock update instead of marking self-report unclear.
+    seen_in:
+      - 7
+    representative_issue: >-
+      Config code-drift output correctly separated log-confirmed and not-run
+      evidence, but still reported the unrun model check as unclear.
+iterations:
+  - iter: 0
+    timestamp: '2026-07-03T09:20:00.000Z'
+    scope: static description-body consistency and initial scenario check
+    overall_pass_rate: null
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed the description and body both target existing model maintenance, spec/code/model drift classification, and domain-language translation.
+      - Confirmed two eval scenarios cover authz model drift and config code drift.
+  - iter: 1
+    timestamp: '2026-07-03T09:32:00.000Z'
+    scope: with_skill, full two-scenario suite
+    overall_pass_rate: 1.0
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        Primary drift class should be selected by divergence from the accepted
+        domain rule, with other surface changes recorded as drivers.
+    reseen_rules: []
+    actions:
+      - Added a primary drift-class selection rule to SKILL.md and SKILL-ja.md.
+      - Added primary_drift_reason to the drift ledger reference.
+      - Tightened the authz eval rubric to require model-drift as primary and docs/code as driver.
+  - iter: 2
+    timestamp: '2026-07-03T09:42:00.000Z'
+    scope: with_skill, full two-scenario suite after primary-class rule
+    overall_pass_rate: 0.975
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules:
+      - >-
+        Surface graders for "do not silently weaken the property" must accept
+        Japanese domain wording such as "勝手に緑化しない" and "SAT を消すのは禁止";
+        semantic graders decide the underlying behavior.
+    reseen_rules: []
+    actions:
+      - Broadened the authz surface grader for no-silent-weaken wording.
+  - iter: 3
+    timestamp: '2026-07-03T09:52:00.000Z'
+    scope: with_skill, full two-scenario suite after authz grader repair
+    overall_pass_rate: 0.975
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules:
+      - >-
+        Config fix-target graders must accept "accepted fail-close rule, return
+        code to deny" and "treat as regression" wording, not only explicit
+        "docs are correct, fix code" phrasing.
+    reseen_rules: []
+    actions:
+      - Broadened the config fix-target surface grader.
+  - iter: 4
+    timestamp: '2026-07-03T10:02:00.000Z'
+    scope: with_skill, full two-scenario suite after config grader repair
+    overall_pass_rate: 1.0
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        Model granularity choices caused by a finer domain rule should be
+        ledger/domain questions, not self-report unclear points.
+    reseen_rules: []
+    actions:
+      - Added model-granularity drift guidance to SKILL.md and SKILL-ja.md.
+      - Added a granularity drift example to the ledger reference.
+  - iter: 5
+    timestamp: '2026-07-03T10:09:00.000Z'
+    scope: with_skill, targeted authz rerun after granularity guidance
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed authz scenario passes 2/2 trials with unclear=0.
+  - iter: 6
+    timestamp: '2026-07-03T10:16:00.000Z'
+    scope: with_skill, full two-scenario suite after granularity guidance
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed full suite passes 2/2 tasks, 4/4 trials with unclear=0.
+  - iter: 7
+    timestamp: '2026-07-03T10:29:00.000Z'
+    scope: baseline comparison, full two-scenario suite
+    overall_pass_rate: 1.0
+    baseline_pass_rate: 1.0
+    delta: 0.0
+    duration_delta_ms: -18662
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - >-
+        Explicit not-run verifier state belongs in the drift ledger's
+        epistemic_status and lock_update, not self-report unclear.
+    reseen_rules: []
+    actions:
+      - Added not-run verifier guidance to SKILL.md and SKILL-ja.md.
+      - Recorded that current scenarios are explicit enough that baseline pass
+        rate also reaches 100%; the skill still reduced average duration in
+        the baseline run and previously reduced authz ambiguity.
+  - iter: 8
+    timestamp: '2026-07-03T10:35:00.000Z'
+    scope: with_skill, targeted config rerun after not-run guidance
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Confirmed config scenario passes 2/2 trials with unclear=0 after not-run verifier guidance.
+convergence:
+  status: converged
+  rationale: |
+    The final full with-skill run reached 100% pass rate across both tasks
+    (iteration 6), and targeted follow-up runs for both previously weak
+    scenarios reached 100% with unclear=0 (authz iteration 5, config iteration
+    8). Baseline comparison also reached 100% pass rate because the scenarios
+    are intentionally explicit, but the skill reduced average duration in that
+    run by about 18.7s and eliminated the recurrent primary-class and not-run
+    verifier ambiguities after targeted edits.

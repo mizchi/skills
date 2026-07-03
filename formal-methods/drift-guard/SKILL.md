@@ -37,6 +37,12 @@ as a drift signal. Translate it into domain language before proposing a fix.
    - Model property: predicate, invariant, reachability, liveness, theorem, or
      proof obligation that represents the claim.
    - Check command: exact command or CI job that decides the model result.
+   - If the domain rule became more granular than the model, do not treat that
+     as executor uncertainty. Record the abstraction choice explicitly as a
+     model/domain question: for example, split `Reachable(Settings)` into
+     `settings:read` and `settings:write`, or keep one state plus a capability
+     relation. Classify the old coarse property as `model-drift` or
+     `coverage-gap` until the owner accepts the new abstraction.
 
 3. **Run the cheapest drift checks first.**
    - Text/code diff: did docs, code, model, fixtures, or expected-result files
@@ -59,6 +65,15 @@ as a drift signal. Translate it into domain language before proposing a fix.
    | `harness-drift` | Tool version, CI, fixtures, expected-output parser, or path filter broke | Fix harness without changing the property |
    | `decision-drift` | Previous domain decision is now ambiguous or contradicted | Re-open domain question |
    | `coverage-gap` | A claim exists on one surface but not the others | Add model, docs, tests, or explicit non-goal |
+
+   Choose one primary drift class. Base it on which surface currently diverges
+   from the accepted domain rule, not on which surface changed first. If docs
+   and code both intentionally moved to a new accepted rule while the model
+   still encodes the old rule, classify the primary drift as `model-drift` and
+   note the spec/code change as the driver. If code moved but docs and model
+   still encode the accepted rule, classify it as `code-drift`. Use secondary
+   notes for contributing factors, but do not leave the fix target ambiguous by
+   listing multiple primary classes.
 
 5. **Translate machine output to domain wording.**
    - Say who can do what, which order is accepted, which config is dead, which
@@ -114,6 +129,16 @@ Use `references/drift-ledger.md` for templates and examples.
 - Preserve the exact failing command or CI URL when available.
 - Do not collapse domain uncertainty into self-report uncertainty. A missing
   domain decision is an output, not a failure to use the skill.
+- Do not put model-granularity choices in self-report unclear points when the
+  deliverable can express them as domain questions. Use self-report only when
+  the skill cannot be applied; use the ledger when the model needs a reviewed
+  abstraction change.
+- Do not put an explicitly unrun verifier/check in self-report unclear points
+  when the task is to produce a drift ledger. Record it as
+  `current_machine_result: not-run`, add `diff-inferred` or `log-confirmed`
+  evidence where available, and propose the exact check as `lock_update`.
+  Only use self-report when the user explicitly asked you to run the verifier
+  and the run failed or was impossible.
 - Do not mark a model obsolete only because it is red. First ask what behavior
   changed and whether that change is intended.
 - Do not claim the implementation refines the model unless the verifier,

@@ -34,6 +34,11 @@ drift_class:
   spec-drift / code-drift / model-drift / harness-drift / decision-drift /
   coverage-gap.
 
+primary_drift_reason:
+  Why this one class is primary when multiple surfaces changed. Say which
+  surface diverges from the accepted domain rule and which changes are only
+  drivers or secondary notes.
+
 witness:
   Smallest input, relation instance, event trace, log trace, or proof failure.
 
@@ -99,6 +104,11 @@ model-drift:
   Product accepted preview users last month and docs/code changed, but the model
   still encodes the old rule.
 
+model-drift with spec/code driver:
+  Docs and code both now accept Support read-only Settings access, but the model
+  still says every non-admin Settings reachability is impossible. Primary class
+  is model-drift; the docs/code change is the driver, not a second primary class.
+
 harness-drift:
   The solver version changes output formatting and the parser marks a passing
   check as failed.
@@ -108,6 +118,12 @@ decision-drift:
 
 coverage-gap:
   Docs define timeout behavior, but no model or test mentions timeout.
+
+granularity drift:
+  Docs refine "can open Settings" into "can read Settings but cannot write",
+  while the model still has only `Reachable(Settings)`. Record whether the
+  model should split read/write states or keep one state plus a capability
+  relation as a domain question; do not hide the choice in self-report.
 ```
 
 ## Fix Target Wording
