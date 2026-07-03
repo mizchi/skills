@@ -12,6 +12,9 @@ description: 形式モデルや検証 CI がすでに存在し、それを継続
 先に `formal-methods-reconciler` を使う。この skill は、Z3 / Alloy / TLA+
 / P / Dafny / MoonBit / Lean / Rocq などのチェック、CI の verifier job、
 モデル台帳、または過去に lock したドメイン判断がある前提で始める。
+初回の claim 抽出、tool selection、initial model design には
+`formal-methods-reconciler` を使い、継続的な drift maintenance にはこの
+skill を使う。
 
 ## 基本ルール
 

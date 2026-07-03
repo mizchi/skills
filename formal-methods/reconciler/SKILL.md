@@ -9,6 +9,11 @@ Use this skill to turn a vague correctness concern into a small formal-methods c
 
 The core stance: the LLM proposes and repairs candidate models; the solver, model checker, verifier, or proof assistant decides; the final result is translated back into domain language for a human decision.
 
+This is the first-modeling and reconciliation skill. If a useful formal model,
+CI verifier, expected result, or locked domain decision already exists and the
+task is to keep it aligned with later spec/code/log changes, switch to
+`formal-methods-drift-guard`.
+
 ## Workflow
 
 1. **Choose the source of truth.**

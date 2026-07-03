@@ -1,0 +1,3 @@
+expected_success_regex = "Model checking completed\\. No error has been found\\."
+current_parser_result = fail
+semantic_result = No error has been found

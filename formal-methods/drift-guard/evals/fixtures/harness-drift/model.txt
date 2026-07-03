@@ -1,0 +1,2 @@
+INVARIANT NoDuplicateProcess
+PROPERTY EventuallyProcessed

@@ -1,0 +1,112 @@
+id: formal-drift-harness-fixture-001
+name: TLC output parser changed while the semantic invariant result stayed green
+description: |
+  A fixture-style holdout where the model and domain claim did not change, but
+  a CI parser expects old TLC wording. The skill should classify harness-drift
+  and avoid weakening the model property.
+
+tags:
+  - formal-methods
+  - drift
+  - holdout
+  - fixture
+  - tla
+  - harness
+
+inputs:
+  prompt: |
+    既存の TLA+ モデル `JOB-DELIVERY-001` の CI が赤くなった。
+    waxa executor は外部 fixture ファイルを読めないので、下の fixture 抜粋だけを根拠に
+    仕様・コード・モデル・harness の drift を分類して、ドメインオーナーに確認できる台帳にして。
+
+    Fixture: spec.md
+    ```md
+    # Worker delivery contract
+    - queued job は、worker crash と retry があっても eventually processed になる。
+    - 同じ job id は processed を 1 回だけ記録する。
+    ```
+
+    Fixture: JobDelivery.tla
+    ```tla
+    INVARIANT NoDuplicateProcess
+    PROPERTY EventuallyProcessed
+    ```
+
+    Fixture: ci-old.log
+    ```text
+    TLC2 Version 2.18
+    Model checking completed. No error has been found.
+    States generated: 184
+    ```
+
+    Fixture: ci-new.log
+    ```text
+    TLC2 Version 2.20
+    Finished in 3s at depth 12.
+    No error has been found.
+    States generated: 184
+    ```
+
+    Fixture: parser rule
+    ```text
+    expected_success_regex = "Model checking completed\\. No error has been found\\."
+    current_parser_result = fail
+    semantic_result = No error has been found
+    ```
+
+    変更 diff:
+    - docs: 変更なし
+    - app code: 変更なし
+    - TLA+ model: 変更なし
+    - CI image: `tlaplus/tlc:2.18` から `tlaplus/tlc:2.20`
+    - parser: 古い success 文言だけを見ている
+
+    property を変えて緑にするべきか、harness を直すべきか、台帳形式で出して。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: classifies_harness_drift
+    type: text
+    config:
+      regex_match:
+        - "(harness-drift|harness.*drift|CI.*parser|parser.*CI|パーサ|ハーネス)"
+
+  - name: preserves_property
+    type: text
+    config:
+      regex_match:
+        - "(?is)(property|invariant|NoDuplicateProcess|EventuallyProcessed|モデル).*?(変えない|弱めない|do not|unchanged|preserve)|(harness|parser|CI).*?(直す|fix|更新)"
+
+  - name: semantic_result_not_red_property
+    type: text
+    config:
+      regex_match:
+        - "(?is)(No error has been found).*?(semantic|意味|成功|green|通っている)|(semantic|意味).*?(No error has been found)"
+
+  - name: domain_wording
+    type: text
+    config:
+      regex_match:
+        - "(?is)(queued job|job|ジョブ).*?(processed|処理).*?(eventually|最終的|1 回|duplicate|重複)|(processed|処理).*?(job|ジョブ)"
+
+  - name: lock_update
+    type: text
+    config:
+      regex_match:
+        - "(?is)(expected|regex|parser|パーサ|CI image|pin|tool version|TLC).*?(更新|fix|直す|lock|固定)"
+
+  - name: semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 6 項目をすべて満たしているか?
+        1. docs/code/model は変更なし、CI image/parser だけが変わったと整理している
+        2. semantic result は `No error has been found` なので property violation と言い切っていない
+        3. primary drift class を `harness-drift` としている
+        4. `NoDuplicateProcess` / `EventuallyProcessed` を弱めず、parser/expected regex/tool pin を直す提案をしている
+        5. ドメイン語では「job は最終的に処理され、同じ job は重複処理されない契約は維持」と説明している
+        6. `machine-confirmed` と CI parser failure を分けて ledger に出している
+        全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

@@ -1,0 +1,108 @@
+id: formal-drift-incident-trace-fixture-001
+name: Incident trace shows a duplicate external charge before trace replay exists
+description: |
+  A fixture-style holdout where docs and model state an idempotency contract,
+  but an incident log shows two external charges for the same request id. The
+  skill should separate log evidence from unrun model replay and propose a lock
+  update.
+
+tags:
+  - formal-methods
+  - drift
+  - holdout
+  - fixture
+  - incident
+  - trace
+  - payments
+
+inputs:
+  prompt: |
+    `PAYMENT-IDEMPOTENCY-001` はすでに P model と CI monitor がある。
+    incident trace を見て、仕様・コード・モデル・ログの drift を台帳にして。
+    waxa executor は外部 fixture ファイルを読めないので、下の fixture 抜粋だけを根拠にする。
+
+    Fixture: docs.md
+    ```md
+    # Payment idempotency
+    - 同じ requestId について external PSP charge は最大 1 回。
+    - retry は許されるが、2 回目以降は既存 charge result を返す。
+    ```
+
+    Fixture: Payment.p
+    ```p
+    spec NoDoubleCharge observes eExternalCharge {
+      // violation when the same requestId is charged twice
+    }
+    ```
+
+    Fixture: previous-ci.log
+    ```text
+    PChecker finished: 0 safety violations, 0 liveness violations
+    ```
+
+    Fixture: incident-trace.log
+    ```text
+    2026-06-28T10:00:01Z requestId=req-9 event=AuthorizeStarted
+    2026-06-28T10:00:02Z requestId=req-9 event=ExternalCharge pspChargeId=ch_1
+    2026-06-28T10:00:03Z requestId=req-9 event=WorkerTimeout
+    2026-06-28T10:00:04Z requestId=req-9 event=RetryScheduled
+    2026-06-28T10:00:05Z requestId=req-9 event=ExternalCharge pspChargeId=ch_2
+    ```
+
+    現状:
+    - incident trace replay harness はまだ無い。
+    - P model の random schedule check は前回 green。
+    - docs と model property は「同じ requestId は 1 charge」を主張している。
+    - code diff はまだ読めていない。
+
+    この時点で何を machine-confirmed / log-confirmed / not-run と言うべきか。
+    domain owner にはどんな言葉で確認し、次の lock 更新は何にするべきか。
+
+expected:
+  outcomes:
+    - type: task_completed
+
+graders:
+  - name: duplicate_charge_domain
+    type: text
+    config:
+      regex_match:
+        - "(?is)(requestId|req-9).*?(2 回|二重|duplicate|twice).*?(charge|課金|決済|ExternalCharge)|(charge|課金|決済).*?(req-9|requestId).*?(2 回|二重|duplicate|twice)"
+
+  - name: separates_epistemic_status
+    type: text
+    config:
+      regex_match:
+        - "(log-confirmed|ログ確認|not-run|未実行|machine-confirmed|diff-inferred)"
+
+  - name: does_not_claim_replay_ran
+    type: text
+    config:
+      regex_match:
+        - "(?is)(trace replay|replay harness|再生).*?(まだ|not-run|未実行|無い|ない)|(not-run|未実行).*?(trace replay|replay harness|再生)"
+
+  - name: drift_class_or_gap
+    type: text
+    config:
+      regex_match:
+        - "(code-drift|coverage-gap|model/code gap|trace.*gap|log-confirmed|primary)"
+
+  - name: lock_update_trace_replay
+    type: text
+    config:
+      regex_match:
+        - "(?is)(trace replay|replay harness|ログ.*再生|incident trace).*?(CI|lock|追加|guard|regression|monitor)"
+
+  - name: semantic
+    type: llm
+    config:
+      rubric: |
+        deliverable は次の 7 項目をすべて満たしているか?
+        1. docs/model は同じ requestId の external charge 最大 1 回を主張していると整理している
+        2. incident trace は `req-9` に `ch_1` と `ch_2` が出たことを、同じ requestId の二重 charge と翻訳している
+        3. incident trace は `log-confirmed`、trace replay harness は `not-run` と分けている
+        4. P の前回 green だけで「実装は model を refine している」と言い切っていない
+        5. code diff 未確認なので primary class を断定しすぎず、少なくとも code-drift 候補または model/code gap/coverage-gap として扱っている
+        6. domain owner への質問が「retry 後に外部 charge を再発行してよいか」などの業務語で書かれている
+        7. incident trace replay を CI/regression guard に追加する lock 更新案がある
+        全 7 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

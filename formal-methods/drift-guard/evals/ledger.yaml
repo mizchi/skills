@@ -158,13 +158,27 @@ iterations:
     reseen_rules: []
     actions:
       - Confirmed config scenario passes 2/2 trials with unclear=0 after not-run verifier guidance.
+  - iter: 9
+    timestamp: '2026-07-03T14:17:00.000Z'
+    scope: with_skill, holdout fixture suite
+    overall_pass_rate: 1.0
+    new_unclear_count: 0
+    reseen_count: 0
+    total_unclear: 0
+    new_rules: []
+    reseen_rules: []
+    actions:
+      - Added holdout eval entrypoint with fixture-style harness-drift and incident-trace scenarios.
+      - Confirmed holdout suite passes 2/2 tasks, 4/4 trials with unclear=0.
 convergence:
   status: converged
   rationale: |
     The final full with-skill run reached 100% pass rate across both tasks
     (iteration 6), and targeted follow-up runs for both previously weak
     scenarios reached 100% with unclear=0 (authz iteration 5, config iteration
-    8). Baseline comparison also reached 100% pass rate because the scenarios
-    are intentionally explicit, but the skill reduced average duration in that
-    run by about 18.7s and eliminated the recurrent primary-class and not-run
-    verifier ambiguities after targeted edits.
+    8). A separate holdout fixture suite also reached 100% across two unseen
+    maintenance cases (iteration 9): harness-only parser drift and incident log
+    replay planning. Baseline comparison also reached 100% pass rate because
+    the scenarios are intentionally explicit, but the skill reduced average
+    duration in that run by about 18.7s and eliminated the recurrent
+    primary-class and not-run verifier ambiguities after targeted edits.

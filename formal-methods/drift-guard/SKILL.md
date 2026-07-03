@@ -12,6 +12,8 @@ This is not the first-modeling skill. If no useful model exists yet, use
 `formal-methods-reconciler` first. This skill starts after at least one of
 these exists: a Z3/Alloy/TLA+/P/Dafny/MoonBit/Lean/Rocq check, a CI verifier
 job, a model ledger, or a domain decision that was previously locked.
+Use `formal-methods-reconciler` for first extraction, tool selection, and
+initial model design; use this skill for ongoing drift maintenance.
 
 ## Core Rule
 

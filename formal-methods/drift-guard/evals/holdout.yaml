@@ -1,0 +1,61 @@
+name: formal-methods-drift-guard-holdout
+description: |
+  Hold-out evaluation suite for formal-methods-drift-guard.
+  These tasks use fixture-style excerpts and are kept outside the main eval
+  set so prompt tuning can be checked against unseen maintenance cases.
+
+skill: formal-methods-drift-guard
+version: "1.0"
+
+config:
+  trials_per_task: 2
+  timeout_seconds: 420
+  parallel: false
+  executor: claude
+  model: claude-opus-4-8
+
+metrics:
+  - name: fixture_mapping
+    weight: 0.20
+    threshold: 1.0
+    description: Fixture excerpts are mapped to spec/code/model/harness surfaces
+  - name: primary_drift_class
+    weight: 0.25
+    threshold: 1.0
+    description: A single primary drift class is chosen with a reason
+  - name: domain_translation
+    weight: 0.25
+    threshold: 1.0
+    description: Machine/log evidence is translated into domain language
+  - name: epistemic_status
+    weight: 0.15
+    threshold: 1.0
+    description: Machine-confirmed, log-confirmed, diff-inferred, and not-run are separated
+  - name: lock_update
+    weight: 0.15
+    threshold: 1.0
+    description: Maintenance action is proposed without weakening the property
+
+graders:
+  - type: code
+    name: substantive_output
+    config:
+      assertions:
+        - "len(output) > 600"
+
+  - type: text
+    name: mentions_fixture_or_trace
+    config:
+      regex_match:
+        - "(?is)(fixture|抜粋|trace|ログ|CI|harness|parser|パーサ)"
+
+  - type: self-report
+    name: self_report_complete
+    config:
+      require_present: true
+      require_all_phases_ok: true
+      max_unclear: 1
+      max_retries: 2
+
+tasks:
+  - "holdouts/*.yaml"

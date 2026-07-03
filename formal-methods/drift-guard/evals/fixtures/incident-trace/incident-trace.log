@@ -1,0 +1,5 @@
+2026-06-28T10:00:01Z requestId=req-9 event=AuthorizeStarted
+2026-06-28T10:00:02Z requestId=req-9 event=ExternalCharge pspChargeId=ch_1
+2026-06-28T10:00:03Z requestId=req-9 event=WorkerTimeout
+2026-06-28T10:00:04Z requestId=req-9 event=RetryScheduled
+2026-06-28T10:00:05Z requestId=req-9 event=ExternalCharge pspChargeId=ch_2
