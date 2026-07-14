@@ -1,6 +1,6 @@
 ---
 name: moonbit-practice
-description: MoonBit code generation best practices. Use when writing MoonBit code to avoid common AI mistakes with syntax, tests, and benchmarks.
+description: MoonBit code generation and packaging best practices. Use when writing MoonBit code to avoid common AI mistakes with syntax, tests, and benchmarks, or when defining and publishing a Wasm executable with SKILL.md for the MoonBit Skills Marketplace.
 ---
 
 # MoonBit Practice Guide
@@ -33,15 +33,16 @@ moon ide outline src/parser.mbt
 **Why:**
 - `moon ide` provides semantic search (distinguishes definitions from call sites)
 - grep picks up comments and strings
-- `moon doc` quickly reveals APIs
+- `moon ide doc` quickly reveals APIs
 
 ### Other Rules
 
-- Use `moon doc '<Type>'` to explore APIs before implementing
+- Use `moon ide doc '<Type>'` to explore APIs before implementing
 - **Config format: prefer the DSL `moon.mod` / `moon.pkg`** over the deprecated-pending `moon.mod.json` / `moon.pkg.json`. `moon fmt` migrates JSON → DSL. Samples: `assets/moon.mod`, `assets/moon.pkg`. Check reference/configuration.md before editing either
 - **Multiple modules in one repo → use a workspace** (`moon.work`), not standalone modules. `moon work init <dirs>` creates the manifest; members share one build context and resolve each other locally. See reference/configuration.md "Workspace"
 - Check reference/language.md for detailed language feature examples (types, traits, pattern matching, etc.)
 - Check reference/mbtx.md for single-file `.mbtx` scripts (`moon run script.mbtx`, stdin via `moon run -`, inline `import { }` block; nightly only)
+- Check reference/skills-marketplace.md before defining or publishing an executable for skills.mooncakes.io; it covers package-local `SKILL.md`, Wasm targets, `moon runwasm`, host capabilities, policy, and release verification
 
 ## Common Pitfalls
 
@@ -263,9 +264,9 @@ moon info  # Generate type definition files
 ## Exploring Built-in Type Methods
 
 ```bash
-moon doc StringView   # StringView methods
-moon doc Array        # Array methods
-moon doc Map          # Map methods
+moon ide doc StringView   # StringView methods
+moon ide doc Array        # Array methods
+moon ide doc Map          # Map methods
 ```
 
 ## Quick Reference
@@ -279,7 +280,7 @@ moon doc Map          # Map methods
 | Doc Test | `moon check` / `moon test` | https://docs.moonbitlang.com/en/stable/language/docs |
 | Format | `moon fmt` | - |
 | Generate types | `moon info` | - |
-| Doc reference | `moon doc <Type>` | - |
+| Doc reference | `moon ide doc <Type>` | - |
 | Workspace init | `moon work init` | See reference/configuration.md |
 | Workspace add | `moon work use mod1 mod2` | Add modules to workspace |
 | API usage analysis | `moon ide analyze .` | Show public API usage stats |
@@ -376,7 +377,7 @@ buf.to_string()
 ## Regex Match `=~` (v0.9+)
 
 Stable regex matching (`s =~ re"..."`) replaces the experimental `lexmatch?`,
-with different semantics — check `moon doc` / docs before relying on capture,
+with different semantics — check `moon ide doc` / docs before relying on capture,
 prefix (`before~`), or suffix (`after~`) binding forms.
 
 ```moonbit
