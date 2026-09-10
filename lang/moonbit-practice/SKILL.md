@@ -313,8 +313,9 @@ For reference, these are the shapes `Debug` produces:
 | Inspected value | `debug_inspect` renders |
 |---|---|
 | `[1, 2, 3]` | `[1, 2, 3]` |
-| `P::{ x: 1 }` (struct) | `{x: 1}` |
-| `Host("example.com", 443)` (enum with payload) | `Host("example.com", 443)` |
+| `Point::{ x: 1, y: 2 }` (struct) | `{ x: 1, y: 2 }` |
+| `Shape::Rect(width=3, height=4)` (enum, labelled) | `Rect(width=3, height=4)` |
+| `Host("example.com", 443)` (enum, positional) | `Host("example.com", 443)` |
 | `Err(InvalidEof)` (`Result` + `suberror`) | `Err(InvalidEof)` |
 
 Long values are wrapped and indented, which is another reason to let `-u` write
