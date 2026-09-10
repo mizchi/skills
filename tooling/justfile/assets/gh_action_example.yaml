@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@v4
 
       - name: Test
         run: just test

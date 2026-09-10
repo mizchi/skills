@@ -9,7 +9,7 @@ Add to `wrangler.toml`:
 ```toml
 name = "my-image-worker"
 main = "src/index.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2026-09-01"  # use today's date for a new Worker
 
 [images]
 binding = "IMAGES"

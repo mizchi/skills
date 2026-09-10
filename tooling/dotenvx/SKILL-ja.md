@@ -134,7 +134,7 @@ curl でインストール。完全な例は `assets/gh_action_example.yaml` を
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v7
 
   - name: Install dotenvx
     run: curl -sfS https://dotenvx.sh | sh

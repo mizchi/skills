@@ -13,7 +13,7 @@
 // hand-written `dist/worker.mjs` shim.
 //
 // TEMPLATE NOTES — replace before use:
-//   <PKG>         = moon package name from moon.mod.json
+//   <PKG>         = moon package name from moon.mod (or the legacy moon.mod.json)
 //   <FRONTEND>    = name of the Vite output directory under dist/
 //                   (omit if no frontend)
 

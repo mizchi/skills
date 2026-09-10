@@ -439,8 +439,8 @@ check: format-check typecheck ast-grep-lint test
 Align tools with the dev environment (use pnpm in CI if the project uses pnpm, npm if it uses npm):
 
 ```yaml
-- uses: actions/setup-node@v4
-  with: { node-version: 24, cache: npm }   # for pnpm projects: pnpm/action-setup@v4 + cache: pnpm
+- uses: actions/setup-node@v7
+  with: { node-version: 24, cache: npm }   # for pnpm projects: pnpm/action-setup@v6 + cache: pnpm
 
 - run: npm ci   # for pnpm: pnpm install --frozen-lockfile
 

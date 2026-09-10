@@ -42,9 +42,12 @@ Usage:
 
 ```moonbit nocheck
 test "catches JS throw" {
-  let r : Result[JsValue, JsError] = try? try_sync(fn() {
+  // `try?` was removed in v0.10.0 — catch into a Result instead
+  let r : Result[JsValue, JsError] = Ok(try_sync(fn() {
     global_this().call_method("eval", [identity("throw new Error('boom')")])
-  })
+  })) catch {
+    e => Err(e)
+  }
   guard r is Err(_) else { fail("expected error") }
 }
 ```
@@ -90,7 +93,8 @@ pub async fn fetch_text(url : String) -> String raise JsError {
 }
 ```
 
-Callers can use `try? fetch_text(url)` in an `async test` to get `Result[String, JsError]`.
+Callers get a `Result[String, JsError]` in an `async test` by catching:
+`Ok(fetch_text(url)) catch { e => Err(e) }` (`try?` was removed in v0.10.0).
 
 ## Pitfalls
 

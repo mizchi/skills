@@ -31,7 +31,7 @@ npm install partytracks @cloudflare/calls observable-hooks
 {
   "name": "my-calls-app",
   "main": "src/index.ts",
-  "compatibility_date": "2025-01-01", // Use current date for new projects
+  "compatibility_date": "2026-09-01", // Use current date for new projects
   "vars": {
     "CALLS_APP_ID": "your-app-id",
     "MAX_WEBCAM_BITRATE": "1200000",

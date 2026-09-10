@@ -4,10 +4,12 @@ title: "MoonBit Configuration Reference"
 
 # MoonBit Configuration Reference
 
-> **Prefer the DSL formats `moon.mod` / `moon.pkg`.** The JSON formats
-> `moon.mod.json` / `moon.pkg.json` are deprecated-pending and kept only for
-> existing projects. New projects should use the DSL. Ready-to-copy samples live
-> at `assets/moon.mod` and `assets/moon.pkg`.
+> **Use the DSL formats `moon.mod` / `moon.pkg`.** The JSON formats
+> `moon.mod.json` / `moon.pkg.json` are deprecated and scheduled for removal;
+> they are kept only so existing projects still build. New projects use the DSL.
+> Ready-to-copy samples live at `assets/moon.mod` and `assets/moon.pkg`.
+>
+> Verified against MoonBit v0.10.12.
 
 ## File Structure
 
@@ -60,20 +62,68 @@ import {
   "moonbitlang/x@0.4.45",
 }
 
-options(
-  source: "src",                              // source directory
-  // exclude: [ "examples", "_build" ],       // paths kept out of the published package
-)
+// Source directory holding the packages (top-level, not inside options)
+source = "src"
 ```
 
 Field mapping from the old JSON keys: `preferred-target` → `preferred_target`,
-`warn-list` → `warnings`, `source`/`deps` move into `options(...)` / the `import`
-block respectively.
+`warn-list` → `warnings`, `source` becomes a top-level assignment, and `deps`
+becomes the `import` block.
+
+### `source` also decides every package's import path
+
+A package's import path is **module name + its directory path relative to
+`source`**. `source` is therefore not just a file-layout setting — moving it
+renames every cross-package import in the module.
+
+```text
+moon.mod                      name = "acme/semver", source = "src"
+src/
+├── semver/                   -> package path "acme/semver/semver"
+│   ├── moon.pkg
+│   └── version.mbt
+└── cmd/semver/               -> package path "acme/semver/cmd/semver"
+    ├── moon.pkg              pkgtype(kind: "executable")
+    └── main.mbt
+```
+
+`src/cmd/semver/moon.pkg` then imports the library as:
+
+```moonbit
+import {
+  "acme/semver/semver" @semver,
+}
+```
+
+Only directories **under `source`** are scanned for packages: with
+`source = "src"`, a top-level `cmd/` directory is invisible to the build. Omit
+`source` to make the module root the source root.
+
+### Publishing filters: `.moonignore`, not `include` / `exclude`
+
+The `include` and `exclude` fields of `moon.mod` are **deprecated**. Packaging now
+follows conventional ignore-file rules: the `.moonignore` in a directory — or its
+`.gitignore` when absent — decides what ships. Dot-prefixed paths and the
+package-root `_build/` are excluded by default (`_build/` cannot be re-included).
+
+```gitignore
+# .moonignore
+examples/
+*.log
+!fixtures/keep.log
+# re-include a root dotfile that the default rule excludes
+!/.moonignore
+```
+
+When a legacy `include` is present it is an exhaustive allowlist and suppresses
+`exclude`, `.gitignore`, `.moonignore`, and the default dot-path exclusion — one
+more reason to migrate.
 
 ### Path dependencies
 
-The JSON `"deps": { "myuser/mod2": { "path": "../mod2" } }` becomes a path entry in
-the `import` block; for cross-module work prefer a workspace (`moon.work`, below).
+Local path dependencies inside `moon.mod` are deprecated. For cross-module work
+use a workspace (`moon.work`, below); members resolve each other by module name
+with no path entry at all.
 
 ---
 
@@ -95,9 +145,13 @@ import {
 supported_targets = "wasm"
 warnings = "-unused_value"
 
-options(
-  is_main: true,                              // executable package with `fn main`
+// Files moon fmt should skip (optional, top-level)
+formatter(ignore: [ "generated.mbt" ])
 
+// What this package builds: "library" (default) | "executable" | "foreign_library"
+pkgtype(kind: "executable")
+
+options(
   // Conditional compilation: file -> backend conditions
   targets: {
     "only_js.mbt": [ "js" ],
@@ -120,14 +174,46 @@ options(
 
 - Conditions: `wasm`, `wasm-gc`, `js`, `native`, `debug`, `release`. Operators:
   `and`, `or`, `not`.
-- `is_main` and `"is-main"` are both accepted; prefer the unquoted `is_main`.
 - `:embed` converts a file to MoonBit source (`--text` / `--binary`, `--name`).
+
+### Package type: `pkgtype`, not `is-main` / `link: true`
+
+One `pkgtype` declaration says what the package builds. The kinds are mutually
+exclusive and must not be declared together.
+
+| `pkgtype(kind: ...)` | Replaces | Meaning |
+|---|---|---|
+| `"library"` | — | Default; nothing to declare |
+| `"executable"` | `options("is-main": true)` | Package has `fn main` |
+| `"foreign_library"` | `options(link: true)` | Builds a library artifact for foreign code |
+
+The **object**-valued `link` option is unrelated and still lives in `options(...)`:
+it configures backend-specific linking (`exports`, `format`, …) as shown above.
+
+### Exporting symbols: prefer `#export_name`
+
+In a `foreign_library` package, `#export_name` pins a stable symbol name on a
+public, non-generic function in the generated Wasm / JS / C output. Prefer it over
+backend-specific `exports` link configuration for new exports.
+
+```moonbit
+#export_name("attr_add")
+pub fn add_by_attr(n : Int) -> Int {
+  n + 42
+}
+```
+
+Export names must currently be valid C identifiers and unique within the package
+on every backend. The attribute cannot be used on generic functions or functions
+with optional arguments. Export declarations are scoped to the package producing
+the artifact — an attribute in a dependency does not add symbols to your output.
 
 ---
 
 ## Legacy JSON formats (existing projects only)
 
-Equivalent JSON for reference when reading older code. Run `moon fmt` to migrate.
+Equivalent JSON for reference when reading older code. Support is deprecated and
+will be removed — run `moon fmt` in the module root to migrate both files.
 
 ### moon.mod.json
 
@@ -156,7 +242,7 @@ Equivalent JSON for reference when reading older code. Run `moon fmt` to migrate
 {
   "is-main": true,
   "import": [
-    "moonbitlang/quickcheck",
+    "moonbitlang/core/quickcheck",
     { "path": "moonbitlang/x/encoding", "alias": "lib" }
   ],
   "test-import": [],

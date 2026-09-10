@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Beam
         uses: erlef/setup-beam@v1
@@ -27,7 +27,7 @@ jobs:
           # elixir-version: "1.19.5"
 
       - name: Setup just
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@v4
 
       # Rust/NIF/Wasm を使う場合だけ追加する
       # - name: Setup Rust

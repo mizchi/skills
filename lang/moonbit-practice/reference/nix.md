@@ -222,11 +222,14 @@ in stdenv.mkDerivation {
 MoonBit から C 関数を呼ぶ場合、`moon.pkg` に `native-stub` を設定する。
 
 ```
+pkgtype(kind: "executable")
+
 options(
-  "is-main": true,
   "native-stub": ["my_ffi.c"],
 )
 ```
+
+（`pkgtype(kind: "executable")` は非推奨の `options("is-main": true)` の後継。v0.10.4 以降はこちらを使う。）
 
 生成された `.o` ファイルはリンク時に手動で含める:
 
@@ -249,7 +252,10 @@ options(
 ## Key Points
 
 - `moon-registry` input は `flake = false` にする（Git リポジトリで flake ではない）
-- `buildMoonPackage` は `moon.mod.json` の `preferred-target` を読んでターゲットを決定
+- `buildMoonPackage` は `moon.mod.json` の `preferred-target` を読んでターゲットを決定。
+  overlay の `moonModJson` 引数は今のところ JSON マニフェストを前提としているため、
+  モジュールを `moon.mod` DSL に移行した場合も Nix 用に `moon.mod.json` を残すか、
+  overlay 側の DSL 対応状況を確認してから削除する
 - `moonTarget` パラメータでオーバーライド可能
 - `moonFlags` で追加の `moon build` フラグを渡せる
 - `doCheck = false` でテストをスキップ（CI 側で別途実行する場合）

@@ -38,12 +38,13 @@ The "Install" column may also be:
 | T1 | otel-node | `mizchi/skills/devops/otel-node` | Node.js OTel SDK setup; esbuild ESM bundle silently drops `instrumentation-*` auto-instrumentation — use when spans don't arrive after bundling |
 
 ### MoonBit
-**Signals**: `moon.mod.json`, `moon.pkg.json`, `_build/`, `.mooncakes/`
+**Signals**: `moon.mod` / `moon.pkg` (DSL), the deprecated `moon.mod.json` / `moon.pkg.json`, `_build/`, `.mooncakes/`, `.mbtx` scripts
 
 | T | Skill | Install | Use when |
 |---|---|---|---|
 | T1 | moonbit-practice | `mizchi/skills/lang/moonbit-practice` | Writing or reviewing MoonBit code (general best practices) |
 | T1 | moonbit-js-binding | `mizchi/skills/lang/moonbit-js-binding` | MoonBit project needs JS FFI (`extern "js"`) for browser / Node / npm packages |
+| T1 | ts2moonbit-migration | `mizchi/skills/lang/ts2moonbit-migration` | Porting an existing TypeScript package to MoonBit on the `js` target while keeping the published JS/`.d.ts` contract |
 | T1 | moonbit-c-binding | `moonbitlang/moonbit-agent-guide/moonbit-c-binding` | MoonBit project links a C library via native FFI |
 | T1 | tuimbt-practice | `mizchi/tui.mbt/skills/tuimbt-practice` | Building terminal UI in MoonBit using `tui.mbt` |
 | T1 | mooncheat | `mizchi/js.mbt/.claude/skills/mooncheat` | MoonBit cheatsheet for syntax / corelibrary lookups while writing `.mbt` |
@@ -201,7 +202,7 @@ The "Install" column may also be:
 |---|---|---|---|
 | T1 | flaker-setup | `mizchi/flaker/skills/flaker-setup` | Introducing `@mizchi/flaker` to a repo for flaky-test detection / GitHub Actions integration |
 | T1 | flaker-management | `mizchi/flaker/skills/flaker-management` | Operating `@mizchi/flaker` after setup — day-to-day runs, sampling / quarantine review, KPI ratchet |
-| T1 | flaker-storage-cache-on-ci | `mizchi/skills/devops/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v4`; debugging "history vanished every run"; adding a new ingest source |
+| T1 | flaker-storage-cache-on-ci | `mizchi/skills/devops/flaker-storage-cache-on-ci` | Persisting flaker's DuckDB storage across GitHub Actions runs via `actions/cache@v6`; debugging "history vanished every run"; adding a new ingest source |
 
 ---
 
@@ -247,6 +248,7 @@ The "Install" column may also be:
 | T | Skill | Install | Use when |
 |---|---|---|---|
 | T3 | translate-programming-language | `mizchi/skills/lang/translate-programming-language` | Porting modules / services / APIs between programming languages with behavior parity |
+| T3 | ts2moonbit-migration | `mizchi/skills/lang/ts2moonbit-migration` | The TypeScript → MoonBit special case of the above (also listed under MoonBit) |
 
 ### Memory / session (mnemo)
 **Signals**: agent needs persistent cross-session memory or session journaling; `mnemo` CLI on PATH

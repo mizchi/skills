@@ -107,15 +107,15 @@ just --fmt        # Format justfile
 
 ## GitHub Actions
 
-Use `extractions/setup-just@v3`. See `assets/gh_action_example.yaml` for full example.
+Use `extractions/setup-just@v4`. See `assets/gh_action_example.yaml` for full example.
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v7
 
-  - uses: extractions/setup-just@v3
+  - uses: extractions/setup-just@v4
     # with:
-    #   just-version: '1.40.0'  # Optional version
+    #   just-version: '1.58.0'  # Optional pin (latest as of 2026-09)
 
   - run: just build
   - run: just test

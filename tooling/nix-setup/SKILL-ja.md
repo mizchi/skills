@@ -327,7 +327,7 @@ rebase 中に `pnpm-lock.yaml` が衝突したら **手で直さず** `pnpm inst
 既存 ci.yml の Node 関連ステップを Nix 化差分で書き換える:
 
 ```diff
--      - uses: actions/setup-node@v4
+-      - uses: actions/setup-node@v7
 -        with:
 -          node-version: 24
 -          cache: pnpm
@@ -388,7 +388,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main

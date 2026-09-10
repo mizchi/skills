@@ -93,7 +93,7 @@ Read `references/contract-capture.md`.
 - Record the module format(s) the package ships (`esm`, `cjs`, dual) and the entry points in `package.json`.
 
 ### Phase 1 — Project setup
-- `moon.mod.json`: set `"preferred-target": "js"` so `moon check/build/test` default to JS.
+- `moon.mod`: set `preferred_target = "js"` so `moon check/build/test` default to JS. Since v0.10.9 the toolchain default target is `wasm`, so skipping this means passing `--target js` everywhere. (`moon.mod.json` with the hyphenated key is deprecated; `moon fmt` migrates it.)
 - `moon add` the toolkit packages you mapped in Phase 0.
 - Lay out `src/moon.pkg` with `link.js` (exports + format) — empty exports for now, filled in Phase 6.
 - Decide the npm interop shape: a thin `package.json` whose `exports` point at the `moon build --release` output (see `references/build-and-publish.md`).
@@ -185,7 +185,7 @@ Full table with edge cases in `references/type-mapping.md`.
 
 ## Verified Against
 
-The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were verified end-to-end with **moon 0.1.20260522 / moonc v0.9.3** and **mizchi/js 0.12.1** (round-tripping objects and Promises through Node). Package boundaries and the `Any` method names (`_get`/`_set`/`_call`/`cast`) shift across releases — re-check against the resolved version in your `moon.mod.json` if a signature mismatches.
+The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were verified end-to-end with **moon 0.1.20260522 / moonc v0.9.3** and **mizchi/js 0.12.1** (round-tripping objects and Promises through Node); config syntax was re-checked against **MoonBit v0.10.12**. Package boundaries and the `Any` method names (`_get`/`_set`/`_call`/`cast`) shift across releases — re-check against the resolved version in your `moon.mod` if a signature mismatches. Language-level changes since v0.9.3 that affect ported code: `try?` was removed (catch into a `Result`), `trait`/`impl` methods need the `fn` keyword, and `impl` no longer attaches methods implicitly (declare `extend Type with Trait::{..}`).
 
 ## References
 

@@ -60,11 +60,12 @@ ln -s README.mbt.md README.md
 
 ## Snapshot Tests
 
-Use `inspect()` for snapshot testing. Run `moon test -u` to auto-update.
+Snapshot helpers fill an empty `content=""` when you run `moon test -u`.
 
 ```moonbit
 test "snapshot" {
-  inspect([1, 2, 3], content="")  // Empty initially
+  inspect("hello", content="")          // primitive / string
+  debug_inspect([1, 2, 3], content="")  // container / custom type
 }
 ```
 
@@ -72,14 +73,23 @@ After `moon test -u`:
 
 ```moonbit
 test "snapshot" {
-  inspect([1, 2, 3], content="[1, 2, 3]")
+  inspect("hello", content="hello")
+  debug_inspect([1, 2, 3], content="[1, 2, 3]")
 }
 ```
 
-### inspect vs @json.inspect
+### Which snapshot helper (v0.9.2+)
 
-- `inspect()` - Uses `Show` trait, good for simple values
-- `@json.inspect()` - Uses `ToJson` trait, better for complex nested structures
+| Helper | Trait | Use for |
+|---|---|---|
+| `inspect()` | `Show` | Primitives and strings |
+| `debug_inspect()` | `Debug` | `Array` / `Map` / `Set` / `Option` / `Result` / tuples and custom types |
+| `@json.inspect()` | `ToJson` | Deeply nested structures — JSON stays readable when formatted |
+
+`Show` for container types is deprecated: the debugging interface moved to the
+`Debug` trait in v0.9, so container snapshots go through `debug_inspect`. Pick by
+the expression's **static** type, and `derive(Debug)` any custom type you snapshot
+(add `Eq` for `@debug.assert_eq`).
 
 ```moonbit
 test "complex structure" {
@@ -131,13 +141,26 @@ QuickCheck generates random test inputs automatically.
 
 ### Setup
 
-Add to `moon.pkg`:
+Since v0.10.9 QuickCheck ships **inside the standard library** as
+`moonbitlang/core/quickcheck` — do not add a `moonbitlang/quickcheck` dependency.
+Import the package when the default prelude alias is not enough:
 
 ```moonbit
 import {
-  "moonbitlang/quickcheck",
+  "moonbitlang/core/quickcheck",
 } for "test"
 ```
+
+### check vs report
+
+| Entry point | Behaviour | Bounds on the type |
+|---|---|---|
+| `@quickcheck.check(prop)` | Raises on failure, silent on success | `Arbitrary + Shrink + Debug` |
+| `@quickcheck.report(prop)` | Returns a `QuickCheckReport` instead of raising | `Arbitrary + Shrink` |
+
+Both accept labelled options: `count?`, `max_size?`, `max_shrinks?`, `seed?`
+(reproduce a failure), `filter?` with `discard_ratio?`, `observe?`, and
+`counterexample_context?`.
 
 ### Basic Usage
 
@@ -174,9 +197,30 @@ test "custom generator" {
 }
 ```
 
+### Generators for custom types
+
+`derive(Arbitrary)` generates values of a custom type; `derive(Shrink)` implements
+`@quickcheck.Shrink` so failures can be minimised. Build bespoke generators from
+the `@quickcheck.Generator[T]` combinators.
+
+```moonbit
+///|
+struct User {
+  name : String
+  age : Int
+} derive(Arbitrary, Shrink, Debug)
+```
+
+### Statistics
+
+`@quickcheck.label`, `@quickcheck.classify`, and `@quickcheck.collect` record
+observations about the generated inputs so you can see whether the distribution
+actually exercises the interesting cases; pass them via `observe?`.
+
 ### Shrinking
 
-QuickCheck automatically shrinks failing inputs to find minimal counterexamples:
+QuickCheck automatically shrinks failing inputs to find minimal counterexamples
+(the `core/quickcheck/shrink` package holds the shrinkers):
 
 ```moonbit
 ///|
@@ -217,12 +261,16 @@ test "panic on empty array" {
 
 ### Error Tests
 
-Use `try?` to convert errors to `Result`:
+`try?` was removed in v0.10.0. Convert an error to a `Result` by catching it:
 
 ```moonbit
 ///|
 test "parse error" {
-  let result = try? parse("invalid")
-  inspect(result, content="Err(ParseError::InvalidInput)")
+  let result : Result[Int, ParseError] = Ok(parse("invalid")) catch { e => Err(e) }
+  debug_inspect(result, content="Err(InvalidInput)")
 }
 ```
+
+`Result` is a container type, so snapshot it with `debug_inspect` and
+`derive(Debug)` the error type. To assert that a call panics instead, use
+`try!` inside a `panic test`.

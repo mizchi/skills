@@ -17,18 +17,18 @@ The standard library (`moonbitlang/core`) is **automatically available** - no ne
 
 ```bash
 # List all available packages
-moon doc ''
+moon ide doc ''
 
 # Explore specific package
-moon doc "@json"
-moon doc "@buffer"
-moon doc "@encoding/utf8"
+moon ide doc "@json"
+moon ide doc "@buffer"
+moon ide doc "@encoding/utf8"
 
 # Find specific function
-moon doc "@strconv.parse_int"
+moon ide doc "@strconv.parse_int"
 
 # Search with glob
-moon doc "String::*find*"
+moon ide doc "String::*find*"
 ```
 
 ## Common Packages
@@ -260,17 +260,17 @@ s.to_lower()                  // "hello world"
 
 ## Discovering APIs
 
-Always use `moon doc` to discover available APIs:
+Always use `moon ide doc` to discover available APIs:
 
 ```bash
 # What methods does Array have?
-moon doc "Array"
+moon ide doc "Array"
 
 # What's in the json package?
-moon doc "@json"
+moon ide doc "@json"
 
 # Find all parse functions
-moon doc "*parse*"
+moon ide doc "*parse*"
 ```
 
 ---
@@ -294,17 +294,23 @@ moon add moonbitlang/x
 ```moonbit
 // @x/fs - File system operations (native/node backend)
 let content = @x/fs.read_to_string("file.txt")
-
-// @x/sys - System operations
-let args = @x/sys.get_args()
-let env = @x/sys.get_env()
 ```
+
+> **`moonbitlang/sys` is deprecated (v0.10.9).** Argument and environment access
+> moved into the standard library as `moonbitlang/core/env`:
+>
+> ```moonbit
+> let argv = @env.args()   // argv[0] is the program; CLI args are argv[1:]
+> ```
+>
+> Import `"moonbitlang/core/env"` in `moon.pkg` and drop the `moonbitlang/sys`
+> dependency.
 
 ### Exploring
 
 ```bash
-moon doc "@x/fs"
-moon doc "@x/sys"
+moon ide doc "@x/fs"
+moon ide doc "@env"
 ```
 
 ## moonbitlang/async - Asynchronous Programming
@@ -347,5 +353,5 @@ async fn fetch_data(url : String) -> String raise {
 ### Exploring
 
 ```bash
-moon doc "@async"
+moon ide doc "@async"
 ```

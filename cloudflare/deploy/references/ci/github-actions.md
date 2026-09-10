@@ -34,8 +34,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: 24, cache: npm }
       - run: npm ci
       - run: npx wrangler deploy
@@ -44,7 +44,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 ```
 
-pnpm なら `pnpm/action-setup@v4` + `pnpm install --frozen-lockfile` + `pnpm exec wrangler deploy` に置き換え。
+pnpm なら `pnpm/action-setup@v6` + `pnpm install --frozen-lockfile` + `pnpm exec wrangler deploy` に置き換え。
 
 ## 3 環境分離（preview / staging / production）
 
@@ -68,8 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: preview-${{ github.event.pull_request.number }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: 24 }
       - run: npm ci
       - name: Deploy preview
@@ -81,7 +81,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: preview-url
           message: |
@@ -91,8 +91,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: 24 }
       - run: npm ci
       - run: npx wrangler d1 migrations apply app-staging --remote --env staging
@@ -107,8 +107,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production         # GitHub Environments で手動 approval
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: 24 }
       - run: npm ci
       - run: npx wrangler d1 migrations apply app-prod --remote --env production
@@ -167,7 +167,7 @@ permissions:
   contents: read
 
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v7
   - name: Configure Cloudflare OIDC
     # Cloudflare の API endpoint (概念):
     # https://api.cloudflare.com/client/v4/accounts/<id>/oidc/tokens/exchange

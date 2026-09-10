@@ -67,13 +67,20 @@ No `better-sqlite3`, no `bindings`, no `node-gyp`.
 {
   "scripts": {
     "build": "tsc",
-    "test": "node --experimental-strip-types --experimental-sqlite --test --test-reporter=spec tests/*.test.ts",
+    "test": "node --experimental-strip-types --test --test-reporter=spec tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   }
 }
 ```
 
-`--experimental-sqlite` is currently still required on Node ≤ 24.x; on Node 25+ where `node:sqlite` is stable, it is a no-op.
+**Do not pass `--experimental-sqlite`.** The flag stopped being required in Node
+v22.13.0 / v23.4.0 — `node:sqlite` is importable out of the box on every version
+this skill targets, and the flag is now a no-op. Node still prints an
+`ExperimentalWarning` because the module sits at stability 1.2 (release candidate
+as of Node 25.7); see "Silencing the ExperimentalWarning" below.
+
+`--experimental-strip-types` is a separate flag and *is* still needed to run
+`.ts` files directly on Node 22; Node 23+ strips types by default.
 
 ## Open + load extension
 
@@ -204,7 +211,7 @@ describe("vec0", () => {
 ```
 
 ```sh
-node --experimental-strip-types --experimental-sqlite --test tests/*.test.ts
+node --experimental-strip-types --test tests/*.test.ts
 ```
 
 Real DB, no mocks. `node:test` outputs TAP by default; pass `--test-reporter=spec` for the readable form.
@@ -225,10 +232,18 @@ import { DatabaseSync } from "node:sqlite";
 
 This becomes annoying in scripts that capture stderr. Suppress it at the entry point only — keep it visible during development if you want.
 
-## When Node 25+ ships
+## Stability timeline
 
-- `--experimental-sqlite` becomes a no-op (`node:sqlite` is stable)
-- The `ExperimentalWarning` goes away — drop `--no-warnings=ExperimentalWarning` from the shebang
+| Node | `node:sqlite` status |
+|---|---|
+| v22.5.0 | Added, behind `--experimental-sqlite` |
+| v22.13.0 / v23.4.0 | Flag no longer required; still experimental (warning stays) |
+| v25.7.0+ | Stability 1.2 — release candidate; warning still emitted |
+
+Practical consequences today (Node 24 LTS "Krypton", Node 26 current):
+
+- Drop `--experimental-sqlite` from every script — it does nothing
+- Keep `--no-warnings=ExperimentalWarning` while the module is pre-1.0; remove it once the stability index reaches 2
 - Everything else (BigInt rowids, vitest avoidance, tsconfig flags) is independent of stability and continues to apply
 
 ## References

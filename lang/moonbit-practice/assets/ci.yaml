@@ -13,10 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [js, native]
+        # `wasm` is the toolchain default since v0.10.9 — keep it in the matrix
+        # even when the project's preferred_target is something else.
+        target: [wasm, js, native]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install MoonBit CLI
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash

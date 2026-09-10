@@ -4,12 +4,16 @@ Use this reference when publishing a MoonBit executable to
 [skills.mooncakes.io](https://skills.mooncakes.io/) or authoring its agent-facing
 `SKILL.md`.
 
+> Verified against MoonBit v0.10.12. **`moon runwasm` is deprecated** — registry
+> packages now run with `moonx`, local packages with
+> `moon run <pkg> --target wasm`.
+
 ## Mental model
 
 Keep these two layers distinct:
 
 1. A MoonBit executable package supplies the command implementation. It must
-   compile to `wasm` and is run locally by `moon runwasm`.
+   compile to `wasm` and is run by `moonx`.
 2. A package-local `SKILL.md` supplies agent metadata and operating
    instructions. The Marketplace exposes it next to the prebuilt Wasm asset.
 
@@ -73,7 +77,7 @@ description: Use tool to inspect and transform local Foo files in WebAssembly. U
 Run:
 
 ```bash
-moon runwasm author/module/cmd/tool -- check input.foo
+moonx author/module/cmd/tool check input.foo
 ```
 
 Document supported commands, output formats, exit codes, host capabilities,
@@ -93,21 +97,27 @@ python path/to/skill-creator/scripts/quick_validate.py cmd/tool
 
 ## Run coordinates
 
-Use an unpinned coordinate for the latest version:
+Use an unpinned coordinate for the latest version already in the local index:
 
 ```bash
-moon runwasm author/module/cmd/tool -- <args>
+moonx author/module/cmd/tool <args>
 ```
 
 Pin reproducible automation to the published module version:
 
 ```bash
-moon runwasm author/module@1.2.3/cmd/tool -- <args>
+moonx author/module@1.2.3/cmd/tool <args>
 ```
 
-`moon runwasm` downloads the Marketplace Wasm asset, verifies its SHA-256
-checksum, caches it under `MOON_HOME`, and passes arguments after the package
-coordinate to the guest command.
+`@latest` refreshes the registry index before resolving; an unpinned coordinate
+updates the index only when the module is missing locally. `moonx` downloads the
+Marketplace Wasm asset, verifies its SHA-256 checksum, caches it under
+`$MOON_HOME/registry/cache/assets`, and forwards everything after the coordinate
+— including hyphen-prefixed values — to the guest command. An explicit `--` is
+accepted but not required.
+
+`moonx` defaults to the Wasm backend and is a second entry point into the `moon`
+executable, not a separate binary.
 
 ## Filesystem, environment, and network policy
 
@@ -117,25 +127,33 @@ make filesystem access deny-by-default.
 
 For agent use or untrusted repositories, provide a policy explicitly:
 
-```toml
-[fs]
-read = ["inputs"]
-write = ["outputs"]
+The policy file is **JSON** (not TOML):
 
-[env]
-from_host = ["HOME"]
-
-[net]
-connect = ["api.example.com:443"]
+```json
+{
+  "fs": {
+    "read": ["inputs"],
+    "write": ["outputs"]
+  },
+  "env": { "from_host": ["HOME"] },
+  "net": { "connect": ["api.example.com:443"] }
+}
 ```
 
 ```bash
-moon runwasm --experimental-policy moonrun-policy.toml \
-  author/module/cmd/tool -- check inputs/main.foo
+moonx --experimental-policy moonrun-policy.json \
+  author/module/cmd/tool check inputs/main.foo
 ```
 
-Policy mode is deny-by-default for omitted `fs`, `env`, and `net` surfaces;
-process spawning also requires explicit enablement. Policy-relative roots are
+`{}` denies every policy-covered surface. To keep the legacy allow-all behaviour
+while still passing a file, use explicit wildcards (`"*"`, `"*:*"`,
+`"process": { "spawn": true }`) — or simply run without a policy.
+
+Policy mode is deny-by-default for omitted or empty `fs`, `env`, and `net`
+surfaces; process spawning stays off unless `process.spawn` is `true` or a
+`process.allow` rule matches (the two cannot be combined). Rules match the
+program name exactly plus an optional `args_prefix`; allowing a shell, package
+runner, or other extensible tool grants far more than the visible prefix. Policy-relative roots are
 resolved relative to the policy file, while paths used by the guest command
 are resolved from the process current working directory. Grant the smallest
 read/write roots needed. Do not place secret values directly in the policy;
@@ -155,7 +173,7 @@ Expose a repeatable cache option and document its exact layout and miss
 behavior:
 
 ```bash
-moon runwasm author/module/cmd/tool -- check \
+moonx author/module/cmd/tool check \
   --package-cache .tool-cache input.pkl
 ```
 
@@ -175,9 +193,12 @@ moon info
 moon check --target wasm --deny-warn
 moon check --target wasm-gc --deny-warn
 moon test --target wasm
-moon runwasm cmd/tool -- --help
-moon runwasm cmd/tool -- check testdata/input.foo
+moon run cmd/tool --target wasm -- --help
+moon run cmd/tool --target wasm -- check testdata/input.foo
 ```
+
+(Local packages go through `moon run --target wasm`; `moonx` is for registry
+coordinates.)
 
 Also test a restrictive policy when the command uses host IO.
 
@@ -190,12 +211,17 @@ unzip -l _build/publish/author-module-1.2.3.zip | rg 'cmd/tool/(SKILL.md|moon.pk
 moon publish
 ```
 
+Package contents are filtered by `.moonignore` (or `.gitignore` when absent), so
+check that `SKILL.md` is not swept up by an ignore rule — dot-prefixed paths and
+`_build/` are excluded by default. mooncakes.io also rejects a module name that
+differs from an existing one only by letter case.
+
 After publication, verify both metadata and instructions:
 
 ```bash
 curl -fsSL https://skills.mooncakes.io/api/v0/skills/author/module@1.2.3/cmd/tool
 curl -fsSL https://skills.mooncakes.io/assets/author/module@1.2.3/cmd/tool/SKILL.md
-moon runwasm author/module@1.2.3/cmd/tool -- --help
+moonx author/module@1.2.3/cmd/tool --help
 ```
 
 The Marketplace may need time to build the optimized Wasm asset. Diagnose the

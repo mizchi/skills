@@ -37,7 +37,7 @@ export default {
 {
   "name": "my-sandbox-worker",
   "main": "src/index.ts",
-  "compatibility_date": "2025-01-01", // Use current date for new projects
+  "compatibility_date": "2026-09-01", // Use current date for new projects
   
   "containers": [{
     "class_name": "Sandbox",

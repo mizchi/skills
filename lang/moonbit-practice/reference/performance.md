@@ -63,7 +63,7 @@ let view = try! s[start:end]
 ### StringView Methods
 
 ```bash
-moon doc StringView
+moon ide doc StringView
 ```
 
 Common operations:
@@ -121,7 +121,7 @@ fn process(view : ArrayView[Int]) -> Unit {
 ### ArrayView Methods
 
 ```bash
-moon doc ArrayView
+moon ide doc ArrayView
 ```
 
 Common operations:

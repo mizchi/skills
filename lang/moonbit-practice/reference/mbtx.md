@@ -1,20 +1,23 @@
 ---
-title: ".mbtx Single-File Script Mode (Nightly Only)"
+title: ".mbtx Single-File Script Mode"
 ---
 
 # .mbtx Single-File Script Mode
 
-> **Nightly only**: Requires `moon` nightly (`>= 0.1.20260214`).
-> Verified with `moon 0.1.20260409` (2026-04-26).
-> Install: `curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s nightly`
-> Or upgrade: `moon upgrade --dev`
-
-Source: [PR #1479](https://github.com/moonbitlang/moon/pull/1479) (merged 2026-02-13)
-Implementation: `crates/moonbuild-rupes-recta/src/mbtx.rs`
+> Stable since v0.10.x and documented upstream at
+> [Running `.mbtx` Scripts](https://docs.moonbitlang.com/en/stable/toolchain/moon/script-mode.html).
+> Verified against MoonBit v0.10.12.
 
 ## Overview
 
-`.mbtx` is a single-file script format that combines `import` declarations and MoonBit code. No `moon.mod.json` or `moon.pkg` required.
+`.mbtx` is a single-file script format that combines `import` declarations and MoonBit code. No `moon.mod` or `moon.pkg` required.
+
+Two runners exist:
+
+| Runner | Use for |
+|---|---|
+| `moon run script.mbtx` | Inside or outside a project; full `moon run` flag surface |
+| `moonx script.mbtx` | Standalone script runner; also runs registry packages (`moonx author/mod/cmd/tool`) |
 
 ```bash
 moon run script.mbtx
@@ -27,13 +30,30 @@ moon run - <<'EOF'
 fn main { println("hi") }
 EOF
 
+# Pass a short script inline
+moon run -c 'fn main { println("hello") }'
+
 # CLI args propagate to @env.args() (positional args after the file)
 moon run script.mbtx foo bar             # OK when no other flags follow
 moon run script.mbtx --target native -- foo bar   # use `--` to disambiguate
+
+# moonx forwards everything after the path to the program; `--` is optional
+moonx script.mbtx --port 8080
 ```
 
-Note: default backend is `wasm-gc`, which does not support `async fn main` or
-`@stdio.stdin`. Use `--target native` for those.
+`moonx` runs `.mbtx` only on the linear-memory Wasm backend (`--target wasm`, the
+default); `--target native` is rejected for standalone scripts. Use `moon run` when
+you need another backend.
+
+Note: `async fn main` and `@stdio.stdin` need a backend with the corresponding
+runtime support — use `--target native` when a script blocks on stdio.
+
+## Sandboxing a script (experimental)
+
+Both `moon run` and `moonx` accept a Moonrun policy. A standalone `.mbtx` may also
+embed one as a leading `// policy:` YAML comment block; an explicit
+`--experimental-policy <file.json>` overrides it. Policy files themselves are
+**JSON** — see reference/skills-marketplace.md for the schema.
 
 ## Import Block Syntax
 

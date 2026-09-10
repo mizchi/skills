@@ -65,7 +65,11 @@ pub fn shape_area(input : @core.Any) -> Double {
   } else {
     input._get("b").cast()
   }
-  match (try? Shape::parse(kind, a, b)) {
+  // `try?` was removed in v0.10.0 — catch into a Result instead
+  let parsed : Result[Shape, ShapeError] = Ok(Shape::parse(kind, a, b)) catch {
+    e => Err(e)
+  }
+  match parsed {
     Ok(shape) => shape.area()        // idiomatic core does the real work
     Err(ShapeError(msg)) => {
       @core.throw_error(msg)         // typed error -> JS Error, matches contract

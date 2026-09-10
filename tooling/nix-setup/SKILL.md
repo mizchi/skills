@@ -136,8 +136,8 @@ Use `jetify-com/devbox-install-action`. A complete workflow lives in `assets/dev
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
-  - uses: jetify-com/devbox-install-action@v0.12.0
+  - uses: actions/checkout@v7
+  - uses: jetify-com/devbox-install-action@v0.15.0
     # with:
     #   enable-cache: true   # caches the Nix store
   - run: devbox run test
@@ -442,7 +442,7 @@ If `pnpm-lock.yaml` conflicts during rebase, **don't fix it by hand** — regene
 Rewrite existing ci.yml Node-related steps with the Nix-ification diff:
 
 ```diff
--      - uses: actions/setup-node@v4
+-      - uses: actions/setup-node@v7
 -        with:
 -          node-version: 24
 -          cache: pnpm
@@ -503,7 +503,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main

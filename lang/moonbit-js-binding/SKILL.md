@@ -7,6 +7,8 @@ description: Write MoonBit bindings to JavaScript with `extern "js"`. Use for FF
 
 Step-by-step workflow for binding JavaScript APIs (browser DOM, Node built-ins, npm packages) to MoonBit through the `js` backend.
 
+> Verified against MoonBit v0.10.12 and `moonbitlang/async` 0.21.0.
+
 ## When To Use
 
 Use this skill when:
@@ -62,20 +64,29 @@ Follow these 4 phases in order.
 
 Configure the module and package for JS output.
 
-**Module (`moon.mod.json`)** — set `preferred-target` so `moon check`, `moon build`, `moon test` default to `js`:
+**Module (`moon.mod`)** — set `preferred_target` so `moon check`, `moon build`, `moon test` default to `js`. Since v0.10.9 the compiler's own default target is `wasm`, so without this every command needs `--target js`:
 
-```json
-{
-  "name": "user/pkg",
-  "version": "0.1.0",
-  "source": "src",
-  "preferred-target": "js"
+```moonbit
+name = "user/pkg"
+
+version = "0.1.0"
+
+source = "src"
+
+preferred_target = "js"
+
+import {
+  "moonbitlang/async@0.21.0",
 }
 ```
 
+> The JSON form `moon.mod.json` (with the hyphenated `preferred-target`, `source`
+> and `deps` keys) is deprecated and slated for removal. `moon fmt` migrates an
+> existing project to the DSL.
+
 **Package (`src/moon.pkg`)** — gate `.mbt` files to the `js` backend and configure link output.
 
-> **File format — `moon.pkg` (DSL) vs `moon.pkg.json` (JSON):** MoonBit accepts either filename. This skill uses the **DSL form `moon.pkg`** (no extension) throughout. Do NOT write `moon.pkg.json`; it is a different syntax (pure JSON, no `options(...)` wrapper, no trailing commas). Mixing them mid-project causes "Unable to read `moon.pkg`" parse errors. If you cloned an older template using `.pkg.json`, delete it and use `moon.pkg` as shown below.
+> **File format — `moon.pkg` (DSL) vs `moon.pkg.json` (JSON):** MoonBit still reads either filename, but JSON support is deprecated and scheduled for removal. This skill uses the **DSL form `moon.pkg`** (no extension) throughout. Do NOT write `moon.pkg.json`; it is a different syntax (pure JSON, no `options(...)` wrapper, no trailing commas). Mixing them mid-project causes "Unable to read `moon.pkg`" parse errors. If you cloned an older template using `.pkg.json`, run `moon fmt` to convert it.
 
 > **`targets:` — only needed for backend-specific files:** The `targets:` block gates individual `.mbt` files to a subset of backends. Files that contain `extern "js"`, `extern "c"`, or backend-specific `#cfg` blocks **must** be listed. Pure MoonBit files (no FFI) do NOT need a `targets:` entry — if every file in the package is pure MoonBit, omit the `targets:` block entirely. The example above lists `ffi.mbt` / `async.mbt` because they contain `extern "js"`; a simple library with no FFI only needs `link: { ... }`.
 
@@ -110,7 +121,7 @@ options(
 
 > **Warning — `supported-targets` vs `targets`:** Do NOT use `supported-targets: ["js"]` at the package level. It blocks downstream consumers. Gate individual files with `targets` instead.
 
-> **Warning — `preferred-target: "js"`:** This is a default, not a lock. `moon test --target wasm-gc` still works on files that support it — useful for cross-backend libraries.
+> **Warning — `preferred_target = "js"`:** This is a default, not a lock. `moon test --target wasm-gc` still works on files that support it — useful for cross-backend libraries.
 
 **Two ways to gate code by backend — `targets:` (file-level) vs `#cfg()` (declaration-level):**
 
@@ -319,6 +330,20 @@ pub fn sqrt(x : Double) -> Double {
 
 Anything listed in `moon.pkg` `link.js.exports` must be `pub`. The compiler emits a named ESM export (or CJS property, or IIFE global) for each. A `.d.ts` is generated automatically from the public signature.
 
+> **`#export_name` (v0.10.4)** pins the emitted symbol name on a single `pub`,
+> non-generic function and is now preferred over backend-specific `exports` link
+> configuration for *new* exports. It does not work on generic functions or
+> functions with optional arguments, and the name must be a valid C identifier
+> that is unique in the package.
+>
+> ```mbt nocheck
+> #export_name("add_ints")
+> pub fn add(a : Int, b : Int) -> Int { a + b }
+> ```
+>
+> Export configuration is scoped to the package that produces the artifact — an
+> attribute inside a dependency does not add a symbol to your output.
+
 ### Phase 4: Promise / Async Bridging
 
 MoonBit async uses two compiler intrinsics that translate to JS Promise internals:
@@ -392,7 +417,14 @@ async test "fetch_text resolves" {
 }
 ```
 
-> **Note — `moonbitlang/async`:** `async test` blocks require `import { "moonbitlang/async" } for "test"` in `moon.pkg`. The dependency is only needed at test time. Add with `moon add moonbitlang/async` — **version 0.17.0 or later** is required (older 0.1.x releases don't support the current `%async.suspend` ABI). As of this skill's writing, `0.18.0` is known good.
+> **Note — `moonbitlang/async`:** `async test` blocks require `import { "moonbitlang/async" } for "test"` in `moon.pkg`. The dependency is only needed at test time. Add with `moon add moonbitlang/async` — **version 0.17.0 or later** is required (older 0.1.x releases don't support the current `%async.suspend` ABI). Verified with `0.21.0`.
+>
+> Breaking changes to watch when upgrading past 0.20: `@http.Headers` is now a
+> case-insensitive map rather than `Map[String, String]`; `@fs` dropped the
+> `create` / `truncate` parameters and `@fs.write_file` now defaults to
+> `CreateOrTruncate`; `@stdio.{Input,Output}::fd` raises instead of returning;
+> `@async.protect_from_cancel` defaults to `resume_on_cancel=true`. The runtime
+> also aborts on detected deadlocks (`@async.set_deadlock_handler` to configure).
 
 ### Phase 5: Testing
 
@@ -470,7 +502,7 @@ A minimal, runnable project demonstrating every pattern above:
 
 ```
 assets/js_binding_proj/
-├── moon.mod.json           # preferred-target: js, moonbitlang/async dep
+├── moon.mod                # preferred_target = "js", moonbitlang/async dep
 └── src/
     ├── moon.pkg            # targets + link.js.exports
     ├── ffi.mbt             # extern "js" + JsValue + inline JS

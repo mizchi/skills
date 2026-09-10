@@ -17,7 +17,7 @@ import {
   "mizchi/js",
 }
 ```
-(The JSON form `moon.pkg.json` with `{ "import": ["mizchi/js/core", "mizchi/js"] }` works too. Pick one per package — don't mix.)
+(The JSON form `moon.pkg.json` with `{ "import": ["mizchi/js/core", "mizchi/js"] }` still parses, but its support is deprecated and scheduled for removal. Pick one per package — don't mix — and prefer the DSL.)
 
 Module sub-layout (import only what you use):
 - `mizchi/js/core` — `Any`, unsafe casts, the FFI primitives
@@ -91,4 +91,4 @@ Strategy: port with `Any` first to get it compiling, then pull the logic down in
 
 > `supported_targets` warning: `mizchi/js` declares it, so `moon check` warns your package should too. For a leaf/app being migrated, declare it to silence the warning — in the `moon.pkg` DSL the verified syntax is the string expression form `supported_targets: "js"` (not `["js"]`, which warns "legacy array syntax"); in `moon.pkg.json` use `"supported-targets": ["js"]`. For a **library you republish**, prefer gating individual FFI files via `targets: { "f.mbt": ["js"] }` instead — a package-level `supported_targets` propagates and can block downstream consumers on other backends (see `moonbit-js-binding`).
 
-> Versioning note: package boundaries have shifted across releases (e.g. npm bindings moved out of `mizchi/js` into `mizchi/npm_typed` around v0.11; browser split into `mizchi/js_browser`). Run `moon add <pkg>` and check the resolved version in `moon.mod.json`; if an import path 404s, the binding likely lives in a sibling package now.
+> Versioning note: package boundaries have shifted across releases (e.g. npm bindings moved out of `mizchi/js` into `mizchi/npm_typed` around v0.11; browser split into `mizchi/js_browser`). Run `moon add <pkg>` and check the resolved version in `moon.mod`; if an import path 404s, the binding likely lives in a sibling package now.

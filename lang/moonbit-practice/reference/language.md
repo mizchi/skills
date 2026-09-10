@@ -25,7 +25,7 @@ $ tree -P '*.mbti' -I 'internal' --prune ~/.moon/lib/core
 ```
 
 **When to use each approach**:
-- Use `moon doc` for interactive API discovery (preferred)
+- Use `moon ide doc` for API discovery (preferred). Plain `moon doc <SYMBOL>` is deprecated and only prints a warning pointing here
 - Read `.mbti` files directly when you need the complete API surface at once
 
 **Reading `.mbti` files for API discovery**:
@@ -58,7 +58,7 @@ let raw : Int = distance.0 // Access first field with .0
 struct Addr {
   host : String
   port : Int
-} derive(Show, Eq, ToJson, FromJson)
+} derive(Show, Eq, Debug, ToJson, FromJson)
 
 ///|
 /// Structural types with literal syntax
@@ -88,27 +88,32 @@ fn sum_tree(tree : Tree[Int]) -> Int {
 
 Most types can automatically derive standard traits using the `derive(...)` syntax:
 
-- **`Show`** - Enables `to_string()` and string interpolation with `\{value}`
+- **`Show`** - Enables `to_string()` and string interpolation with `\{value}` (human-facing formatting)
+- **`Debug`** - Structural debug output; required by `debug_inspect` and `@debug.to_string`
 - **`Eq`** - Enables `==` and `!=` equality operators
 - **`Compare`** - Enables `<`, `>`, `<=`, `>=` comparison operators
 - **`ToJson`** - Enables `@json.inspect()` for readable test output
 - **`Hash`** - Enables use as Map keys
+- **`Arbitrary` / `Shrink`** - Property-test generation and shrinking (`@quickcheck`)
 
 ```mbt check
 ///|
 struct Coordinate {
   x : Int
   y : Int
-} derive(Show, Eq, ToJson)
+} derive(Show, Eq, Debug, ToJson)
 
 ///|
 enum Status {
   Active
   Inactive
-} derive(Show, Eq, Compare)
+} derive(Show, Eq, Debug, Compare)
 ```
 
-**Best practice**: Always derive `Show` and `Eq` for data types. Add `ToJson` if you plan to test them with `@json.inspect()`.
+**Best practice**: derive `Debug` and `Eq` on every data type — `debug_inspect` and
+`@debug.assert_eq` need them, and since v0.9 `Show` on container types is
+deprecated in favour of `Debug`. Keep `Show` for human-facing formatting, and add
+`ToJson` if you plan to test with `@json.inspect()`.
 
 ## Reference Semantics by Default
 
@@ -232,7 +237,7 @@ struct Rectangle {
 }
 
 ///|
-fn Rectangle::area(self : Rectangle) -> Double {
+fn Rectangle::area(self : Self) -> Double {
   self.width * self.height
 }
 
@@ -243,15 +248,21 @@ fn Rectangle::new(w : Double, h : Double) -> Rectangle {
 }
 
 ///|
-/// Show trait uses output(self, logger) for custom formatting
-pub impl Show for Rectangle with output(self, logger) {
+/// Show trait uses output(self, logger) for custom formatting.
+/// Since v0.10.0 the `fn` keyword is required on trait methods and impls.
+pub impl Show for Rectangle with fn output(self, logger) {
   logger.write_string("Rectangle(\{self.width}x\{self.height})")
 }
 
 ///|
+/// Since v0.10.4, `impl` no longer attaches methods implicitly.
+/// Declare which trait methods are callable with dot syntax.
+pub extend Rectangle with Show::{ output, to_string }
+
+///|
 /// Traits can have non-object-safe methods
 trait Named {
-  name() -> String // No 'self' parameter - not object-safe
+  fn name() -> String // No 'self' parameter - not object-safe
 }
 
 ///|
@@ -261,7 +272,7 @@ fn[T : Show + Named] describe(value : T) -> String {
 }
 
 ///|
-impl Hash for Rectangle with hash_combine(self, hasher) {
+impl Hash for Rectangle with fn hash_combine(self, hasher) {
   hasher..combine(self.width)..combine(self.height)
 }
 ```
@@ -275,12 +286,12 @@ MoonBit supports operator overloading through traits:
 struct Vector(Int, Int)
 
 ///|
-pub impl Add for Vector with add(self, other) {
+pub impl Add for Vector with fn add(self, other) {
   Vector(self.0 + other.0, self.1 + other.1)
 }
 
 ///|
-pub impl Mul for Vector with mul(self, other) {
+pub impl Mul for Vector with fn mul(self, other) {
   Vector(self.0 * other.0, self.1 * other.1)
 }
 
@@ -290,7 +301,7 @@ struct Person {
 } derive(Eq)
 
 ///|
-pub impl Compare for Person with compare(self, other) {
+pub impl Compare for Person with fn compare(self, other) {
   self.age.compare(other.age)
 }
 

@@ -2,137 +2,60 @@
 title: "moon ide"
 ---
 
-
 ## Code Navigation with `moon ide`
 
-**ALWAYS use `moon ide` for code navigation in MoonBit projects instead of manual file searching, grep, or semantic search.**
+**Use `moon ide` for code navigation in MoonBit projects instead of manual file
+searching, grep, or semantic search.** It resolves symbols through the compiler,
+so it distinguishes definitions from call sites and never matches comments or
+string literals.
 
-This tool provides two essential commands for precise code exploration:
+`moon ide` is served by the `moon-ide` binary shipped with the toolchain. If moon
+reports `no such subcommand: 'ide'`, reinstall or upgrade the toolchain
+(`moon upgrade`).
 
-### Core Commands
+### Subcommands
 
-- `moon ide goto-definition` - Find where a symbol is defined
-- `moon ide find-references` - Find all usages of a symbol
+| Command | Purpose |
+|---|---|
+| `moon ide peek-def <symbol>` | Show a symbol's definition with surrounding context |
+| `moon ide find-references <symbol>` | List every usage across the project |
+| `moon ide outline <path>` | Structural overview of a file or package |
+| `moon ide doc '<query>'` | Discover and read APIs (supports globs) |
+| `moon ide hover <symbol> -loc <file:line[:col]>` | Inferred type + doc comment at a location |
+| `moon ide rename <old> <new>` | Rename a symbol project-wide |
+| `moon ide analyze <path>` | Public API usage statistics |
 
-### Query System
+> There is **no** `moon ide goto-definition`, and no `-tags` / `-query` flags.
+> Earlier toolchains exposed that interface; it was replaced by the symbol-argument
+> form below. `peek-def` covers "where is this defined", `doc` covers fuzzy search.
 
-Symbol lookup uses a two-part query system for precise results:
+### Symbol syntax
 
-#### 1. Symbol Name Query (`-query`)
+All subcommands that take a `<symbol>` accept the same forms:
 
-Fuzzy search for symbol names with package filtering support:
+- `[@pkg.]symbol` — a function, constant, or type (e.g. `parse_int`, `Array`).
+  Omitting `@pkg.` searches the current package and the prelude.
+- `[@pkg.]Type::member` — methods, struct fields, enum variants, trait methods
+  (e.g. `Array::length`, `@http.Request::new`, `Option::None`).
+
+### `moon ide peek-def` — view definitions
 
 ```bash
-# Find any symbol named 'symbol'
-moon ide goto-definition -query 'symbol'
-
-# Find methods of a specific type
-moon ide goto-definition -query 'Type::method'
-
-# Find trait method implementations
-moon ide goto-definition -query 'Trait for Type with method'
-
-# Find symbol in specific package using @pkg prefix
-moon ide goto-definition -query '@moonbitlang/x encode'
-
-# Find symbol in multiple packages (searches in pkg1 OR pkg2)
-moon ide goto-definition -query '@username/mymodule/pkg1 @username/mymodule/pkg2 helper'
-
-# Find symbol in nested package
-moon ide goto-definition -query '@username/mymodule/mypkg helper'
+moon ide peek-def <symbol> [-loc filename:line[:col]]
 ```
 
-**Supported symbols**: functions, constants, let bindings, types, structs, enums, traits
+Two modes:
 
-**Package filtering**: Prefix your query with `@package_name` to scope the search. Multiple `@pkg` prefixes create an OR condition.
-
-#### 2. Tag-based Filtering (`-tags`)
-
-Pre-filter symbols by characteristics before name matching:
-
-**Visibility tags**:
-
-- `pub` - Public symbols
-- `pub all` - Public structs with all public fields
-- `pub open` - Public traits with all methods public
-- `priv` - Private symbols
-
-**Symbol type tags**:
-
-- `type` - Type definitions (struct, enum, typealias, abstract)
-- `error` - Error type definitions
-- `enum` - Enum definitions and variants
-- `struct` - Struct definitions
-- `alias` - Type/function/trait aliases
-- `let` - Top-level let bindings
-- `const` - Constant definitions
-- `fn` - Function definitions
-- `trait` - Trait definitions
-- `impl` - Trait implementations
-- `test` - Named test functions
-
-**Combine tags with logical operators**:
+1. **Global search** (no `-loc`): resolves `<symbol>` using the symbol syntax above.
+2. **Contextual search** (`-loc` given): matches `<symbol>` as a plain substring at
+   that location. The line must be exact; the column is a hint. Use this when a
+   name is ambiguous or shadowed.
 
 ```bash
-# Public functions only
-moon ide goto-definition -tags 'pub fn' -query 'my_func'
-
-# Functions or constants
-moon ide goto-definition -tags 'fn | const' -query 'helper'
-
-# Public functions or constants
-moon ide goto-definition -tags 'pub (fn | const)' -query 'api'
-
-# Public types or traits
-moon ide goto-definition -tags 'pub (type | trait)' -query 'MyType'
-```
-
-### Practical Examples
-
-```bash
-# Find public function definition
-moon ide goto-definition -tags 'pub fn' -query 'maximum'
-
-# Find all references to a struct
-moon ide find-references -tags 'struct' -query 'Rectangle'
-
-# Find trait implementations
-moon ide goto-definition -tags 'impl' -query 'Show for MyType'
-
-# Find errors in specific package
-moon ide goto-definition -tags 'error' -query '@mymodule/parser ParseError'
-
-# Find symbol across multiple packages
-moon ide goto-definition -query '@moonbitlang/x @moonbitlang/core encode'
-
-# Combine package filtering with tags
-moon ide goto-definition -tags 'pub fn' -query '@username/myapp helper'
-```
-
-### Query Processing
-
-The tool processes queries in this order:
-
-1. Filter symbols by `-tags` conditions
-2. Extract package scope from `@pkg` prefixes in `-query`
-3. Fuzzy match remaining symbols by name
-4. Return top 3 best matches with location information
-
-**Best Practice**: Start with `-tags` to reduce noise, then use `@pkg` prefixes in `-query` to scope by package for precise navigation.
-
-## Additional IDE Commands
-
-### `moon ide peek-def`
-
-Display definitions inline. More accurate than grep (semantic search).
-
-```bash
-# Top-level symbol definition
 $ moon ide peek-def String::rev
 Found 1 symbols matching 'String::rev':
 `pub fn String::rev` in package moonbitlang/core/builtin at .../string_methods.mbt:1039-1044
 
-# Local symbol definition with location
 $ moon ide peek-def Parser -loc src/parse.mbt:46:4
 Definition found at file src/parse.mbt
   | ///|
@@ -143,91 +66,110 @@ Definition found at file src/parse.mbt
   | }
 ```
 
-### `moon ide outline`
-
-List top-level symbols in a package or file.
+### `moon ide find-references` — track usages
 
 ```bash
-# Directory (package) outline
+moon ide find-references <symbol>
+```
+
+Always searches globally; `-loc` is not supported here. Prints the definition
+first, then every reference with file:line:col and context.
+
+```bash
+$ moon ide find-references TranslationUnit
+```
+
+### `moon ide outline` — structural overview
+
+```bash
+moon ide outline .              # every .mbt file in the package
+moon ide outline src/parser.mbt # one file
+```
+
+```bash
 $ moon ide outline .
 spec.mbt:
  L003 | pub(all) enum CStandard {
        ...
  L013 | pub(all) struct Position {
        ...
-
-# Single file outline
-$ moon ide outline parser.mbt
 ```
 
-### `moon ide hover`
+### `moon ide doc` — API discovery
 
-Show type signature and documentation for a symbol at a specific location. Unlike `peek-def` which shows the source definition, `hover` shows the inferred type and doc comments.
+**This is the primary tool for exploring an API.** Faster and more accurate than
+grep. `moon doc <SYMBOL>` is deprecated and prints a warning pointing here.
 
 ```bash
-# Show type and docs for a symbol at a location
-$ moon ide hover my_func --loc src/lib.mbt:10:4
+# Empty query: list packages (in a module) or symbols (in a package)
+moon ide doc ''
+
+# Lookup by name
+moon ide doc "String"            # a type and its methods
+moon ide doc "@buffer"           # every exported symbol of a package
+moon ide doc "@buffer.new"       # one function, with docs
+moon ide doc "@encoding/utf8"    # nested package paths work
+
+# Globbing
+moon ide doc "String::*rev*"     # String methods containing "rev"
+moon ide doc "*parse*"           # any symbol containing "parse"
+```
+
+```bash
+$ moon ide doc "@buffer.new"
+package "moonbitlang/core/buffer"
+
+pub fn new(size_hint? : Int) -> Buffer
+  Creates ...
+```
+
+### `moon ide hover` — type and docs in context
+
+Unlike `peek-def`, which shows the source definition, `hover` shows the *inferred*
+type plus doc comments at a specific location.
+
+```bash
+$ moon ide hover my_func -loc src/lib.mbt:10:4
 fn my_func(x : Int) -> String
 ---
 Documentation for my_func...
 
-# Show type info for a type reference
-$ moon ide hover Map --loc src/lib.mbt:5:18
+$ moon ide hover Map -loc src/lib.mbt:5:18
 type Map[K, V]
 ---
 Mutable linked hash map that maintains the order of insertion...
 ```
 
-**When to use**: Use `hover` to inspect the inferred type or read documentation for a symbol in context. Use `peek-def` to jump to the source definition.
+### `moon ide rename` — project-wide rename
 
-### `moon ide rename`
-
-Rename a symbol across the entire project. Preferred over manual find-and-replace.
+Preferred over manual find-and-replace, which cannot tell a definition from a
+same-named local.
 
 ```bash
-# Rename a symbol
 $ moon ide rename old_name new_name
 ```
 
-### `moon ide find-references`
-
-Find all references to a symbol.
+### `moon ide analyze` — unused public API
 
 ```bash
-$ moon ide find-references TranslationUnit
-```
-
-### `moon ide analyze`
-
-Display public APIs with usage statistics. Useful for finding unused exports (v0.8.3+).
-
-```bash
-# Analyze current package
 $ moon ide analyze .
 pub fn build_report(...) -> Report  // usage: 2 (1 in test), in exports.mbt
 pub fn never_called_pub() -> String // usage: 0 (0 in test), in exports.mbt
 
-# Analyze with glob pattern
 $ moon ide analyze internal/*
 ```
 
-## `moon doc` for API Discovery
+Useful before a release to find exports nobody calls, and to size the blast
+radius of a signature change.
 
-**CRITICAL**: `moon doc '<query>'` is the primary tool for API discovery. Faster and more accurate than grep.
+## Choosing a command
 
-```bash
-# Empty query: list available packages
-moon doc ''
-
-# List type methods
-moon doc "String"
-
-# List symbols in a package
-moon doc "@buffer"
-
-# Specific function details
-moon doc "@buffer.new"
-
-# Glob pattern
-moon doc "String::*rev*"
-```
+| Question | Command |
+|---|---|
+| "Where is `X` defined?" | `peek-def X` |
+| "What is `X` here, exactly?" | `hover X -loc file:line:col` |
+| "Who calls `X`?" | `find-references X` |
+| "What does this package expose?" | `doc '@pkg'` |
+| "Is there a method like `…rev…`?" | `doc 'String::*rev*'` |
+| "What's in this file?" | `outline path` |
+| "Can I drop this export?" | `analyze .` |

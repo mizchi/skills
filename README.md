@@ -158,7 +158,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 | [opentelemetry](devops/opentelemetry/) | `devops/opentelemetry` | Platform-agnostic OTel reference — signal selection, span design, context propagation, sampling, OTLP exporter config. |
 | [otel-node](devops/otel-node/) | `devops/otel-node` | Node.js OTel setup — SDK init, auto-instrumentation, and the esbuild ESM silent-failure gotcha. |
 | [gh-fix-ci](devops/gh-fix-ci/) | `devops/gh-fix-ci` | Debug and fix failing GitHub Actions PR checks via `gh`. |
-| [flaker-storage-cache-on-ci](devops/flaker-storage-cache-on-ci/) | `devops/flaker-storage-cache-on-ci` | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v4` with sliding key. |
+| [flaker-storage-cache-on-ci](devops/flaker-storage-cache-on-ci/) | `devops/flaker-storage-cache-on-ci` | Persist flaker's DuckDB storage across GitHub Actions via `actions/cache@v6` with sliding key. |
 | [workers-cd-rollback](devops/workers-cd-rollback/) | `devops/workers-cd-rollback` | GitHub Actions CD for a Cloudflare Worker with auto-rollback on smoke failure. |
 
 ### Process / Meta

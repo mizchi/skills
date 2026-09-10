@@ -439,8 +439,8 @@ check: format-check typecheck ast-grep-lint test
 dev 環境とツールを揃える（プロジェクトで pnpm を使うなら CI も pnpm、npm なら npm）:
 
 ```yaml
-- uses: actions/setup-node@v4
-  with: { node-version: 24, cache: npm }   # pnpm プロジェクトなら pnpm/action-setup@v4 + cache: pnpm
+- uses: actions/setup-node@v7
+  with: { node-version: 24, cache: npm }   # pnpm プロジェクトなら pnpm/action-setup@v6 + cache: pnpm
 
 - run: npm ci   # pnpm なら pnpm install --frozen-lockfile
 

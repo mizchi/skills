@@ -21,6 +21,7 @@ on:
       - "wrangler.jsonc"
       - "package.json"
       - "pnpm-lock.yaml"
+      - "moon.mod"
       - "moon.mod.json"
 
 permissions:

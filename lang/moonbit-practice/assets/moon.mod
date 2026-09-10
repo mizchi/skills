@@ -30,7 +30,8 @@ import {
   // "username/other@0.1.0",
 }
 
-options(
-  source: "src",          // source directory holding the packages
-  // exclude: [ "examples", "node_modules", "_build" ],  // paths kept out of the published package
-)
+// Source directory holding the packages (top-level, not inside options)
+source = "src"
+
+// Publishing filters live in .moonignore (falling back to .gitignore).
+// The `include` / `exclude` fields are deprecated.

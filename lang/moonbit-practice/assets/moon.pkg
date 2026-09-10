@@ -20,9 +20,15 @@ import {
 // Per-package warning tweaks (optional, top-level)
 // warnings = "-unused_value"
 
-options(
-  is_main: true,          // executable package containing `fn main`
+// What this package builds: "library" (default) | "executable" | "foreign_library".
+// `pkgtype(kind: "executable")` replaces the legacy options("is-main": true);
+// `pkgtype(kind: "foreign_library")` replaces options(link: true).
+pkgtype(kind: "executable")
 
+// Files `moon fmt` should leave alone (optional, top-level)
+// formatter(ignore: [ "generated.mbt" ])
+
+options(
   // Conditional compilation: file -> backend conditions (and / or / not supported)
   targets: {
     "only_js.mbt": [ "js" ],

@@ -5,7 +5,7 @@ description: Persist flaker's DuckDB storage across GitHub Actions runs and feed
 
 # flaker storage cache on GitHub Actions
 
-`flaker` keeps its data in a DuckDB file at the path declared by `flaker.toml` `[storage] path` (default `.flaker/data`). For flaky detection / KPI / quarantine to work, that file must persist between CI runs. GitHub Actions has no first-class runtime storage, so the convention is **`actions/cache@v4` with a sliding key**.
+`flaker` keeps its data in a DuckDB file at the path declared by `flaker.toml` `[storage] path` (default `.flaker/data`). For flaky detection / KPI / quarantine to work, that file must persist between CI runs. GitHub Actions has no first-class runtime storage, so the convention is **`actions/cache@v6` with a sliding key**.
 
 ## When this skill applies
 
@@ -19,7 +19,7 @@ description: Persist flaker's DuckDB storage across GitHub Actions runs and feed
 ```yaml
 - name: Cache flaker data
   if: always()
-  uses: actions/cache@v4
+  uses: actions/cache@v6
   with:
     path: .flaker/data
     key: flaker-data-${{ github.run_id }}
@@ -37,14 +37,14 @@ The `path` MUST equal `flaker.toml`'s `[storage] path`. Default is `.flaker/data
 
 ## Triggering writes
 
-`actions/cache@v4` saves automatically in its post-step. Callers don't `cache save` explicitly. The save key is the run-id, so duplicate writes never collide.
+`actions/cache@v6` saves automatically in its post-step. Callers don't `cache save` explicitly. The save key is the run-id, so duplicate writes never collide.
 
 ## fetch-depth for `--changed` derivation
 
 Any flaker invocation that uses the **hybrid / affected** strategy (`flaker run --gate merge` in CI profile, by default) needs `--changed <files,...>`. Without it: `Error: hybrid mode requires resolver and changedFiles`.
 
 ```yaml
-- uses: actions/checkout@v4
+- uses: actions/checkout@v7
   with:
     fetch-depth: 0  # need history for `git diff` against the PR base
 ```

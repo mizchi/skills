@@ -28,13 +28,13 @@ A cache miss means re-downloading hundreds of packages on every run. This is the
 **pnpm**
 
 ```yaml
-- uses: pnpm/action-setup@v4
+- uses: pnpm/action-setup@v6
   with:
     version: latest           # or pin to a specific version
 
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
-    node-version-file: .nvmrc  # or node-version: '20'
+    node-version-file: .nvmrc  # or node-version: '24' (current LTS)
     cache: 'pnpm'              # ← must be present; omitting it silently skips caching
 ```
 
@@ -43,7 +43,7 @@ Common mistake: calling `corepack enable` instead of `pnpm/action-setup`. `corep
 **npm**
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
     node-version-file: .nvmrc
     cache: 'npm'
@@ -52,7 +52,7 @@ Common mistake: calling `corepack enable` instead of `pnpm/action-setup`. `corep
 **yarn (classic / berry)**
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v7
   with:
     node-version-file: .nvmrc
     cache: 'yarn'
@@ -107,7 +107,7 @@ jobs:
       - run: pnpm exec playwright test --shard=${{ matrix.shard }}/4
         env:
           CI: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}       # ← upload even on test failure
         with:
           name: blob-report-${{ matrix.shard }}
@@ -198,30 +198,30 @@ on:
 - Use a comment with the human-readable version for readability:
 
 ```yaml
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 ```
 
 - Dependabot or Renovate can keep SHA pins up to date automatically. Check that `.github/dependabot.yml` includes the `github-actions` ecosystem.
 
 **Node.js 20 deprecation warning**: GitHub started issuing "Node.js 20 actions are deprecated" warnings in 2025/2026. This refers to the action's own runtime (`runs.using: node20`), not the project's Node version. Fix by upgrading to the first major version that uses `node24`:
 
-| action | node24-compatible version (as of 2026-05) |
-|---|---|
-| `actions/checkout` | v6.0.0+ |
-| `actions/setup-node` | v6.0.0+ |
-| `actions/cache` | v5.0.0+ |
-| `actions/upload-artifact` | v7.0.0+ |
-| `actions/download-artifact` | v8.0.0+ |
-| `aws-actions/configure-aws-credentials` | v6.0.0+ |
+| action | first node24 major | current major (2026-09) |
+|---|---|---|
+| `actions/checkout` | v6.0.0 | v7 |
+| `actions/setup-node` | v6.0.0 | v7 |
+| `actions/cache` | v5.0.0 | v6 |
+| `actions/upload-artifact` | v7.0.0 | v7 |
+| `actions/download-artifact` | v8.0.0 | v8 |
+| `aws-actions/configure-aws-credentials` | v6.0.0 | v6 |
 
-Latest pinned SHAs (2026-05):
+Latest pinned SHAs (verified 2026-09):
 ```yaml
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
 uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
 uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-uses: aws-actions/configure-aws-credentials@99214aa6889fcddfa57764031d71add364327e59 # v6.1.3
+uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
 ```
 
 Note: SHAs drift — always verify with `gh release view --repo <owner>/<action>` before pinning.
@@ -259,7 +259,7 @@ gh run view <run_id> --log | grep -i "cache"
 
 | Anti-pattern | Problem | Fix |
 |---|---|---|
-| `corepack enable` only (no pnpm/action-setup) | pnpm store is not cached | Add `pnpm/action-setup@v4` before setup-node |
+| `corepack enable` only (no pnpm/action-setup) | pnpm store is not cached | Add `pnpm/action-setup@v6` before setup-node |
 | `pnpm install` without `--frozen-lockfile` | Lockfile can silently drift | Use `--frozen-lockfile` always in CI |
 | `fail-fast: true` on test matrix | Shards cancel before uploading artifacts | Set `fail-fast: false` |
 | Upload artifact without `if: ${{ !cancelled() }}` | Blob reports lost on test failure | Add the `if` condition |

@@ -151,7 +151,7 @@ jobs:
   ai-triage:
     runs-on: ubuntu-latest
     steps:
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_AI_AGENT_ROLE_ARN }}
           aws-region: ap-northeast-1
