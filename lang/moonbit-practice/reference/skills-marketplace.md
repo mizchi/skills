@@ -24,16 +24,34 @@ test the published command's real workflow.
 
 ## Package layout
 
-Place `SKILL.md` in the executable package directory, beside `moon.pkg`:
+Place `SKILL.md` in the executable package directory, beside `moon.pkg`.
+
+**This layout assumes `moon.mod` does not set `source`** — the module root is the
+source root:
 
 ```text
-moon.mod
+moon.mod            (no `source` line)
 cmd/tool/
 ├── moon.pkg
 ├── main.mbt
 ├── main_wbtest.mbt
 └── SKILL.md
 ```
+
+If your `moon.mod` sets `source = "src"` (as `assets/moon.mod` does), the command
+package must live **under** it — a top-level `cmd/` is invisible to the build:
+
+```text
+moon.mod            source = "src"
+src/cmd/tool/
+├── moon.pkg
+├── main.mbt
+└── SKILL.md
+```
+
+Pick one and keep the manifest and the tree consistent; the package's import path
+follows from it (see reference/configuration.md, "`source` also decides every
+package's import path").
 
 Define an executable package with the DSL config:
 
@@ -89,11 +107,16 @@ verbatim. State whether paths resolve from the current working directory and
 whether shell quoting is required. Do not claim a capability merely because
 the package compiles for Wasm.
 
-Validate the skill with an agentskills-compatible validator when available:
+Optionally validate the frontmatter with any agentskills-compatible validator —
+for example the `quick_validate.py` shipped with the `skill-creator` skill, if that
+skill is installed:
 
 ```bash
-python path/to/skill-creator/scripts/quick_validate.py cmd/tool
+python "$HOME/.claude/skills/skill-creator/scripts/quick_validate.py" cmd/tool
 ```
+
+Skip this step when no validator is on hand; it checks frontmatter shape, not
+behaviour, and nothing downstream depends on it.
 
 ## Run coordinates
 
@@ -162,6 +185,11 @@ allow selected host variable names instead.
 The policy covers `moonbitlang/async` and Moonrun-owned `__moonbit_*_unstable`
 FFI, including `moonbitlang/x/fs` on Wasm. It does not cover WASI imports.
 
+It also applies only to **guest execution**. `moonx`'s own work — refreshing the
+registry index, downloading and checksumming the Marketplace asset — happens before
+the policy-bearing child is spawned and is not governed by it, so a deny-all `net`
+policy does not break a cold-cache run.
+
 ### Package and remote dependencies
 
 Treat URI syntax and host capability as separate concerns. A Wasm command can
@@ -200,9 +228,37 @@ moon run cmd/tool --target wasm -- check testdata/input.foo
 (Local packages go through `moon run --target wasm`; `moonx` is for registry
 coordinates.)
 
-Also test a restrictive policy when the command uses host IO.
+The path argument is a **filesystem path to the package directory**, not an import
+path: with `source = "src"` the command above is `moon run src/cmd/tool
+--target wasm`. Everything after `--` goes to the program.
+
+Publish targets the **linear-memory `wasm`** backend — that is what `moonx` runs by
+default and what the Marketplace serves. `wasm-gc` is a different backend: check it
+if you also support it, but the asset users get is `wasm`, so that is the target
+your tests must cover.
+
+`moon info` regenerates `.mbti` interface files. An executable package exposes no
+public API, so it is a no-op there — run it for the library packages the command
+depends on, not for `cmd/tool` itself.
+
+Also exercise the restrictive policy, in both directions — an allowed path must
+succeed and a path outside the granted roots must be denied:
+
+```bash
+moon run cmd/tool --target wasm --experimental-policy moonrun-policy.json \
+  -- check inputs/main.foo        # expected: succeeds
+moon run cmd/tool --target wasm --experimental-policy moonrun-policy.json \
+  -- check /etc/hosts             # expected: denied by policy
+```
 
 Bump the module version before publishing; published versions are immutable.
+
+**Order matters when `SKILL.md` embeds a pinned coordinate.** That file ships
+*inside* the artifact, so a pinned example in it has to be updated to the new
+version before the dry-run, or it will ship pointing at the previous release — and
+it goes stale again on every later version. Prefer an unpinned coordinate in the
+shipped `SKILL.md` and keep pinned examples in your repo's own docs.
+
 Then validate the complete artifact:
 
 ```bash

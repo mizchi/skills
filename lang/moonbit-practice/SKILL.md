@@ -42,10 +42,16 @@ moon ide outline src/parser.mbt
 
 **When `moon` is not installed** (sandbox, review-only checkout) none of the
 verification steps this guide leans on — `moon fmt`, `moon check`, `moon test -u`,
-`moon ide doc` — are available. Then: use `reference/stdlib.md` for core API
-signatures instead of `moon ide doc`, leave every snapshot `content=""` for
-`moon test -u` to fill later, and say explicitly in your summary which parts are
-unverified. Do not hand-write values a tool was supposed to generate.
+`moon ide doc` — are available. Then:
+
+- Leave every snapshot `content=""` for `moon test -u` to fill later.
+- `reference/stdlib.md` is a package tour, not a complete signature index. When a
+  symbol you need is not in it and you cannot run `moon ide doc`, prefer a
+  construct this guide documents over one you half-remember, and mark it
+  unverified.
+- Say explicitly in your summary which parts are unverified.
+
+Do not hand-write values a tool was supposed to generate.
 
 ### Other Rules
 
@@ -55,7 +61,9 @@ unverified. Do not hand-write values a tool was supposed to generate.
 - **Multiple modules in one repo → use a workspace** (`moon.work`), not standalone modules. `moon work init <dirs>` creates the manifest; members share one build context and resolve each other locally. Path dependencies inside `moon.mod` are deprecated in favour of `moon.work`. See reference/configuration.md "Workspace"
 - **Publishing filters live in `.moonignore`** (falling back to `.gitignore`), not the deprecated `include` / `exclude` fields in `moon.mod`
 - **Examples below omit `pub`.** Anything a downstream package or a JS/Wasm host must see needs `pub` (`pub fn`, `pub struct`, `pub suberror`, `pub impl`, `pub extend`); package-local items do not.
-- **Test files**: `*_test.mbt` is black-box (sees only the package's public API), `*_wbtest.mbt` is white-box (sees private items too). A bare `test "..." { }` block goes in one of those, or inline in the source file for a white-box test
+- **Test files**: `*_test.mbt` is black-box (sees only the package's public API), `*_wbtest.mbt` is white-box (sees private items too). A bare `test "..." { }` block goes in one of those, or inline in the source file for a white-box test. A black-box test reaches its own package through the package alias (`@mypackage.f()`) with no extra import; only *other* packages it uses need an `import { ... } for "test"` entry
+- **Executable entry point**: `fn main { ... }` — no parameter list, no parens. `async fn main { ... }` for an async program. Read arguments with `@env.args()`; the package needs `pkgtype(kind: "executable")`
+- **Visibility**: `pub` exposes a name; `pub(all)` additionally exposes a struct's fields or an enum's / `suberror`'s constructors, which is what a *different* package needs in order to pattern-match them. A plain `pub struct` / `pub suberror` is readonly-from-outside: constructible and matchable only in its own package
 - Reference files in this skill: `reference/language.md` (types, traits, pattern matching), `reference/testing.md` (test layout, snapshots, property tests, benchmarks), `reference/stdlib.md` (core APIs), `reference/configuration.md` (`moon.mod` / `moon.pkg` / workspaces), `reference/ide.md` (`moon ide`), `reference/ffi.md` and `reference/ffi-native.md` (FFI), `reference/performance.md`, `reference/refactor.md`, `reference/nix.md`, `reference/mbtx.md`, `reference/skills-marketplace.md`. **On any conflict, SKILL.md wins.**
 - Check reference/mbtx.md for single-file `.mbtx` scripts (`moon run script.mbtx`, `moonx script.mbtx`, stdin via `moon run -`, inline source via `moon run -c '...'`, `import { }` prelude block)
 - Check reference/skills-marketplace.md before defining or publishing an executable for skills.mooncakes.io; it covers package-local `SKILL.md`, Wasm targets, `moonx`, host capabilities, policy, and release verification
@@ -73,7 +81,7 @@ unverified. Do not hand-write values a tool was supposed to generate.
 - **`nobreak` not `else`** for functional for-loop exit values (`else` is deprecated)
 - **Legacy syntax**: `function_name!(...)` and `function_name(...)?` are deprecated
 - **`for { ... }` is deprecated** - use `for ;; { ... }` or `while true { ... }` for infinite loops
-- **Cross-package `.` syntax for `impl` removed** - `.` method call only works within the same package
+- **Cross-package `.` on a trait method needs `pub extend`** - an `impl` alone never makes `value.f()` work from another package. Attach it explicitly (`pub extend Type with Trait::{ f }`); without `pub` the attachment is package-local, and with no `extend` at all callers must write `Trait::f(value)`
 - **`trait`/`impl` methods require the `fn` keyword (v0.10.0)** - `moon fmt` migrates old code; see "Migrating a trait or impl" below
 - **Attach trait methods with `extend` (v0.10.4)** - implicit `impl` → method attachment is deprecated; see "Migrating a trait or impl" below
 - **`try?` is gone (v0.10.0)** - use `Ok(expr) catch { e => Err(e) }` for a `Result`, `try!` to panic on error
@@ -308,7 +316,8 @@ guessed value produces a test that fails on first run. If you cannot run the
 toolchain, leave every `content=""` empty and say so; an empty snapshot is an
 honest TODO, a wrong one is a false assertion.
 
-For reference, these are the shapes `Debug` produces:
+These are the shapes `Debug` produces. They are here so you can **read** an
+existing snapshot, not so you can write a new one — writing is still `-u`'s job:
 
 | Inspected value | `debug_inspect` renders |
 |---|---|
@@ -395,7 +404,7 @@ moon ide doc Map          # Map methods
 | Filtered test | `moon test --filter 'glob'` | Run specific tests |
 | Benchmark | `moon bench` | https://docs.moonbitlang.com/en/stable/language/benchmarks |
 | Doc Test | `moon check` / `moon test` | https://docs.moonbitlang.com/en/stable/language/docs |
-| Format | `moon fmt` | Also migrates deprecated syntax + JSON config |
+| Format | `moon fmt` | Migrates `moon.mod.json`/`moon.pkg.json` → DSL and adds the `fn` keyword to `trait`/`impl`. **Nothing else on the pitfalls list** — `try?`, `fn new`, `is-main`, `extend` are all manual |
 | Generate types | `moon info` | - |
 | Explain an error code | `moon explain E0087` | Or `moon check --explain` |
 | Doc reference | `moon ide doc <Type>` | `moon doc <SYMBOL>` is deprecated |
@@ -596,6 +605,9 @@ Three declaration shapes — pick the smallest that fits:
 /// of the same name — `raise EmptyInput` works directly.
 suberror EmptyInput
 
+///| `derive` attaches to the payload-free form too, with no braces in between
+suberror NotFound derive(Eq, Debug)
+
 ///| One constructor carrying a payload — the constructor repeats the type name
 suberror DivError { DivError(String) }
 
@@ -692,6 +704,19 @@ if the compiler cannot prove it always succeeds it reports E0087. Use `guard!`
 when terminating is intended — `guard!` takes no `else`.
 
 ```moonbit
+///| Fallible guard: `else` supplies the value for the whole enclosing function
+fn guarded_get(array : Array[Int], index : Int) -> Int? {
+  guard index >= 0 && index < array.length() else { None }
+  Some(array[index])
+}
+
+///| With a pattern, via `is`
+fn plain_text(r : Resource) -> String raise Error {
+  guard r is PlainText(text) else { fail("not plain text") }
+  text
+}
+
+///| Provably total, or a deliberate panic: `guard!` takes no `else`
 fn require_some(value : Int?) -> Int {
   guard! value is Some(result)
   result

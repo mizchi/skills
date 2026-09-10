@@ -4,14 +4,34 @@ title: "MoonBit Standard Library and External Packages"
 
 # MoonBit Standard Library
 
-The standard library (`moonbitlang/core`) is **automatically available** - no need to add it to dependencies.
+> Error-raising calls need no suffix. The legacy `f(x)!` / `f!(x)` / `f(x)?`
+> propagation forms were removed — inside a `raise` context errors propagate
+> automatically; otherwise use `expr catch { ... }` or `Ok(expr) catch { e => Err(e) }`.
+
+The standard library (`moonbitlang/core`) is **never a dependency** — it ships with
+the toolchain. But that does not mean every core package is in scope for free.
 
 ## Important Rules
 
 - ❌ **DO NOT** use `moon add moonbitlang/core/*`
-- ❌ **DO NOT** add it to the `import` block in `moon.mod` (module deps)
-- ❌ **DO NOT** add it to the `import` block in `moon.pkg` (package imports)
-- ✅ **DO** use directly: `@strconv.parse_int()`, `@json.parse()`, etc.
+- ❌ **DO NOT** add `moonbitlang/core` to the `import` block in `moon.mod` (module deps)
+- ✅ **DO** use prelude packages directly, with no import at all:
+  `@strconv.parse_int()`, `@json.parse()`, `@buffer.new()`
+- ✅ **DO** add a **`moon.pkg`** import for a core package outside the prelude —
+  that is a package import, not a dependency:
+
+  ```moonbit
+  import {
+    "moonbitlang/core/immut/vector",   // used as @immut/vector
+    "moonbitlang/core/quickcheck",     // used as @quickcheck
+  }
+  ```
+
+  The default alias is the path after `moonbitlang/core/`, so a nested package
+  keeps its slash: `moonbitlang/core/immut/sorted_set` → `@immut/sorted_set`.
+
+When in doubt, try it without the import first: an unimported non-prelude package
+is a compile error naming the package, which tells you exactly what to add.
 
 ## Exploring the Standard Library
 
@@ -37,7 +57,7 @@ moon ide doc "String::*find*"
 
 ```moonbit
 // Parse JSON
-let value : @json.JsonValue = @json.parse("{\"name\": \"Alice\"}")!
+let value : @json.JsonValue = @json.parse("{\"name\": \"Alice\"}")
 
 // Access fields
 match value {
@@ -66,11 +86,11 @@ let result = buf.to_string()  // "Hello World"
 
 ```moonbit
 // Parse integers
-let n : Int = @strconv.parse_int("42")!
-let hex : Int = @strconv.parse_int("ff", base=16)!
+let n : Int = @strconv.parse_int("42")
+let hex : Int = @strconv.parse_int("ff", base=16)
 
 // Parse floats
-let f : Double = @strconv.parse_double("3.14")!
+let f : Double = @strconv.parse_double("3.14")
 ```
 
 ### @encoding/utf8 - UTF-8 Encoding
@@ -183,7 +203,7 @@ struct Config {
   value: Int
 } derive(ToJson, FromJson)
 
-let config : Config = @json.from_json(@json.parse(json_str)!)!
+let config : Config = @json.from_json(@json.parse(json_str))
 ```
 
 ### Eq / Compare - Equality and Ordering
@@ -345,7 +365,7 @@ async fn fetch_data(url : String) -> String raise {
 
 // Run async code
 @async.run(async fn() {
-  let data = fetch_data("https://example.com")!
+  let data = fetch_data("https://example.com")
   println(data)
 })
 ```

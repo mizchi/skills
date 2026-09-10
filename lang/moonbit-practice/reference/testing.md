@@ -267,7 +267,7 @@ test "panic on empty array" {
 ///|
 test "parse error" {
   let result : Result[Int, ParseError] = Ok(parse("invalid")) catch { e => Err(e) }
-  debug_inspect(result, content="Err(InvalidInput)")
+  debug_inspect(result, content="")   // moon test -u fills this in
 }
 ```
 
