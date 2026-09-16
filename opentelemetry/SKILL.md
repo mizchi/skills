@@ -1,6 +1,6 @@
 ---
 name: opentelemetry
-description: Platform-agnostic OpenTelemetry reference — signal selection (traces/metrics/logs), span design, context propagation (W3C TraceContext), sampling strategies, and OTLP exporter config. Use before writing any OTel instrumentation to get design decisions right. Platform-specific skills (devops/otel-node, cloudflare/workers-otel-utels) layer on top of this.
+description: Platform-agnostic OpenTelemetry reference — signal selection (traces/metrics/logs), span design, context propagation (W3C TraceContext), sampling strategies, and OTLP exporter config. Use before writing any OTel instrumentation to get design decisions right. Platform-specific skills (otel-node, cloudflare-workers-otel-utels) layer on top of this.
 ---
 
 # OpenTelemetry — Core Patterns
@@ -131,7 +131,7 @@ Use `BatchSpanProcessor` in production — it is async and low-overhead. `Simple
 ## Common Pitfalls
 
 - **`provider.register()` not called**: SDK is configured but nothing is exported. Call before any instrumentation runs.
-- **ESM + auto-instrumentation (Node.js)**: `require-in-the-middle` hooks do not fire for ESM static imports. See `devops/otel-node` for the workaround.
-- **Cloudflare Workers**: no Node.js runtime, fetch-boundary instrumentation needed. See `cloudflare/workers-otel-utels`.
+- **ESM + auto-instrumentation (Node.js)**: `require-in-the-middle` hooks do not fire for ESM static imports. See `otel-node` for the workaround.
+- **Cloudflare Workers**: no Node.js runtime, fetch-boundary instrumentation needed. See `cloudflare-workers-otel-utels`.
 - **Span name includes dynamic data**: explodes trace index cardinality. Move to attributes.
 - **No W3C propagation on outbound calls**: distributed trace breaks — downstream spans appear as orphaned roots.

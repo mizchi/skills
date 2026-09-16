@@ -52,7 +52,7 @@ moon add mizchi/x
 Use this **instead of** hand-binding `node:fs`/`node:http`/`node:child_process` whenever the ported code should also be runnable natively. Depends on `moonbitlang/async` and `moonbitlang/x`.
 
 ### `mizchi/cloudflare` — Cloudflare Workers (separate repo)
-Workers runtime bindings. Pair with `cloudflare/mbt-worker-bundle` for the build/bundle step.
+Workers runtime bindings. Pair with `cloudflare-mbt-worker-bundle` for the build/bundle step.
 ```bash
 moon add mizchi/cloudflare
 ```

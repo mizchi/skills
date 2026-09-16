@@ -27,7 +27,7 @@ Do **not** use this skill (reach for the named alternative instead) when:
 
 - You only need to *call* a few JS APIs from an existing MoonBit project → `moonbit-js-binding`.
 - You are migrating between two non-JS languages, or the target is not MoonBit → `translate-programming-language`.
-- You are bundling MoonBit core + a TS entry for Cloudflare → `cloudflare/mbt-worker-bundle` (this skill covers the *porting*, that skill covers the *bundling*).
+- You are bundling MoonBit core + a TS entry for Cloudflare → `cloudflare-mbt-worker-bundle` (this skill covers the *porting*, that skill covers the *bundling*).
 
 ## The Governing Principle: the contract is the spec
 

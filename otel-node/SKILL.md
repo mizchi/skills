@@ -1,6 +1,6 @@
 ---
 name: otel-node
-description: Node.js OpenTelemetry setup — SDK init, auto-instrumentation packages, and the esbuild ESM silent-failure gotcha (instrumentation-* packages produce no spans when bundled with esbuild --format=esm). Use when adding OTel to a Node.js/Hono/Express service or debugging missing spans after bundling. See devops/opentelemetry for signal design decisions.
+description: Node.js OpenTelemetry setup — SDK init, auto-instrumentation packages, and the esbuild ESM silent-failure gotcha (instrumentation-* packages produce no spans when bundled with esbuild --format=esm). Use when adding OTel to a Node.js/Hono/Express service or debugging missing spans after bundling. See opentelemetry for signal design decisions.
 ---
 
 # OpenTelemetry — Node.js
@@ -147,7 +147,7 @@ Collector logs show `Trace ID: ... Name: GET /api/users` when spans arrive. No o
 
 ## Related
 
-- `devops/opentelemetry` — signal design, span naming, sampling, W3C propagation
-- `cloudflare/workers-otel-utels` — Cloudflare Workers telemetry (no Node runtime, fetch-boundary approach)
+- `opentelemetry` — signal design, span naming, sampling, W3C propagation
+- `cloudflare-workers-otel-utels` — Cloudflare Workers telemetry (no Node runtime, fetch-boundary approach)
 - esbuild + Vite + SWC all share the same `require-in-the-middle` failure mode
 - `instrumentation-*` packages do not support static import patching as of 2026-05
