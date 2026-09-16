@@ -165,6 +165,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend/review-p
 
 | Skill | Install path | Description |
 | --- | --- | --- |
+| [multi-agent-orchestration](meta/multi-agent-orchestration/) | `meta/multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | [empirical-prompt-tuning](meta/empirical-prompt-tuning/) | `meta/empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [retrospective-codify](meta/retrospective-codify/) | `meta/retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
 | [skill-selector](meta/skill-selector/) | `meta/skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
