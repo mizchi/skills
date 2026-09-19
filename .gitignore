@@ -32,3 +32,6 @@ _tmp_*/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# first-reader run state (regenerable; see ai-index/examples for a kept run)
+.first-reader/

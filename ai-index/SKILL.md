@@ -226,6 +226,7 @@ the strong one.
 | `fixtures/ai_ja.md` | unedited AI Japanese |
 | `fixtures/ai_ja_laundered.md` | same text with only Layer A fixed — the §3 counterexample |
 | `fixtures/ai_en.md` | unedited AI English |
+| `examples/` | one article measured end to end, with the reader runs and the blinded Layer B scoring that several numbers here cite |
 
 ## Related
 
