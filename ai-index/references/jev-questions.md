@@ -12,8 +12,8 @@ that justifies it:
 
 | rule | why |
 | --- | --- |
-| ordered conclusions use `score`, never `choice` | `choice` discards the ordering: 14/24 → 23/24 on the same data |
-| independent predicates use `noul`, one threshold each | per-question thresholds took 13/36 → 24/36 at equal false positives |
+| ordered conclusions use `score`, never `choice` | `choice` discards the ordering: 19/24 vs 23/24 over 24 labeled shell commands |
+| independent predicates use `noul`, one threshold each | per-question thresholds took 13/36 → 24/36 over 36 labeled defective functions, at equal false positives |
 | never put "none of the above" in a `choice` | `choice` always picks; returns conf 0.96 on nonsense. Put the escape in a separate `noul` (18/18 vs 16/18) |
 | ask only what is visible in the subject | a question needing invisible context returns a confident middle value — gap 0.28 → 0.77 after rewording |
 | never write the threshold into the question | thresholds are a code decision; in the prompt they break comparability across recalibrations |

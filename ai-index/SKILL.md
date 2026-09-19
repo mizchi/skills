@@ -29,10 +29,10 @@ human who edited model output, and §3 shows exactly why.
 | --- | --- | --- |
 | What it finds | word and shape tells (`することができます`, `delve`, uniform sentence length) | whether sentences carry information |
 | Cost | free, deterministic, no API | one API call per document |
-| Gap vs unedited AI | **wide** (measured: 0–1 vs 7–8 tells) | wide |
-| Gap vs *edited* AI | **zero** (measured: §3) | holds |
+| Gap vs unedited AI | **wide** (measured: 0–1 vs 7–8 tells) | +0.53 |
+| Gap vs *edited* AI | **zero** (measured: §3) | **+0.21 — narrow** (see `references/jev-questions.md`) |
 | Removable by find-and-replace | yes, entirely | no |
-| Use it as | a lint with a floor | the index |
+| Use it as | a lint with a floor | the index, once its question is rewritten |
 
 Layer A is a spell-checker for slop. It is worth running because it is free and
 because unedited output really does fail it. It is not a score, and §3 is the
@@ -169,7 +169,10 @@ Answer shapes follow the Jev typing rules:
 
 - **`score`** for anything ordered — density of document-updating sentences,
   hedging level, specificity. Asking an ordered conclusion as a `choice` throws
-  the ordering away; the Jev notes measure that mistake at 14/24 versus 23/24.
+  the ordering away; over 24 labeled shell commands the Jev notes measure
+  `choice` at 19/24 against `score` at 23/24. (14/24 is a different row in
+  that table -- code-side threshold tuning over atomic signals -- so do not
+  quote it for this rule.)
 - **`noul`** for independent predicates — "this paragraph makes a claim with no
   name, number, or link attached". One threshold each.
 - **`choice`** only for genuinely exclusive branches, and never with a
