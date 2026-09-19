@@ -1,0 +1,10 @@
+{
+ "draft": "(served)",
+ "persona": "mizchi を Zenn でフォローしている TypeScript エンジニア。AI に下書きさせた記事を自分でも直していて、その判定が実際に効くのか知りたい。好意的に読み、押し出されない限り最後まで読む。",
+ "chunks": null,
+ "cursor": 11,
+ "done": true,
+ "quit_at": null,
+ "started": 1789819095.5976176,
+ "_chunks_note": "12 passages, stripped: they are the draft itself (see ../../zenn-ai-index-article.md). Re-insert with rehydrate.py before running room.py."
+}

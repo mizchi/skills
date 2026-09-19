@@ -1,0 +1,350 @@
+[
+ {
+  "id": "P001",
+  "document_updating": 2,
+  "survives_deletion": true,
+  "why": "一般論と結びの挨拶のみで具体が無い"
+ },
+ {
+  "id": "P002",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "設計上の性質と擬似Reasoningの試行結果"
+ },
+ {
+  "id": "P003",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "重複がバグを招く因果と一元化の手段"
+ },
+ {
+  "id": "P004",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "350ms の実測と西海岸という理由づけ"
+ },
+ {
+  "id": "P005",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "画像入力未対応の事実と将来の見通し"
+ },
+ {
+  "id": "P006",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "候補外は選ばれないという仕組みを述べる"
+ },
+ {
+  "id": "P007",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "デコーディング層の構造と名称の由来"
+ },
+ {
+  "id": "P008",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "strict の効果という機構を述べる"
+ },
+ {
+  "id": "P009",
+  "document_updating": 1,
+  "survives_deletion": true,
+  "why": "定義と称賛に本記事の予告が混在"
+ },
+ {
+  "id": "P010",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "注釈過多の弊害と自分の立場を明示"
+ },
+ {
+  "id": "P011",
+  "document_updating": 2,
+  "survives_deletion": true,
+  "why": "後続内容を指す見出し的な案内のみ"
+ },
+ {
+  "id": "P012",
+  "document_updating": 2,
+  "survives_deletion": true,
+  "why": "解説しましたと要点提示の宣言だけ"
+ },
+ {
+  "id": "P013",
+  "document_updating": 2,
+  "survives_deletion": true,
+  "why": "前節と本節の案内が文の主体"
+ },
+ {
+  "id": "P014",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "構造を直接出力する着想の説明"
+ },
+ {
+  "id": "P015",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "アーキテクチャ比較と小型化の不確実性"
+ },
+ {
+  "id": "P016",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "誰に意味があるかの書き手の判断"
+ },
+ {
+  "id": "P017",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "重複→バグと一箇所化という機構"
+ },
+ {
+  "id": "P018",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "500ms から 2fps を導く試算と適用判断"
+ },
+ {
+  "id": "P019",
+  "document_updating": 2,
+  "survives_deletion": true,
+  "why": "段階導入で質が上がる一般論のみ"
+ },
+ {
+  "id": "P020",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "256 と 361 の対比、枝刈りの必要"
+ },
+ {
+  "id": "P021",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "ESLint ルールで運用を揃える手段"
+ },
+ {
+  "id": "P022",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "500ms のバジェットで 256 並列の数値"
+ },
+ {
+  "id": "P023",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "合法手制約と Sonnet の違反回数"
+ },
+ {
+  "id": "P024",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "CPU/GPU 比喩で精度と速度の対価"
+ },
+ {
+  "id": "P025",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "未最適化で判断は変わらなかった観察"
+ },
+ {
+  "id": "P026",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "Embedding 用途は不明という疑いの表明"
+ },
+ {
+  "id": "P027",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "120ms の遅延と日本リージョン待ち"
+ },
+ {
+  "id": "P028",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "型チェック無効化と絞り込み強制の機構"
+ },
+ {
+  "id": "P029",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "256 同時と 250倍の解釈、過大評価の指摘"
+ },
+ {
+  "id": "P030",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "従来は自然言語で無理に運用したという前提"
+ },
+ {
+  "id": "P031",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "型安全性の定義と実行時エラー削減"
+ },
+ {
+  "id": "P032",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "追随の予測と 2か月後という見立て"
+ },
+ {
+  "id": "P033",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "500ms は対話に使えるという評価"
+ },
+ {
+  "id": "P034",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "定義と保守性・実行時エラーの効果"
+ },
+ {
+  "id": "P035",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "注釈過多の保守性低下という対立軸"
+ },
+ {
+  "id": "P036",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "わからないという不確実の表明"
+ },
+ {
+  "id": "P037",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "ガードレール用途と Bloomfilter の扱い"
+ },
+ {
+  "id": "P038",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "Playwright 実験で選択肢削除により継続"
+ },
+ {
+  "id": "P039",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "Hermes Agent の 186 ツールを一括採点"
+ },
+ {
+  "id": "P040",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "型情報がドキュメントとして働く機構"
+ },
+ {
+  "id": "P041",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "構造化前提ゆえ親和性が高いという判断"
+ },
+ {
+  "id": "P042",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "Tool Call/MCP と Cline 等の固有名"
+ },
+ {
+  "id": "P043",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "事後トレーニングで得る三つの能力"
+ },
+ {
+  "id": "P044",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "型チェック無効化と代替型の絞り込み"
+ },
+ {
+  "id": "P045",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "型情報が文書として働き新人が理解"
+ },
+ {
+  "id": "P046",
+  "document_updating": 1,
+  "survives_deletion": true,
+  "why": "定義と採用状況にやり方を挙げる予告"
+ },
+ {
+  "id": "P047",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "前提を置いた上での書き手の是認"
+ },
+ {
+  "id": "P048",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "500ms・256並列を設計課題として提示"
+ },
+ {
+  "id": "P049",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "500~600ms と最遅 1200ms の実測"
+ },
+ {
+  "id": "P050",
+  "document_updating": 1,
+  "survives_deletion": false,
+  "why": "一晩叩いた経験と感想を書く宣言が混在"
+ },
+ {
+  "id": "P051",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "ESLint 検出で運用を一貫させる手段"
+ },
+ {
+  "id": "P052",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "誤った選択肢に高得点が付く限界"
+ },
+ {
+  "id": "P053",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "strict で厳格化しバグを早期発見"
+ },
+ {
+  "id": "P054",
+  "document_updating": 1,
+  "survives_deletion": false,
+  "why": "有効化の手順と以下に示すという案内"
+ },
+ {
+  "id": "P055",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "置換でなく補助という位置づけの判断"
+ },
+ {
+  "id": "P056",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "Tool Call 以前の具体的な指示文を引用"
+ },
+ {
+  "id": "P057",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "ユーティリティ型での導出と一貫性"
+ },
+ {
+  "id": "P058",
+  "document_updating": 0,
+  "survives_deletion": false,
+  "why": "ユーティリティ型の列挙とその効果"
+ }
+]

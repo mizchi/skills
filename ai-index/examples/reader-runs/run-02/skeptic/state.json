@@ -1,0 +1,10 @@
+{
+ "draft": "(served)",
+ "persona": "Zenn のトレンド一覧でタイトルを見ただけの日本語エンジニア。今月「AI 文章の見分け方」系を十数本読み、どれも結論が『決定的な方法はない』で終わって時間を無駄にした。止める理由を探しており、一つあれば足りる。冒頭の忍耐予算は 10〜15 秒、最初の 2 行程度。",
+ "chunks": null,
+ "cursor": 11,
+ "done": true,
+ "quit_at": null,
+ "started": 1789819109.4088366,
+ "_chunks_note": "12 passages, stripped: they are the draft itself (see ../../zenn-ai-index-article.md). Re-insert with rehydrate.py before running room.py."
+}
