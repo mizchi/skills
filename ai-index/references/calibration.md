@@ -126,6 +126,32 @@ Margin = (worst human) − (AI), oriented so positive means the signal separates
    samples measured 0.0 per 1000 words. It is the most-cited tell and, in this
    sample, the least useful.
 
+## Layer B question wordings, measured against each other
+
+Same 58 source-blinded paragraphs, so the rows are comparable. Reproduce with
+`../examples/judgment-layer/compare-axes.py`.
+
+| axis | scale | human | laundered | unedited | gap | gap/pt | verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| genericness | 0–4 | 0.91 | 3.89 | 4.00 | +2.97 | **+0.74** | wide — this is the index |
+| personalEvidence | 0–4 | 2.29 | 0.22 | 0.00 | +2.06 | +0.52 | wide |
+| specificity | 0–4 | 2.63 | 0.89 | 0.62 | +1.74 | +0.43 | wide |
+| document_updating | 0–2 | 0.09 | 0.30 | 0.62 | +0.21 | +0.11 | narrow — demoted |
+
+`gap/pt` divides by the axis range, which is what makes a 0–2 and a 0–4 axis
+comparable. The Jev field notes' narrow band (0.2–0.3 raw on a 0–2 score) is
+0.10–0.15 of range, so 0.15 is the threshold in that verdict column — a raw
+band cannot be applied across scales.
+
+The top three are adopted from [TKY-27/JevSlop](https://github.com/TKY-27/JevSlop)
+(MIT). 8 of the 9 scored laundered paragraphs hit genericness 4, the ceiling,
+while `document_updating` scored those same paragraphs 0.
+
+Caveats: 57 of 58 paragraphs were scored (the omitted one is laundered and would
+almost certainly have scored 4, so the gap is understated), and the pool is mixed
+Japanese/English, so **none of this is an English calibration**. Refit per
+language before gating.
+
 ## Discourse shape — the signals that actually separate (JA)
 
 Added after the marker-rate approach failed. A draft tuned to hit every lexical

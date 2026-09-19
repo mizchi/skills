@@ -29,10 +29,10 @@ human who edited model output, and §3 shows exactly why.
 | --- | --- | --- |
 | What it finds | word and shape tells (`することができます`, `delve`, uniform sentence length) | whether sentences carry information |
 | Cost | free, deterministic, no API | one API call per document |
-| Gap vs unedited AI | **wide** (measured: 0–1 vs 7–8 tells) | +0.53 |
-| Gap vs *edited* AI | **zero** (measured: §3) | **+0.21 — narrow** (see `references/jev-questions.md`) |
+| Gap vs unedited AI | **wide** (measured: 0–1 vs 7–8 tells) | +0.77/pt |
+| Gap vs *edited* AI | **zero** (measured: §3) | **+0.74/pt** via `genericness` (was +0.11/pt) |
 | Removable by find-and-replace | yes, entirely | no |
-| Use it as | a lint with a floor | the index, once its question is rewritten |
+| Use it as | a lint with a floor | the index |
 
 Layer A is a spell-checker for slop. It is worth running because it is free and
 because unedited output really does fail it. It is not a score, and §3 is the
@@ -149,23 +149,42 @@ Layer B asks questions whose answers cannot be find-and-replaced, because
 answering them requires the text to contain information. The full question set,
 with the typed schema and the thresholds, is in `references/jev-questions.md`.
 
-The load-bearing question, and the sharpest thing in any of the sources surveyed:
+The index is one question, chosen by measurement rather than by how good it
+sounds:
+
+> **How interchangeable is this prose with generic writing on the same subject?**
+
+Asked on a five-level scale over source-blinded paragraphs, it puts human prose
+at 0.91 and laundered AI at 3.89 out of 4 — a gap of 0.74 per point of range.
+Adopted from [TKY-27/JevSlop](https://github.com/TKY-27/JevSlop) (MIT).
+
+The question it replaced is the sharpest *idea* in the sources surveyed, and it
+is still in the set for the locations it finds:
 
 > **Does this sentence update the situation, or update the document?**
 
 Sentences that update the *situation* report an event, a number, a measurement,
 or the writer's actual judgment state. Sentences that update the *document*
 report how the document looks or what it will do next — `本章では〜を扱う`,
-"In this section we will explore", "It's important to note that". The second
-kind carries no information about the subject, survives deletion with no loss,
-and is what AI prose is overwhelmingly made of. Credit:
+"In this section we will explore", "It's important to note that". Credit:
 [k16shikano's cognitive-rhythm-writing norm](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432),
 analysed in `natural-writing-ja`.
 
-This is a good Jev question because it is **checkable from the subject alone** —
-the gate can see the sentence, so it can answer. Compare a bad one: "would a
-human have written this?" is not answerable from the text, and asking it returns
-a confident number that means nothing.
+But measured, it separates at only 0.11 per point, because **a sentence stating
+a mechanism reads as subject-updating even when the mechanism is generic** — and
+generic-but-correct filler is exactly what surviving a Layer A pass leaves
+behind. Asking about self-reference misses it; asking about interchangeability
+saturates on it. The full comparison is in `references/jev-questions.md`.
+
+The lesson generalises past this one swap: **a question that is obviously right
+is still a hypothesis until it is measured against a labeled set.** This one was
+load-bearing in an earlier version of this file on nothing but its own
+plausibility.
+
+Both are good Jev questions for the same reason — they are **checkable from the
+subject alone**, so the gate can see what it is being asked about. Compare a bad
+one: "would a human have written this?" is not answerable from the text, and
+asking it returns a confident number that means nothing.
 
 Answer shapes follow the Jev typing rules:
 
