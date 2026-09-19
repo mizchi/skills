@@ -8,7 +8,7 @@ unreproducible assertions.
 | path | what it is |
 | --- | --- |
 | `zenn-ai-index-article.md` | the article, Zenn frontmatter, `published: true` |
-| `judgment-layer/` | the blinded Layer B measurement behind the B1 gap table |
+| `judgment-layer/` | the blinded Layer B measurements; `aggregate.py` for B1, `compare-axes.py` to compare question wordings |
 | `reader-runs/run-01`, `run-02` | two `first-reader` beta-read runs, before and after revision |
 | `rehydrate.py` | puts the passages back into the sessions so `room.py` can rebuild the pages |
 
