@@ -83,7 +83,7 @@ Margin = (worst human) − (AI), oriented so positive means the signal separates
 | burstiness CV | 0.62 | 0.24 | **+0.38** | wide — usable (unlike JA) |
 | em-dash / 1000w | 0.0 | 0.0 | 0.00 | no separation in this sample |
 | MATTR(100) | 0.80 | 0.84 | **−0.04** | **inverted** — AI scored more diverse |
-| tricolons / 200w | 1.55 | — | — | human *exceeds* the published <1 threshold; 14/14 hits are real enumerations |
+| tricolons / 200w | 1.55 | — | — | human *exceeds* the published <1 threshold; 13 of 14 hits are false positives |
 
 ## Findings that contradict published thresholds
 
@@ -97,14 +97,20 @@ Margin = (worst human) − (AI), oriented so positive means the signal separates
    TTR falls as documents get longer, so it cannot be compared across documents.
    Use a moving-window measure or nothing.
 
-3. **The tricolon threshold has a ~100% false-positive rate on technical prose.**
+3. **The tricolon threshold has a 93% false-positive rate on technical prose.**
    Published guidance is <1 polished triplet per 200 words. The human reference
-   article measures 1.55, and every one of the 14 hits is a real enumeration of
-   domain nouns: `lines of code, commits and PR counts`, `Microsoft, Accenture
-   and a Fortune 100 company`, `review, validation and security`. Exactly one
-   hit (`verification, systems thinking, and accountability`) is the abstract
-   rhetorical kind that the signal is actually about. **Concreteness, not count,
-   is the discriminator** — and that is a judgment question, not a regex.
+   article measures 1.55. Breaking the 14 hits down:
+
+   | | n | example |
+   | --- | --- | --- |
+   | real enumeration of domain nouns | 12 | `LOC, commit count and PR count`, `Microsoft, Accenture and a Fortune 100 company` |
+   | not a triple at all (regex mis-parse of a comma splice) | 1 | `if your platform is weak, AI makes it weaker faster, and activity metrics will` |
+   | the abstract rhetorical triple the signal is about | **1** | `verification, systems thinking, and accountability` |
+
+   So 13 of 14 are false positives, and one of those is the detector's own
+   parsing rather than the threshold's fault. **Concreteness, not count, is the
+   discriminator** — and that is a judgment question, not a regex (question B4
+   in `jev-questions.md`).
 
 4. **Burstiness does not transfer between languages.** CV separates cleanly in
    English (+0.38) and barely at all in Japanese (+0.04). Japanese sentence

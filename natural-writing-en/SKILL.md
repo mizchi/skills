@@ -82,13 +82,15 @@ nothing about authorship.
 
 **Counting triples by shape false-positives on technical prose.** The published
 budget is <1 polished triplet per 200 words; the human article measures **1.55**,
-and 14 of its 14 hits are real enumerations:
+and 13 of its 14 hits are false positives:
 
 ```
-real enumeration (fine):   LOC, commit count and PR count
-                           Microsoft, Accenture and a Fortune 100 company
-                           review, validation and security
-abstract triple (a tell):  verification, systems thinking, and accountability
+real enumeration (fine, x12):  LOC, commit count and PR count
+                               Microsoft, Accenture and a Fortune 100 company
+                               review, validation and security
+not a triple at all (x1):      if your platform is weak, AI makes it weaker
+                               faster, and activity metrics will ...
+abstract triple (a tell, x1):  verification, systems thinking, and accountability
 ```
 
 The discriminator is **concreteness, not count**. Three things you could point
