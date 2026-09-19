@@ -126,6 +126,48 @@ Margin = (worst human) − (AI), oriented so positive means the signal separates
    samples measured 0.0 per 1000 words. It is the most-cited tell and, in this
    sample, the least useful.
 
+## Discourse shape — the signals that actually separate (JA)
+
+Added after the marker-rate approach failed. A draft tuned to hit every lexical
+rate in the mizchi profile (`自分` 11.1 vs 11.5 measured, sentence length 40 vs
+43.6) still read as pastiche, so the corpus was re-measured at the paragraph and
+section level instead of the token level.
+
+| signal | mizchi (n=18, 766 paras) | AI unedited | marker-tuned draft |
+| --- | --- | --- | --- |
+| sentences per paragraph | **1.45** (range 1.2–2.0) | 2.46 | **3.27** |
+| one-sentence paragraphs | **64%** (39–86%) | 15% | 13% |
+| paragraphs of 5+ sentences | **0%** (0–2.7%) | 0% | **23%** |
+| first paragraph, sentences | **1–2** (11x1, 7x2) | 3 | 3 |
+| headings that are noun labels | **84%** (149/178) | — | 62% |
+| heading length | median 12 chars, 41% ≤10 | — | median 12 |
+| prose chars between code blocks | median **102** | 396 | 1105 |
+| section length | median 313 chars, CV 0.57–0.70, min 18 max 1180 | CV 0.22 | CV 0.37 |
+
+**The marker-tuned draft is further from the corpus than unedited AI output on
+the decisive axis.** Paragraph granularity is where hand-written Japanese tech
+prose and block-shaped output differ most, and no phrase substitution moves it.
+
+Two methodological notes:
+
+- **The paragraph breaks are real.** Zenn keeps the markdown source line in
+  `data-line`, and across consecutive `<p>` pairs the line delta is never 1
+  (0 of 252) — every boundary has a blank line. This is authored formatting,
+  not a soft-break rendering artifact.
+- **Heading form beats heading length.** The marker-tuned draft matched the
+  median heading length (12 chars) exactly while writing statement-form
+  headings (`自分のシグナルが 3 つ死んだ`). The corpus writes noun labels
+  (`作ったもの`, `実装手順`) 84% of the time and questions 9%; statements are 7%.
+
+Closing move, counted by hand over all 18 final paragraphs: the dominant form is
+**forward-looking** — what the author does next, an invitation to the reader, or
+a promise of unfinished work (`自分は次に、これを使って GitHub 以外で動く CI 環境を
+作っています`, `もうちょっと練ったら後で紹介したい`, `皆さんもブラウザを作りましょう`).
+Summarising to close appears zero times. An earlier version of the style skill
+claimed `おわり` was the idiom; it is not in the corpus at all.
+
+`slopscore.py --lang ja` reports the first five of these under "discourse shape".
+
 ## Register purity — a real rule with no gap
 
 18 of 18 human JA articles hold one register (敬体 or 常体) at ≥80% purity;

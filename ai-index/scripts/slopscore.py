@@ -73,9 +73,23 @@ class _Blocks(HTMLParser):
         self._flush()
 
 
+def _looks_like_html(raw: str) -> bool:
+    """Is this an HTML document, rather than markdown that talks about HTML?
+
+    A markdown article discussing `<p>` tags must not be parsed as HTML, so the
+    test ignores fenced blocks and code spans and then demands either a document
+    wrapper or several closing block tags -- an opening tag alone is something
+    prose mentions all the time.
+    """
+    stripped = re.sub(r"```.*?```|~~~.*?~~~|`[^`]*`", " ", raw, flags=re.S)
+    if re.search(r"<(!doctype html|html|body|article)\b", stripped, re.I):
+        return True
+    return len(re.findall(r"</(p|div|h[1-6]|li|section)\s*>", stripped, re.I)) >= 3
+
+
 def extract(raw: str) -> list[tuple[str, str]]:
-    """Return [(kind, text)] where kind is p / li / h / pre."""
-    if re.search(r"<(p|div|article|body|h[1-6])\b", raw, re.I):
+    """Return [(kind, text)] where kind is p / li / h / pre / table."""
+    if _looks_like_html(raw):
         p = _Blocks()
         p.feed(raw)
         p.close()
@@ -264,6 +278,28 @@ def en_sentences(paras: list[str]) -> list[str]:
     return out
 
 
+_H_PRED = re.compile(
+    r"(する|した|しない|しよう|してみた|できる|できない|ある|ない|いい|よい|だ|である"
+    r"|なる|なった|った|ってる|たい|ます|です|れる|かった|すぎる|しんどい|つらい"
+    r"|欲しい|ほしい|みる|！|!)$"
+)
+
+
+def _heading_is_label(h: str) -> bool:
+    """A heading is a noun-phrase label rather than a sentence or a question.
+
+    86% of headings across the mizchi corpus are labels (`作ったもの`, `実装手順`),
+    9% questions (`なぜ作ったか`, `で、使えるの？`), 7% statements. Editorialised
+    statement headings are the tell.
+    """
+    h = h.strip()
+    if re.search(r"[？?]$|のか$|か$", h):
+        return False
+    if _H_PRED.search(h) or "。" in h or "、" in h:
+        return False
+    return True
+
+
 def mattr(tokens: list[str], window: int = 100) -> float | None:
     """Moving-average type-token ratio. Length-independent, unlike plain TTR."""
     if len(tokens) < window:
@@ -423,6 +459,21 @@ def analyse(raw: str, lang: str = "auto") -> dict:
         )
         r["rhetorical_q"] = sum(1 for s in sents if s.endswith(("？", "か。")))
 
+        # --- discourse shape -------------------------------------------
+        # Measured on 18 mizchi Zenn articles / 766 paragraphs. These are
+        # structural, not lexical: a marker pass cannot move them, and they
+        # separate hand-written Japanese tech prose from block-shaped output
+        # far better than any phrase table. See references/calibration.md.
+        spp = [len(ja_sentences([p])) or 1 for p in paras]
+        if spp:
+            r["sents_per_para"] = round(st.mean(spp), 2)
+            r["one_sent_para_pct"] = round(100 * sum(1 for x in spp if x == 1) / len(spp))
+            r["five_plus_para_pct"] = round(100 * sum(1 for x in spp if x >= 5) / len(spp))
+            r["first_para_sents"] = spp[0]
+        if heads:
+            r["heading_label_pct"] = round(100 * sum(1 for h in heads if _heading_is_label(h)) / len(heads))
+            r["heading_len_median"] = int(st.median([len(h) for h in heads]))
+
     r["removable_tells"] = tells
     r["floor_exceeded"] = tells >= 3
     return r
@@ -479,6 +530,25 @@ def fmt(name: str, r: dict) -> str:
                 f"{str(r['register_purity_pct'])+'%':>12}  {'>=80%':>11}"
             )
         L.append(f"  {'体言止め / 反問 (human devices)':38s}{str(r['taigendome'])+' / '+str(r['rhetorical_q']):>12}")
+        if "sents_per_para" in r:
+            L.append("")
+            L.append("  discourse shape (mizchi corpus band, n=18 / 766 paras)")
+            L.append("  " + "-" * (W - 4))
+            for label, key, band, ok in [
+                ("文 / 段落", "sents_per_para", "1.2-2.0", 1.2 <= r["sents_per_para"] <= 2.0),
+                ("一文段落の割合", "one_sent_para_pct", "39-86%", 39 <= r["one_sent_para_pct"] <= 90),
+                ("5文以上の段落", "five_plus_para_pct", "<=3%", r["five_plus_para_pct"] <= 3),
+                ("冒頭段落の文数", "first_para_sents", "1-2", r["first_para_sents"] <= 2),
+                ("見出しが名詞ラベル", "heading_label_pct", ">=50%", r.get("heading_label_pct", 100) >= 50),
+            ]:
+                if key not in r:
+                    continue
+                L.append(f"  {label:38s}{r[key]:>12}  {band:>11}  {'ok' if ok else 'OFF'}")
+            if not (1.2 <= r["sents_per_para"] <= 2.0):
+                L.append(
+                    f"    ! {r['sents_per_para']} sentences per paragraph — the corpus writes 1.4. "
+                    "Break on blank lines; this is the strongest shape signal and no marker pass moves it."
+                )
     L.append("")
     L.append(f"  REMOVABLE TELLS OVER BUDGET: {r['removable_tells']}   (floor = 3)")
     for n in r["notes"]:
