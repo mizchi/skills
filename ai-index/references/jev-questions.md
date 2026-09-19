@@ -51,6 +51,34 @@ Visible in the subject: yes — the paragraph is right there.
 Aggregate as **mean over paragraphs** (this one is a density, so the mean is the
 quantity of interest), and separately flag any paragraph at 2.
 
+**Measured gap, and it is narrower than this question's billing.** Paragraphs
+from `fixtures/ai_ja_laundered.md`, `fixtures/ai_ja.md` and one human article
+were pooled, source-blinded, shuffled and scored per paragraph by a judge that
+had seen neither the sources nor any article about them (58 paragraphs):
+
+| source | n | mean | du>=1 | du=2 | survives deletion |
+| --- | --- | --- | --- | --- | --- |
+| human | 35 | **0.09** | 6% | 3% | 3% |
+| AI, laundered | 10 | **0.30** | 20% | 10% | 20% |
+| AI, unedited | 13 | **0.62** | 38% | 23% | 31% |
+
+The ordering is right, and it catches what Layer A cannot: the laundered text
+scores 0 removable tells yet 0.30 here against a human 0.09. But the gap against
+laundered output is **+0.21**, which §4's own table puts in the *narrow* band —
+so by this skill's own rule the question needs rewriting, not a threshold.
+
+Reading the per-paragraph scores says why: 8 of the 10 laundered paragraphs
+scored 0, with reasons like 「型チェック無効化と絞り込み強制の機構」. **A sentence
+stating a mechanism reads as subject-updating even when the mechanism is generic.**
+B1 asks only whether the text talks about itself, so it cannot separate a correct
+generality from this document's actual situation — and generic-but-correct filler
+is exactly what laundering leaves behind.
+
+Candidate rewrite, unmeasured: "この段落の内容は、この文書が扱っている特定の事例
+からしか出てこないか" — i.e. ask for *non-portability* rather than
+self-reference. B5 already gestures at this; the two may need merging. Do not
+trust either wording until it is re-measured on a blinded set.
+
 ### B2 — deletion test (`noul`, per paragraph)
 
 ```json
