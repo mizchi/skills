@@ -56,8 +56,9 @@ AI  JA:    tells 7,    CV 0.32
 AI  EN:    tells 8,    CV 0.24
 ```
 
-`ai_ja_laundered.md` sits at **0 tells** — better than 6 of the 18 genuine human
-articles — with no content added. That row is the argument for Layer B.
+`ai_ja_laundered.md` sits at **0 tells** — strictly better than 5 of the 18
+genuine human articles, and tied with the other 13 — with no content added.
+That row is the argument for Layer B.
 
 ## Per-signal gap table
 
