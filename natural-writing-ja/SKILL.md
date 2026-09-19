@@ -101,6 +101,51 @@ Paragraph density waves: after two or three dense paragraphs, one sparse one.
 A sparse paragraph does exactly one job — fix a settled point in one line,
 present the next thing to be judged, or change viewing distance.
 
+## Numbers are read by their unit, not their count
+
+A run of figures is not automatically dense-and-skippable. What decides whether
+a reader takes a number in is **whether its unit is one they can apply to their
+own work** — not how many numbers are in the paragraph.
+
+This came out of two timed reads of a measurement-heavy article (`first-reader`
+transcripts, two readers, two runs). The same reader read one dense table in
+full and skipped two others, and said why:
+
+> 単位が「文・段落」だった表は全部読めたので、数値区間の退屈さは量ではなく自分の
+> 原稿に当てられる単位かどうかで決まっていた
+
+| | unit | what happened |
+| --- | --- | --- |
+| 文長の十分位 / 一文段落 64% / 5 文以上 0% | 文・段落 — the reader's own draft has these | read in full, both runs, and produced the reader's one action |
+| `19/24` 対 `23/24`, 共通 1 本だと `13/36` | the writer's labeled test cases | skipped, both runs: 「分母の 24 と 36 が何件の何なのか分からないので数字として受け取れず、目が滑って表の下まで飛んだ」 |
+| MATTR 0.84 対 0.80, TTR 0.418 | a metric the reader does not compute | skipped, both runs |
+| `246ms 対 5227ms` | seconds — everyone has these | the one figure that survived that paragraph |
+
+The second reader, who did not know the author, skipped the same material:
+「文長十分位・マーカー比率・ms の羅列は全部飛ばした」.
+
+(For the record, since this file is not allowed to commit the fault it names:
+that `24` is 24 labeled shell commands, and that `36` is the 36 in-class
+judgements of 8 defect metrics. Neither was stated where the reader met them,
+which is the whole point.)
+
+So, before writing a figure:
+
+- **Name the denominator.** A fraction whose denominator is unexplained is not a
+  number to the reader, it is punctuation. If you cannot say what the denominator
+  counts, delete the fraction and keep the rule.
+- **Convert to the reader's unit where you can.** Sentences, paragraphs, minutes,
+  files, commits, yen. An internal score scale (`score 1.94/3`, `AUC 0.83`)
+  belongs in an appendix or a link, not in the line carrying the argument.
+- **One figure per claim in the prose.** Put the rest in a table the reader may
+  skip without losing the argument, and make sure the argument survives the skip.
+- Do not thin a run of figures by reformatting it into a table. Measured twice:
+  collapsing four consecutive rules into a table removed the run and changed
+  nothing about whether the numbers were read.
+
+A number the reader cannot act on costs the same attention as one they can, and
+buys nothing.
+
 ## Two devices the AI drafts never reach for
 
 Measured present in 15 of 18 human articles, and at zero in unedited model output:
@@ -243,6 +288,7 @@ Mechanical, in order. The first is the one that matters.
 | chapter end preachy | closed on abstraction | land on something concrete the reader holds; leave one question open |
 | opening reads clerical | attitude-free agenda list | give the forecast an attitude, or handle the reader's resistance first |
 | register wobbles | patched paragraph-by-paragraph | pick 敬体 or 常体 and re-pass the whole draft |
+| readers drift in the number-heavy stretch | the figures are in the writer's unit, not the reader's | name every denominator; convert to 文・段落・分・件 where you can; one figure per claim in the prose |
 
 ## Evaluation of the source norm
 

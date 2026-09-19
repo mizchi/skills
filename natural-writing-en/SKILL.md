@@ -136,6 +136,34 @@ to note that the research is mixed" commits to nothing.
 Cut every preamble in the second pass. A human editor does this reflexively;
 it is precisely what an unedited model does not do.
 
+## Numbers are read by their unit, not their count
+
+A run of figures is not automatically skippable. What decides whether a reader
+takes a number in is **whether its unit is one they can apply to their own
+work** — not how many numbers share the paragraph.
+
+Evidence for this is from Japanese readers on a Japanese draft, so the
+measurement lives in `natural-writing-ja`; the mechanism is about units and
+denominators rather than about Japanese, which is why it is repeated here. Two
+readers, two timed reads each: the table measured in *sentences and paragraphs*
+was read in full every time and produced both readers' one action, while
+fractions like `13/36` whose denominator was never named were skipped every
+time — "I couldn't receive it as a number, so my eyes slid past the table."
+(That `13/36` counts the in-class judgements of 8 defect metrics. Stating it
+here and not where the reader met it is exactly the failure.)
+
+- **Name the denominator.** A fraction with an unexplained denominator is
+  punctuation, not a number. If you cannot say what it counts, cut the fraction
+  and keep the rule.
+- **Convert to the reader's unit** where one exists: sentences, paragraphs,
+  minutes, files, commits, dollars. Internal scales (`AUC 0.83`, `score 1.94/3`)
+  belong in an appendix or behind a link, not in the sentence carrying the claim.
+- **One figure per claim in the prose.** Everything else goes in a table the
+  reader may skip, and the argument has to survive the skip.
+- **Reformatting does not help.** Collapsing four consecutive numeric rules into
+  a table was measured twice: it removed the run and changed nothing about
+  whether the numbers were read.
+
 ## Openings
 
 Open on an occasion or a correction, not an agenda. The human reference opens by
@@ -220,6 +248,7 @@ would resolve it.
 | reads like any article on the topic | no first-hand material | replace generic examples with what you actually ran |
 | sections symmetric | structure imposed before content | let length follow content; delete empty sections |
 | closing says nothing | summary instead of consequence | end on the instruction or the open question |
+| readers drift in the number-heavy stretch | the figures are in the writer's unit, not the reader's | name every denominator; convert to sentences/minutes/files; one figure per claim in the prose |
 
 ## Related
 

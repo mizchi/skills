@@ -132,7 +132,9 @@ homemade detectors.
 Corollaries worth keeping:
 
 - **Per-signal thresholds, never one global cutoff.** Signals differ in scale by
-  an order of magnitude. One shared cutoff loses roughly half the true positives.
+  an order of magnitude. Over the 36 in-class judgements of 8 defect metrics, one
+  shared cutoff caught 13/36 where per-signal thresholds caught 24/36 at the same
+  false-positive count.
 - **Confidence routes, it does not gate.** Report everything over threshold;
   send low-confidence items to a human with a different message. Gating on
   confidence throws away correct detections.

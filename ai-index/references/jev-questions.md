@@ -13,12 +13,12 @@ that justifies it:
 | rule | why |
 | --- | --- |
 | ordered conclusions use `score`, never `choice` | `choice` discards the ordering: 19/24 vs 23/24 over 24 labeled shell commands |
-| independent predicates use `noul`, one threshold each | per-question thresholds took 13/36 → 24/36 over 36 labeled defective functions, at equal false positives |
-| never put "none of the above" in a `choice` | `choice` always picks; returns conf 0.96 on nonsense. Put the escape in a separate `noul` (18/18 vs 16/18) |
+| independent predicates use `noul`, one threshold each | per-question thresholds took 13/36 → 24/36 over the 36 in-class judgements of 8 defect metrics, at equal false positives |
+| never put "none of the above" in a `choice` | `choice` always picks; returns conf 0.96 on nonsense. Over 18 out-of-scope judgements (6 answerless scenarios x 3 runs), a separate `noul` catches 18/18 against 16/18 for a "none" option |
 | ask only what is visible in the subject | a question needing invisible context returns a confident middle value — gap 0.28 → 0.77 after rewording |
 | never write the threshold into the question | thresholds are a code decision; in the prompt they break comparability across recalibrations |
 | one request, all questions | 20 questions: 246 ms vs 5227 ms split, answers moved 0.011 |
-| atomic questions supplement a broad one | atomic wins on enumerated classes (25/36 vs 18/36), loses on unenumerated (11/15 vs 15/15) |
+| atomic questions supplement a broad one | atomic wins on the 36 in-class judgements of enumerated classes (25/36 vs 18/36) and loses on the 15 judgements of classes nobody enumerated (11/15 vs 15/15) |
 | do not average; take max or excess-over-threshold | averaging dilutes the one question carrying signal |
 | confidence routes, never gates | gating on confidence cost 11 points (73.7% → 62.5%) |
 
