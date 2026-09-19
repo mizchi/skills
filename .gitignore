@@ -28,3 +28,7 @@ results/
 # Subagent / discovery scratch dirs (cloned repos, fetched READMEs)
 .tmp-*/
 _tmp_*/
+
+# Python bytecode
+__pycache__/
+*.pyc
