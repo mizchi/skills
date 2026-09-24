@@ -40,11 +40,21 @@ local checkReadme: Task = new {
   }
 }
 
+local testMaintainerPersona: Task = new {
+  name = "test:maintainer-persona"
+  description = "Run node tests for maintainer-persona scripts"
+  cmd = "node --test 'maintainer-persona/scripts/*_test.ts'"
+  inputs {
+    "maintainer-persona/scripts/*.ts"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
   deps {
     testFrontmatter
+    testMaintainerPersona
     checkFrontmatter
     checkReadme
   }
@@ -64,6 +74,7 @@ local preCommit: Task = new {
 tasks {
   checkFrontmatter
   testFrontmatter
+  testMaintainerPersona
   genReadme
   checkReadme
   test
