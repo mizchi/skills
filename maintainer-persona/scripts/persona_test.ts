@@ -8,7 +8,9 @@ import {
   summarizeIssues,
   summarizePulls,
   headingsOf,
-  writingLanguage,
+  visibleText,
+  registerOf,
+  languageOf,
   type Measured,
   type Pull,
 } from "./persona.ts";
@@ -30,6 +32,8 @@ const pull = (over: Partial<Pull>): Pull => ({
   labels: ["bug"],
   closesIssues: 1,
   firstResponseAt: "2026-01-01T06:00:00Z",
+  firstTimeAtCreation: false,
+  closedByAutomation: false,
   ...over,
 });
 
@@ -116,7 +120,7 @@ const measured = (): Measured => ({
   measuredAt: "2026-09-24",
   headSha: "0123456789abcdef",
   context: { relation: "oss", standing: "first-time", exposure: "public" },
-  language: "en",
+  languages: { pr: "en", issue: "ja" },
   viewer: "me",
   files: { contributing: "CONTRIBUTING.md", prTemplate: null, issueTemplates: [], codeowners: false },
   rules: ["pull_request: 1 approval"],
@@ -165,15 +169,63 @@ test("summarizePulls counts bodies written in Japanese", () => {
   assert.equal(s.japaneseBodies, 1);
 });
 
-test("writingLanguage decides from PR and issue bodies together", () => {
-  assert.equal(writingLanguage(summarizePulls([pull({ body: "修正します" })]), summarizeIssues([{ body: "不具合です", labels: [] }])), "ja");
-  assert.equal(writingLanguage(summarizePulls([pull({})]), summarizeIssues([{ body: "bug", labels: [] }])), "en");
-  assert.equal(
-    writingLanguage(summarizePulls([pull({}), pull({ body: "修正します" })]), summarizeIssues([{ body: "bug", labels: [] }, { body: "x", labels: [] }])),
-    "mixed",
-  );
+test("languageOf decides by share of Japanese bodies", () => {
+  assert.equal(languageOf(6, 10), "ja");
+  assert.equal(languageOf(1, 10), "en");
+  assert.equal(languageOf(3, 10), "mixed");
+  assert.equal(languageOf(0, 0), "en");
+});
+
+test("renderMeasured reports the language per submission kind", () => {
+  const block = renderMeasured(measured());
+  assert.match(block, /PRs are written in \*\*en\*\*/);
+  assert.match(block, /issues in \*\*ja\*\*/);
 });
 
 test("kanji-only text is not taken as Japanese (it may be Chinese)", () => {
   assert.equal(summarizeIssues([{ body: "修复错误", labels: [] }]).japaneseBodies, 0);
+});
+
+test("firstTimers counts PRs whose author had no merged PR when they opened it, whatever their association is now", () => {
+  const s = summarizePulls([
+    // merged first PR: GitHub now labels the author CONTRIBUTOR
+    pull({ authorAssociation: "CONTRIBUTOR", firstTimeAtCreation: true }),
+    pull({ authorAssociation: "NONE", firstTimeAtCreation: true, state: "CLOSED", firstResponseAt: null }),
+    pull({ authorAssociation: "NONE", firstTimeAtCreation: true, state: "CLOSED", closedByAutomation: true, firstResponseAt: null }),
+    pull({ authorAssociation: "CONTRIBUTOR", firstTimeAtCreation: false }),
+  ]);
+  assert.deepEqual(s.firstTimers, {
+    merged: 1,
+    closedUnmerged: 1,
+    closedByAutomation: 1,
+    noResponse: 1,
+    firstResponseHoursMedian: 6,
+  });
+});
+
+test("visibleText drops <details> blocks and HTML comments", () => {
+  assert.equal(visibleText("a\n<!-- note -->\n<details>\n<summary>x</summary>\nlong\n</details>\nb"), "a\n\n\nb");
+});
+
+test("body length is measured on the visible part", () => {
+  const s = summarizePulls([pull({ body: "short<details>" + "x".repeat(500) + "</details>" })]);
+  assert.deepEqual(s.bodyChars, { median: 5, p90: 5 });
+});
+
+test("renderMeasured labels the association table as current, and shows first-timers at creation", () => {
+  const m = measured();
+  const block = renderMeasured(m);
+  assert.match(block, /association as of now/);
+  assert.match(block, /First-time authors \(no merged PR when they opened it\)/);
+});
+
+test("registerOf classifies Japanese bodies by sentence endings", () => {
+  assert.equal(registerOf("修正します。確認しました。"), "polite");
+  assert.equal(registerOf("修正する。確認した。原因である。"), "plain");
+  assert.equal(registerOf("Fix the link."), null);
+});
+
+test("summaries count polite Japanese bodies", () => {
+  assert.equal(summarizeIssues([{ body: "壊れています。", labels: [] }, { body: "壊れている。", labels: [] }]).politeBodies, 1);
+  assert.equal(summarizePulls([pull({ body: "直しました。" })]).politeBodies, 1);
 });

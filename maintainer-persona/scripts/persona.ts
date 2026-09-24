@@ -18,11 +18,16 @@ export type Pull = {
   commitMessages: string[];
   labels: string[];
   closesIssues: number;
-  // earliest review or comment by someone other than the author
+  // earliest review or comment by a human other than the author
   firstResponseAt: string | null;
+  // the author had no merged PR in this repo when this PR was opened.
+  // Not the same as authorAssociation, which GitHub computes at query time:
+  // an outsider whose first PR merged is now CONTRIBUTOR.
+  firstTimeAtCreation: boolean;
+  closedByAutomation: boolean;
 };
 
-export type Issue = { body: string; labels: string[] };
+export type Issue = { number?: number; author?: string; body: string; labels: string[] };
 
 export type Tally = [string, number][];
 export type Spread = { median: number; p90: number };
@@ -34,6 +39,8 @@ export type AssociationOutcome = {
   firstResponseHoursMedian: number | null;
 };
 
+export type FirstTimerOutcome = AssociationOutcome & { closedByAutomation: number };
+
 export type PullSummary = {
   merged: number;
   closedUnmerged: number;
@@ -44,15 +51,17 @@ export type PullSummary = {
   selfMerged: number;
   drafts: number;
   japaneseBodies: number;
+  politeBodies: number;
   bodyChars: Spread;
   headings: Tally;
   labels: Tally;
   humanReviewers: Tally;
   botReviewers: Tally;
   byAssociation: Record<string, AssociationOutcome>;
+  firstTimers: FirstTimerOutcome;
 };
 
-export type IssueSummary = { count: number; japaneseBodies: number; bodyChars: Spread; headings: Tally; labels: Tally };
+export type IssueSummary = { count: number; japaneseBodies: number; politeBodies: number; bodyChars: Spread; headings: Tally; labels: Tally };
 
 export type Relation = "oss" | "internal";
 export type Context = { relation: Relation; standing: "first-time" | "returning"; exposure: "public" | "private" };
@@ -62,7 +71,7 @@ export type Measured = {
   measuredAt: string;
   headSha: string;
   context: Context;
-  language: Language;
+  languages: Record<Kind, Language>;
   viewer: string;
   files: { contributing: string | null; prTemplate: string | null; issueTemplates: string[]; codeowners: boolean };
   rules: string[];
@@ -103,6 +112,25 @@ export function headingsOf(body: string): string[] {
   });
 }
 
+// What a reader sees without expanding anything: <details> and HTML comments
+// (PR template instructions) are dropped, on the corpus and the draft alike.
+export function visibleText(body: string): string {
+  return body.replace(/<details>[\s\S]*?<\/details>/gi, "").replace(/<!--[\s\S]*?-->/g, "");
+}
+
+const POLITE_END = /(です|ます|でした|ました|ません|でしょう|ください)$/;
+
+// 敬体 or 常体, by the majority of sentence endings; null when not Japanese.
+export function registerOf(body: string): "polite" | "plain" | null {
+  const sentences = visibleText(body)
+    .split(/[。．!！?？\n]+/)
+    .map((x) => x.replace(/[\s)）」』*`]+$/, ""))
+    .filter((x) => KANA.test(x));
+  if (sentences.length === 0) return null;
+  const polite = sentences.filter((x) => POLITE_END.test(x)).length;
+  return polite * 2 >= sentences.length ? "polite" : "plain";
+}
+
 const hoursBetween = (a: string, b: string) => (Date.parse(b) - Date.parse(a)) / 3_600_000;
 
 export function summarizePulls(pulls: Pull[]): PullSummary {
@@ -110,11 +138,9 @@ export function summarizePulls(pulls: Pull[]): PullSummary {
   const closed = pulls.filter((p) => p.state === "CLOSED");
   const reviewerGroups = merged.map((p) => p.reviewers);
 
-  const byAssociation: Record<string, AssociationOutcome> = {};
-  for (const assoc of new Set(pulls.map((p) => p.authorAssociation))) {
-    const group = pulls.filter((p) => p.authorAssociation === assoc && p.state !== "OPEN");
+  const outcome = (group: Pull[]): AssociationOutcome => {
     const responded = group.filter((p) => p.firstResponseAt);
-    byAssociation[assoc] = {
+    return {
       merged: group.filter((p) => p.state === "MERGED").length,
       closedUnmerged: group.filter((p) => p.state === "CLOSED").length,
       noResponse: group.length - responded.length,
@@ -122,7 +148,18 @@ export function summarizePulls(pulls: Pull[]): PullSummary {
         ? spread(responded.map((p) => Math.round(hoursBetween(p.createdAt, p.firstResponseAt!)))).median
         : null,
     };
+  };
+  const done = pulls.filter((p) => p.state !== "OPEN");
+  const byAssociation: Record<string, AssociationOutcome> = {};
+  for (const assoc of new Set(done.map((p) => p.authorAssociation))) {
+    byAssociation[assoc] = outcome(done.filter((p) => p.authorAssociation === assoc));
   }
+  // automated closes are reported apart: they say nothing about human review
+  const first = done.filter((p) => p.firstTimeAtCreation);
+  const firstTimers = {
+    ...outcome(first.filter((p) => !p.closedByAutomation)),
+    closedByAutomation: first.filter((p) => p.closedByAutomation).length,
+  };
 
   return {
     merged: merged.length,
@@ -134,20 +171,25 @@ export function summarizePulls(pulls: Pull[]): PullSummary {
     selfMerged: merged.filter((p) => p.mergedBy === p.author).length,
     drafts: pulls.filter((p) => p.isDraft).length,
     japaneseBodies: merged.filter((p) => KANA.test(p.body)).length,
-    bodyChars: spread(merged.map((p) => p.body.length)),
+    politeBodies: merged.filter((p) => registerOf(p.body) === "polite").length,
+    bodyChars: spread(merged.map((p) => visibleText(p.body).length)),
     headings: tally(merged.map((p) => headingsOf(p.body))),
     labels: tally(merged.map((p) => p.labels)),
     humanReviewers: tally(reviewerGroups.map((g) => g.filter((r) => !BOT.test(r)))),
     botReviewers: tally(reviewerGroups.map((g) => g.filter((r) => BOT.test(r)))),
     byAssociation,
+    firstTimers,
   };
 }
+
+export const KANA_RE = KANA;
 
 export function summarizeIssues(issues: Issue[]): IssueSummary {
   return {
     count: issues.length,
     japaneseBodies: issues.filter((i) => KANA.test(i.body)).length,
-    bodyChars: spread(issues.map((i) => i.body.length)),
+    politeBodies: issues.filter((i) => registerOf(i.body) === "polite").length,
+    bodyChars: spread(issues.map((i) => visibleText(i.body).length)),
     headings: tally(issues.map((i) => headingsOf(i.body))),
     labels: tally(issues.map((i) => i.labels)),
   };
@@ -155,13 +197,15 @@ export function summarizeIssues(issues: Issue[]): IssueSummary {
 
 export type Language = "ja" | "en" | "mixed";
 
-// The language maintainers write in, from merged PR and issue bodies together.
-export function writingLanguage(pulls: PullSummary, issues: IssueSummary): Language {
-  const total = pulls.merged + issues.count;
+// The language maintainers write in, decided separately for PRs and issues:
+// one repo can take English PRs and Japanese issues.
+export function languageOf(japanese: number, total: number): Language {
   if (total === 0) return "en";
-  const share = (pulls.japaneseBodies + issues.japaneseBodies) / total;
+  const share = japanese / total;
   return share >= 0.5 ? "ja" : share <= 0.1 ? "en" : "mixed";
 }
+
+export type Kind = "issue" | "pr";
 
 export function classify(input: {
   visibility: string;
@@ -187,6 +231,7 @@ const list = (t: Tally) => (t.length ? t.map(([k, n]) => `\`${k}\` ${n}`).join("
 
 export function renderMeasured(m: Measured): string {
   const p = m.pulls;
+  const ft = p.firstTimers;
   const assoc = Object.entries(p.byAssociation)
     .map(
       ([k, v]) =>
@@ -199,8 +244,11 @@ export function renderMeasured(m: Measured): string {
     `<!-- maintainer-persona:data ${data} -->`,
     "",
     `Measured ${m.measuredAt} at \`${m.headSha.slice(0, 12)}\` as \`${m.viewer}\`.`,
-    `Context: **${m.context.relation}**, **${m.context.standing}**, exposure **${m.context.exposure}**, writes in **${m.language}**` +
-      ` (Japanese bodies: PRs ${pct(m.pulls.japaneseBodies, m.pulls.merged)}, issues ${pct(m.issues.japaneseBodies, m.issues.count)}).`,
+    `Context: **${m.context.relation}**, **${m.context.standing}**, exposure **${m.context.exposure}**.`,
+    `PRs are written in **${m.languages.pr}** (Japanese ${pct(m.pulls.japaneseBodies, m.pulls.merged)}),` +
+      ` issues in **${m.languages.issue}** (Japanese ${pct(m.issues.japaneseBodies, m.issues.count)}).` +
+      ` Polite form (敬体) among Japanese bodies: PRs ${pct(m.pulls.politeBodies, m.pulls.japaneseBodies)},` +
+      ` issues ${pct(m.issues.politeBodies, m.issues.japaneseBodies)}.`,
     "",
     "### Gates and files",
     "",
@@ -212,7 +260,7 @@ export function renderMeasured(m: Measured): string {
     "",
     `### Pull requests (${p.merged} merged, ${p.closedUnmerged} closed unmerged)`,
     "",
-    `- Body length (chars): median ${p.bodyChars.median}, p90 ${p.bodyChars.p90}`,
+    `- Visible body length (chars, outside <details> and comments): median ${p.bodyChars.median}, p90 ${p.bodyChars.p90}`,
     `- Conventional-commit titles: ${pct(p.conventionalTitles, p.merged)}`,
     `- Links a closing issue: ${pct(p.closesIssue, p.merged)}`,
     `- Touches a test file: ${pct(p.touchesTests, p.merged)}`,
@@ -224,13 +272,17 @@ export function renderMeasured(m: Measured): string {
     `- Human reviewers (PRs reviewed): ${list(p.humanReviewers)}`,
     `- Bot reviewers: ${list(p.botReviewers)}`,
     "",
-    "| author association | merged | closed unmerged | no response | first response, median h |",
+    `First-time authors (no merged PR when they opened it): ${ft.merged} merged, ${ft.closedUnmerged} closed by a human,` +
+      ` ${ft.closedByAutomation} closed by automation; ${ft.noResponse} of the human-handled got no human response;` +
+      ` first human response median ${ft.firstResponseHoursMedian ?? "-"} h.`,
+    "",
+    "| author association as of now (merged first-timers show as CONTRIBUTOR) | merged | closed unmerged | no response | first response, median h |",
     "|---|---|---|---|---|",
     assoc,
     "",
     `### Issues (${m.issues.count})`,
     "",
-    `- Body length (chars): median ${m.issues.bodyChars.median}, p90 ${m.issues.bodyChars.p90}`,
+    `- Visible body length (chars): median ${m.issues.bodyChars.median}, p90 ${m.issues.bodyChars.p90}`,
     `- Headings: ${list(m.issues.headings)}`,
     `- Labels: ${list(m.issues.labels)}`,
     END,

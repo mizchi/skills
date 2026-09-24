@@ -4,7 +4,7 @@
 //
 //   node measure.ts acme/widget [--out personas/acme/widget.md] [--prs 100]
 //                   [--issues 50] [--relation oss|internal] [--as <login>]
-//                   [--corpus <dir>]   # also write merged PR bodies, one .md each
+//                   [--corpus <dir>]   # also write bodies: <dir>/pr/*.md, <dir>/issue/*.md
 //
 // Needs an authenticated `gh`. Reads only; never writes to the target.
 
@@ -17,7 +17,7 @@ import {
   renderMeasured,
   summarizeIssues,
   summarizePulls,
-  writingLanguage,
+  languageOf,
   type Issue,
   type Measured,
   type Pull,
@@ -74,7 +74,8 @@ query($o:String!,$r:String!,$n:Int!,$after:String){ repository(owner:$o,name:$r)
       files(first:100){ nodes{ path } }
       commits(first:10){ nodes{ commit{ message } } }
       labels(first:20){ nodes{ name } }
-      closingIssuesReferences(first:1){ totalCount } } } } }`;
+      closingIssuesReferences(first:1){ totalCount }
+      timelineItems(itemTypes:[CLOSED_EVENT], last:1){ nodes{ ... on ClosedEvent{ actor ${ACTOR} } } } } } } }`;
 
 type RawPull = {
   number: number; title: string; state: Pull["state"]; isDraft: boolean; authorAssociation: string;
@@ -84,7 +85,10 @@ type RawPull = {
   comments: { nodes: { author: { login: string; __typename: string } | null; createdAt: string }[] };
   files: { nodes: { path: string }[] }; commits: { nodes: { commit: { message: string } }[] };
   labels: { nodes: { name: string }[] }; closingIssuesReferences: { totalCount: number };
+  timelineItems: { nodes: { actor: { login: string; __typename: string } | null }[] };
 };
+
+const isAutomation = (who: string) => who.endsWith("[bot]") || who === "github-actions";
 
 export function toPull(p: RawPull): Pull {
   const author = login(p.author);
@@ -93,7 +97,7 @@ export function toPull(p: RawPull): Pull {
     ...p.comments.nodes.map((c) => ({ who: login(c.author), at: c.createdAt })),
   ]
     // bots answer within seconds and would make every repo look responsive
-    .filter((x) => x.at && x.who !== author && !x.who.endsWith("[bot]"))
+    .filter((x) => x.at && x.who !== author && !isAutomation(x.who))
     .map((x) => x.at!)
     .sort();
   return {
@@ -106,7 +110,30 @@ export function toPull(p: RawPull): Pull {
     labels: p.labels.nodes.map((l) => l.name),
     closesIssues: p.closingIssuesReferences.totalCount,
     firstResponseAt: responses[0] ?? null,
+    firstTimeAtCreation: false, // filled in by markFirstTimers
+    closedByAutomation:
+      p.state === "CLOSED" && p.timelineItems.nodes.some((n) => n.actor && isAutomation(login(n.actor))),
   };
+}
+
+const INSIDER = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+
+// One search per outside PR: did its author have a merged PR before opening it?
+export function firstTimeQueries(repo: string, pulls: Pull[]): [number, string][] {
+  return pulls
+    .filter((p) => !INSIDER.has(p.authorAssociation) && !isAutomation(p.author) && p.author !== "ghost")
+    .map((p) => [p.number, `repo:${repo} is:pr is:merged author:${p.author} merged:<${p.createdAt}`]);
+}
+
+function markFirstTimers(repo: string, pulls: Pull[]): void {
+  const queries = firstTimeQueries(repo, pulls);
+  const byNumber = new Map(pulls.map((p) => [p.number, p]));
+  for (let i = 0; i < queries.length; i += 20) {
+    const chunk = queries.slice(i, i + 20);
+    const body = chunk.map(([n, q]) => `q${n}: search(query:${JSON.stringify(q)}, type:ISSUE){ issueCount }`).join(" ");
+    const d = graphql<Record<string, { issueCount: number }>>(`query{ ${body} }`, {});
+    for (const [n] of chunk) byNumber.get(n)!.firstTimeAtCreation = d[`q${n}`].issueCount === 0;
+  }
 }
 
 function fetchPulls(o: string, r: string, total: number): Pull[] {
@@ -124,13 +151,27 @@ function fetchPulls(o: string, r: string, total: number): Pull[] {
   return out;
 }
 
+// Baseline material for the slop lint, one directory per submission kind.
+// The viewer's own bodies are left out: the baseline is the maintainers' writing.
+export function corpusFiles(pulls: Pull[], issues: Issue[], viewer: string): [string, string][] {
+  return [
+    ...pulls.filter((p) => p.state === "MERGED" && p.body.trim() && p.author !== viewer).map((p) => [`pr/pr-${p.number}.md`, p.body] as [string, string]),
+    ...issues.filter((i) => i.body.trim() && i.author !== viewer).map((i) => [`issue/issue-${i.number}.md`, i.body] as [string, string]),
+  ];
+}
+
 function fetchIssues(o: string, r: string, n: number): Issue[] {
-  const d = graphql<{ repository: { issues: { nodes: { body: string; labels: { nodes: { name: string }[] } }[] } } }>(
+  const d = graphql<{ repository: { issues: { nodes: { number: number; author: { login: string } | null; body: string; labels: { nodes: { name: string }[] } }[] } } }>(
     `query($o:String!,$r:String!,$n:Int!){ repository(owner:$o,name:$r){
-       issues(last:$n){ nodes{ body labels(first:20){ nodes{ name } } } } } }`,
+       issues(last:$n){ nodes{ number author{ login } body labels(first:20){ nodes{ name } } } } } }`,
     { o, r, n },
   );
-  return d.repository.issues.nodes.map((i) => ({ body: i.body ?? "", labels: i.labels.nodes.map((l) => l.name) }));
+  return d.repository.issues.nodes.map((i) => ({
+    number: i.number,
+    author: i.author?.login ?? "ghost",
+    body: i.body ?? "",
+    labels: i.labels.nodes.map((l) => l.name),
+  }));
 }
 
 const CONTRIBUTING = ["CONTRIBUTING.md", ".github/CONTRIBUTING.md", "docs/CONTRIBUTING.md"];
@@ -204,8 +245,10 @@ function main(argv: string[]) {
   const facts = fetchRepoFacts(o, r);
   const me = args.as ?? facts.viewer;
   const pulls = fetchPulls(o, r, args.prs);
+  markFirstTimers(args.repo, pulls);
   const pullSummary = summarizePulls(pulls);
-  const issueSummary = summarizeIssues(fetchIssues(o, r, args.issues));
+  const issues = fetchIssues(o, r, args.issues);
+  const issueSummary = summarizeIssues(issues);
   const measured: Measured = {
     repo: args.repo,
     measuredAt: new Date().toISOString().slice(0, 10),
@@ -220,21 +263,24 @@ function main(argv: string[]) {
     }),
     files: facts.files,
     rules: fetchRules(o, r, facts.branch),
-    language: writingLanguage(pullSummary, issueSummary),
+    languages: {
+      pr: languageOf(pullSummary.japaneseBodies, pullSummary.merged),
+      issue: languageOf(issueSummary.japaneseBodies, issueSummary.count),
+    },
     pulls: pullSummary,
     issues: issueSummary,
   };
   if (args.corpus) {
-    mkdirSync(args.corpus, { recursive: true });
-    for (const p of pulls.filter((p) => p.state === "MERGED" && p.body.trim())) {
-      writeFileSync(join(args.corpus, `pr-${p.number}.md`), p.body);
+    for (const [rel, body] of corpusFiles(pulls, issues, me)) {
+      mkdirSync(dirname(join(args.corpus, rel)), { recursive: true });
+      writeFileSync(join(args.corpus, rel), body);
     }
   }
   const existing = existsSync(args.out) ? readFileSync(args.out, "utf8") : null;
   mkdirSync(dirname(args.out), { recursive: true });
   writeFileSync(args.out, mergePersona(existing, renderMeasured(measured)));
   const c = measured.context;
-  console.log(`${existing ? "updated" : "created"} ${args.out} (${c.relation}, ${c.standing}, ${c.exposure}, ${measured.language})`);
+  console.log(`${existing ? "updated" : "created"} ${args.out} (${c.relation}, ${c.standing}, ${c.exposure}; PRs ${measured.languages.pr}, issues ${measured.languages.issue})`);
 }
 
 if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {

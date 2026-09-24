@@ -590,6 +590,10 @@ def main() -> int:
                 f"{label[-44:]:44s}{r['burstiness_cv']:7.2f}"
                 f"{r['removable_tells']:7d}{(r.get('mattr100') or 0):8.3f}{str(reg):>7}"
             )
+        if not ok:
+            # e.g. --lang ja over a corpus with no Japanese body: report it, do not crash
+            print("\nn=0  no file had prose in this language; no baseline")
+            return 0
         cvs = [r["burstiness_cv"] for r in ok]
         tl = [r["removable_tells"] for r in ok]
         print(f"\nn={len(ok)}  CV: min {min(cvs):.2f} p50 {st.median(cvs):.2f} max {max(cvs):.2f}")
