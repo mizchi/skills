@@ -51,12 +51,20 @@ spec/code/log 変更と揃え続けるタスクなら `formal-methods-drift-guar
    - ドメイン判断が変わっていない限り、緑にするためだけに property を弱めない。
    - 反例はドメインレビュー用の witness として保存する。
 
-7. **結果をドメインの言葉へ翻訳する。**
+7. **witness を実装で再現する。**
+   - モデルの反例は、まだモデルについての主張であり、コードについての主張ではない。
+   - witness を強制する実装のテストを書く。同じ入力、同じ関係のインスタンス、または barrier、crash の注入、止めた時計で作った同じ実行順を使う。
+   - テストが同じように落ちれば、witness は実在するバグであり、そのテストを regression guard にする。
+   - 修正版も実装で確かめる。緑のモデルも、モデルについての主張にすぎない。
+   - どちらの向きでも実装と食い違えば、まずモデルのバグとして扱う。実行環境と食い違う前提 (分離レベル、ロックの意味、retry policy、provider の保証) を見直し、モデルを直して両方を再実行する。
+   - モデルが小さく信頼できるなら、test oracle として残す。モデルの witness や model checker の trace を実装のテストケースとして再生するか、実行可能なモデルと実装を突き合わせる。
+
+8. **結果をドメインの言葉へ翻訳する。**
    - `sat`、`unsat`、trace、proof failure で止めない。
    - 誰が何をできるのか、どの順序が受理されるのか、どの config が dead なのか、どの crash sequence がデータを失うのかを述べる。
    - 出力テンプレートには `references/domain-ledger.md` を使う。
 
-8. **決定を lock する。**
+9. **決定を lock する。**
    - 反例が意図通りなら、docs/specs を更新し、明確化した挙動の regression guard を追加する。
    - 意図していないなら、bug として file/fix し、model/check を CI に残す。
    - 不明なら、最小 witness と domain-owner question を出す。
@@ -100,6 +108,10 @@ LLM を使ってはいけないもの:
 - theorem proving では subgoal decomposition を使う
 - すべての claim に epistemic status を明示する
 
+## Reference Implementations
+
+このワークフローを実際に動く形で示した例は `references/reference-implementations.md` を読む。eval シナリオごとに 1 つずつと、broken variant、sanity case、実装での再現、モデルの前提の修正を示す playground の use case を載せている。
+
 ## Output Contract
 
 常に、次のいずれかの成果物を残すことを目指す。
@@ -107,6 +119,7 @@ LLM を使ってはいけないもの:
 - repo 内の formal check と passing/failing command
 - ドメイン用語に翻訳した counterexample witness
 - regression guard candidate
-- 簡潔な ledger entry: source、implementation observation、model question、machine result、domain question、decision、lock
+- witness を再現する実装のテスト、または再現しなかったことと、どのモデルの前提が誤っていたかの記録
+- 簡潔な ledger entry: source、implementation observation、model question、machine result、witness、reproduction、domain question、decision、lock
 
 形式モデルを作る価値がない場合は、その理由を述べ、より安い check を提案する。

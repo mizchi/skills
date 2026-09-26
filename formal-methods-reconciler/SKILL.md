@@ -52,12 +52,20 @@ task is to keep it aligned with later spec/code/log changes, switch to
    - Never make a property weaker just to get green unless the domain decision changed.
    - Preserve counterexamples as witnesses for domain review.
 
-7. **Translate results to domain language.**
+7. **Reproduce the witness against the implementation.**
+   - A counterexample from the model is a claim about the model, not yet about the code.
+   - Write an implementation test that forces the witness: the same input, the same relation instance, or the same interleaving driven by barriers, injected crashes, or a stopped clock.
+   - If the test fails the same way, the witness is a real bug and the test becomes the regression guard.
+   - Run the fixed variant against the implementation too; a green model is also only a claim about the model.
+   - If the implementation disagrees in either direction, treat it as a model bug first. Revisit the assumption that differs from the runtime (isolation level, lock semantics, retry policy, provider guarantee), fix the model, and rerun both.
+   - When the model is small and trusted, keep it as a test oracle: replay model witnesses or model-checker traces as implementation test cases, or diff the implementation against an executable model.
+
+8. **Translate results to domain language.**
    - Do not stop at `sat`, `unsat`, trace, or proof failure.
    - Say who can do what, which order is accepted, which config is dead, or which crash sequence loses data.
    - Use `references/domain-ledger.md` for output templates.
 
-8. **Lock decisions.**
+9. **Lock decisions.**
    - If the counterexample is intended, update docs/specs and add a regression guard for the clarified behavior.
    - If unintended, file/fix a bug and keep the model/check in CI.
    - If unclear, produce the minimal witness and a domain-owner question.
@@ -101,6 +109,13 @@ Read `references/research-patterns.md` when designing or improving an automated 
 - subgoal decomposition for theorem proving
 - explicit epistemic status for every claim
 
+## Reference Implementations
+
+Read `references/reference-implementations.md` for worked, runnable examples of
+this workflow: one per eval scenario plus the playground use cases that show a
+broken variant, a sanity case, an implementation reproduction, and a corrected
+model assumption.
+
 ## Output Contract
 
 Always aim to leave one of these artifacts:
@@ -108,6 +123,7 @@ Always aim to leave one of these artifacts:
 - a formal check in the repo and a passing/failing command
 - a counterexample witness translated into domain terms
 - a regression guard candidate
-- a concise ledger entry: source, implementation observation, model question, machine result, domain question, decision, lock
+- an implementation test that reproduces the witness, or a note that it did not reproduce and which model assumption was wrong
+- a concise ledger entry: source, implementation observation, model question, machine result, witness, reproduction, domain question, decision, lock
 
 If no formal model is worth building, say why and propose the cheaper check.

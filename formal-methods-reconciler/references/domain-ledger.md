@@ -26,6 +26,10 @@ machine result:
 witness:
   Smallest input, relation instance, action trace, event schedule, or failed obligation.
 
+reproduction:
+  Implementation test that forces the witness, and whether it failed the same way.
+  A mismatch in either direction means the model is suspect first: name the assumption that differed.
+
 domain wording:
   Who can do what, what state is reachable, or which sequence loses data.
 
@@ -75,6 +79,27 @@ Z3 returned unsat.
 ```text
 The implementation treats timeout as fail-open for preview access, while the docs do not mention timeout behavior.
 Should timeout deny access, allow access, or preserve the last known decision?
+```
+
+## Model/Implementation Mismatch Wording
+
+A mismatch can go either way: the model reports a witness the implementation
+does not show, or the model is green for a fix the implementation still fails.
+
+Prefer:
+
+```text
+The model was green for "lock the org row with SELECT ... FOR UPDATE, then count".
+The PostgreSQL test still admitted two members under REPEATABLE READ.
+The model took the snapshot after the lock; PostgreSQL takes it when the
+locking statement starts, before it waits. The model was corrected (RR_LOCK),
+reproduces the same trace, and the fix is READ COMMITTED + FOR UPDATE or SERIALIZABLE.
+```
+
+Avoid:
+
+```text
+TLC passed, so the fix is correct.
 ```
 
 ## Fix Recommendation Wording
