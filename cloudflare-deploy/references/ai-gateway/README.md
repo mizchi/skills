@@ -1,5 +1,7 @@
 # Cloudflare AI Gateway
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Expert guidance for implementing Cloudflare AI Gateway - a universal gateway for AI model providers with analytics, caching, rate limiting, and routing capabilities.
 
 ## When to Use This Reference

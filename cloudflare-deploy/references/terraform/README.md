@@ -1,5 +1,7 @@
 # Cloudflare Terraform Provider
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 **Expert guidance for Cloudflare Terraform Provider - infrastructure as code for Cloudflare resources.**
 
 ## Core Principles
@@ -98,5 +100,5 @@ cf-terraforming import --resource-type cloudflare_dns_record --zone <zone-id>
 
 ## See Also
 - [pulumi](../pulumi/) - Alternative IaC tool for Cloudflare
-- [wrangler](../wrangler/) - CLI deployment alternative
+- [cf](../cf/) - CLI deployment alternative
 - [workers](../workers/) - Worker runtime documentation

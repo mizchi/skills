@@ -1,5 +1,7 @@
 # Cloudflare D1 Database
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Expert guidance for Cloudflare D1, a serverless SQLite database designed for horizontal scale-out across multiple databases.
 
 ## Overview

@@ -59,7 +59,7 @@ Reference test pattern: spins up a tmpdir project with synthetic `sqlc_types.mbt
 
 ## References
 
-- [`references/d1-bind-hang.md`](references/d1-bind-hang.md) — the BigInt → 1101 chain in detail, including how to recognize it from a `wrangler tail` session.
+- [`references/d1-bind-hang.md`](references/d1-bind-hang.md) — the BigInt → 1101 chain in detail, including how to recognize it from a `Workers Logs` session.
 
 ## Source
 

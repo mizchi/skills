@@ -1,5 +1,7 @@
 # Cloudflare Sandbox SDK
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Secure isolated code execution in containers on Cloudflare's edge. Run untrusted code, manage files, expose services, integrate with AI agents.
 
 **Use cases**: AI code execution, interactive dev environments, data analysis, CI/CD, code interpreters, multi-tenant execution.

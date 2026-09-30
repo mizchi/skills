@@ -1,6 +1,6 @@
 // Post-build sanity check for the bundled Worker.
 //
-// `moon build --target js --release` + `wrangler deploy --dry-run` can
+// `moon build --target js --release` + `cf build` can
 // produce a bundle with subtle corruption: stray \x1f control bytes
 // from the wasm host that emits the MoonBit JS (sqlc-gen-moonbit #17),
 // a far-too-small file (moon produced an empty stub because of a
@@ -13,11 +13,12 @@
 // REQUIRED_MARKERS when you add code paths that must appear in the
 // bundle (e.g. a scheduled cron handler).
 
-import { readFile, stat } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
+import { join } from "node:path";
 
 const target = process.argv[2];
 if (!target) {
-  console.error("usage: check-worker-bundle.ts <path-to-bundle.js>");
+  console.error("usage: check-worker-bundle.ts <bundle.js-or-bundle-directory>");
   process.exit(2);
 }
 
@@ -28,18 +29,23 @@ try {
   console.error(`worker bundle check: cannot stat ${target}: ${error.message}`);
   process.exit(1);
 }
-if (!info.isFile()) {
-  console.error(`worker bundle check: ${target} is not a file`);
+if (!info.isFile() && !info.isDirectory()) {
+  console.error(`worker bundle check: ${target} is not a file or directory`);
   process.exit(1);
 }
-if (info.size < 1024) {
+const paths = info.isFile() ? [target] : (await readdir(target, { recursive: true, withFileTypes: true }))
+  .filter(entry => entry.isFile() && /\.(?:m?js|cjs)$/.test(entry.name))
+  .map(entry => join(entry.parentPath, entry.name));
+const modules = await Promise.all(paths.map(path => readFile(path, "utf8")));
+const size = modules.reduce((total, module) => total + Buffer.byteLength(module), 0);
+if (size < 1024) {
   console.error(
-    `worker bundle check: ${target} is only ${info.size} bytes — moon build likely produced an empty / stub file`,
+    `worker bundle check: ${target} is only ${size} bytes — moon build likely produced an empty / stub file`,
   );
   process.exit(1);
 }
 
-const content = await readFile(target, "utf8");
+const content = modules.join("\n");
 
 // Reject stray \x1f (Unit Separator). The MoonBit toolchain has been
 // observed to leak this into emitted JS during wasm-host translation.
@@ -66,7 +72,7 @@ if (usPositions.length > 0) {
 //   ];
 const REQUIRED_MARKERS: Array<{ needle: string; reason: string }> = [];
 for (const marker of REQUIRED_MARKERS) {
-  if (!content.includes(marker.needle)) {
+  if (!modules.some(module => module.includes(marker.needle))) {
     console.error(
       `worker bundle check: missing marker "${marker.needle}" (${marker.reason}) in ${target}. ` +
         `Either the upstream moon output changed shape or src/worker.ts dropped its import. ` +

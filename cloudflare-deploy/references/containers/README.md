@@ -1,5 +1,7 @@
 # Cloudflare Containers Skill Reference
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 **APPLIES TO: Cloudflare Containers ONLY - NOT general Cloudflare Workers**
 
 Use when working with Cloudflare Containers: deploying containerized apps on Workers platform, configuring container-enabled Durable Objects, managing container lifecycle, or implementing stateful/stateless container patterns.

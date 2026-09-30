@@ -1,5 +1,7 @@
 # Cloudflare Workers Smart Placement
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Automatic workload placement optimization to minimize latency by running Workers closer to backend infrastructure rather than end users.
 
 ## Core Concept

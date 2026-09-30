@@ -85,7 +85,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
-| [cloudflare-deploy](cloudflare-deploy/) | `cloudflare-deploy` | Deploy applications to Cloudflare Workers / Pages and related platform services. |
+| [cloudflare-deploy](cloudflare-deploy/) | `cloudflare-deploy` | Deploy Workers and platform resources through cf and typed configuration. |
 | [cloudflare-access-app-setup](cloudflare-access-app-setup/) | `cloudflare-access-app-setup` | One-shot Cloudflare Access self-hosted application provisioning via the API — app + email allowlist policy + service token. |
 | [cloudflare-workers-otel-utels](cloudflare-workers-otel-utels/) | `cloudflare-workers-otel-utels` | Cloudflare Worker telemetry — OTLP traces / metrics / logs + utels error tracking + D1 Proxy slow-query warnings. |
 | [cloudflare-mbt-worker-bundle](cloudflare-mbt-worker-bundle/) | `cloudflare-mbt-worker-bundle` | Bundle a Cloudflare Worker that combines MoonBit core code with a TypeScript entry. |
@@ -144,7 +144,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [nix-setup](nix-setup/) | `nix-setup` | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates, direnv, GitHub Actions. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |
-| [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a wrangler secret. |
+| [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a Worker secret through cf. |
 
 ### Kubernetes
 

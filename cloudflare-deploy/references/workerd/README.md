@@ -1,5 +1,7 @@
 # Workerd Runtime
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 V8-based JS/Wasm runtime powering Cloudflare Workers. Use as app server, dev tool, or HTTP proxy.
 
 ## ⚠️ IMPORTANT SECURITY NOTICE
@@ -75,4 +77,4 @@ workerd is in **active development**. Breaking changes possible. Pin versions in
 ## Related References
 - [workers](../workers/) - Workers runtime API documentation
 - [miniflare](../miniflare/) - Testing tool built on workerd
-- [wrangler](../wrangler/) - CLI that uses workerd for local dev
+- [cf](../cf/) - CLI that uses workerd for local dev

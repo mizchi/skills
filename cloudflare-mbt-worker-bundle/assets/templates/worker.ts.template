@@ -1,9 +1,8 @@
 // Cloudflare Worker entrypoint.
 //
-// wrangler bundles this file at deploy time via its built-in esbuild
-// integration, so TypeScript and the relative `_build/` import of the
-// MoonBit output both resolve into a single output. There's no
-// pre-bundling step — `wrangler.jsonc` points `main` here directly.
+// cf build delegates to the Cloudflare Vite plugin. cloudflare.config.ts
+// points its entrypoint here. Import the prepared MoonBit output so the
+// required FFI rewrites are part of the emitted Build Output.
 //
 // The MoonBit module runs its top-level `fn main { ... }` at import
 // time, which registers `globalThis.__appServerFetch`. The telemetry
@@ -13,7 +12,7 @@
 // time and registers `globalThis.__appServerFetch`. The file is plain
 // ESM JS so no .d.ts is needed; tsc resolves it under `module:
 // "esnext"` + `moduleResolution: "bundler"`.
-import "../_build/js/release/build/cloudflare-starterkit-mbt.js";
+import "./_generated/<PKG>-core.js";
 import { withTelemetry, withUtelsErrorTracking } from "./telemetry-runtime.ts";
 
 declare global {

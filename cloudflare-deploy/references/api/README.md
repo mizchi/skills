@@ -1,5 +1,7 @@
 # Cloudflare API Integration
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Guide for working with Cloudflare's REST API - authentication, SDK usage, common patterns, and troubleshooting.
 
 ## Quick Decision Tree
@@ -62,4 +64,4 @@ All SDKs are Stainless-generated from OpenAPI spec (consistent APIs).
 
 - [Cloudflare API Docs](https://developers.cloudflare.com/api/)
 - [Bindings Reference](../bindings/) - Workers runtime bindings (preferred over REST API)
-- [Wrangler Reference](../wrangler/) - CLI tool for Cloudflare development
+- [Wrangler Reference](../cf/) - CLI tool for Cloudflare development

@@ -1,186 +1,49 @@
-# GitHub Actions で Cloudflare にデプロイ
+# GitHub Actions with cf
 
-Workers / Pages / D1 migration を GitHub Actions から deploy する recipes。API token / OIDC / preview / tag deploy を扱う。
-
-## Auth 方式の選択
-
-| 方式 | 手順 | 推奨度 |
-|---|---|---|
-| `CLOUDFLARE_API_TOKEN` secret | token 発行 → GitHub Secrets に格納 | デフォルト、最も枯れている |
-| GitHub OIDC → Cloudflare | Cloudflare 側で OIDC provider 登録 + role 設定 | 複雑。Cloudflare の OIDC サポートは限定的で、多くの場面で API token が実用 |
-
-**結論**: 2026 年 4 月時点では **API token + `CLOUDFLARE_ACCOUNT_ID`** が実運用で現実的。Cloudflare の OIDC は AWS ほど成熟していない。
-
-## API Token の作成
-
-1. https://dash.cloudflare.com/profile/api-tokens
-2. "Create Token" → "Edit Cloudflare Workers" template（Workers + Pages + D1 + KV + R2 を一括カバー）
-3. Zone / Account を絞ってから Create
-4. 表示された token を GitHub Secrets (`CLOUDFLARE_API_TOKEN`) に貼る
-5. `CLOUDFLARE_ACCOUNT_ID` も同じ page 右上から取得して secrets に追加
-
-必要なら zone を絞った Custom token も可（全 product を使うなら上記 template が楽）。
-
-## Worker deploy（最小）
+Commit `cloudflare.config.ts`, the project-local cf dependency and pnpm lockfile before enabling CI. Node.js 24+ is the repository convention. For migration, run cf migrate locally and finish its follow-ups; project commands in CI must not perform automatic setup on an unmigrated Wrangler project.
 
 ```yaml
-# .github/workflows/deploy.yml
-name: deploy
+name: Worker
 on:
+  pull_request:
   push:
     branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 24, cache: npm }
-      - run: npm ci
-      - run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-```
-
-pnpm なら `pnpm/action-setup@v6` + `pnpm install --frozen-lockfile` + `pnpm exec wrangler deploy` に置き換え。
-
-## 3 環境分離（preview / staging / production）
-
-`wrangler.jsonc` で `env.staging` / `env.production` を定義し、top-level を preview として扱う。
-
-```yaml
-name: deploy
-on:
-  pull_request:                    # preview: PR ごとに別名 deploy
-  push:
-    branches: [main]               # staging: main push で自動
-    tags: ['v*']                   # production: tag push で手動 approval
-
 permissions:
   contents: read
-  pull-requests: write             # PR コメント用
-
 jobs:
-  preview:
-    if: github.event_name == 'pull_request'
+  worker:
     runs-on: ubuntu-latest
-    concurrency: preview-${{ github.event.pull_request.number }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 24 }
-      - run: npm ci
-      - name: Deploy preview
-        id: deploy
-        run: |
-          NAME="my-worker-pr-${{ github.event.pull_request.number }}"
-          npx wrangler deploy --name "$NAME"
-          echo "url=https://$NAME.<account>.workers.dev" >> $GITHUB_OUTPUT
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - uses: marocchino/sticky-pull-request-comment@v3
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
         with:
-          header: preview-url
-          message: |
-            Preview deployed: ${{ steps.deploy.outputs.url }}
-
-  staging:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 24 }
-      - run: npm ci
-      - run: npx wrangler d1 migrations apply app-staging --remote --env staging
-        env: &cf
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec cf workers types --mode production
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm exec cf build --mode production
+      - run: pnpm exec cf deploy --prebuilt --mode production --dry-run
+      - if: github.event_name == 'push'
+        run: pnpm exec cf deploy --prebuilt --mode production
+        env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - run: npx wrangler deploy --env staging
-        env: *cf
-
-  production:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    environment: production         # GitHub Environments で手動 approval
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with: { node-version: 24 }
-      - run: npm ci
-      - run: npx wrangler d1 migrations apply app-prod --remote --env production
-        env: &cf_p
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - run: npx wrangler deploy --env production
-        env: *cf_p
 ```
 
-注意点:
-- `concurrency: preview-<pr>` で同一 PR の連続 push 時に旧 job を cancel
-- `environment: production` + GitHub Environments 側で Required Reviewers を設定すると tag push で手動 approval
-- `push.branches` と `push.tags` は同じ `on.push` 内に書く（2 つの `push:` キーを並べる YAML は無効）
+Declare `packageManager` in package.json for pnpm/action-setup. This example needs no Worker secrets. If config declares `bindings.secret()`, provide dummy values through an ignored `--secrets-file` for PR validation and real values only in the publication step. Credentials are restricted to the publication step so fork PR checks can still build/typecheck/dry-run.
 
-## Pages deploy
+Build once, validate and deploy the same Build Output with `--prebuilt` and a matching mode. For staging, use `--mode staging` throughout and ensure the config chooses independent names/resources.
 
-```yaml
-- run: npm run build
-- run: npx wrangler pages deploy ./dist --project-name=my-app --branch=main
-  env:
-    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-    CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+D1 migration commands take a database ID and default to remote:
+
+```bash
+pnpm exec cf d1 migrations apply DATABASE_ID --dir db/migrations
 ```
 
-PR preview が必要なら `--branch=${{ github.head_ref }}` にすると Cloudflare Pages が自動で preview URL を発行する（Cloudflare Pages Git 連携をオフにして GitHub Actions 経由にした場合）。
+Apply compatible migrations before deployment. They are not undone by rolling back the Worker. For JSON traffic snapshots, smoke and automatic rollback, use [cloudflare-workers-cd-rollback](../../../cloudflare-workers-cd-rollback/SKILL.md).
 
-## D1 migration の順序
+For PR Worker previews, inspect `pnpm exec cf previews deploy --help`; this publishes a preview and has no dry-run option. Legacy Pages deployment is not implemented by the checked cf beta; migrate to a supported Workers/framework configuration instead of substituting `cf pages deploy`.
 
-deploy より先に migration を当てる（さもないと new column / table がまだ存在せず Worker が 500）:
-
-```yaml
-- run: npx wrangler d1 migrations apply app-prod --remote --env production
-- run: npx wrangler deploy --env production
-```
-
-`--remote` が必須（`--local` はローカル SQLite を触るだけで本番に影響しない）。
-
-## 失敗時の切り分け
-
-| 症状 | 典型原因 |
-|---|---|
-| `Authentication error` | `CLOUDFLARE_API_TOKEN` が未設定 / expired。`wrangler whoami` をローカルで確認 |
-| `No such database` | `--remote` 忘れ、または `database_id` が env 間で食い違い |
-| `binding not found` | `wrangler.jsonc` の `[env.xxx]` で binding が non-inheritable。各 env に個別列挙必要 |
-| preview URL が `undefined` | `actions/checkout` が depth=1 で head_ref 取得できない場合あり。`fetch-depth: 0` |
-| `permission denied` for `secrets.GITHUB_TOKEN` | `permissions:` ブロックに `pull-requests: write` を付け忘れ |
-
-## OIDC（将来、Cloudflare が完全サポートした場合の形）
-
-2026 年時点では実験的。参考までに枠組みのみ:
-
-```yaml
-permissions:
-  id-token: write
-  contents: read
-
-steps:
-  - uses: actions/checkout@v7
-  - name: Configure Cloudflare OIDC
-    # Cloudflare の API endpoint (概念):
-    # https://api.cloudflare.com/client/v4/accounts/<id>/oidc/tokens/exchange
-    # token を exchange してから wrangler に渡す
-    run: |
-      # TODO: 公式対応を待つ
-      echo "OIDC not yet first-class for Cloudflare; fall back to API token"
-```
-
-current best practice: **API token で運用し、token は 90 日ごとに rotation**。
-
-## 参照
-
-- `references/wrangler/auth.md` — token 発行の詳細
-- `references/wrangler/configuration.md` — `[env.xxx]` の構文
-- `references/d1/` — migration 全般
+Authentication: [cf/auth.md](../cf/auth.md). Source: [cf CI documentation](https://developers.cloudflare.com/cf/ci/).

@@ -1,0 +1,33 @@
+import { bindings, defineConfig } from "cf/config";
+import * as entrypoint from "./src/worker.ts" with { type: "cf-worker" };
+
+export default defineConfig(({ mode }) => {
+  const staging = mode === "staging";
+  const name = staging ? "cf-mbt-app-staging" : "cf-mbt-app";
+  return {
+    worker: {
+      name,
+      entrypoint,
+      compatibilityDate: "2026-09-30", // Choose today's date for a new Worker.
+      observability: { enabled: true },
+      env: {
+        OTEL_SERVICE_NAME: bindings.text(name),
+        OTEL_SERVICE_VERSION: bindings.text("0.1.0"),
+        DEPLOY_ENV: bindings.text(staging ? "staging" : "production"),
+        UTELS_ENDPOINT: bindings.text("https://utels.dev/__utels?v=1"),
+        UTELS_PROJECT_ID: bindings.text(staging ? "cf-mbt-app-staging" : "cf-mbt-app-prod"),
+        UTELS_RELEASE: bindings.text("0.1.0"),
+        DB: bindings.d1({
+          id: staging ? "REPLACE_WITH_STAGING_D1_ID" : "REPLACE_WITH_PRODUCTION_D1_ID",
+        }),
+        ASSETS: bindings.r2({ name: staging ? "cf-mbt-app-assets-staging" : "cf-mbt-app-assets" }),
+        // Enable only when configured; declared secrets are required on deploy.
+        // UTELS_INGEST_TOKEN: bindings.secret(),
+        // OTEL_EXPORTER_OTLP_ENDPOINT: bindings.secret(),
+        // OTEL_EXPORTER_OTLP_HEADERS: bindings.secret(),
+        // VECTOR_INDEX: bindings.vectorize({ name: "REPLACE_WITH_MODE_SPECIFIC_INDEX" }),
+      },
+      // Add production-only scheduled triggers explicitly; modes do not inherit them.
+    },
+  };
+});

@@ -23,7 +23,7 @@ Use when you're:
 
 ### `assets/scripts/setup-access-app.ts`
 
-Generic script. Reads config via env vars / CLI args, calls the Cloudflare API at `https://api.cloudflare.com/client/v4/accounts/<id>/access/apps`. Outputs the app's AUD (paste into `wrangler.jsonc.vars.APP_ACCESS_AUD` or equivalent) and, if `--create-service-token`, the token client_id + client_secret (paste into `.env.cloudflare`).
+Generic script. Reads config via env vars / CLI args, calls the Cloudflare API at `https://api.cloudflare.com/client/v4/accounts/<id>/access/apps`. Outputs the app's AUD (declare as `worker.env.APP_ACCESS_AUD: bindings.text(aud)` in `cloudflare.config.ts`) and, if `--create-service-token`, the token client_id + client_secret (paste into `.env.cloudflare`).
 
 Inputs (env or CLI):
 
@@ -46,3 +46,5 @@ Inputs (env or CLI):
 ## Source
 
 The mnemo version (with hard-coded mnemo domain defaults) is at [`mizchi/mnemo/blob/main/mnemo-server/scripts/setup-access-app.mjs`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/scripts/setup-access-app.mjs). The version shipped here is the same script with the domain defaults parameterized.
+
+For manual Access operations, discover the cf command with `pnpm exec cf cli search "create a self hosted Access application"`, then inspect its schema. The bundled helper calls the REST API directly and does not require Wrangler. See [cf authentication](../cloudflare-deploy/references/cf/auth.md).

@@ -11,7 +11,7 @@ Two wrappers that compose around a Worker's `{fetch, scheduled}` handler. Both a
 withUtelsErrorTracking(withTelemetry(coreHandler))
 ```
 
-- `withTelemetry` — OTLP traces / metrics / logs push when any `OTEL_EXPORTER_OTLP_*` endpoint is configured. Also wraps every D1 binding with a Proxy that logs `event: "d1.slow_query"` to `wrangler tail`, **even without OTLP**, so the slow-query story works on a fresh deploy.
+- `withTelemetry` — OTLP traces / metrics / logs push when any `OTEL_EXPORTER_OTLP_*` endpoint is configured. Also wraps every D1 binding with a Proxy that logs `event: "d1.slow_query"` for Workers Logs in the dashboard, **even without OTLP**, so the slow-query story works on a fresh deploy.
 - `withUtelsErrorTracking` — pushes one `exception` event per 5xx response or thrown exception to a [utels.dev](https://utels.dev) project. The endpoint, project ID, and ingest token are env-configured.
 
 ## When to invoke
@@ -19,13 +19,13 @@ withUtelsErrorTracking(withTelemetry(coreHandler))
 Use when you're:
 - Standing up observability on a new Worker, want OTLP-compatible traces and metrics to any backend (Honeycomb, Grafana Cloud, Tempo, Jaeger collector, …).
 - Adding server-side error tracking via utels without changing handler code.
-- Investigating a slow query: drop the threshold env var and watch `wrangler tail`.
+- Investigating a slow query: drop the threshold env var and inspect Workers Logs in the dashboard.
 
 ## What's in here
 
 ### `assets/scripts/telemetry-runtime.ts`
 
-The whole runtime, ready to drop into `src/`. Exports `withTelemetry` and `withUtelsErrorTracking`. Bundled by wrangler's esbuild at deploy.
+Copy this file and `d1-wrap.ts` together into `src/`; the runtime imports `./d1-wrap.ts`. It exports `withTelemetry` and `withUtelsErrorTracking` and is bundled by `cf build` through the Cloudflare Vite plugin.
 
 Hot points to customize per-project:
 
@@ -57,41 +57,45 @@ export default {
 };
 ```
 
-```jsonc
-// wrangler.jsonc
-{
-  "vars": {
-    "OTEL_SERVICE_NAME": "my-app",
-    "OTEL_SERVICE_VERSION": "0.1.0",
-    "DEPLOY_ENV": "production",
-    // Optional utels
-    "UTELS_ENDPOINT": "https://utels.dev/__utels?v=1",
-    "UTELS_PROJECT_ID": "my-app-prod",
-    "UTELS_RELEASE": "0.1.0"
-  }
-}
+```typescript
+// cloudflare.config.ts: merge these into worker.env.
+import { bindings } from "cf/config";
+const telemetryBindings = {
+  OTEL_SERVICE_NAME: bindings.text("my-app"),
+  OTEL_SERVICE_VERSION: bindings.text("0.1.0"),
+  DEPLOY_ENV: bindings.text("production"),
+  UTELS_ENDPOINT: bindings.text("https://utels.dev/__utels?v=1"),
+  UTELS_PROJECT_ID: bindings.text("my-app-prod"),
+  UTELS_RELEASE: bindings.text("0.1.0"),
+  // Declare only the secrets for enabled integrations:
+  // OTEL_EXPORTER_OTLP_ENDPOINT: bindings.secret(),
+  // OTEL_EXPORTER_OTLP_HEADERS: bindings.secret(),
+  // UTELS_INGEST_TOKEN: bindings.secret(),
+};
 ```
+
+Choose mode-specific service/project names for staging. Supply local secret values in `.dev.vars`; deployment values go in an ignored JSON or dotenv file. Declared secret bindings are required during deploy validation. Values decrypted into the CLI process with dotenvx are not automatically Worker bindings.
 
 ```bash
-# Optional OTLP. Set any of these to enable trace/metric/log push.
-pnpm exec dotenvx set OTEL_EXPORTER_OTLP_ENDPOINT https://api.honeycomb.io -f .env.cloudflare
-pnpm exec dotenvx set OTEL_EXPORTER_OTLP_HEADERS "x-honeycomb-team=<key>" -f .env.cloudflare
-
-# Optional utels ingest token (wrangler secret, not committed)
-pnpm exec wrangler secret put UTELS_INGEST_TOKEN
+pnpm exec cf workers types
+pnpm exec cf deploy --dry-run --secrets-file .env.production
+pnpm exec cf deploy --secrets-file .env.production
 ```
+
+For direct utels registration and secret delivery without argv/log exposure, use [utels-project-bootstrap](../utels-project-bootstrap/SKILL.md). The checked cf beta has no live-log streaming; use Workers Logs in the dashboard or the OTLP backend to inspect `d1.slow_query` events.
 
 Disable individually with `OTEL_SDK_DISABLED=true` or `UTELS_DISABLED=true`.
 
 ## Slow-query independence
 
-`withTelemetry` ALWAYS wraps D1 bindings with the Proxy. Even when OTLP is unconfigured, every query whose duration crosses `APP_D1_SLOW_THRESHOLD_MS` (default 250ms) gets logged as a structured `console.warn` that `wrangler tail` picks up. This is the cheapest possible "is my query slow?" loop — works on day-one of a new deploy.
+`withTelemetry` always wraps D1 bindings with the Proxy. Even when OTLP is unconfigured, every query whose duration crosses `APP_D1_SLOW_THRESHOLD_MS` (default 250ms) gets logged as a structured `console.warn` visible in Workers Logs. This works independently of OTLP configuration.
 
 ## References
 
-- [`references/otlp-payload-shapes.md`](references/otlp-payload-shapes.md) — the exact shape of the traces/metrics/logs JSON the runtime emits, with notes on what each OTLP backend cares about.
-- [`references/utels-event-shape.md`](references/utels-event-shape.md) — the `exception` event schema utels expects.
+- [telemetry-runtime.ts](assets/scripts/telemetry-runtime.ts) — OTLP encoders and utels exception payload construction.
+- [telemetry.test.ts](assets/tests/telemetry.test.ts) — payload assertions to adapt to the copied project's build layout.
+- [cf configuration](../cloudflare-deploy/references/cf/configuration.md) — bindings, modes and secret delivery.
 
 ## Source
 
-The runtime is identical to [`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt/blob/main/src/telemetry-runtime.ts) and [`mizchi/mnemo`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/src/telemetry-runtime.ts).
+The runtime is based on [`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt/blob/main/src/telemetry-runtime.ts) and [`mizchi/mnemo`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/src/telemetry-runtime.ts), with the sibling import adapted for the bundled assets.

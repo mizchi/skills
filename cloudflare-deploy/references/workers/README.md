@@ -1,5 +1,7 @@
 # Cloudflare Workers
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Expert guidance for building, deploying, and optimizing Cloudflare Workers applications.
 
 ## Overview
@@ -105,4 +107,4 @@ async tail(events: TraceItem[], env: Env, ctx: ExecutionContext): Promise<void>
 - [R2](../r2/README.md) - Object storage
 - [Durable Objects](../durable-objects/README.md) - Stateful coordination
 - [Queues](../queues/README.md) - Message queues
-- [Wrangler](../wrangler/README.md) - CLI tool reference
+- [Wrangler](../cf/README.md) - CLI tool reference

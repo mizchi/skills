@@ -8,8 +8,8 @@
 //      `globalThis.__appMaybeHandleAsset` at module-load time.
 //
 // The worker entry (`src/worker.ts`) side-effect-imports both
-// generated files plus the TS telemetry wrappers. wrangler bundles
-// src/worker.ts via its esbuild integration on deploy — there's no
+// generated files plus the TS telemetry wrappers. Vite bundles
+// src/worker.ts through the Cloudflare Vite plugin on cf build — there's no
 // hand-written `dist/worker.mjs` shim.
 //
 // TEMPLATE NOTES — replace before use:

@@ -1,5 +1,7 @@
 # Stream Configuration
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Setup, environment variables, and wrangler configuration.
 
 ## Installation
@@ -137,5 +139,5 @@ const playerParams = new URLSearchParams({
 
 ## See Also
 
-- [wrangler](../wrangler/) - Wrangler CLI and configuration
+- [cf](../cf/) - Wrangler CLI and configuration
 - [workers](../workers/) - Deploy Stream APIs in Workers

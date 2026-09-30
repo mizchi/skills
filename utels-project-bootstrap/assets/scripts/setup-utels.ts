@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 // One-shot helper for registering <your-app>'s two utels projects
 // (production + staging) and writing the returned ingest tokens to
-// wrangler secrets. Intended to be re-run idempotently; if a project
-// is already registered, the script falls back to a no-op for that
-// environment and the operator must inject the existing token via
-// `wrangler secret put` manually.
+// cf Worker secrets. Existing project slugs can fail registration;
+// use --only to retry a failed environment with a new project slug.
 //
 // Required env (typically provided by `pnpm dotenvx run --quiet -f
 // <utels>/.env --`):
 //   UTELS_BOOTSTRAP_TOKEN  — utels bootstrap token (header value)
+//   APP_WORKER_PROD / APP_WORKER_STAGING — Worker name for each selected target
 //
 // Optional env:
 //   UTELS_ENDPOINT         — defaults to https://utels.dev
@@ -18,12 +17,20 @@
 //   DRY_RUN                — "1" to skip mutations
 //
 // The script intentionally never prints tokens to stdout/stderr; the
-// ingest token is fed to `wrangler secret put` via stdin and then
-// dropped from memory.
+// ingest token is fed as a JSON body to `cf workers secrets update`
+// through stdin on macOS/Linux and then dropped from memory.
 
 import { spawn } from "node:child_process";
 import { dirname, resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
+
+type RegistrationTarget = {
+  env: "production" | "staging";
+  projectId: string;
+  displayName: string;
+  origins: string[];
+  worker?: string;
+};
 
 const here = dirname(fileURLToPath(import.meta.url));
 const serverDir = process.env.APP_SERVER_DIR
@@ -40,7 +47,8 @@ if (!bootstrapToken) {
   process.exit(2);
 }
 
-const endpoint = (process.env.UTELS_ENDPOINT ?? "https://utels.dev").replace(/\/$/, "");
+const endpointFlag = process.argv.find(arg => arg.startsWith("--endpoint="));
+const endpoint = (endpointFlag?.slice("--endpoint=".length) ?? process.env.UTELS_ENDPOINT ?? "https://utels.dev").replace(/\/$/, "");
 const prodProject = process.env.APP_UTELS_PROJECT_PROD ?? "<your-app>-prod";
 const stagingProject =
   process.env.APP_UTELS_PROJECT_STAGING ?? "<your-app>-staging";
@@ -50,20 +58,20 @@ const stagingProject =
 // the worker host; we don't use the browser SDK from <your-app>, but
 // having the origin in the allowlist keeps the registration call valid
 // and lets future browser-side experiments piggyback.
-const targets = [
+const targets: RegistrationTarget[] = [
   {
     env: "production",
     projectId: prodProject,
     displayName: "<your-app> (production)",
     origins: ["https://REPLACE_ME.workers.dev"],
-    wranglerArgs: [],
+    worker: process.env.APP_WORKER_PROD,
   },
   {
     env: "staging",
     projectId: stagingProject,
     displayName: "<your-app> (staging)",
     origins: ["https://REPLACE_ME-staging.workers.dev"],
-    wranglerArgs: ["--env", "staging"],
+    worker: process.env.APP_WORKER_STAGING,
   },
 ];
 
@@ -73,6 +81,15 @@ const onlyEnv = (() => {
   return process.env.APP_UTELS_ONLY || null;
 })();
 
+if (onlyEnv && !targets.some(target => target.env === onlyEnv)) {
+  console.error("setup-utels: --only must be production or staging");
+  process.exit(2);
+}
+if (!dry && targets.some(target => (!onlyEnv || target.env === onlyEnv) && !target.worker)) {
+  console.error("setup-utels: set APP_WORKER_PROD / APP_WORKER_STAGING for each selected target");
+  process.exit(2);
+}
+
 let exitCode = 0;
 for (const target of targets) {
   if (onlyEnv && target.env !== onlyEnv) {
@@ -81,16 +98,16 @@ for (const target of targets) {
   }
   console.log(`setup-utels: registering ${target.projectId} (${target.env}) …`);
   if (dry) {
-    console.log(`  (DRY_RUN) would POST /api/registration and wrangler secret put`);
+    console.log(`  (DRY_RUN) would POST /api/registration and cf workers secrets update for ${target.worker ?? target.env}`);
     continue;
   }
 
   let token;
   try {
-    token = await registerProject(target);
+    token = await registerProject(target, bootstrapToken);
   } catch (error) {
     exitCode = 1;
-    console.error(`  registration failed: ${error.message ?? error}`);
+    console.error(`  registration failed: ${error instanceof Error ? error.message : "unknown error"}`);
     continue;
   }
   if (!token) {
@@ -100,11 +117,11 @@ for (const target of targets) {
   }
 
   try {
-    await wranglerSecretPut("UTELS_INGEST_TOKEN", token, target.wranglerArgs);
-    console.log(`  wrangler secret put UTELS_INGEST_TOKEN — OK`);
+    await cfSecretUpdate("UTELS_INGEST_TOKEN", token, target.worker);
+    console.log(`  cf workers secrets update UTELS_INGEST_TOKEN — OK`);
   } catch (error) {
     exitCode = 1;
-    console.error(`  wrangler secret put failed: ${error.message ?? error}`);
+    console.error(`  cf secret update failed: ${error instanceof Error ? error.message : "unknown error"}`);
   } finally {
     token = null;
   }
@@ -112,13 +129,13 @@ for (const target of targets) {
 
 process.exit(exitCode);
 
-async function registerProject(target) {
+async function registerProject(target: RegistrationTarget, registrationCredential: string): Promise<string | null> {
   const url = new URL("/api/registration", endpoint);
   url.searchParams.set("v", "1");
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      "x-utels-bootstrap-token": bootstrapToken,
+      "x-utels-bootstrap-token": registrationCredential,
       "content-type": "application/json",
     },
     body: JSON.stringify({
@@ -133,31 +150,39 @@ async function registerProject(target) {
   });
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${text.slice(0, 200)}`);
+    throw new Error(`HTTP ${response.status}`);
   }
-  let body;
+  let body: unknown;
   try {
     body = JSON.parse(text);
   } catch {
     throw new Error("response is not JSON");
   }
-  return body?.tokens?.ingest?.token;
+  if (!body || typeof body !== "object" || !("tokens" in body)) return null;
+  const tokens = body.tokens;
+  if (!tokens || typeof tokens !== "object" || !("ingest" in tokens)) return null;
+  const ingest = tokens.ingest;
+  if (!ingest || typeof ingest !== "object" || !("token" in ingest)) return null;
+  return typeof ingest.token === "string" && ingest.token ? ingest.token : null;
 }
 
-function wranglerSecretPut(name, value, extraArgs) {
-  return new Promise((resolveP, rejectP) => {
-    const args = ["exec", "wrangler", "secret", "put", name, ...extraArgs];
+function cfSecretUpdate(name: string, value: string, worker: string | undefined): Promise<void> {
+  if (!worker) return Promise.reject(new Error("Worker name is required"));
+  return new Promise<void>((resolveP, rejectP) => {
+    const args = ["exec", "cf", "workers", "secrets", "update", name,
+      "--worker", worker, "--body", "@/dev/stdin"];
     const child = spawn("pnpm", args, {
       cwd: serverDir,
-      stdio: ["pipe", "inherit", "inherit"],
+      // cf output may include API bodies on errors; keep tokens out of logs.
+      stdio: ["pipe", "ignore", "ignore"],
       env: process.env,
     });
     child.on("error", rejectP);
     child.on("close", (code) => {
       if (code === 0) resolveP();
-      else rejectP(new Error(`wrangler exited with code ${code}`));
+      else rejectP(new Error(`cf exited with code ${code}`));
     });
-    child.stdin.write(`${value}\n`);
-    child.stdin.end();
+    child.stdin.on("error", rejectP);
+    child.stdin.end(JSON.stringify({ name, text: value, type: "secret_text" }));
   });
 }

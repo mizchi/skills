@@ -1,5 +1,7 @@
 # Cloudflare Durable Objects
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Expert guidance for building stateful applications with Cloudflare Durable Objects.
 
 ## Reading Order
@@ -182,4 +184,4 @@ npx wrangler deploy           # Deploy + auto-apply migrations
 
 - **[DO Storage](../do-storage/README.md)** - SQLite, KV, transactions (detailed storage guide)
 - **[Workers](../workers/README.md)** - Core Workers runtime features
-- **[WebSockets](../websockets/README.md)** - WebSocket APIs and patterns
+- **[WebSocket patterns](patterns.md)** - Durable Object WebSocket APIs and patterns

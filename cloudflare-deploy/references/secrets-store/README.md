@@ -1,5 +1,7 @@
 # Cloudflare Secrets Store
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Account-level encrypted secret management for Workers and AI Gateway.
 
 ## Overview
@@ -71,4 +73,4 @@ API Token permissions: `Account Secrets Store Edit/Read`
 
 ## See Also
 - [workers](../workers/) - Worker bindings integration
-- [wrangler](../wrangler/) - CLI secret management commands
+- [cf](../cf/) - CLI secret management commands

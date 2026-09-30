@@ -2,7 +2,7 @@
 
 ## Symptom
 
-A route that touches an `INTEGER` column never returns. `wrangler tail` shows the request enter the handler. After ~30 s Cloudflare kills the isolate with:
+A route that touches an `INTEGER` column never returns. `Workers Logs` shows the request enter the handler. After ~30 s Cloudflare kills the isolate with:
 
 ```
 1101 Worker threw exception
@@ -51,7 +51,7 @@ Block-based parsing (`source.split(/^(?=pub async fn )/m)`) avoids the truncatio
 
 ## How to recognize this from a tail log
 
-Without telemetry: the only signal is a request that never returns. A `wrangler tail` will show the request entering the handler, then silence, then nothing until the CF runtime kills it.
+Without telemetry: the only signal is a request that never returns. Workers Logs will show the request entering the handler, then silence, then nothing until the CF runtime kills it.
 
 With telemetry: the `withTelemetry` D1 Proxy wrap (`cloudflare-workers-otel-utels` skill) records per-query duration in a `finally`. A query that never reaches `finally` because `.run()` never resolves is a smoking gun for this class of bug.
 

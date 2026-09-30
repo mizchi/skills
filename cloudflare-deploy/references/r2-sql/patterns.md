@@ -1,5 +1,7 @@
 # R2 SQL Patterns
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Common patterns, use cases, and integration examples for R2 SQL.
 
 ## Wrangler CLI Query

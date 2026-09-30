@@ -1,79 +1,49 @@
 ---
 name: cloudflare-mbt-worker-bundle
-description: Bundle a Cloudflare Worker that combines MoonBit core code with a TypeScript entry. Use when wrangler must ship a moon-built JS module alongside hand-written TS, with FFI rewrites and a post-build bundle check.
+description: Bundle a Cloudflare Worker combining MoonBit core code with a TypeScript entry through cf and the Cloudflare Vite plugin, with required FFI rewrites and a post-build bundle check.
 ---
 
 # Cloudflare Workers + MoonBit bundle pipeline
 
-The canonical way to ship a Cloudflare Worker where the bulk of the request handler is MoonBit code (compiled to JS via `moon build --target js --release`) but the entry shim is hand-written TypeScript.
+Use `cf`, `cloudflare.config.ts` and the Cloudflare Vite plugin to bundle MoonBit's JS output with the TypeScript Worker entry. See [mizchi/cf-example](https://github.com/mizchi/cf-example) (`~/ghq/github.com/mizchi/cf-example`) for the current cf/Vite setup; its checked versions are cf beta.5 and the Vite plugin beta on Node.js 24.
 
-## When to invoke
+## Pipeline
 
-Use when you're:
-- Setting up a new MoonBit → Cloudflare Workers project.
-- Migrating an existing project from a hand-written `dist/worker.mjs` shim to wrangler-native TS bundling.
-- Diagnosing a Worker that hangs on the first `await` after startup (FFI rewrite missed; see references).
-
-## Key facts about wrangler + MoonBit
-
-1. **wrangler bundles TS natively.** As of wrangler 4.x, `main: "src/worker.ts"` in `wrangler.jsonc` is enough — wrangler's built-in esbuild integration transpiles + bundles + emits a single JS file on every `wrangler dev` / `wrangler deploy`. No separate `tsc` emit step is needed for the worker.
-2. **MoonBit output is plain ESM JS.** `moon build --target js --release` writes `_build/js/release/build/<package>.js`. wrangler can `import` it from a TS entry — no bridging needed except for the side-effect import (the moon module registers globals at module init).
-3. **Two MoonBit-specific source rewrites are mandatory.** These are not optional and cannot move into TS:
-   - `moonbitlang$async$internal$event_loop$$reschedule()` → the mangled `_M0FP...event__loop10reschedule()` name. The legacy hook only drains the deque once; the new name re-pumps via `setTimeout(0)`. Without the rewrite, every `await` past startup hangs.
-   - Module-scope random seed → a constant. Workers reject random in module init.
-   Both must happen between `moon build` and `wrangler deploy`, applied to the moon JS output. See `assets/scripts/prepare-worker.ts.template`.
-
-## Pipeline shape
-
-```
-clean → db:verify → vite build (if frontend) → moon build → prepare-worker → wrangler deploy
-                                                            ↓
-                                                            (writes src/_generated/<pkg>-core.js
-                                                             with FFI rewrites applied; wrangler's
-                                                             esbuild picks it up as part of the src/ tree)
+```text
+moon build --target js --release
+  → prepare-worker (FFI rewrites into src/_generated/<PKG>-core.js)
+  → cf build --mode <mode>
+  → check emitted bundle
+  → cf deploy --prebuilt --mode <same-mode> --dry-run
+  → cf deploy --prebuilt --mode <same-mode>
 ```
 
-For a project without frontend / FFI rewrites (no MoonBit), the pipeline is even simpler: `wrangler deploy` against `src/worker.ts` is sufficient. The starter kit `cloudflare-starterkit-mbt` ships with a slim version of this.
+Preparation must run before every build that will ship MoonBit changes. For local development, prepare the generated JS first, run `pnpm exec cf dev`, and regenerate it when MoonBit sources change; Vite does not invoke `moon build` automatically.
 
-## What's in here
+MoonBit emits plain ESM JS. The TypeScript entry side-effect imports the **prepared** file, which registers `globalThis.__appServerFetch`. Importing the original `_build/` file bypasses the rewrites and can produce a Worker that hangs.
 
-### `assets/templates/worker.ts.template`
+Two source rewrites are required for the runtime versions this template targets:
 
-A minimal `src/worker.ts` entry that:
-1. Side-effect imports the prepared moon core (registers `globalThis.__appServerFetch`).
-2. Imports telemetry + utels wrappers from `./telemetry-runtime.ts`.
-3. Exports `{ fetch, scheduled }` for wrangler.
+- Replace `moonbitlang$async$internal$event_loop$$reschedule()` with the generated recursive reschedule symbol so awaited work resumes.
+- Replace module-scope random seed initialization with a deterministic constant; Workers disallow random I/O at module initialization.
 
-Rename `__appServerFetch` to match your moon module's `register_cloudflare_fetch` call.
+`requiredReplace` must fail when the expected source is absent. After a MoonBit/runtime upgrade, inspect generated code and update the rewrite deliberately rather than silently skipping it. Details: [moonbit-ffi-rewrites.md](references/moonbit-ffi-rewrites.md).
 
-### `assets/scripts/prepare-worker.ts.template`
+## Assets
 
-The pre-bundle step. Reads moon output, applies the two FFI rewrites with `requiredReplace` (fails loudly if the target string isn't found — silent no-op was a real production hang), writes to `src/_generated/<pkg>-core.js`.
+- [worker.ts.template](assets/templates/worker.ts.template): TypeScript entry importing `./_generated/<PKG>-core.js` and telemetry wrappers. Copy to `src/worker.ts`; replace `<PKG>` and handler registration names as needed.
+- [prepare-worker.ts.template](assets/scripts/prepare-worker.ts.template): copy to `scripts/prepare-worker.ts`, replace `<PKG>`, apply both FFI rewrites, write prepared JS into `src/_generated/`.
+- [cloudflare.config.ts.template](assets/templates/cloudflare.config.ts.template): copy to `cloudflare.config.ts`. Modes choose production/staging Worker names, D1 IDs and R2 names. Replace IDs after provisioning; apply D1 migrations with `cf d1 migrations apply DATABASE_ID --dir db/migrations`.
+- [vite.config.ts.template](assets/templates/vite.config.ts.template): Vite integration used by `cf dev`/`cf build`.
+- [check-worker-bundle.ts](assets/scripts/check-worker-bundle.ts): checks an emitted JS bundle for corrupt control bytes, stub output and project-specific markers. Inspect `worker.config.json`'s manifest for the main module and pass its path under `.cloudflare/output/v0/workers/<worker>/bundle/`. If Vite splits modules, check the bundle directory so markers in other modules are included.
 
-### `assets/scripts/check-worker-bundle.ts`
+Add `cf`, `@cloudflare/vite-plugin@beta`, Vite and TypeScript with pnpm, commit the lockfile, generate types with `pnpm exec cf workers types`, and include `.cloudflare/types` in TypeScript. Use the build mode again for prebuilt deploy. For required secret bindings, pass an ignored `--secrets-file` to validation and deployment.
 
-Post-build sanity check on the final bundle. Catches:
-- Stray `\x1f` control bytes (wasm-host text corruption, sqlc-gen-moonbit #17 family).
-- Bundle too small (moon emitted a stub).
-- Required markers missing (extend `REQUIRED_MARKERS` per project — e.g. `globalThis.__appCronTick` for scheduled handlers).
-
-### `assets/templates/wrangler.jsonc.template`
-
-Skeleton with `env.staging` block, the `name`/`main`/`compatibility_date` shape, and inline comments on where to paste D1 IDs / R2 / Vectorize bindings.
-
-## Why this pipeline (over alternatives)
-
-| Alternative | Trade-off |
-| --- | --- |
-| Pre-bundle everything to `dist/` with `tsc` + a hand-written `worker.mjs` shim | Used to be required before wrangler 4 TS support. Adds a separate emit + a shim file to maintain. Drop in favor of wrangler-native bundling unless you have a niche need to inspect `dist/`. |
-| Use Vite as the bundler | Works for non-Worker code. For Workers the runtime constraints (no setTimeout > 0, no module-init random, no eval in some paths) need wrangler's awareness. Sticking with wrangler's esbuild is safer. |
-| Drop MoonBit, write the worker fully in TS | Loses the typed handler / mars routing / static check guarantees. Use when MoonBit isn't already on the team. |
+When migrating an existing Worker, run `cf migrate --dry-run` then `cf migrate` before using project commands. Keep prior DO lifecycle history and resource IDs; do not bootstrap a replacement config that loses existing bindings. See the [cf configuration guide](../cloudflare-deploy/references/cf/configuration.md).
 
 ## References
 
-- [`references/wrangler-traps.md`](references/wrangler-traps.md) — `deployments list` ordering, the nonexistent `--yes` flag, etc.
-- [`references/moonbit-ffi-rewrites.md`](references/moonbit-ffi-rewrites.md) — what each rewrite does, why, and how to recognize when one stops landing.
-
-## Source
-
-The runtime reference is in [`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt). A larger example with the FFI rewrites + editor-assets runtime is in [`mizchi/mnemo`](https://github.com/mizchi/mnemo) under `mnemo-server/`.
+- [cf-traps.md](references/cf-traps.md): modes, build artifacts, resource IDs and unsupported beta operations.
+- [moonbit-ffi-rewrites.md](references/moonbit-ffi-rewrites.md): runtime rewrite targets and symptoms.
+- [cf-example](https://github.com/mizchi/cf-example): cf/Vite/types/Playwright example.
+- [cloudflare-starterkit-mbt](https://github.com/mizchi/cloudflare-starterkit-mbt) and [mnemo](https://github.com/mizchi/mnemo): MoonBit handler/runtime examples; translate their older CLI setup to cf.

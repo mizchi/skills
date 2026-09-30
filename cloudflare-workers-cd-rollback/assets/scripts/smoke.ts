@@ -1,6 +1,6 @@
 // Generic post-deploy smoke check. Runs a small set of HTTP probes
 // against a base URL and exits non-zero if any check fails. Designed
-// for CI use after `wrangler deploy` so a broken deploy never sits in
+// for CI use after `cf deploy` so a broken deploy never sits in
 // production silently.
 //
 // Inputs (env vars):

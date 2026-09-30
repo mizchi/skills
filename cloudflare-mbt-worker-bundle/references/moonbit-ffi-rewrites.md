@@ -1,6 +1,6 @@
 # MoonBit FFI rewrites for Cloudflare Workers
 
-Two source rewrites that `prepare-worker.ts` applies to the moon JS output between `moon build --target js --release` and `wrangler deploy`. Both are not optional for Cloudflare Workers.
+Two source rewrites that `prepare-worker.ts` applies to the moon JS output between `moon build --target js --release` and `cf deploy`. Both are not optional for Cloudflare Workers.
 
 ## Rewrite 1: event_loop reschedule rename
 
@@ -17,8 +17,8 @@ In the unrewritten moon output, after the first batch of awaited Promises resolv
 
 Symptoms when the rewrite stops landing:
 - New deploys hang on the first request after a `pnpm install` that bumped `moonbitlang/async`.
-- `wrangler tail` shows the request entering and never exiting.
-- `pnpm run dev` works locally (different moonbitlang/async transformation in dev mode), but `wrangler deploy` produces a hanging Worker.
+- Workers Logs shows the request entering and never exiting.
+- `pnpm run dev` works locally (different moonbitlang/async transformation in dev mode), but `cf deploy` produces a hanging Worker.
 
 `requiredReplace` in `prepare-worker.ts` fails loudly if the legacy name isn't present — that's the primary defense.
 
@@ -56,7 +56,7 @@ Update both the search and replacement strings together.
 
 ## Why these rewrites live in JS rewriting (not MoonBit FFI)
 
-You can't FFI your way out of these inside MoonBit because they're not function calls in your source — they're emitted by the moonbitlang/async runtime and the moon compiler's prelude. The only place to fix them is the produced JS, before wrangler bundles it.
+You can't FFI your way out of these inside MoonBit because they're not function calls in your source — they're emitted by the moonbitlang/async runtime and the moon compiler's prelude. The only place to fix them is the produced JS, before Vite bundles it.
 
 ## Cross-reference
 

@@ -10,6 +10,9 @@ on:
       - "**/evals/**"
       - "scripts/**"
       - "Taskfile.pkl"
+      - "cloudflare.justfile"
+      - "cloudflare-*/**"
+      - "utels-project-bootstrap/**"
   pull_request:
     paths:
       - ".github/workflows/skills.yml"
@@ -19,6 +22,9 @@ on:
       - "**/evals/**"
       - "scripts/**"
       - "Taskfile.pkl"
+      - "cloudflare.justfile"
+      - "cloudflare-*/**"
+      - "utels-project-bootstrap/**"
   workflow_dispatch:
 
 permissions:
@@ -41,3 +47,8 @@ jobs:
         run: ruby scripts/validate-skill-frontmatter.rb
       - name: Check generated README files
         run: ruby scripts/gen-skill-readme.rb --check
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Test cf deployment and secret helpers
+        run: node --test cloudflare-workers-cd-rollback/assets/scripts/deployment-state.test.ts utels-project-bootstrap/assets/scripts/setup-utels.test.ts cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.test.ts

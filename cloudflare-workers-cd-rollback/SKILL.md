@@ -1,79 +1,53 @@
 ---
 name: cloudflare-workers-cd-rollback
-description: "GitHub Actions CD for a Cloudflare Worker with auto-rollback on smoke failure. Use when you want push-to-deploy with safety: capture pre-deploy version, deploy, smoke, rollback if smoke fails."
+description: GitHub Actions CD for Cloudflare Workers through cf with automatic traffic rollback on smoke failure, including JSON deployment snapshots, D1 migrations and prebuilt artifacts.
 ---
 
 # Cloudflare Workers CD with auto-rollback
 
-A three-workflow CD setup:
-- `deploy.yml` (reusable, `workflow_call`) — the actual deploy chain: capture pre-deploy version_id → apply D1 migrations → build → deploy → smoke → auto-rollback if smoke failed → summary report.
-- `cd-staging.yml` — fires on push to `main`, calls `deploy.yml` with `environment: staging`.
-- `cd-production.yml` — fires on push to `release`, calls `deploy.yml` with `environment: production`.
+Use the three workflow templates with cf, Node.js 24 and pnpm. cf-example at `~/ghq/github.com/mizchi/cf-example` shows the current Vite/config/typegen integration; this skill adds deployment state capture and rollback.
 
-The chain catches production-only bugs (BigInt hangs, missing env, region-only routing) without a human in the loop — failed smoke automatically restores the previous Worker version.
-
-## When to invoke
-
-Use when you're:
-- Setting up CD for a new Cloudflare Worker and want safety beyond "wrangler deploy".
-- Adding rollback to an existing manual-deploy project.
-- Debugging a deploy that should have rolled back but didn't — the common causes are documented in `references/cd-traps.md`.
-
-## Pipeline shape
-
-```
-push to main      ──► cd-staging.yml      ──┐
-                                            │ uses: deploy.yml
-push to release   ──► cd-production.yml   ──┘
-                       │
-                       ├─ capture pre-deploy version_id (first_deploy detection)
-                       ├─ apply D1 migrations
-                       ├─ build (clean → db:verify → moon build → bundle check)
-                       ├─ wrangler deploy
-                       ├─ smoke (continue-on-error)
-                       ├─ if smoke failed: wrangler rollback <pre_deploy_id>
-                       ├─ report summary
-                       └─ fail the job if smoke failed (held until after rollback)
+```text
+push main/release → staging/production caller → deploy.yml
+  → capture previous traffic versions as JSON
+  → cf d1 migrations apply DATABASE_ID --dir db/migrations
+  → MoonBit build + FFI preparation
+  → cf workers types + cf build --mode <target>
+  → bundle check + cf deploy --prebuilt --mode <target> --dry-run
+  → cf deploy --prebuilt --mode <target>
+  → smoke
+  → on failure: cf workers deployments create with the saved traffic array
+  → report + fail the workflow when smoke failed
 ```
 
-## What's in here
+## Copy and configure
 
-### `assets/workflows/deploy.yml`
+Copy `assets/workflows/{deploy,cd-staging,cd-production}.yml` to `.github/workflows/` and the helper scripts to `scripts/`. The bundle checker comes from [the MoonBit skill](../cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.ts); copy [deployment-state.ts](assets/scripts/deployment-state.ts) and [smoke.ts](assets/scripts/smoke.ts) from this skill.
 
-The reusable workflow. Inputs: `environment` (staging|production), optional `message`, `skip_smoke`, `skip_rollback`. Calls `wrangler` through dotenvx so all Cloudflare credentials decrypt from a single committed `.env.cloudflare` file (rotating one repo secret rotates every CF cred).
+The project must have `cloudflare.config.ts` before CI. Migrate an existing Wrangler project with `cf migrate` and resolve its follow-ups locally, then commit the typed config and lockfile. CI must not depend on automatic setup.
 
-Notable bits:
-- **Pre-deploy version_id capture** handles the "Worker doesn't exist yet" first-deploy case (CF error 10007). The rollback step skips cleanly when there's no prior version.
-- **`bash -e` workaround**: `set +e` before the `wrangler deployments list` call so a non-zero exit doesn't kill the step before we can branch on the actual error message.
-- **`github.sha` instead of `head_commit.message`** in the deploy message. Commit bodies contain newlines + shell metachars; YAML-interpolating them is unsafe (`--yes` or `wrangler` inside a commit body would be parsed as shell tokens).
+Configure:
 
-### `assets/workflows/cd-staging.yml` + `cd-production.yml`
+- DevDependencies: `cf`, `@cloudflare/vite-plugin@beta`, Vite, TypeScript and `@dotenvx/dotenvx`.
+- `build:core` package script: `moon build --target js --release && node scripts/prepare-worker.ts`. For a TypeScript-only project remove the MoonBit install/build steps and use cf build directly.
+- `smoke` package script: `node scripts/smoke.ts`, with project-specific paths/status expectations.
+- GitHub variables `D1_DATABASE_ID_PRODUCTION`, `D1_DATABASE_ID_STAGING`, `WORKERS_SUBDOMAIN`; optional `WORKER_NAME_PRODUCTION` and `WORKER_NAME_STAGING` default to `cf-mbt-app` and `cf-mbt-app-staging`. Match those names and IDs to the corresponding config modes.
+- The encrypted `.env.cloudflare` with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; GitHub secret `DOTENV_PRIVATE_KEY_CLOUDFLARE` decrypts it. Access smoke credentials can also come from this file.
 
-Thin wrappers. Both include a `precheck` job that materializes `secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE` presence into a job output and gates the `deploy` job via `needs:` + `if:`. Without this gate, the upstream starter-kit repo (no secret configured) gets a red CI on every push.
+Adapt D1 steps if the project has no D1 or several databases. cf expects IDs, remote is the default, and `--dir` selects the migration directory. Use compatible schema migrations: Worker rollback does not undo database changes.
 
-### `assets/scripts/smoke.ts`
+Build and prebuilt deploy use the same mode. If enabling `bindings.secret()`, supply mock values for dry-run checks and the appropriate ignored/decrypted `--secrets-file` during publication; CLI credentials alone do not become Worker bindings.
 
-Minimal smoke runner. Reads `SMOKE_BASE_URL`, optional `CF_ACCESS_CLIENT_ID/SECRET`, runs a configurable list of `{path, expectStatus}` probes. Returns non-zero if any check failed; `deploy.yml`'s rollback step keys on this exit code.
+## Rollback contract
 
-## .env.cloudflare contract
+cf API output is JSON on stdout; progress/errors are stderr. Deployment listings put the **latest active deployment first**, unlike old Wrangler text ordering. [deployment-state.ts](assets/scripts/deployment-state.ts) validates the response and saves the complete `{version_id, percentage}[]` allocation, including a gradual split. It rejects malformed data instead of choosing an older deployment.
 
-Single dotenvx-encrypted file is the source of truth for every Cloudflare credential. Repo only needs ONE GitHub Actions secret: `DOTENV_PRIVATE_KEY_CLOUDFLARE`. Rotating that key rotates every CF credential.
+An empty successful list or the specific missing-Worker error 10007 means first deployment: save `[]`, skip rollback and report smoke failure. Authentication, permission, network and parsing failures abort before deploy. Do not treat every failed listing as first deployment.
 
-Keys this skill expects:
+On smoke failure, restore the saved allocation with `cf workers deployments create --worker <name> --strategy percentage --versions @file`. Do not add `--force` automatically to bypass a rollback blocked by secret changes. First deployments cannot restore an earlier version. Serialize deployments per target mode; avoid other deployment pipelines racing this workflow.
 
-| Key | Used by |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | every `wrangler …` call |
-| `CLOUDFLARE_ACCOUNT_ID` | wrangler scope |
-| `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` | smoke against Access-gated prod |
-| `CF_ACCESS_CLIENT_ID_STAGING` / `CF_ACCESS_CLIENT_SECRET_STAGING` | smoke against staging |
+Messages enter shell steps through environment variables. Never interpolate commit bodies or arbitrary dispatch input directly into shell source. The wrappers gate deployment on the dotenvx key and watch `cloudflare.config.ts` and `vite.config.ts`.
 
-`dotenvx set KEY VALUE -f file` is **space-separated**, not `KEY=VALUE`. The latter form errors out with "missing required argument 'value'".
+## Verification
 
-## References
-
-- [`references/cd-traps.md`](references/cd-traps.md) — 8 specific GitHub Actions + wrangler traps the workflows compensate for. Read before debugging a deploy that "should have worked".
-
-## Source
-
-[`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt) has the runnable starter; [`mizchi/mnemo`](https://github.com/mizchi/mnemo) has a more elaborated version with multi-D1-shard migrations + utels-sourcemap upload integrated.
+The [deployment-state tests](assets/scripts/deployment-state.test.ts) cover latest-first selection, gradual traffic, first deployment and malformed/API-error data. Validate YAML and run a dry run before enabling the copied workflow. Sources and limitations: [cd-traps.md](references/cd-traps.md), [cf API guide](../cloudflare-deploy/references/cf/api.md).

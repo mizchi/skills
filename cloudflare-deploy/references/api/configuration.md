@@ -1,5 +1,7 @@
 # Configuration
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 ## Environment Variables
 
 ### Set Variables
@@ -157,4 +159,4 @@ account_id = "your-account-id"
 
 - [api.md](./api.md) - Client initialization, authentication
 - [gotchas.md](./gotchas.md) - Rate limits, timeout errors
-- [Wrangler Reference](../wrangler/) - CLI tool details
+- [Wrangler Reference](../cf/) - CLI tool details

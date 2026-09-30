@@ -1,5 +1,7 @@
 # Miniflare
 
+> **Legacy CLI/config examples:** Wrangler commands and JSON/TOML settings below are migration input only. Use [cf commands](../cf/api.md), [typed configuration](../cf/configuration.md) and [migration guidance](../cf/patterns.md) for current operations; do not execute or copy the legacy setup. Runtime/SDK examples remain product references.
+
 Local simulator for Cloudflare Workers development/testing. Runs Workers in workerd sandbox implementing runtime APIs - no internet required.
 
 ## Features
@@ -100,6 +102,6 @@ await mf.dispose();
 - [api.md](./api.md) - Complete method reference
 
 ## See Also
-- [wrangler](../wrangler/) - CLI tool that embeds Miniflare for `wrangler dev`
+- [cf](../cf/) - CLI tool that embeds Miniflare for `wrangler dev`
 - [workerd](../workerd/) - Runtime that powers Miniflare
 - [workers](../workers/) - Workers runtime API documentation

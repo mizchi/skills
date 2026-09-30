@@ -103,16 +103,16 @@ The "Install" column may also be:
 | T2 | actrun-debug | `mizchi/actrun/.claude/skills/actrun-debug` | Diagnosing actrun execution failures — log analysis, root-cause, fix suggestions |
 
 ### Cloudflare
-**Signals**: `wrangler.toml`, Cloudflare account, Workers / Pages deploy
+**Signals**: `cloudflare.config.ts`, cf CLI, Cloudflare account, Workers deploy, Wrangler migration
 
 | T | Skill | Install | Use when |
 |---|---|---|---|
-| T1 | cloudflare-deploy | `mizchi/skills/cloudflare-deploy` | Deploying to Cloudflare Workers / Pages — wrangler commands, secrets, custom domains |
+| T1 | cloudflare-deploy | `mizchi/skills/cloudflare-deploy` | Deploying to Cloudflare Workers / Pages — cf commands, typed configuration, secrets, custom domains |
 | T1 | workers-cd-rollback | `mizchi/skills/cloudflare-workers-cd-rollback` | Adding push-to-deploy + automatic rollback on smoke failure to a Workers GitHub Actions pipeline |
 | T1 | cloudflare-workers-otel-utels | `mizchi/skills/cloudflare-workers-otel-utels` | Adding OTLP tracing / metrics / logs and utels error tracking to a Worker without touching handler code |
-| T1 | cloudflare-mbt-worker-bundle | `mizchi/skills/cloudflare-mbt-worker-bundle` | Bundling a Worker that combines a MoonBit moon-built JS module with a TypeScript entry via wrangler |
+| T1 | cloudflare-mbt-worker-bundle | `mizchi/skills/cloudflare-mbt-worker-bundle` | Bundling a Worker that combines a MoonBit moon-built JS module with a TypeScript entry via cf and the Cloudflare Vite plugin |
 | T3 | cloudflare-access-app-setup | `mizchi/skills/cloudflare-access-app-setup` | Gating a Worker behind Cloudflare Access via API in one shot — app + email allowlist + service token |
-| T3 | utels-project-bootstrap | `mizchi/skills/utels-project-bootstrap` | Registering a new utels.dev project and writing the returned ingest token into a wrangler secret in one shot |
+| T3 | utels-project-bootstrap | `mizchi/skills/utels-project-bootstrap` | Registering a new utels.dev project and writing the returned ingest token into a Worker secret through cf without argv/log exposure |
 
 ### AWS
 **Signals**: ECS / Fargate service, GitHub Actions → AWS OIDC, aws-vault MFA error

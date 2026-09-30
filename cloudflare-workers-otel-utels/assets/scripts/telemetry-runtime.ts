@@ -1,9 +1,9 @@
 // Cloudflare Worker telemetry wrappers used at the generated worker
-// entrypoint (dist/worker.mjs). Provides:
+// TypeScript entrypoint (src/worker.ts). Provides:
 //   - `withTelemetry`: OTLP traces / metrics / logs push when an
 //     OTEL_EXPORTER_OTLP_* endpoint is configured; runs D1 query
 //     telemetry unconditionally so slow queries surface in
-//     `wrangler tail` even without OTLP wired up.
+//     Workers Logs even without OTLP wired up.
 //   - `withUtelsErrorTracking`: pushes one `exception` event per 5xx
 //     response or thrown exception to a utels.dev project. Inert
 //     unless `UTELS_ENDPOINT` + `UTELS_PROJECT_ID` + `UTELS_INGEST_TOKEN`
@@ -248,7 +248,7 @@ import {
   detectDbTable,
   truncateStatement,
   wrapD1Bindings,
-} from "./telemetry/d1-wrap.ts";
+} from "./d1-wrap.ts";
 
 function d1QuerySpan(spanCtx, query) {
   return _d1QuerySpan(spanCtx, query, { toKeyValues, randomHex });
