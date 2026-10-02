@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "test:mutation": "stryker run",
+    "test:mutation:changed": "node scripts/mutation-changed.mjs",
+    "test:mutation:summary": "node scripts/mutation-summary.mjs"
+  }
+}

@@ -115,6 +115,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | Skill | Install path | Description |
 | --- | --- | --- |
 | [playwright-cli](playwright-cli/) | `playwright-cli` | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
+| [stryker-js](stryker-js/) | `stryker-js` | Measure JavaScript/TypeScript test quality with StrykerJS; run Git diff mutations in CI and use surviving mutants to improve assertions locally. Includes setup snippets and AI-readable reports. |
 | [playwright-test](playwright-test/) | `playwright-test` | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
 
 ### AI / VLM

@@ -1,0 +1,81 @@
+name: Mutation diff
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: Comparison ref or commit (merge-base with the selected branch)
+        required: true
+        default: HEAD~1
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout PR head and full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          run_install: false
+
+      - name: Set up Node.js and pnpm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Select changed source without installing dependencies
+        id: plan
+        env:
+          MUTATION_BASE: ${{ github.event.pull_request.base.sha || inputs.base }}
+        run: |
+          mkdir -p reports/mutation
+          node scripts/mutation-changed.mjs --base "$MUTATION_BASE" --diff-only --list > reports/mutation/changed-plan.json
+          node --input-type=module -e '
+            import { appendFileSync, readFileSync } from "node:fs";
+            const plan = JSON.parse(readFileSync("reports/mutation/changed-plan.json", "utf8"));
+            appendFileSync(process.env.GITHUB_OUTPUT, "has_targets=" + (plan.mutate.length > 0) + "\n");
+            console.log(JSON.stringify(plan, null, 2));
+          '
+
+      - name: Install dependencies
+        if: steps.plan.outputs.has_targets == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Test mutations in changed source
+        if: steps.plan.outputs.has_targets == 'true'
+        env:
+          MUTATION_BASE: ${{ github.event.pull_request.base.sha || inputs.base }}
+        run: pnpm test:mutation:changed --base "$MUTATION_BASE" --diff-only
+
+      - name: Upload selection and mutation reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: mutation-diff-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            reports/mutation/changed-plan.json
+            reports/mutation/changed.html
+            reports/mutation/changed.json
+          if-no-files-found: ignore
+          retention-days: 7

@@ -13,6 +13,8 @@ on:
       - "cloudflare.justfile"
       - "cloudflare-*/**"
       - "utels-project-bootstrap/**"
+      - "stryker-js/**"
+      - "stryker.justfile"
   pull_request:
     paths:
       - ".github/workflows/skills.yml"
@@ -25,6 +27,8 @@ on:
       - "cloudflare.justfile"
       - "cloudflare-*/**"
       - "utels-project-bootstrap/**"
+      - "stryker-js/**"
+      - "stryker.justfile"
   workflow_dispatch:
 
 permissions:
@@ -52,3 +56,5 @@ jobs:
           node-version: 24
       - name: Test cf deployment and secret helpers
         run: node --test cloudflare-workers-cd-rollback/assets/scripts/deployment-state.test.ts utels-project-bootstrap/assets/scripts/setup-utels.test.ts cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.test.ts
+      - name: Test Stryker setup helpers
+        run: node --test stryker-js/tests/*.test.mjs

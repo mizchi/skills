@@ -1,0 +1,8 @@
+mutate *args:
+    pnpm test:mutation {{args}}
+
+mutate-changed *args:
+    pnpm test:mutation:changed {{args}}
+
+mutation-summary report="reports/mutation/mutation.json":
+    pnpm test:mutation:summary "{{report}}"
