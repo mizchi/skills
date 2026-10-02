@@ -1,0 +1,7 @@
+{
+  "name": "sample-skill",
+  "version": "0.1.0",
+  "description": "Demonstration plugin containing one portable agent skill",
+  "author": { "name": "Your Name" },
+  "skills": ["./skills/sample-skill"]
+}

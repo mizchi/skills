@@ -1,0 +1,7 @@
+name: skill-install-smoke
+version: 0.1.0
+targets:
+  - claude
+dependencies:
+  apm:
+    - ../source/sample-skill

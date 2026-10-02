@@ -167,6 +167,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
+| [publish-agent-skill](publish-agent-skill/) | `publish-agent-skill` | Publish and update portable skills through Claude Code marketplaces, APM and the skills CLI; verify discovery, installed resources and consumer updates. |
 | [multi-agent-orchestration](multi-agent-orchestration/) | `multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |

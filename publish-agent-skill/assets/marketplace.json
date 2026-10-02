@@ -1,0 +1,12 @@
+{
+  "name": "sample-skills-marketplace",
+  "description": "Portable agent skills distributed as Claude Code plugins",
+  "owner": { "name": "Your Name" },
+  "plugins": [
+    {
+      "name": "sample-skill",
+      "source": "./plugins/sample-skill",
+      "description": "Demonstration plugin containing one portable agent skill"
+    }
+  ]
+}

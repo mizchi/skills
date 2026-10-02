@@ -1,0 +1,15 @@
+{
+  "name": "sample-skills-marketplace",
+  "description": "Selected plugins from a collection of portable agent skills",
+  "owner": { "name": "Your Name" },
+  "plugins": [
+    {
+      "name": "sample-skill",
+      "source": "./",
+      "strict": false,
+      "version": "0.1.0",
+      "description": "One skill selected from a repository of sibling skill folders",
+      "skills": ["./sample-skill"]
+    }
+  ]
+}
