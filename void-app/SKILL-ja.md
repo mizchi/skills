@@ -238,6 +238,12 @@ pnpm exec void db status      # 2 本とも local: applied
 
 回帰テストは `node:sqlite` に生成 SQL をそのまま適用する。旧マイグレーション → 行を投入 → 残りの履歴を適用、の順で全データ・既定値・NOT NULL・採番の保持を検証し、空 DB への全履歴適用も試した。Playwright では新しい列の更新と再読み込み後の保持を確認した。実施したのはローカル D1 の移行で、リモートの移行は未実行。
 
+## React の画面に Solid を埋め込む
+
+専用 DOM を境界にして、React Pages の一部分を Solid で動かせる。`.solid.tsx` を React Compiler の対象から外し、`vite-plugin-solid` でそのファイルだけ変換する。React の effect から遅延 import してマウントし、型付きの値とコールバックで更新を渡し、アンマウント時に破棄する。
+
+表示時の読み込み、双方向の状態連携、ページ遷移時の後始末、本番プレビューで動作を確認した。実装前に [React + Solid の検証済み手順](references/react-solid.md) を読む。今回確認したのは React SSR と Solid のクライアントマウントの混在。Solid 自身の SSR HTML を hydrate する場合は別途境界を設計する。
+
 ## Vite+ の設定・テスト
 
 `test` / `lint` / `fmt` の型を使うため `defineConfig` は **`vite-plus`** から import する。スターターが作る `vite` の alias / override は維持する。

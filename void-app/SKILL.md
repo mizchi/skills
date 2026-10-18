@@ -216,6 +216,10 @@ For this change, stop the dev server before editing/applying and restart it afte
 
 Regression tests used `node:sqlite` with the actual generated SQL: apply the old migration, insert a row, apply the remaining history, verify full row preservation/defaults/NOT NULL/auto-increment, then test the full chain on an empty DB. Playwright also verified updating the new field and retaining it after reload. This exercised local D1, not a remote migration.
 
+## Embed another UI framework
+
+React Pages can host a Solid widget through a dedicated DOM boundary. Use `.solid.tsx` files, exclude them from React Compiler, and let `vite-plugin-solid` transform only those files. Mount after dynamic import from a React effect, update through a typed values/callbacks contract, and dispose on unmount. This was verified with visibility-triggered loading, bidirectional state updates, route cleanup, and a production preview. Read [React + Solid integration](references/react-solid.md) before implementing it. The verified mode is React SSR plus Solid client mounting; Solid SSR hydration needs a separate design.
+
 ## Vite+ checks and tests
 
 Use `defineConfig` from **`vite-plus`** so `test`, `lint`, and `fmt` are typed. The generated `vite` package alias/override is intentional; preserve it.
