@@ -220,6 +220,10 @@ Regression tests used `node:sqlite` with the actual generated SQL: apply the old
 
 React Pages can host a Solid widget through a dedicated DOM boundary. Use `.solid.tsx` files, exclude them from React Compiler, and let `vite-plugin-solid` transform only those files. Mount after dynamic import from a React effect, update through a typed values/callbacks contract, and dispose on unmount. This was verified with visibility-triggered loading, bidirectional state updates, route cleanup, and a production preview. Read [React + Solid integration](references/react-solid.md) before implementing it. The verified mode is React SSR plus Solid client mounting; Solid SSR hydration needs a separate design.
 
+## Static Astro pages with native Void auth
+
+To retain Void Pages loaders/actions and Void-managed Better Auth, build Astro in a **separate package** and serve its static output through the Void app. Do not add Astro to the Void root's dependencies: framework auto-detection would select framework mode, where Void-managed auth is unsupported. Keep public informational pages static and all authenticated UI/API logic in Void. See [static Astro + native auth](references/astro-static-auth.md) for the verified layout, dependency scanning fix, ownership checks, migration handling, and test coverage.
+
 ## Vite+ checks and tests
 
 Use `defineConfig` from **`vite-plus`** so `test`, `lint`, and `fmt` are typed. The generated `vite` package alias/override is intentional; preserve it.

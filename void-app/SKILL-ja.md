@@ -244,6 +244,10 @@ pnpm exec void db status      # 2 本とも local: applied
 
 表示時の読み込み、双方向の状態連携、ページ遷移時の後始末、本番プレビューで動作を確認した。実装前に [React + Solid の検証済み手順](references/react-solid.md) を読む。今回確認したのは React SSR と Solid のクライアントマウントの混在。Solid 自身の SSR HTML を hydrate する場合は別途境界を設計する。
 
+## Astro の静的ページと Void の認証を組み合わせる
+
+Void Pages の loader／action と Void 管理の Better Auth を保持する場合は、Astro を**別パッケージ**でビルドし、生成した静的 HTML を Void から配信します。Void 側のルート依存に Astro を追加すると framework mode と判定され、Void 管理の認証は使えません。公開紹介ページを Astro、認証と操作画面・API を Void が担当します。[検証済みの構成と認証手順](references/astro-static-auth.md) に、依存解析の設定、所有者チェック、既存データを保つ移行、テストの要点をまとめています。
+
 ## Vite+ の設定・テスト
 
 `test` / `lint` / `fmt` の型を使うため `defineConfig` は **`vite-plus`** から import する。スターターが作る `vite` の alias / override は維持する。
