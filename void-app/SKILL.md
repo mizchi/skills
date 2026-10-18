@@ -193,6 +193,29 @@ Call with `import { fetch } from 'void/client'`, then `await fetch('/api/notes')
 
 For repeatable changes: edit schema → generate → review SQL → migrate locally → test → deploy. Do not replace migration history after it has been applied/shared. Replacing a starter's initial migrations is only appropriate before applying them anywhere. D1 development state normally lives in `.void/`; `voidPlugin({ persistTo: 'local-state' })` can change it. Start the dev server once to record the new directory before CLI DB commands.
 
+## Worked column addition (verified)
+
+In the link-note baseline, add `isRead: integer('is_read', { mode: 'boolean' }).notNull().default(false)` to the existing `link_notes` table. Keep its initial migration intact. The generated second migration was:
+
+```sql
+ALTER TABLE `link_notes` ADD `is_read` integer DEFAULT false NOT NULL;
+```
+
+```sh
+pnpm exec void db export --output .void/before-migration.sql
+# Edit db/schema.ts, then:
+pnpm exec void db generate
+# Read the new SQL; check for unexpected table rebuilds or data removal.
+pnpm exec void db status      # second migration: local pending
+pnpm exec void db migrate     # Applied 1 migration
+pnpm exec void db migrate     # All migrations are up to date
+pnpm exec void db status      # both migrations: local applied
+```
+
+For this change, stop the dev server before editing/applying and restart it afterward, so the new schema is not queried before the column exists. Compare API rows before and after, excluding only the added property. All original fields of the three existing rows were unchanged and `isRead` was `false` for each.
+
+Regression tests used `node:sqlite` with the actual generated SQL: apply the old migration, insert a row, apply the remaining history, verify full row preservation/defaults/NOT NULL/auto-increment, then test the full chain on an empty DB. Playwright also verified updating the new field and retaining it after reload. This exercised local D1, not a remote migration.
+
 ## Vite+ checks and tests
 
 Use `defineConfig` from **`vite-plus`** so `test`, `lint`, and `fmt` are typed. The generated `vite` package alias/override is intentional; preserve it.

@@ -215,6 +215,29 @@ export const GET = defineHandler(async () => ({
 
 D1 の開発用データは通常 `.void/`。`voidPlugin({ persistTo: 'local-state' })` で変更できるが、変更後に一度開発サーバーを起動して保存先を記録してから DB コマンドを使う。
 
+## 検証した列追加の例
+
+リンクノートの `link_notes` テーブルに `isRead: integer('is_read', { mode: 'boolean' }).notNull().default(false)` を追加した。初期マイグレーションはそのまま残し、次の 2 本目の SQL を生成した。
+
+```sql
+ALTER TABLE `link_notes` ADD `is_read` integer DEFAULT false NOT NULL;
+```
+
+```sh
+pnpm exec void db export --output .void/before-migration.sql
+# db/schema.ts を編集してから:
+pnpm exec void db generate
+# 生成 SQL を読み、予期しないテーブル再作成やデータ削除がないか確認する。
+pnpm exec void db status      # 2 本目が local: pending
+pnpm exec void db migrate     # Applied 1 migration
+pnpm exec void db migrate     # All migrations are up to date
+pnpm exec void db status      # 2 本とも local: applied
+```
+
+この変更では開発サーバーを止めてから編集・適用し、完了後に再起動した。列がない状態で新しいスキーマの問い合わせが走るのを避けるため。API の移行前後を比較し、既存 3 件の全項目が同じで、追加した `isRead` だけがすべて `false` になることを確認した。
+
+回帰テストは `node:sqlite` に生成 SQL をそのまま適用する。旧マイグレーション → 行を投入 → 残りの履歴を適用、の順で全データ・既定値・NOT NULL・採番の保持を検証し、空 DB への全履歴適用も試した。Playwright では新しい列の更新と再読み込み後の保持を確認した。実施したのはローカル D1 の移行で、リモートの移行は未実行。
+
 ## Vite+ の設定・テスト
 
 `test` / `lint` / `fmt` の型を使うため `defineConfig` は **`vite-plus`** から import する。スターターが作る `vite` の alias / override は維持する。
