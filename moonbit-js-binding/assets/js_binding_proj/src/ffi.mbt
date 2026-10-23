@@ -47,12 +47,20 @@ pub extern "js" fn JsValue::set(
   #| (obj, key, value) => { obj[key] = value }
 
 ///|
-pub extern "js" fn JsValue::call_method(
+pub extern "js" fn JsValue::call_method_ffi(
+  self : JsValue,
+  name : String,
+  args : FixedArray[JsValue],
+) -> JsValue =
+  #| (obj, name, args) => obj[name](...args)
+
+pub fn JsValue::call_method(
   self : JsValue,
   name : String,
   args : Array[JsValue],
-) -> JsValue =
-  #| (obj, name, args) => obj[name](...args)
+) -> JsValue {
+  JsValue::call_method_ffi(self, name, FixedArray::from_array(args))
+}
 
 ///|
 pub extern "js" fn new_object() -> JsValue =
