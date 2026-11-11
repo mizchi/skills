@@ -70,7 +70,7 @@ graders:
     type: text
     config:
       regex_match:
-        - "(?i)pin.*(tag|sha)|apm\\s*view|frozen-lockfile"
+        - "(?i)pin.*(tag|sha)|apm\\s*view|--frozen(?![\\w-])"
 
   # Empirical-prompt-tuning: structured self-report from the executor.
   - name: self_report_complete

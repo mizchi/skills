@@ -95,7 +95,7 @@ scripts:
 
 - **project スコープ**: `apm.lock.yaml` を **commit** する（チーム間で同じ skill version を解決するため）。`node_modules` の package-lock と同じ発想
 - **global スコープ**: `~/.apm/apm.lock.yaml` は chezmoi で同期すると新マシンで同じ version が入る
-- CI / 新マシンでは `apm install --frozen-lockfile` を使って drift を防ぐ（lockfile が manifest と一致しなければ fail）
+- CI / 新マシンでは `apm install --frozen` を使って drift を防ぐ（lockfile が manifest と一致しなければ fail）
 - lockfile を意図的に更新したいときだけ `apm install --update`
 
 ### chezmoi との共存

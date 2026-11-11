@@ -100,7 +100,7 @@ Invoke with `apm run <name>` (e.g. `apm run verify`). `postinstall` runs automat
 
 - **project scope**: **commit** `apm.lock.yaml` so teammates resolve the same skill versions. Same idea as `package-lock` in `node_modules`.
 - **global scope**: sync `~/.apm/apm.lock.yaml` via chezmoi so a new machine installs the same versions.
-- In CI / on a new machine, use `apm install --frozen-lockfile` to prevent drift (fails if the lockfile does not match the manifest).
+- In CI / on a new machine, use `apm install --frozen` to prevent drift (fails if the lockfile does not match the manifest).
 - Only run `apm install --update` when you intentionally want to update the lockfile.
 
 ### Coexisting with chezmoi
