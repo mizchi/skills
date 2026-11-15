@@ -98,4 +98,4 @@ Disable individually with `OTEL_SDK_DISABLED=true` or `UTELS_DISABLED=true`.
 
 ## Source
 
-The runtime is based on [`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt/blob/main/src/telemetry-runtime.ts) and [`mizchi/mnemo`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/src/telemetry-runtime.ts), with the sibling import adapted for the bundled assets.
+The runtime is based on [`mizchi/cloudflare-starterkit-mbt`](https://github.com/mizchi/cloudflare-starterkit-mbt/blob/main/src/telemetry-runtime.ts) and the owner's internal `mizchi/mnemo` runtime, with the sibling import adapted for the bundled assets.

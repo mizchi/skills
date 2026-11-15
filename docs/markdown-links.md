@@ -65,3 +65,12 @@ To update lychee, select a released version, update the platform assets and
 checksums in `scripts/lychee-release.json`, align the workflow cache key, install,
 and run the tests plus both check modes. The pinned artifacts cover macOS ARM64
 and Linux x64/ARM64; adding a platform requires its official release checksum.
+
+## 2026-11-16 follow-up
+
+The six private mnemo links now point to bundled/public implementation contracts,
+with origin attribution retained as text. The rejected Cloudflare forum URL was
+replaced by the current Basin Catalog documentation. A subsequent HTTP(S) scan
+completed with zero errors; no broad status-code or repository exclusions were
+added. Private-repository names in provenance and optional catalog identifiers
+remain identifiers, not claims that a public reader can fetch their contents.

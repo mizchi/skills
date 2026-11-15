@@ -58,17 +58,29 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 
 検証では変更前に8箇所の旧指定を検出し、変更後はすべて解消。Node v24.22.2でSQL系の正常系4コマンドを実行し、意図したSQL injection例はexit 1になった。waxaの`deno task check`も通過した。GitHub上でコピー先の全workflowを実行したという意味ではない。
 
-最終確認は、`pkf run test`（Ruby 4件・14 assertions、Node 41件、76入口のfrontmatter、README整合性）、Markdown 560ファイルのローカルリンク検査、実workflowのactionlint、diffの空白検査が通過。jev-lintは92文書・276比較を再確認し、今回変わった8文書の24回答を更新した。既知のupstream-fix-and-pinのSHA表現1件が残り、新しい整合性候補は出ていない。これは上記のAPI・配布物の鮮度問題が解決したという意味ではない。
+初回監査時の確認は、`pkf run test`（Ruby 4件・14 assertions、Node 41件、76入口のfrontmatter、README整合性）、Markdown 560ファイルのローカルリンク検査、実workflowのactionlint、diffの空白検査が通過。jev-lintは92文書・276比較を再確認し、今回変わった8文書の24回答を更新した。既知のupstream-fix-and-pinのSHA表現1件が残り、新しい整合性候補は出ていない。これは上記のAPI・配布物の鮮度問題が解決したという意味ではない。
 
-## 更新差分が大きく、次に実行確認するもの
+## 更新差分の再検証結果
 
-| 対象 | 記録済みの基準 | 取得した公開版 | 再検証する内容 |
-| --- | --- | --- | --- |
-| cf / Cloudflare Vite plugin | cf beta.5、plugin beta | cf beta.32、plugin 1.69.1 | CLI/schema・typed config・secret入力・dry run。cfのNode条件は`^24.22.0`等で、Node 24の任意のpatchでよいわけではない。 |
-| Void / Vite+ | Void 1.1.11、Vite+ 1.3.0 | Void 1.9.1、Vite+ 1.6.0 | 同梱docs・reset/redirect回避策・D1の非破壊migration・CRUD E2E。旧例に不具合があるとは未判定。 |
-| Playwright | 一部Docker例は1.59.1 | 1.65.1 | CLI・型・blob report・browser/imageの対応。プロジェクトが1.59.1固定ならimageだけ更新しない。 |
-| MoonBit外部adapter | mizchi/js 0.12.1等の歴史的な動作記録 | compilerはv0.10.20を確認済み | compiler/直接FFIの既存検証と、`mizchi/js`・`mizchi/x`の現行API検証を分ける。記事の最新3本は反映済みで、今回も更新一覧の最新が2026-11-05であることを確認。 |
-| node-sqlite-vec | 特定のVite/Vitestでの回避策 | 現行組合せは未実行 | 「Vitestでは動かない」等の一律な禁止を残す前に、対象バージョン・extension読み込みまで再現する。Node 22にSQLiteがないという誤記は今回解消した。 |
+| 対象 | 現行の確認範囲 | 残る範囲 |
+| --- | --- | --- |
+| cf / Cloudflare plugin | beta.32 / plugin 2.0.0-beta.v.17、型生成・build・deploy dry-run | 実アカウントの製品別操作、rollback実行 |
+| Void / Vite+ | 1.9.1 / 1.6.0、フォームreset・入力保持・永続化・redirect・build | 旧実験の全CRUD・DB移行・React/Solid併用の全面的な再実行 |
+| Playwright | 1.65.1 ChromiumでHTML比較とVoid E2E | 消費側の全runner設定・blob report・Docker image組合せ |
+| MoonBit外部adapter | js_core 0.13.0 / x 0.7.0。旧importの失敗と修正版を確認。Any/Promise、JSとNativeのファイル・子プロセス | Web/Node/npm binding全体と複数async runtimeの状態共有 |
+| MoonBit Nix | overlayの現行latest、v0.10.20 toolchain、DSL nativeビルドと出力42、Nix templateの評価 | Linux実行、依存を含むNix build。moon-nixの現行pkgtype対応は失敗するcontrolを記録 |
+| node-sqlite-vec | sqlite-vec 0.1.9、NodeとVitest 5.1.0でvec0検索 | 消費側の別設定・別runnerとの組合せ |
+
+## 追加修正と監視範囲の拡張
+
+- PRとmain pushに[現在の本文・英日ペアの意味検査](skill-review-ci.md)を追加。
+  fixture replayとは別に、変更した入口全体を検査する。PRはベース側の検査コードでheadのblobをデータとして読む。
+- 監視を15グループへ拡張。Gleam本体とHexのWisp/Mist/OTP、ast-grep、Nix/Devbox/overlay/project builder、dotenvx、Stryker、skills CLIとClaude plugin資料を追加した。
+  Gleamの公開版比較はregistryの記録であり、全サンプルを現行compilerでコンパイルした意味ではない。
+- dotenvx 2.38.2で先のファイル・shell値が優先、overloadで後から上書きすることをテストし、英日を修正。opt-in方針を保持。
+- AWSの末尾に残ったwildcardの旧手順も修正。ConverseのIAM action、ReadOnlyAccessの実permission、activationと推論の区別を公式資料で再確認した。
+- private mnemoへのリンク6件は出自の記録を残して同梱コード・公開資料へ整理。403のforum URLは現行Basin Catalog公式資料へ変更。
+  HTTP失敗を許可する除外は追加していない。修正後の外部リンク検査はエラー0。
 
 ## 自動化する範囲
 
@@ -100,7 +112,7 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 | [cloudflare-access-app-setup](../cloudflare-access-app-setup/SKILL.md) | 再検証 | 毎日 | cf schema・Access API・token再実行動作 |
 | [cloudflare-deploy](../cloudflare-deploy/SKILL.md) | 修正済み | 毎日 | F06: Workers Node API表。cf CLIは再検証、Node例修正済み |
 | [cloudflare-mbt-worker-bundle](../cloudflare-mbt-worker-bundle/SKILL.md) | 再検証 | 毎日 | cf更新とMoonBit出力symbol変更の組合せ |
-| [cloudflare-workers-cd-rollback](../cloudflare-workers-cd-rollback/SKILL.md) | 再検証 | 毎日 | cf response schema・rollback/secret回帰テスト |
+| [cloudflare-workers-cd-rollback](../cloudflare-workers-cd-rollback/SKILL.md) | 一部再検証済み | 毎日 | deployment/credentialのローカル回帰テスト済み。実rollbackは別 |
 | [cloudflare-workers-otel-utels](../cloudflare-workers-otel-utels/SKILL.md) | 再検証 | 毎日 | Worker wrapper・OTLP exporter・非公開実装の来歴 |
 | [conventional-changelog](../conventional-changelog/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [dep-lib-review](../dep-lib-review/SKILL.md) | 修正済み | 毎週 | F05: pnpm audit JSON parser |
@@ -122,7 +134,7 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 | [frontend-review-triage](../frontend-review-triage/SKILL.md) | 修正済み | 毎月 | F04: 呼び出す監査runnerが未同梱 |
 | [frontend-review-weekly](../frontend-review-weekly/SKILL.md) | 修正済み | 毎週 | F04: 収集runnerと外部skill依存 |
 | [gh-fix-ci](../gh-fix-ci/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
-| [gleam-practice](../gleam-practice/SKILL.md) | 再検証 | 毎日 | Gleam/OTP/Wisp/Mistの解決版でサンプルをコンパイル |
+| [gleam-practice](../gleam-practice/SKILL.md) | 監視追加・再検証待ち | 毎日 | Gleam/Hex registry監視追加。全サンプルcompileは未実行 |
 | [justfile](../justfile/SKILL.md) | 棚卸し | 毎日 | just構文・setup action metadata |
 | [k8s-crd-from-typed-schema](../k8s-crd-from-typed-schema/SKILL.md) | 棚卸し | 毎月 | CRD API・schema generator互換性 |
 | [maintainer-persona](../maintainer-persona/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
@@ -134,7 +146,7 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 | [natural-writing-en](../natural-writing-en/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [natural-writing-ja](../natural-writing-ja/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [nix-setup](../nix-setup/SKILL.md) | 修正済み | 毎日 | Node 24のDevbox例とテンプレート。opt-in方針を保持 |
-| [node-sqlite-vec](../node-sqlite-vec/SKILL.md) | 再検証 | 毎週 | Vitest禁止の適用範囲・SQLite状態。Node方針修正済み |
+| [node-sqlite-vec](../node-sqlite-vec/SKILL.md) | 修正済み | 毎週 | Node/Vitest双方でvec0検索を再検証済み |
 | [opentelemetry](../opentelemetry/SKILL.md) | 修正済み | 毎週 | F02: SDK・semconvの世代差 |
 | [optimizing-descriptions](../optimizing-descriptions/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [otel-node](../otel-node/SKILL.md) | 修正済み | 毎週 | F02: SDK初期化・ESM loader |
@@ -142,7 +154,7 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 | [pi-coding-agent](../pi-coding-agent/SKILL.md) | 修正済み | 毎日 | F08: package改名・SDK世代を明記。Node方針修正済み |
 | [playwright-cli](../playwright-cli/SKILL.md) | 棚卸し | 毎週 | test/codegen等のCLIと利用可能なbrowser tool |
 | [playwright-test](../playwright-test/SKILL.md) | 再検証 | 毎日 | runner設定・report・browser/imageの版整合 |
-| [publish-agent-skill](../publish-agent-skill/SKILL.md) | 再検証 | 毎日 | APM/skills CLI/marketplaceの消費側install契約 |
+| [publish-agent-skill](../publish-agent-skill/SKILL.md) | 一部再検証済み | 毎日 | APM 0.35.1のconsumer確認済み。skills 1.8.1は監視追加 |
 | [react-expert](../react-expert/SKILL.md) | 棚卸し | 四半期 | 観点は比較的安定。入力raw JSONと外部checklistの配布を確認 |
 | [retrospective-codify](../retrospective-codify/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [review-image](../review-image/SKILL.md) | 棚卸し | 毎月 | model提供状況・OpenRouter schema・JSON gate契約 |
@@ -158,9 +170,9 @@ Cloudflare CI例の`pnpm/action-setup@v4`は上流metadataが`node20`だった�
 | [tech-article-reproducibility](../tech-article-reproducibility/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
 | [tech-trend-watch](../tech-trend-watch/SKILL.md) | 修正済み | 毎週 | F09: Radar発行頻度・調査データの版 |
 | [translate-programming-language](../translate-programming-language/SKILL.md) | 棚卸し | 変更時 | 原則・手順は低変動。依存CLI/APIまたは利用環境変更時に再確認 |
-| [ts2moonbit-migration](../ts2moonbit-migration/SKILL.md) | 再検証 | 毎日 | 現行mizchi/js・xとの外部API統合 |
+| [ts2moonbit-migration](../ts2moonbit-migration/SKILL.md) | 一部再検証済み | 毎日 | js_core 0.13.0 / x 0.7.0のJS/Native実行済み |
 | [upstream-fix-and-pin](../upstream-fix-and-pin/SKILL.md) | 要確認 | 毎週 | 既存SHA曖昧さ。pnpm build許可設定も版確認 |
-| [utels-project-bootstrap](../utels-project-bootstrap/SKILL.md) | 再検証 | 毎日 | cf secret stdin契約・登録API |
+| [utels-project-bootstrap](../utels-project-bootstrap/SKILL.md) | 一部再検証済み | 毎日 | cf secret stdin契約の回帰テスト済み。実登録は別 |
 | [vlmkit](../vlmkit/SKILL.md) | 修正済み | 毎日 | F03: package/binと公開経路の混在 |
-| [void-app](../void-app/SKILL.md) | 再検証 | 毎週 | 1.1.11の既知回避策を1.9.1で検証 |
+| [void-app](../void-app/SKILL.md) | 一部再検証済み | 毎週 | 1.9.1のreset/redirect・永続化・build済み。全旧実験は別 |
 | [waxa-eval](../waxa-eval/SKILL.md) | 棚卸し | 変更時 | 同一repoのCLI変更時にgrader/ledger契約検証 |

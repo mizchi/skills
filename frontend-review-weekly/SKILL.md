@@ -5,7 +5,7 @@ description: Use for the weekly AI review. Orchestrates all frontend-review-* sk
 
 # Frontend Review — Weekly Orchestrator
 
-You are running the weekly AI review. Your job is NOT to make new judgments — it's to:
+Run the weekly evidence review, combine the domain and perspective findings, and compare measured KPIs. The review produces reports and follow-up proposals; implementation follows a separate engineering request:
 
 1. Re-run every `frontend-review-*` skill in the correct order.
 2. Run the five perspective reviews using the authorized execution mode.
@@ -96,20 +96,18 @@ Recommend investigating a tool replacement when **any two** of these conditions 
 3. A **maintainer departure or deprecation notice** was reported.
 4. A **clear superior alternative** exists: feature parity + significant performance or DX improvement + realistic migration path.
 
-## AI / Human Responsibility Split
+## Follow-up engineering
 
-**AI can act on (without human pre-approval):**
-- Auto-fixable lint / typecheck errors
-- Expanding test coverage for existing patterns
-- Dependency version bumps (after lint + test pass)
+Classify each proposed change for the separately requested engineering work:
 
-**Human must decide:**
-- Test failure triage: is the spec wrong, the implementation wrong, or the test wrong?
-- New library additions or removals
-- Architecture boundary changes (new state layer, new routing pattern, new async boundary)
-- Any change that modifies what the app does, not just how it does it
+- Routine candidates: automatic lint/type fixes, tests for existing behavior,
+  and dependency updates validated by the project's checks.
+- Product or architecture decisions: changed app behavior, a new state/routing
+  boundary, library replacement, or a disagreement between specification and tests.
 
-Flag any AI-generated PRs in the weekly report that appear to cross into the human-decision zone.
+Record the evidence and decision owner in the weekly report. Source changes and
+new engineering PRs belong to the implementation request; generating this report
+does not authorize applying those changes to the client application.
 
 ## Boundaries
 

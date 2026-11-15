@@ -1,11 +1,14 @@
 ---
 name: gleam-practice
-description: Best practices for building and reviewing Gleam projects on the Erlang target, especially Wisp plus Mist web services, OTP processes, justfile workflows, testing, formatting, CI, and performance measurement.
+description: Use when writing or reviewing Gleam code on the Erlang target — especially Wisp + Mist HTTP services, OTP-based processes (gen_server / supervisor analogues), justfile workflows, gleeunit testing, `gleam format`, GitHub Actions CI, and performance measurement. Trigger on `gleam.toml`, `.gleam` files, or Erlang/BEAM-related symptoms even if the user does not say "Gleam" by name.
 ---
 
 # Gleam Practice
 
 Gleam を新規作成するとき、既存プロジェクトを改善するとき、`wisp + mist + gleam_otp + just` 構成で実装するときに使う。
+
+公開registryの基準（2026-11-16）: Gleam `v1.19.2`、Wisp `2.2.2`、Mist `6.0.3`、gleam_otp `1.3.0`。
+これらは公開版の記録であり、組合せの互換性を検証したものではない。`gleam add` で対象プロジェクトの依存をまとめて解決し、Hexのretirement/security情報と、lockfileに対応する実サンプルのコンパイルを確認する。
 
 ## Default Workflow
 

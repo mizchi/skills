@@ -1,6 +1,6 @@
 ---
 name: ts2moonbit-migration
-description: "Migrate a TypeScript codebase to MoonBit on the `js` target while keeping the same JavaScript API contract, using mizchi/js (JS/Web/Node bindings), mizchi/x (cross-target async backend: process/fs/http/ws), and mizchi/npm_typed (npm bindings). Use when porting a TS library, Node service, npm package, or Cloudflare Worker to MoonBit and the existing JS/TS consumers, `.d.ts`, and tests must keep working unchanged."
+description: "Migrate a TypeScript codebase to MoonBit on the `js` target while keeping the same JavaScript API contract, using the mizchi/js split binding modules, mizchi/x (cross-target async backend: process/fs/http/ws), and mizchi/npm_typed (npm bindings). Use when porting a TS library, Node service, npm package, or Cloudflare Worker to MoonBit and the existing JS/TS consumers, `.d.ts`, and tests must keep working unchanged."
 ---
 
 # TypeScript → MoonBit Migration
@@ -14,6 +14,12 @@ This skill is the playbook that *composes* three lower-level skills — it does 
 - **`moonbit-practice`** — MoonBit syntax, tests, `moon` commands.
 
 What this skill adds on top of those: the **mizchi toolkit map**, a **TypeScript-specific type-classification pass**, and the **"preserve the JS API contract" build/publish loop** that lets you swap the implementation without touching downstream code.
+
+Current external-binding baseline: `mizchi/js_core@0.13.0` and `mizchi/x@0.7.0`
+were checked with compiler v0.10.20 on 2026-11-16. The old `mizchi/js/core`
+path fails in that published facade. Read the [toolkit map](references/toolkit-map.md)
+and [adapter validation](references/adapter-validation.md) before copying an old
+import or combining the external and core async runtimes.
 
 ## When To Use
 

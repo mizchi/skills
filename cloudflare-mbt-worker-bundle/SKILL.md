@@ -48,4 +48,4 @@ When migrating an existing Worker, run `cf migrate --dry-run` then `cf migrate` 
 - [cf-traps.md](references/cf-traps.md): modes, build artifacts, resource IDs and unsupported beta operations.
 - [moonbit-ffi-rewrites.md](references/moonbit-ffi-rewrites.md): runtime rewrite targets and symptoms.
 - [cf-example](https://github.com/mizchi/cf-example): cf/Vite/types/Playwright example.
-- [cloudflare-starterkit-mbt](https://github.com/mizchi/cloudflare-starterkit-mbt) and [mnemo](https://github.com/mizchi/mnemo): MoonBit handler/runtime examples; translate their older CLI setup to cf.
+- [cloudflare-starterkit-mbt](https://github.com/mizchi/cloudflare-starterkit-mbt): MoonBit handler/runtime examples; translate their older CLI setup to cf.

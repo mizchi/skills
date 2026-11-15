@@ -25,7 +25,9 @@
     "test:audit-report": "node --test dep-lib-review/scripts/audit-report_test.mjs",
     "freshness:controls": "node scripts/check-freshness-controls.mjs",
     "frontend:sync": "node scripts/sync-frontend-audit.mjs",
-    "frontend:sync:check": "node scripts/sync-frontend-audit.mjs --check"
+    "frontend:sync:check": "node scripts/sync-frontend-audit.mjs --check",
+    "review:skills": "node scripts/review-skills.mjs",
+    "test:skill-review": "node --test scripts/skill-review_test.mjs"
   },
   "devDependencies": {
     "jev-lint": "0.8.0"

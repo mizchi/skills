@@ -1,7 +1,7 @@
 # スキルの鮮度検査
 
 `jev-lint@0.8.0` と公式の上流情報を組み合わせ、古くなった説明を検出する。
-[監視リスト](skill-upstream-watchlist.json)は10グループ・38スキルを対象にする。
+[監視リスト](skill-upstream-watchlist.json)は15グループ・38スキルを対象にする。
 [全76スキルの棚卸し](skill-freshness-audit-2026-11-16.md)とは範囲が異なる。
 低変動の原則まで、毎日のAPI検証が済んだとは扱わない。
 
@@ -18,7 +18,7 @@ just --justfile skill-freshness.justfile check
 ```
 
 `plan` は上流を取得し、比較対象・欠落参照を検査する。モデルへの問い合わせはない。
-`check` はnpmの公開metadata、GitHub release・対象ファイル・branch、公式文書を
+`check` はnpm・Hexの公開metadata、GitHub release・対象ファイル・branch、公式文書を
 取得してdigestを比較する。Actionsは実YAMLの正確なrefとcomposite内の依存も調べ、
 内蔵Nodeが24未満なら失敗する。プロジェクトのNode設定とは別の検査である。
 pnpmのJSON形式は固定したpnpmによる読み取り専用の `pnpm audit --json` でも確認する。
@@ -58,7 +58,7 @@ parserで証拠・質問・回答件数との対応も検証する。
 基準を書き換えない。一部だけの実行では承認できない。通常実行やCIでの自動更新はしない。
 `--group otel` で対象を絞れる。`--force` は変更のないグループも再判定する。
 
-[初期基準](../.jev-lint/freshness-baseline.json)は82出典・66ファイル・32比較を記録する。
+[現在の基準](../.jev-lint/freshness-baseline.json)は108出典・75ファイル・42比較を記録する。
 基準は上流と対象のdigest、設定、検査実装・jev-lintの質問、モデル名・判定範囲に
 結び付ける。通常実行では毎回上流を取得し、一致する承認済み判定だけを再利用する。
 出典・スキル・設定・検査実装のどれかが変われば再検査する。
@@ -67,7 +67,8 @@ parserで証拠・質問・回答件数との対応も検証する。
 
 [Skill freshness workflow](../.github/workflows/skill-freshness.yml) は毎日
 06:23 JST（21:23 UTC）と手動実行で上流を検査し、14日間レポートを保存する。
-PR/pushではネットワークやモデルを使わないコントラクト検査を実行する。
+このworkflowのPR/push jobはコントラクト検査を実行する。
+別の[意味検査workflow](skill-review-ci.md)が、変更本文と英日ペアをモデルで検査する。
 上流取得にはread-onlyの `GITHUB_TOKEN`、モデルにはrepository secret
 `TYPESAFE_API_KEY` を使う。キー値をファイルやコマンド引数へ書かない。
 workflowをdefault branchへ反映すると定期実行が有効になる。
@@ -86,7 +87,9 @@ workflowをdefault branchへ反映すると定期実行が有効になる。
 | vlmkit | `vlmkit/assets/smoke` でinstall、`pnpm exec playwright install chromium`、`pnpm test`。HTMLの3viewport比較 |
 | SQLite | `node-sqlite-vec/assets/smoke` でinstall、`pnpm test` と `pnpm test:vitest`。node:testとVitestでvec0検索 |
 | Cloudflare | `cloudflare-deploy/assets/smoke` でinstall、typecheck、build、`pnpm exec cf deploy --dry-run`。公開しない |
-| MoonBit | `just --justfile moonbit.justfile test`。コンパイラと直接FFIの確認。外部adapterとは別 |
+| MoonBit | `just --justfile moonbit.justfile test`。コンパイラ・直接FFIと外部adapterのJS/Native検証 |
+| Nix | `just --justfile moonbit.justfile test-nix aarch64-darwin`。選択済みNix環境でDSLのbuildと実行 |
+| dotenvx | `dotenvx/assets/smoke` でfrozen install、`pnpm test`。先勝ち・shell値・overload。既存利用か明示選択に限る |
 | フロントエンド監査 | `pnpm test:frontend-audit`、`pnpm test:audit-report`、`pnpm frontend:sync:check`。単体配置・空白パス・未知値の扱い |
 
 フロントエンド監査コードの正本は `scripts/frontend-audit.mjs` と

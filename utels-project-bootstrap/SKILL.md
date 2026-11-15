@@ -43,4 +43,4 @@ The [integration test](assets/scripts/setup-utels.test.ts) mocks utels registrat
 
 - [Cloudflare telemetry](../cloudflare-workers-otel-utels/SKILL.md): configure the returned ingest token as a Worker binding.
 - [cf API guide](../cloudflare-deploy/references/cf/api.md): secrets and command discovery.
-- [Original helper](https://github.com/mizchi/mnemo/blob/main/mnemo-server/scripts/setup-utels.mjs): registration protocol source; this version adapts secret delivery to cf.
+- [Bundled helper source](assets/scripts/setup-utels.ts): registration and cf secret delivery. Adapted from the owner's internal `mizchi/mnemo` helper; this copy is self-contained.

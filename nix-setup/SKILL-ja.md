@@ -132,10 +132,11 @@ echo 'use flake' > .envrc && direnv allow
 
 ### MoonBit
 
-- `moonbit-overlay.packages.${system}.moon-patched_latest` を使う
-- **overlay は既知の動作バージョンにピン留めしている** (`50118f5c3c0298b5cb17cc6f1c346165801014c8`)。最新 HEAD は nixpkgs-unstable で broken 扱いのパッケージ (例: tcc) に依存することがあり、評価すら通らない時期がある。更新は動作確認してから
-- `moon.mod.json` があれば `moon update` を自動実行（初回のみ）
-- 参考: vibe-lang の `flake.nix`
+- `moonbit-overlay.packages.${system}.latest` を使う。overlay revision は `a0e830b32d60bcc59d18853e39e0b3fa5081f033` に固定（2026-11-16 確認）。
+- 現行 overlay のhostは `aarch64-darwin` と `x86_64-linux`。追加hostは選んだsnapshotにバイナリのhashがあるか確認する。
+- registry metadataの更新が必要なときに `moon update` を明示的に実行する。shellに入るだけで依存のネットワーク更新は行わない。
+- toolchainとcoreを揃える。overlayのwrapperが同梱SDKを選ぶ。プロジェクトは `moon.mod` / `moon.pkg` DSLを使う。
+- 同梱flakeをテンプレートの正本とし、overlayのpin更新前にlockと対象devShellの評価を確認する。
 
 ### Rust
 

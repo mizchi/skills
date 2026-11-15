@@ -33,8 +33,8 @@ dotenvx run -- node index.js
 # 特定の .env ファイルを指定
 dotenvx run -f .env.production -- npm start
 
-# 複数ファイル読み込み（後が優先）
-dotenvx run -f .env -f .env.local -- npm start
+# 複数ファイル読み込み（先のファイル優先。既存の環境変数はさらに優先）
+dotenvx run -f .env.local -f .env -- npm start
 
 # 環境変数を取得
 dotenvx get DATABASE_URL
@@ -42,6 +42,9 @@ dotenvx get DATABASE_URL
 # 全環境変数を表示
 dotenvx get
 ```
+
+`--overload` を指定すると、後のファイルが前の値と既存の環境変数を上書きできる。
+[優先順位のテスト](assets/smoke/precedence.test.mjs)で `@dotenvx/dotenvx@2.38.2` の両モードを確認（2026-11-16）。テストのディレクトリで `pnpm install --frozen-lockfile`、`pnpm test` を実行する。
 
 ## 暗号化
 

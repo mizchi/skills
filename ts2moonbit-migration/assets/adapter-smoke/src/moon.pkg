@@ -1,0 +1,3 @@
+import { "mizchi/js_core" @core }
+supported_targets = "js"
+options(link: { "js": { "exports": ["dynamic_read:dynamicRead", "double_async:doubleAsync"], "format": "esm" } })

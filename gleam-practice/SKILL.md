@@ -7,6 +7,12 @@ description: Use when writing or reviewing Gleam code on the Erlang target — e
 
 Use this when creating a new Gleam project, improving an existing one, or implementing with a `wisp + mist + gleam_otp + just` stack.
 
+Registry baseline (2026-11-16): Gleam `v1.19.2`, Wisp `2.2.2`, Mist `6.0.3`
+and gleam_otp `1.3.0` are published upstream versions. These labels are not a
+verified compatibility cohort. Resolve the consumer's dependencies together
+with `gleam add`, check Hex retirement/security notices, then compile its
+actual examples against that lockfile.
+
 ## Default Workflow
 
 - Start with `gleam new` and `gleam add`. Let the solver choose dependencies instead of hand-writing them.

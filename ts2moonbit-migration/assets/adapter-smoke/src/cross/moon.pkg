@@ -1,0 +1,6 @@
+import {
+  "mizchi/x/process",
+  "mizchi/x/fs",
+  "moonbitlang/core/async",
+} for "test"
+options("allow-experimental-packages": ["moonbitlang/core/async"])

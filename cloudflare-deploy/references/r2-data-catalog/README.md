@@ -1,5 +1,12 @@
 # Cloudflare R2 Data Catalog Skill Reference
 
+Current name (checked 2026-11-16): **Basin Catalog**, formerly R2 Data Catalog,
+is generally available. Existing configuration and APIs remain compatible for
+now; keep the legacy directory name for existing links. Consult the
+[official current documentation](https://developers.cloudflare.com/basin-catalog/)
+before translating the older CLI examples below.
+
+
 Expert guidance for Cloudflare R2 Data Catalog - Apache Iceberg catalog built into R2 buckets.
 
 ## Reading Order

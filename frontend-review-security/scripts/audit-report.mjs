@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { readFileSync, realpathSync } from 'node:fs';
+import { readFileSync, realpathSync, existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const severities = ['info', 'low', 'moderate', 'high', 'critical'];
@@ -54,7 +54,7 @@ export function collectAudit(root, { prod = false, run = spawnSync } = {}) {
   return normalizeAudit(JSON.parse(result.stdout));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+if (process.argv[1] && existsSync(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2);
     let root = process.cwd(), input, prod = false;

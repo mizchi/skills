@@ -70,10 +70,12 @@ directory matching loses the leading dot of relative hidden-directory roots and
 can otherwise produce zero fixture subjects. Verify subject counts before any
 claim about a rule's coverage.
 
-CI installs the pinned CLI, tests source selection, and replays the calibration
-records without API credentials. It does not present historical audit records as
-fresh evaluations of subsequently edited skills. Re-run live checks when assessing
-new skill content. Translation replay validates snapshot freshness:
+CI keeps the offline calibration replay and also runs a separate
+[current-content review](../docs/skill-review-ci.md) for changed skill documents
+and their English/Japanese pairs. PR inputs are read as blobs by base-branch
+tooling; proposed code and configuration do not receive the model secret.
+Historical audit records are not used as fresh answers to edited text.
+Translation replay validates snapshot freshness:
 
 ```sh
 pnpm lint:translations --replay .jev-lint/translations-current.json

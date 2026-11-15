@@ -110,7 +110,8 @@
         "stryker-js/assets/mutation-diff.yml",
         "gleam-practice/assets/github-actions/ci.yml",
         "nix-setup/assets/devbox/gh_action_example.yaml",
-        ".github/workflows/skill-freshness.yml"
+        ".github/workflows/skill-freshness.yml",
+        ".github/workflows/skill-review.yml"
       ],
       "topic": "Only project Node 24+ and the embedded Node runtime of named GitHub Actions, including supported pinned older releases. Release examples need not track the newest patch; exclude unrelated deployment, caching and framework behavior.",
       "comparisons": [
@@ -138,6 +139,9 @@
         },
         {
           "path": ".github/workflows/skill-freshness.yml"
+        },
+        {
+          "path": ".github/workflows/skill-review.yml"
         }
       ]
     },
@@ -323,6 +327,11 @@
           "path": "moonbit-js-binding/SKILL.md",
           "contains": "**Array migration:**"
         }
+      ],
+      "targets": [
+        "ts2moonbit-migration/references/toolkit-map.md",
+        "ts2moonbit-migration/references/build-and-publish.md",
+        "ts2moonbit-migration/assets/adapter-smoke/moon.mod"
       ]
     },
     {
@@ -367,6 +376,30 @@
           "kind": "github-path",
           "repository": "earendil-works/pi",
           "path": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "skills",
+          "tag": "latest"
+        },
+        {
+          "kind": "github-path",
+          "repository": "vercel-labs/skills",
+          "path": "README.md",
+          "focus": [
+            "skills update",
+            "--project",
+            "--global"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://code.claude.com/docs/en/plugins-reference",
+          "focus": [
+            "plugin update",
+            "marketplace update",
+            "--scope"
+          ]
         }
       ],
       "validation": [
@@ -398,6 +431,11 @@
           "path": "publish-agent-skill/references/updates.md",
           "heading": "APM dependency refresh",
           "topic": "APM targeted dependency update versus upgrading the APM tool, including global scope and frozen replay. Other distribution channels are separate."
+        },
+        {
+          "path": "publish-agent-skill/references/skills-cli.md",
+          "contains": "Distribution watch",
+          "topic": "The npm skills CLI package, Node engine requirement and explicitly dated current package version. Historical 1.7.0 experiments remain historical; do not infer all current CLI behavior from them."
         }
       ]
     },
@@ -718,6 +756,33 @@
             "context",
             "customizing"
           ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://docs.aws.amazon.com/aws-managed-policy/latest/reference/ReadOnlyAccess.html",
+          "focus": [
+            "secretsmanager:",
+            "kms:",
+            "s3:Get",
+            "v191"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html",
+          "focus": [
+            "bedrock:InvokeModel",
+            "permission"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html",
+          "focus": [
+            "activation",
+            "Marketplace",
+            "prerequisites"
+          ]
         }
       ],
       "validation": [
@@ -736,8 +801,243 @@
         },
         {
           "path": "aws-github-oidc-scoped-role/references/oidc-subjects.md"
+        },
+        {
+          "path": "aws-github-oidc-scoped-role/SKILL.md",
+          "contains": "Current ReadOnlyAccess",
+          "topic": "The actual current AWS managed ReadOnlyAccess permission document versus the explicitly dated statement about GetSecretValue and kms:Decrypt; explicit Deny is defense against additional policies."
+        },
+        {
+          "path": "aws-github-oidc-scoped-role/SKILL.md",
+          "heading": "Bedrock permissions and activation",
+          "topic": "Converse IAM permissions versus separate model activation prerequisites; scope read-only policy details to the provided managed-policy document."
+        },
+        {
+          "path": "aws-github-oidc-scoped-role/SKILL.md",
+          "heading": "Common Pitfalls",
+          "topic": "Full OIDC customized sub versus wildcard fallback; separate model activation/inference permission and broad ReadOnlyAccess data permissions."
         }
       ]
+    },
+    {
+      "id": "gleam-toolchain",
+      "cadence": "daily",
+      "skills": [
+        "gleam-practice"
+      ],
+      "sources": [
+        {
+          "kind": "github-release",
+          "repository": "gleam-lang/gleam",
+          "observed": "v1.19.2"
+        },
+        {
+          "kind": "hex-package",
+          "package": "wisp"
+        },
+        {
+          "kind": "hex-package",
+          "package": "mist"
+        },
+        {
+          "kind": "hex-package",
+          "package": "gleam_otp"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://gleam.run/writing-gleam/",
+          "focus": [
+            "gleam new",
+            "gleam add",
+            "erlang"
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "path": "gleam-practice/SKILL.md",
+          "contains": "Registry baseline (2026-11-16)"
+        }
+      ],
+      "topic": "Published compiler and Hex package versions only. A published-version list explicitly does not assert a verified compatibility cohort. Project setup and optional package examples still require compilation in the consumer."
+    },
+    {
+      "id": "ast-grep-cli",
+      "cadence": "daily",
+      "skills": [
+        "ast-grep-practice"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@ast-grep/cli",
+          "tag": "latest"
+        },
+        {
+          "kind": "github-release",
+          "repository": "ast-grep/ast-grep"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://ast-grep.github.io/guide/quick-start.html",
+          "focus": [
+            "@ast-grep/cli",
+            "ast-grep",
+            "scan"
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "path": "ast-grep-practice/SKILL.md",
+          "heading": "Installation"
+        }
+      ],
+      "topic": "The official ast-grep npm package and binary, plus local package-manager and installation commands. Project policy may choose a different supported package manager."
+    },
+    {
+      "id": "nix-toolchains",
+      "cadence": "daily",
+      "skills": [
+        "nix-setup",
+        "moonbit-practice"
+      ],
+      "sources": [
+        {
+          "kind": "github-path",
+          "repository": "NixOS/nix",
+          "path": ".version"
+        },
+        {
+          "kind": "github-release",
+          "repository": "jetify-com/devbox"
+        },
+        {
+          "kind": "github-path",
+          "repository": "moonbit-community/moonbit-overlay",
+          "path": "README.md",
+          "focus": [
+            "moonbit-bin",
+            "latest",
+            "moon-nix",
+            "platform"
+          ]
+        },
+        {
+          "kind": "github-path",
+          "repository": "moonbit-community/moonbit-overlay",
+          "path": "versions/toolchains/latest.json"
+        },
+        {
+          "kind": "github-path",
+          "repository": "moonbit-community/moon-nix",
+          "path": "README.org",
+          "focus": [
+            "mkMoonNix",
+            "buildProject",
+            "DSL"
+          ]
+        },
+        {
+          "kind": "github-path",
+          "repository": "jetify-com/devbox",
+          "path": "README.md",
+          "focus": [
+            "install.sh",
+            "raw.githubusercontent"
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "path": "moonbit-practice/reference/nix.md",
+          "heading": "Toolchain and project builders"
+        },
+        {
+          "path": "nix-setup/SKILL.md",
+          "contains": "https://raw.githubusercontent.com/jetify-com/devbox/main/install.sh"
+        }
+      ],
+      "topic": "MoonBit toolchain distribution via overlay packages.latest versus the separate moon-nix project builder, and the Devbox installer URL. Existing user-selected Nix/Devbox policy is separate from vendor defaults.",
+      "targets": [
+        "nix-setup/assets/moonbit/flake.nix",
+        "moonbit-practice/assets/nix-smoke/flake.nix",
+        "moonbit-practice/assets/nix-smoke/flake.lock"
+      ]
+    },
+    {
+      "id": "dotenvx-cli",
+      "cadence": "daily",
+      "skills": [
+        "dotenvx"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@dotenvx/dotenvx",
+          "tag": "latest"
+        },
+        {
+          "kind": "github-release",
+          "repository": "dotenvx/dotenvx"
+        },
+        {
+          "kind": "github-path",
+          "repository": "dotenvx/dotenvx",
+          "path": "README.md",
+          "focus": [
+            "first file",
+            "Subsequent files",
+            "overload",
+            "run -f"
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "path": "dotenvx/SKILL.md",
+          "heading": "Basic Commands"
+        },
+        {
+          "path": "dotenvx/SKILL-ja.md",
+          "heading": "基本コマンド"
+        }
+      ],
+      "topic": "dotenvx environment-file precedence: shell values and earlier files win by default; overload allows later values to replace them. Adoption remains opt-in by repository policy."
+    },
+    {
+      "id": "stryker-cli",
+      "cadence": "daily",
+      "skills": [
+        "stryker-js"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@stryker-mutator/core",
+          "tag": "latest"
+        },
+        {
+          "kind": "github-release",
+          "repository": "stryker-mutator/stryker-js"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://stryker-mutator.io/docs/stryker-js/getting-started/",
+          "focus": [
+            "@stryker-mutator/core",
+            "Node",
+            "stryker"
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "path": "stryker-js/SKILL.md",
+          "contains": "Upstream package baseline"
+        }
+      ],
+      "topic": "StrykerJS npm package identity and published engine requirements; the repository uses Node 24+ even if a package supports an older runtime. This is a dated distribution baseline, not an assertion that every release is required."
     }
   ],
   "requiredResources": [

@@ -41,3 +41,10 @@ test('a registry failure cannot be normalized into a clean audit', () => {
   assert.throws(() => collectAudit('/project', { run: () => ({ status: 2, stdout: '{}', stderr: 'unavailable' }) }));
   assert.throws(() => collectAudit('/project', { run: () => ({ status: 1, stdout: 'not JSON' }) }));
 });
+
+test('importing from a stdin-driven Node process does not run the CLI or throw', async () => {
+ const {spawnSync}=await import('node:child_process');
+ const module=new URL('./audit-report.mjs',import.meta.url).href;
+ const result=spawnSync(process.execPath,['--input-type=module','-'],{input:`await import(${JSON.stringify(module)});`,encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);assert.equal(result.stdout,'');
+});

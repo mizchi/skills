@@ -161,8 +161,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 ## Resources
 
-- [Cloudflare Community](https://community.cloudflare.com/c/developers/workers/40)
-- [Cloudflare Discord](https://discord.cloudflare.com) - #r2 channel
+- [Basin Catalog documentation](https://developers.cloudflare.com/basin-catalog/)
+- [Cloudflare Discord](https://discord.cloudflare.com) - #basin-catalog channel
 - [PyIceberg GitHub](https://github.com/apache/iceberg-python/issues)
 - [Apache Iceberg Slack](https://iceberg.apache.org/community/)
 

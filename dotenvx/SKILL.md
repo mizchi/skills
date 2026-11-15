@@ -33,8 +33,8 @@ dotenvx run -- node index.js
 # Specify a particular .env file
 dotenvx run -f .env.production -- npm start
 
-# Load multiple files (later ones take precedence)
-dotenvx run -f .env -f .env.local -- npm start
+# Load multiple files (earlier files win; shell values take precedence)
+dotenvx run -f .env.local -f .env -- npm start
 
 # Get an environment variable
 dotenvx get DATABASE_URL
@@ -42,6 +42,11 @@ dotenvx get DATABASE_URL
 # Display all environment variables
 dotenvx get
 ```
+
+`--overload` lets later files replace earlier values, including existing shell
+values. The [precedence smoke test](assets/smoke/precedence.test.mjs) checks both
+modes with `@dotenvx/dotenvx@2.38.2` (2026-11-16). Run `pnpm install
+--frozen-lockfile` and `pnpm test` in its directory.
 
 ## Encryption
 

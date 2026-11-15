@@ -97,8 +97,6 @@ resource "aws_iam_role_policy" "ai_agent_bedrock" {
         Action = [
           "bedrock:InvokeModel",
           "bedrock:InvokeModelWithResponseStream",
-          "bedrock:Converse",
-          "bedrock:ConverseStream",
         ]
         Resource = [
           # Direct foundation model ARNs
@@ -107,24 +105,12 @@ resource "aws_iam_role_policy" "ai_agent_bedrock" {
           "arn:aws:bedrock:*:*:inference-profile/*anthropic.*",
         ]
       },
-      # Anthropic models on Bedrock are AWS Marketplace SaaS products.
-      # Even when already subscribed at the account level, the *assuming role*
-      # must have Marketplace view/subscribe permissions or Bedrock returns
-      # AccessDenied regardless of the subscription status.
-      {
-        Effect = "Allow"
-        Action = [
-          "aws-marketplace:ViewSubscriptions",
-          "aws-marketplace:Subscribe",
-        ]
-        Resource = "*"
-      },
     ]
   })
 }
 
-# ReadOnlyAccess includes secretsmanager:GetSecretValue and kms:Decrypt.
-# Deny these explicitly so the agent cannot read secrets or tfstate.
+# ReadOnlyAccess permits broad data reads, including S3.
+# Explicit Deny also limits sensitive permissions added by other policies.
 resource "aws_iam_role_policy" "ai_agent_deny" {
   name = "deny-sensitive-reads"
   role = aws_iam_role.ai_agent.id
@@ -149,6 +135,24 @@ resource "aws_iam_role_policy" "ai_agent_deny" {
 }
 ```
 
+## Bedrock permissions and activation
+
+`Converse` uses `bedrock:InvokeModel`; streaming uses
+`bedrock:InvokeModelWithResponseStream`. API operation names are not additional
+IAM action names. See the [Converse API reference](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html).
+
+Model activation has separate account, provider and Marketplace prerequisites.
+Check [model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)
+for the selected model and activation principal before granting subscription
+permissions to a runtime role. A successful subscription alone does not establish
+all model access. The example above grants inference permissions, not activation.
+
+Current ReadOnlyAccess (v191, checked 2026-11-16) does not grant
+`secretsmanager:GetSecretValue` or `kms:Decrypt`. It still allows broad data
+reads, so review its [actual policy document](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/ReadOnlyAccess.html).
+The explicit sensitive-action Deny above protects against additional grants
+from other policies; it does not imply those actions came from ReadOnlyAccess.
+
 ## GitHub Actions Workflow Side
 
 ```yaml
@@ -169,12 +173,13 @@ jobs:
 
 ## Common Pitfalls
 
-- **Missing `aws-marketplace` permissions with Bedrock**: Even if the Bedrock subscription is active at the account level, the *assumed role* needs `aws-marketplace:ViewSubscriptions` (and sometimes `Subscribe`) or Bedrock API calls return `AccessDenied`. This is not mentioned in most Bedrock IAM documentation.
-
-- **Cross-region inference profile ARNs**: Bedrock cross-region inference uses `inference-profile` resource type with region-prefixed model IDs (`jp.anthropic.*`, `us.anthropic.*`, `global.anthropic.*`). The standard `foundation-model/anthropic.*` ARN only covers same-region invocations. You need **both** ARNs.
-
-- **`sub` condition must not be empty**: AWS OIDC validation requires at least one `sub` condition even when using `job_workflow_ref`. Use a wildcard (`repo:ORG/REPO:*`) as a fallback — the real scoping comes from `job_workflow_ref`.
-
-- **`job_workflow_ref` includes the full ref**: the value is `ORG/REPO/.github/workflows/FILE.yml@refs/heads/main` — not just the file path. Omitting the `@refs/heads/main` suffix means any branch can trigger the assume.
-
-- **ReadOnlyAccess includes sensitive read actions**: `secretsmanager:GetSecretValue`, `kms:Decrypt`, `s3:GetObject` are all included in ReadOnlyAccess. For agent roles that only need infrastructure inspection, add explicit Deny statements to prevent credential leakage.
+- Match the full subject to the repository's configured template. A wildcard
+  repository subject authorizes a wider set of jobs; it does not compensate for
+  a missing workflow claim. Embed `job_workflow_ref` in `sub` when required.
+- Include the complete reusable-workflow ref in that customized subject, such
+  as `@refs/heads/main`, and validate the exact resulting string.
+- Check inference-profile and underlying-model resource requirements for the
+  chosen model and region. Do not infer access from a different model's ARN.
+- Diagnose subscription/activation and inference authorization separately.
+- ReadOnlyAccess allows data retrieval. Use the narrow inspection permissions
+  and explicit data restrictions appropriate to the actual agent task.

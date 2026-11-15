@@ -155,7 +155,7 @@ export function collect(mode, root, { runChecks = false, run = command } = {}) {
   return analyze(mode, { files, pkg, sources, issues, coverage, coverageMtime }, commands);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+if (process.argv[1] && existsSync(process.argv[1]) && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   try {
     const args = process.argv.slice(2), mode = args.shift();
     let root, runChecks = false;

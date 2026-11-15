@@ -69,4 +69,8 @@ You can't FFI your way out of these inside MoonBit because they're not function 
 
 ## Cross-reference
 
-- The same patterns appear in [`mizchi/mnemo`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/scripts/prepare-worker.mjs) and [`docs/regression/worker-deploy.md`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/docs/regression/worker-deploy.md) trap 1.
+- The [bundled bundle checker](../assets/scripts/check-worker-bundle.ts) and its
+  [regression tests](../assets/scripts/check-worker-bundle.test.ts) verify that
+  emitted modules contain no unresolved process/runtime references. These
+  patterns originated in the owner's internal `mizchi/mnemo` deployment; the
+  public checker and this reference provide the reproducible contract.

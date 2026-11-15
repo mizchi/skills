@@ -9,7 +9,9 @@ Toward the end of a task, extract the insight of "if only I had known this first
 
 ## When to use
 
-- Right before task completion, or when the user says "leave the lesson behind" or "codify it"
+Invoke only on an explicit user request to extract or codify reusable lessons. The following describe suitable material after that request, not automatic triggers:
+
+- Near task completion, when the requested retrospective has enough execution evidence
 - When you arrived at the solution after trial and error (stuck on the first attempt, built a wrong hypothesis, burned time due to missing docs, etc.)
 - When you might perform a similar task again in the future
 
@@ -50,10 +52,12 @@ When not to use:
      - "Partial overlap" (part of the insight is covered by the existing one, rest is new) also falls in this tier. Write the overlapping part under "Duplicate detected," and the new part under "Adoption candidates" (`[skill append]` or `[rule]`) separately.
    - **Duplicate with existing (no proposal needed)**: the existing entry already fully covers the same insight -> zero proposals, but keep the "Duplicate detected" line in the presentation format (for auditability). Attach the existing skill name + the relevant section name (or line number) as evidence on the Duplicate detected line.
    - **Undecidable**: the agent cannot tell whether it is a duplicate -> show the match result to the user and ask for judgment
-5. **Write out**: Generate the artifact following the template (below) for the chosen format.
-6. **Confirm**: Show the diff to the user and get approval. If rejected, keep it as a session note instead of a skill.
+5. **Draft**: Prepare a proposed diff using the chosen template. A draft is a review artifact, not an edit to the authoritative skill, lint or CLAUDE.md.
+6. **Apply within authorization**: If the user already selected the rules and destination, apply that authorized diff. Otherwise show the completed draft and obtain the missing selection before modifying the authoritative files. A rejected proposal stays a session note.
 
 ## Classification decision
+
+In proposal labels, `[lint]` means an executable static check; `[rule]` means an always-loaded CLAUDE.md instruction; `[skill append]` and `[skill new]` mean procedural guidance.
 
 ```dot
 digraph classify {
@@ -147,7 +151,7 @@ message: Set/Map のサイズは .size プロパティを使う。
 ### Example 3: Codify as a new skill (procedure + judgment involved)
 
 - First attempt: To call a C library from MoonBit, tried several approaches and got stuck on the placement of FFI declarations and stubs.
-- Final solution: The combination of an `extern "c"` declaration + a stub using `moonbit.h` + `native-stub` / `link.native` settings in `moon.pkg.json`.
+- Final solution: The combination of an `extern "c"` declaration + a stub using `moonbit.h` + `native-stub` / `link.native` settings in `moon.pkg`.
 - Insight: It does not fit in a single step; you need to understand the three layers — declaration, stub, and build config — together.
 
 -> Carve out the procedure and templates as a new skill `moonbit-c-binding` (since it already exists, this example is the case of choosing "append to existing" via the dedup check).
@@ -159,7 +163,7 @@ Stop once if the following thoughts appear.
 | Rationalization that surfaces | Reality |
 |---|---|
 | "It is project-specific but let's make a skill just in case" | Skills bloat and searchability drops. A commit message / PR is enough. |
-| "Skip approval and write it out first; I can show it later" | Modifying CLAUDE.md / skills on your own makes future behavior unpredictable. Always: propose -> approve -> write out. |
+| "Skip approval and write it out first; I can show it later" | Modifying CLAUDE.md / skills on your own makes future behavior unpredictable. Prepare the draft first; apply it only within the user's existing or subsequent authorization. |
 | "I kind of could write it in ast-grep, but writing it in natural language as a rule is faster" | Writing statically detectable things in prose means agents do not follow them. Prefer ast-grep. |
 | "The insight is thin, but I have to write something to save face" | Zero proposals is also a correct answer. An empty retrospective causes no harm. |
 | "Dedup checks are tedious; skip them, erase duplicates later" | If duplicate rules remain, behavior splits. Dedup is a mandatory step. |

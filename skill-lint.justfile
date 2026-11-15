@@ -36,3 +36,9 @@ replay:
 
 test:
     pnpm test:skill-lint
+
+review-plan base head:
+    pnpm review:skills --base {{base}} --head {{head}} --dry-run
+
+review base head:
+    pnpm review:skills --base {{base}} --head {{head}}

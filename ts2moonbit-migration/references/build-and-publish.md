@@ -46,7 +46,7 @@ options(
 
 ## Async exports — return a real Promise
 
-An exported MoonBit `async fn` cannot be awaited by a sync JS caller as-is. Wrap the internal async logic with `mizchi/js/core`'s `promisify*` (or `from_async`) so the export returns `@core.Promise[T]` and JS receives a real `Promise`. Verified pattern (mizchi/js 0.12.1):
+An exported MoonBit `async fn` cannot be awaited by a sync JS caller as-is. Wrap the internal async logic with `mizchi/js_core`'s `promisify*` (or `from_async`) so the export returns `@core.Promise[T]` and JS receives a real `Promise`. Checked pattern (mizchi/js_core 0.13.0, external async 0.22.7, compiler v0.10.20):
 
 ```mbt nocheck
 // internal async logic
@@ -62,6 +62,11 @@ pub fn do_work(x : Int) -> @core.Promise[Int] {
 ```
 
 List `do_work` in `exports`. At runtime JS gets a genuine `Promise` (`p instanceof Promise === true`, `await p` works — verified). **But** the generated `.d.ts` types the return as `any`, not `Promise<number>`, because `@core.Promise[T]` is an external type. If consumers need the precise `Promise<T>` type, ship a small hand-maintained overlay `.d.ts` that re-declares the async exports, or wrap the package in a thin typed `index.ts`.
+
+The [consumer test](../assets/adapter-smoke/smoke.test.mjs) checks `instanceof
+Promise` and the awaited values from the built ESM artifact. The paired
+`cross` package tests x 0.7.0 filesystem/process behavior on JS and Native.
+See [adapter validation](adapter-validation.md) for exact commands and limits.
 
 ## Build
 

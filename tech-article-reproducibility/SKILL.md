@@ -1,6 +1,6 @@
 ---
 name: tech-article-reproducibility
-description: Evaluate the reproducibility of technical articles. Dispatch a subagent to simulate a first-time reader reproducing the work locally and list missing information. Use as the final check on a draft before publication.
+description: Evaluate the reproducibility of technical articles. Dispatch a subagent to simulate a first-time reader reproducing the work locally and list missing information. Use as the final check on a draft before publication or to recheck a published article before responding to reader feedback.
 ---
 
 # Tech Article Reproducibility

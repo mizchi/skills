@@ -238,10 +238,32 @@ The previous SHA terminology and three activation differences were corrected;
 the old records above remain historical snapshots.
 
 [Upstream freshness](../docs/skill-freshness.md) is a separate gate: 82 official
-source snapshots, 66 watched files across 38 skills, and 32 explicit document
-comparisons in ten groups. The accepted initial snapshot has no missing or
+source snapshots, 66 watched files across 38 skills, and 30 explicit document
+comparisons in ten groups at that snapshot. The accepted initial snapshot has no missing or
 unassessed comparisons. Source drift independently requires review even if the
 model agrees. No automatic content rewrite or baseline acceptance is enabled.
 The categorical document controls (4 defects, 5 clean, 1 insufficient-context)
 were measured three times without a label flip. These controls are a small
 regression set, not an API-wide accuracy claim.
+
+## Follow-up coverage — 2026-11-16
+
+The upstream baseline now covers 15 groups, 108 sources, 75 watched files and
+42 explicit comparisons, still affecting 38 maintained skills. Compiler/Hex,
+ast-grep, Nix/Devbox, dotenvx, Stryker and the other distribution channels now
+have their own source evidence. The initial snapshot had 30 freshness
+comparisons; the earlier figure 32 confused that count with translation coverage.
+The [PR review gate](../docs/skill-review-ci.md) checks current changed documents
+and translations with trusted base-branch tooling. Its text gate uses three
+passes with unchanged calibrated cutoffs. A synthetic contradictory proposal
+returned exit 1, the corrected pair exit 0, and the proposal's install script
+was never executed.
+
+New concrete corrections include the dotenvx precedence error, the removed
+mizchi/js/core import, the MoonBit overlay API and the stale AWS wildcard
+pitfall. The AWS review also corrected Converse IAM names and the claimed
+ReadOnlyAccess secret permissions against current AWS documents. Weekly review
+scope and the article-reproducibility activation summary were clarified.
+See the [updated audit](../docs/skill-freshness-audit-2026-11-16.md) for completed
+versus partial runtime checks. The external HTTP scan now has zero failures
+following public/bundled-reference replacements, without new HTTP exclusions.

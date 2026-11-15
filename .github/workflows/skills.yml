@@ -73,7 +73,9 @@ jobs:
           npm install --global pnpm@10.28.2
           pnpm install --frozen-lockfile
       - name: Test maintained skill selection
-        run: pnpm test:skill-lint
+        run: |
+          pnpm test:skill-lint
+          pnpm test:skill-review
       - name: Replay calibrated skill rules without API requests
         run: pnpm lint:skills:replay
       - name: Test cf deployment and secret helpers

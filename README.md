@@ -194,10 +194,12 @@ The [2026-11-16 skill freshness audit](docs/skill-freshness-audit-2026-11-16.md)
 inventories all 76 maintained entrypoints, separates confirmed stale guidance
 from version-specific examples needing revalidation, and prioritizes update
 detection. The [upstream watchlist](docs/skill-upstream-watchlist.json) records
-sources and validation gates for ten groups affecting 38 skills. The [daily freshness check](docs/skill-freshness.md) fetches current upstream evidence,
+sources and validation gates for fifteen groups affecting 38 skills. The [daily freshness check](docs/skill-freshness.md) fetches current upstream evidence,
 compares declared topics with jev-lint and fails on unreviewed upstream drift.
 It reports candidates without rewriting skills or accepting a baseline automatically.
-Run `just --justfile skill-freshness.justfile check`. Maintained Node examples use Node 24+.
+Run `just --justfile skill-freshness.justfile check`.
+[PR semantic review](docs/skill-review-ci.md) checks changed entrypoints and their
+English/Japanese pairs using trusted tooling. Maintained Node examples use Node 24+.
 
 ### Markdown links
 

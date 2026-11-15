@@ -1,266 +1,79 @@
----
-title: "MoonBit Nix Development"
----
+# MoonBit with Nix
 
-# MoonBit Nix Development
+Use Nix for a project that already uses it or when the user selects it.
+Keep the existing environment otherwise; Devbox remains opt-in.
 
-moonbit-overlay を使って再現可能な開発環境とパッケージビルドを構築する。
+## Toolchain and project builders
 
-## Prerequisites
+Checked 2026-11-16: [moonbit-overlay](https://github.com/moonbit-community/moonbit-overlay)
+distributes complete versioned toolchains. Use
+`moonbit-overlay.packages.${system}.latest` directly, or
+`pkgs.moonbit-bin.latest` with its overlay. `latest` is fixed by the input's
+lock revision. Current supported hosts are `aarch64-darwin` and `x86_64-linux`.
+The old `moon-patched_latest`, `moonPlatform.bundleWithRegistry` and
+`buildMoonPackage` examples do not describe the current distribution API.
 
-- Nix with flakes enabled
-- Optional: direnv
+Project dependency resolution is separate:
+[moon-nix](https://github.com/moonbit-community/moon-nix) exposes
+`lib.mkMoonNix { inherit pkgs; toolchain = ...; }` and `buildProject`.
+Pin and test its revision before use; do not infer compatibility from the
+compiler version alone.
 
-## Quick Setup
-
-### flake.nix (minimal devShell)
+## Development shell
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
     moonbit-overlay.url = "github:moonbit-community/moonbit-overlay";
-    moon-registry = {
-      url = "git+https://mooncakes.io/git/index";
-      flake = false;
-    };
   };
-
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "x86_64-linux" "aarch64-linux"
-        "x86_64-darwin" "aarch64-darwin"
-      ];
-
-      perSystem = { system, ... }:
-        let
-          pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [ inputs.moonbit-overlay.overlays.default ];
-          };
-          moonHome = pkgs.moonPlatform.bundleWithRegistry {
-            cachedRegistry = pkgs.moonPlatform.buildCachedRegistry {
-              moonModJson = ./nix/moon-deps.json;
-              registryIndexSrc = inputs.moon-registry;
-            };
-          };
-        in {
-          devShells.default = pkgs.mkShellNoCC {
-            packages = [ moonHome pkgs.git ];
-            env.MOON_HOME = "${moonHome}";
-          };
-        };
+  outputs = { nixpkgs, moonbit-overlay, ... }:
+    let
+      system = "aarch64-darwin"; # or x86_64-linux
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [ moonbit-overlay.packages.${system}.latest ];
+      };
     };
 }
 ```
 
-### .envrc (direnv)
+Commit `flake.lock`. Enter with `nix develop`; run `moon version --all` before
+copying compiler-specific syntax. The Nix toolchain wrapper sets its own SDK
+root; do not point it at a different globally installed core.
+Use `use flake` in `.envrc` only when the project already uses direnv or requests it.
 
-```bash
-use flake
+## Verified DSL package build
+
+The [smoke flake](../assets/nix-smoke/flake.nix) uses the current
+`moon.mod` / `moon.pkg` DSL and a pinned v0.10.20 toolchain. Its dependency-free
+native executable is built with `stdenv.mkDerivation`, calling
+`moon build --target native --release --deny-warn`, then installing the emitted
+executable. The Nix check executes that binary and asserts output `42`.
+
+```sh
+nix build path:./moonbit-practice/assets/nix-smoke#checks.aarch64-darwin.output --no-link
+nix develop path:./moonbit-practice/assets/nix-smoke --command moon version --all
 ```
 
-### Usage
+Both commands passed on aarch64-darwin with Nix 2.33.0 / Determinate Nix 3.15.1
+and compiler v0.10.20+65efd5b93. Linux is declared but was not executed here.
+For another project, change the output path and verify it from `moon build`.
+For dependencies, provide vendored/resolved inputs in the Nix build or validate
+a compatible project builder. An offline sandbox cannot run an unpinned
+network registry update as a dependency-resolution substitute.
 
-```bash
-nix develop    # enter shell with moon, moonc, etc.
-direnv allow   # or auto-enter with direnv
-```
+## Project-builder compatibility control
 
-## Package Build (pure MoonBit)
+At moon-nix commit `026f5a4e9fc7bf78699d69fdb70318c26ac8f07c`, a minimal
+`pkgtype(kind: "executable")` project failed evaluation with
+`must declare is-main`. The builder's executable check still reads `raw.is-main`.
+Do not rewrite modern project manifests to legacy JSON or claim that a
+DSL-capable parser necessarily supports the current executable declaration.
+The verified smoke build above keeps the compiler's current DSL intact.
+Revalidate this control before adopting a newer builder.
 
-`buildMoonPackage` は `moon build --target <target> --release` を実行し、`_build/<target>/release/build/` から `.exe` を `$out/bin/` にインストールする。
-
-### package.nix
-
-```nix
-{
-  lib, git, autoPatchelfHook, stdenv,
-  moonPlatform, moonRegistryIndex,
-}:
-moonPlatform.buildMoonPackage {
-  src = ./.;
-  moonModJson = ./nix/moon-deps.json;
-  inherit moonRegistryIndex;
-
-  doCheck = false;
-  propagatedBuildInputs = [ git ];
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
-
-  meta = {
-    description = "My MoonBit app";
-    mainProgram = "my-app";
-    platforms = [
-      "x86_64-linux" "aarch64-linux"
-      "x86_64-darwin" "aarch64-darwin"
-    ];
-  };
-}
-```
-
-### flake.nix (with package)
-
-```nix
-flake = {
-  overlays.default = _final: prev: {
-    my-app = prev.callPackage ./package.nix {
-      moonRegistryIndex = inputs.moon-registry;
-    };
-  };
-};
-
-perSystem = { system, ... }: let
-  pkgs = import inputs.nixpkgs {
-    inherit system;
-    overlays = [ inputs.moonbit-overlay.overlays.default ];
-  };
-  my-app = pkgs.callPackage ./package.nix {
-    moonRegistryIndex = inputs.moon-registry;
-  };
-in {
-  packages.default = my-app;
-  apps.default = {
-    type = "app";
-    program = "${my-app}/bin/my-app";
-  };
-};
-```
-
-### default.nix (legacy)
-
-```nix
-{
-  pkgs ? import <nixpkgs> { },
-  moonRegistryIndex ? builtins.fetchGit {
-    url = "https://mooncakes.io/git/index";
-    ref = "main";
-  },
-  ...
-}:
-pkgs.callPackage ./package.nix { inherit moonRegistryIndex; }
-```
-
-## C Library Dependencies (native target)
-
-`buildMoonPackage` は `moon build` を内部で実行するが、moon のリンカは `-L` パスを外部から受け取れない。C ライブラリ（duckdb, zlib 等）に依存する場合は `stdenv.mkDerivation` で2段階ビルドを行う。
-
-### Step 1: Generate C source
-
-```bash
-moon build --target native --release src/cmd/my_app 2>/dev/null || true
-# link fails but .c files are generated
-```
-
-### Step 2: Manual linking
-
-```bash
-cc -O2 -o my-app \
-  -I"$MOON_HOME/include" \
-  "$MOON_HOME/lib/libmoonbitrun.o" \
-  "$BINARY.c" \
-  "$BUILD_DIR/runtime.o" \
-  $BUILD_DIR/.mooncakes/some/dep/lib*.a \
-  -L"${lib-path}" -lmylib -lm \
-  "$MOON_HOME/lib/libbacktrace.a"
-```
-
-### package.nix (with C deps)
-
-```nix
-{ lib, git, duckdb, zlib, stdenv, moonPlatform, moonRegistryIndex }:
-let
-  moonHome = moonPlatform.bundleWithRegistry {
-    cachedRegistry = moonPlatform.buildCachedRegistry {
-      moonModJson = ./nix/moon-deps.json;
-      registryIndexSrc = moonRegistryIndex;
-    };
-  };
-in stdenv.mkDerivation {
-  pname = "my-app";
-  version = "0.1.0";
-  src = ./.;
-
-  nativeBuildInputs = [ moonHome ];
-  buildInputs = [ duckdb.dev zlib.dev ];
-  propagatedBuildInputs = [ git duckdb.lib zlib ];
-
-  buildPhase = ''
-    export MOON_HOME=$(mktemp -d)
-    cp -rL ${moonHome}/* $MOON_HOME/
-    chmod -R u+w $MOON_HOME
-    export HOME=$TMPDIR
-
-    C_INCLUDE_PATH="${duckdb.dev}/include:${zlib.dev}/include" \
-    LIBRARY_PATH="${duckdb.dev}/lib:${zlib}/lib" \
-    moon build --target native --release src/cmd/my_app 2>/dev/null || true
-
-    BUILD_DIR="_build/native/release/build"
-    cc -O2 -o my-app \
-      -I"$MOON_HOME/include" \
-      "$MOON_HOME/lib/libmoonbitrun.o" \
-      "$BUILD_DIR/cmd/my_app/my_app.c" \
-      "$BUILD_DIR/runtime.o" \
-      $BUILD_DIR/.mooncakes/f4ah6o/duckdb/libduckdb.a \
-      $BUILD_DIR/.mooncakes/mizchi/zlib/lib*.a \
-      -L"${duckdb.dev}/lib" -L"${zlib}/lib" \
-      -lduckdb -lz -lm \
-      "$MOON_HOME/lib/libbacktrace.a" \
-      ${lib.optionalString stdenv.isDarwin "-Wl,-rpath,${duckdb.lib}/lib"}
-  '';
-
-  installPhase = ''
-    mkdir -p $out/bin
-    install -Dm755 my-app $out/bin/my-app
-  '';
-}
-```
-
-## C FFI Stubs
-
-MoonBit から C 関数を呼ぶ場合、`moon.pkg` に `native-stub` を設定する。
-
-```
-pkgtype(kind: "executable")
-
-options(
-  "native-stub": ["my_ffi.c"],
-)
-```
-
-（`pkgtype(kind: "executable")` は非推奨の `options("is-main": true)` の後継。v0.10.4 以降はこちらを使う。）
-
-生成された `.o` ファイルはリンク時に手動で含める:
-
-```bash
-$BUILD_DIR/cmd/my_app/my_ffi.o \
-```
-
-### FFI Warning (0055) 抑制
-
-`Bytes` パラメータの `extern "C"` で unannotated_ffi warning が出る場合:
-
-```
-options(
-  "warn-list": "-0055",
-)
-```
-
-将来的には `#borrow` / `#owned` アノテーションを付けるべき。
-
-## Key Points
-
-- `moon-registry` input は `flake = false` にする（Git リポジトリで flake ではない）
-- このページの `moonModJson` は旧 overlay API の例。v0.10.19 でのビルドは未検証。
-  使用中の lock revision が DSL と対象コンパイラに対応するか確認する。
-  JSON 専用 helper を残す場合は `nix/moon-deps.json` などの別ファイルを使い、
-  `moon.mod` と同期する。`moon.mod.json` をビルド用 manifest として残さない。
-- 既存の環境管理方法を維持する。Nix / devbox の導入は利用者が選択した場合に限る。
-- `moonTarget` パラメータでオーバーライド可能
-- `moonFlags` で追加の `moon build` フラグを渡せる
-- `doCheck = false` でテストをスキップ（CI 側で別途実行する場合）
-- warnings は errors として扱われる — deprecated API は修正が必要
-- `nix flake check` でビルド検証
-- `nix run .` でローカル実行
-- `nix run github:user/repo` でリモートから直接実行
+For C FFI, keep target-specific `native-stub` declarations and system libraries
+explicit in the derivation; see [ffi-native.md](ffi-native.md). Nix support for a
+host platform is separate from the MoonBit backend being compiled.

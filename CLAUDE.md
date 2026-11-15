@@ -23,6 +23,7 @@ After a batch of edits, commit + push here, then the next `apm update -g <reques
 - Use `pkf run test` to run the frontmatter validator tests plus the repository frontmatter check.
 - For skill consistency checks, use `just --justfile skill-lint.justfile plan` before a live `check`; inspect candidates against the source. `just --justfile skill-lint.justfile replay` validates the calibrated rules offline. See `.jev-lint/README.md` for translation checks and scope.
 - Run `pnpm links:install` once, then `just --justfile markdown-links.justfile check` after Markdown edits. Use `online` for HTTP(S) status checks; see `docs/markdown-links.md` for scope and reports.
+- For a commit-to-commit skill review, use `pnpm review:skills --base <sha> --head <sha> --dry-run` before the live run. See `docs/skill-review-ci.md` for the PR execution boundary.
 - For upstream freshness, use `just --justfile skill-freshness.justfile plan` and `check`; review current evidence and relevant smoke tests before explicit `accept`. Do not accept baselines automatically in CI. See `docs/skill-freshness.md`.
 - Skill directory name must match the `name:` in its `SKILL.md` frontmatter.
 - Do not commit MoonBit build artifacts (`_build/`, `.mooncakes/`) or `node_modules/` — `.gitignore` covers them.

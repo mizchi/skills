@@ -7,6 +7,11 @@ description: Introduce StrykerJS mutation testing or assess JavaScript/TypeScrip
 
 Use mutation testing to ask whether tests detect plausible defects in production code. A passing suite or high coverage alone does not answer that question. Mutate production source; improve the tests that fail to detect meaningful mutations.
 
+Upstream package baseline (2026-11-16): `@stryker-mutator/core@10.1.1`
+requires Node `>=22.0.0`; maintained examples here use Node 24+.
+A newer upstream version triggers review, not automatic replacement of a
+consumer's compatible pinned runner cohort.
+
 ## Choose the work
 
 - **Introduce Stryker:** read [setup.md](references/setup.md), adapt the assets, and verify the integration with a small real module before widening the scope.

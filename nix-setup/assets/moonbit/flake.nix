@@ -5,14 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
-    # moonbit-overlay is pinned to a known-working rev.
-    # The overlay HEAD sometimes depends on nixpkgs packages that have been
-    # marked broken (e.g. tcc) in nixpkgs-unstable. Bump this rev deliberately.
-    moonbit-overlay.url = "github:moonbit-community/moonbit-overlay/50118f5c3c0298b5cb17cc6f1c346165801014c8";
+    # Toolchain snapshot checked on 2026-11-16. Keep flake.lock and verify
+    # the compiler plus current host support before changing this revision.
+    moonbit-overlay.url = "github:moonbit-community/moonbit-overlay/a0e830b32d60bcc59d18853e39e0b3fa5081f033";
   };
 
   outputs = { self, nixpkgs, flake-utils, moonbit-overlay }:
-    flake-utils.lib.eachDefaultSystem (system:
+    flake-utils.lib.eachSystem [ "aarch64-darwin" "x86_64-linux" ] (system:
       let
         pkgs = import nixpkgs { inherit system; };
         apm = import ./apm.nix { inherit pkgs; };
@@ -21,9 +20,9 @@
         devShells.default = pkgs.mkShell {
           packages = [
             # MoonBit toolchain (moon, moonc, moonrun, mooncake).
-            # This overlay exposes versioned aliases too:
-            #   moon-patched_v0_6_27-5aa3a5173, moonbit_v0_9_0-9f1423bcb-c9ac7ee, ...
-            moonbit-overlay.packages.${system}.moon-patched_latest
+            # Current release aliases are the original identifiers, e.g.
+            # "v0.10.20+65efd5b93+940aa18". Lock the input for reproducibility.
+            moonbit-overlay.packages.${system}.latest
 
             # Common tooling (included in every template)
             pkgs.just
@@ -31,12 +30,7 @@
             apm
           ];
 
-          shellHook = ''
-            # First-time setup: fetch mooncake registry
-            if [ -f moon.mod.json ] && [ ! -d .mooncakes ]; then
-              moon update 2>/dev/null || true
-            fi
-          '';
+
         };
       });
 }

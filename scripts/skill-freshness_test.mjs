@@ -130,3 +130,11 @@ test('pnpm schema evidence probes readonly commands and excludes advisory conten
   assert.ok(!result.text.includes('secret-project-package'));
   assert.deepEqual(calls, [['pnpm', ['--version']], ['pnpm', ['audit', '--json']]]);
 });
+
+test('Hex evidence uses the stable package release and rejects missing metadata', async () => {
+ const source={kind:'hex-package',package:'wisp'};
+ const result=await fetchSource(source,{fetch:async()=>reply({name:'wisp',latest_stable_version:'2.2.2',
+  latest_version:'3.0.0-rc1',meta:{links:{Repository:'https://github.com/gleam-wisp/wisp'}},releases:[{version:'2.2.2',retirement:null}]})});
+ assert.equal(result.revision,'2.2.2');assert.match(result.text,/2.2.2/);
+ await assert.rejects(fetchSource(source,{fetch:async()=>reply({name:'wisp',latest_version:'3.0.0-rc1'})}));
+});

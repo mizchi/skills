@@ -9,7 +9,7 @@ const canonical = (v) => Array.isArray(v) ? v.map(canonical)
   : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])])) : v;
 export const stable = (v) => JSON.stringify(canonical(v));
 const sourceFields = ['kind', 'package', 'tag', 'repository', 'path', 'branch', 'ref', 'url'];
-const kinds = new Set(['npm-dist-tag', 'github-release', 'github-path', 'github-branch', 'documentation', 'github-action', 'pnpm-audit-schema']);
+const kinds = new Set(['npm-dist-tag', 'github-release', 'github-path', 'github-branch', 'documentation', 'github-action', 'pnpm-audit-schema', 'hex-package']);
 
 export function sourceId(source) {
   return hash(stable(Object.fromEntries(sourceFields.filter((k) => source[k] !== undefined).map((k) => [k, source[k]]))));
@@ -33,6 +33,7 @@ export function validateWatchlist(watch, root) {
     for (const source of group.sources) {
       if (!kinds.has(source.kind)) throw new Error(`Unsupported source kind: ${source.kind}`);
       if (source.kind.startsWith('github-') && !/^[\w.-]+\/[\w.-]+$/.test(source.repository ?? '')) throw new Error('Invalid GitHub repository');
+      if (source.kind === 'hex-package' && !/^[a-z][a-z0-9_]*$/.test(source.package ?? '')) throw new Error('Invalid Hex package');
       if (source.kind === 'npm-dist-tag' && (!source.package || !source.tag)) throw new Error('Missing npm package/channel');
       if (source.kind === 'github-path' && (!source.path || source.path.split('/').includes('..'))) throw new Error('Invalid GitHub path');
       if (source.kind === 'github-branch' && !source.branch) throw new Error('Missing GitHub branch');
@@ -85,6 +86,18 @@ export async function fetchSource(source, { fetch: request = globalThis.fetch, t
       topLevelKeys: Object.keys(value).sort(),
       vulnerabilityCountsPath: 'metadata.vulnerabilities',
       advisoryMap: value.advisories ? 'advisories' : 'vulnerabilities' });
+  } else if (source.kind === 'hex-package') {
+    url = `https://hex.pm/api/packages/${source.package}`;
+    const value = await get(url);
+    const version = value.latest_stable_version;
+    if (value.name !== source.package || !/^\d+\.\d+\.\d+$/.test(version ?? '')
+      || !Array.isArray(value.releases) || !value.releases.some((r) => r.version === version)) {
+      throw new Error(`Invalid Hex package metadata: ${source.package}`);
+    }
+    revision = version;
+    text = stable({ name: value.name, version, description: value.meta?.description ?? null,
+      links: value.meta?.links ?? {}, retirements: value.retirements ?? {},
+      securityAdvisories: value.security_advisories ?? [] });
   } else if (source.kind === 'npm-dist-tag') {
     url = `https://registry.npmjs.org/${encodeURIComponent(source.package)}/${encodeURIComponent(source.tag)}`;
     const value = await get(url);

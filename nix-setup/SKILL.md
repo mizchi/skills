@@ -74,7 +74,7 @@ Use this section only for an existing devbox project or an explicit devbox choic
 ### Install
 
 ```bash
-curl -fsSL https://get.jetify.com/devbox | bash
+curl -fsSL https://raw.githubusercontent.com/jetify-com/devbox/main/install.sh | bash
 ```
 
 ### Basic commands
@@ -236,10 +236,11 @@ echo 'use flake' > .envrc && direnv allow
 
 ### MoonBit
 
-- Uses `moonbit-overlay.packages.${system}.moon-patched_latest`
-- **The overlay is pinned to a known-working revision** (`50118f5c3c0298b5cb17cc6f1c346165801014c8`). The latest HEAD sometimes depends on packages marked as broken on nixpkgs-unstable (e.g. tcc), so evaluation can fail for stretches. Verify before updating.
-- Runs `moon update` automatically when `moon.mod.json` is present (first time only)
-- Reference: vibe-lang's `flake.nix`
+- Uses `moonbit-overlay.packages.${system}.latest`, locked at overlay revision `a0e830b32d60bcc59d18853e39e0b3fa5081f033` (checked 2026-11-16).
+- Current overlay hosts are `aarch64-darwin` and `x86_64-linux`. Check the selected snapshot's binary hashes before adding another host.
+- Run `moon update` explicitly when registry metadata needs refreshing. Entering the shell does not perform network dependency updates.
+- The toolchain and its core must match. The overlay's wrapper selects its bundled SDK; keep the project's `moon.mod` / `moon.pkg` DSL.
+- The bundled flake is the source template; verify its lock and evaluate the selected devShell before updating the overlay pin.
 
 ### Rust
 

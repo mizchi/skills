@@ -87,7 +87,7 @@ shape_area({ kind: "rect", a: 3, b: 4 }); // 12
 shape_area({ kind: "tri", a: 1 });        // throws Error: unknown shape: tri
 ```
 
-(Verified end-to-end with moon 0.1.x / mizchi/js 0.12.1.)
+(Historical shape example: moon 0.1.x / mizchi/js 0.12.1. For current package imports and the separately revalidated Any/Promise boundary, see [adapter-validation.md](adapter-validation.md).)
 
 ## What goes where
 

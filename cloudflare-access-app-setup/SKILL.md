@@ -45,6 +45,8 @@ Inputs (env or CLI):
 
 ## Source
 
-The mnemo version (with hard-coded mnemo domain defaults) is at [`mizchi/mnemo/blob/main/mnemo-server/scripts/setup-access-app.mjs`](https://github.com/mizchi/mnemo/blob/main/mnemo-server/scripts/setup-access-app.mjs). The version shipped here is the same script with the domain defaults parameterized.
+The parameterized [helper source](assets/scripts/setup-access-app.ts) is bundled
+with this skill. It was adapted from the owner's internal `mizchi/mnemo`
+deployment helper; no access to that repository is needed to run or review it.
 
 For manual Access operations, discover the cf command with `pnpm exec cf cli search "create a self hosted Access application"`, then inspect its schema. The bundled helper calls the REST API directly and does not require Wrangler. See [cf authentication](../cloudflare-deploy/references/cf/auth.md).
