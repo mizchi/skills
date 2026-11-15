@@ -1,7 +1,7 @@
 # @mizchi/waxa
 
 [![npm version](https://img.shields.io/npm/v/@mizchi/waxa.svg)](https://www.npmjs.com/package/@mizchi/waxa)
-[![license](https://img.shields.io/npm/l/@mizchi/waxa.svg)](./LICENSE)
+[![license](https://img.shields.io/npm/l/@mizchi/waxa.svg)](https://www.npmjs.com/package/@mizchi/waxa)
 
 Skill evaluation CLI with an empirical-prompt-tuning iteration loop, structured self-report grader, LLM-as-Judge, and with_skill / without_skill baseline comparison.
 
@@ -43,7 +43,7 @@ deno task run -- ../path/to/eval.yaml
 
 Requirements:
 
-- Node.js 20+ (for the published npm CLI; verified on 20+, ESM-only, built with dnt 0.42.3)
+- Node.js 24+ (for the npm CLI; ESM-only, built with dnt 0.42.3). Newly built packages declare `engines.node: ">=24"`; older published artifacts retain their original metadata.
 - `claude` CLI on `PATH` and authenticated (OAuth login or
   `ANTHROPIC_API_KEY`) — waxa shells out to `claude -p` for the
   bias-suppressed executor

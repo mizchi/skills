@@ -9,7 +9,9 @@ You are optimizing GitHub Actions CI for a frontend project. The target is **med
 
 ## Procedure
 
-1. Run `scripts/audit-ci.sh --repo <client-repo>`.
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
+1. Run `<skill-dir>/scripts/audit-ci.sh --repo <client-repo> --run-checks`.
 2. Read `<client-repo>/.frontend-review/report/latest/raw/ci.json`.
 3. For the slowest runs, dig into step-level timing:
    ```bash
@@ -83,6 +85,4 @@ The **PR CI total** target is the critical gate. CI slower than 5 minutes is rou
 
 ## Reference
 
-- Checklist: `checklist/09-ci-optimization.md`
-- Phase: `phase/week-1-ci-baseline.md`
-- Templates: `templates/github-actions/ci.yml`, `templates/github-actions/e2e.yml`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

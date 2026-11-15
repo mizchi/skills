@@ -14,7 +14,7 @@ source = "src"
 preferred_target = "js"
 ```
 
-`preferred_target = "js"` makes `moon check`/`build`/`test` default to the JS backend — necessary since v0.10.9, where the toolchain default target became `wasm`. The JSON form `moon.mod.json` (hyphenated `preferred-target`, `source` and `deps` keys) is deprecated; run `moon fmt` to migrate. It's a default, not a lock — `moon test --target native` still works for code that supports it (relevant when porting onto `mizchi/x`).
+`preferred_target = "js"` makes `moon check`/`build`/`test` default to the JS backend — necessary since v0.10.9, where the toolchain default target became `wasm`. The JSON form `moon.mod.json` (hyphenated `preferred-target`, `source` and `deps` keys) is no longer accepted as of v0.10.19; run `moon fmt` to migrate. It's a default, not a lock — `moon test --target native` still works for code that supports it (relevant when porting onto `mizchi/x`).
 
 ## src/moon.pkg — exports + format
 
@@ -40,7 +40,7 @@ options(
 - **`format`** must match what the package shipped (`esm` / `cjs` / `iife`). Wrong format breaks consumers even when signatures match.
 - Gate any file containing `extern "js"` to `["js"]` via `targets:` (see `moonbit-js-binding`).
 
-> Use the `moon.pkg` DSL form (no `.json`). Do not mix with `moon.pkg.json`, whose support is deprecated and scheduled for removal.
+> Use the `moon.pkg` DSL form (no `.json`). JSON manifests are no longer accepted in v0.10.19; `moon fmt` remains the migration entry point.
 >
 > An executable package declares `pkgtype(kind: "executable")` rather than the legacy `options("is-main": true)`. For a single export, `#export_name("jsName")` on the `pub fn` is now preferred over adding it to `link.js.exports` — but `exports` is still the way to rename many symbols at once with `"moonbit_name:jsName"`.
 

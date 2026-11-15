@@ -1,0 +1,16 @@
+{
+  "name": "vlmkit-skill-smoke",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test smoke.test.mjs"
+  },
+  "devDependencies": {
+    "@mizchi/vlmkit": "0.24.0",
+    "@playwright/test": "1.65.1",
+    "playwright": "1.65.1"
+  }
+}

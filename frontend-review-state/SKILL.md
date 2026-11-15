@@ -9,6 +9,8 @@ You are reviewing the state management architecture of a frontend project. The m
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `package.json` to identify the state management libraries in use.
 2. Grep for global state usage patterns:
    ```bash
@@ -118,5 +120,4 @@ Keep under 200 lines. File-level details stay in the raw search output, not in t
 
 ## Reference
 
-- Checklist: `23-state-management.md`, `17-pure-io-separation.md`, `21-api-layer.md`
-- Related: `frontend-review-performance` (re-render profiling)
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

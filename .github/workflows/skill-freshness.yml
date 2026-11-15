@@ -1,0 +1,84 @@
+name: Skill freshness
+
+on:
+  pull_request:
+    paths:
+      - '**/SKILL*.md'
+      - 'scripts/**'
+      - 'docs/skill-upstream-watchlist.json'
+      - '.jev-lint/freshness-fixtures/**'
+      - '.jev-lint/freshness-baseline.json'
+      - '.github/workflows/skill-freshness.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'skill-freshness.justfile'
+      - 'frontend-review-*/**'
+      - 'dep-lib-review/**'
+  push:
+    paths:
+      - '**/SKILL*.md'
+      - 'scripts/**'
+      - 'docs/skill-upstream-watchlist.json'
+      - '.jev-lint/freshness-fixtures/**'
+      - '.jev-lint/freshness-baseline.json'
+      - '.github/workflows/skill-freshness.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'skill-freshness.justfile'
+      - 'frontend-review-*/**'
+      - 'dep-lib-review/**'
+  schedule:
+    - cron: '23 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-freshness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          pnpm test:freshness
+          pnpm test:frontend-audit
+          pnpm test:audit-report
+          pnpm freshness:controls
+          pnpm frontend:sync:check
+
+  upstream:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - run: pnpm install --frozen-lockfile
+      - name: Compare fresh upstream evidence with skill guidance
+        run: pnpm lint:freshness
+      - name: Upload source drift and jev-lint evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: skill-freshness-${{ github.run_id }}
+          path: .cache/skill-freshness/current/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

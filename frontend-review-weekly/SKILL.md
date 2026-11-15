@@ -1,6 +1,6 @@
 ---
 name: frontend-review-weekly
-description: Use for the weekly AI review. Orchestrates all frontend-review-* skills in order, dispatches the 5 perspective sub-skills in parallel, diffs against last week's KPIs, and produces a weekly report that feeds the ratchet.
+description: Use for the weekly AI review. Orchestrates all frontend-review-* skills in order, runs five perspective reviews, in parallel when authorized or sequentially, diffs against last week's KPIs, and produces a weekly report that feeds the ratchet.
 ---
 
 # Frontend Review — Weekly Orchestrator
@@ -8,16 +8,18 @@ description: Use for the weekly AI review. Orchestrates all frontend-review-* sk
 You are running the weekly AI review. Your job is NOT to make new judgments — it's to:
 
 1. Re-run every `frontend-review-*` skill in the correct order.
-2. Dispatch the 5 perspective sub-skills in parallel.
+2. Run the five perspective reviews using the authorized execution mode.
 3. Diff the KPIs against last week's baseline.
 4. File GitHub issues for repeat findings.
 5. Propose static-rule promotions for patterns that appear 3+ weeks in a row.
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 ### Phase 1: raw data collection
 
-Run, in this order:
+Run, in this order. Keep partial collection reports visible and do not treat missing inputs as a passing KPI:
 
 1. `frontend-review-triage`
 2. `frontend-review-ci`
@@ -39,7 +41,7 @@ These write to `<client-repo>/.frontend-review/report/latest/md/`.
 
 ### Phase 2: perspective review (parallel)
 
-Dispatch the 5 perspective skills concurrently using the `dispatching-parallel-agents` skill. Each reads the raw JSON and produces a perspective-specific markdown report:
+Use available parallel-agent tools for the five perspective reviews when that execution is authorized and beneficial; otherwise run them sequentially. No external orchestration skill is required. Each reads the raw JSON and produces a perspective-specific markdown report:
 
 - `frontend-expert`
 - `react-expert`
@@ -117,7 +119,4 @@ Flag any AI-generated PRs in the weekly report that appear to cross into the hum
 
 ## Reference
 
-- Checklist: `11-ai-review.md`, `13-kpi-tracking.md`
-- Phase: `week-4-ai-review.md`, `ongoing.md`
-- Related skills: all `frontend-review-*` plus `frontend-expert`, `react-expert`, `performance-expert`, `security-expert`, `frontend-ops-expert`
-- External skill: `superpowers:dispatching-parallel-agents`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

@@ -1,0 +1,368 @@
+{
+  "schema": "jev-lint-documents-1",
+  "snapshotDigest": "baa2bc3521259ee24f532a6140fe9b64beaf48fd8e6038b80bd5ad4c43f31b09",
+  "questionDigest": "209d6df378ccb747fcb0e821998fcd6105bc76638a88d22488d3b398d6a21595",
+  "model": "jev-1.14.0",
+  "snapshotChanged": false,
+  "status": "partial",
+  "qualityVerdict": "UNREVIEWED",
+  "candidates": [
+    {
+      "id": "wrong-bin",
+      "mode": "semantic",
+      "topic": "Package installation and supplied CLI binary",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "wrong-bin",
+        "path": ".jev-lint/freshness-fixtures/wrong-bin.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nInstall @example/old-cli, then run new-cli.",
+        "contentHash": "2deb2806b946b8e01454ada66775e5a416eff179720d67b910913b877d5f40c1"
+      },
+      "context": [],
+      "candidateId": "6e30e8555cb3023de0e07d0f88d9eae5fc57d49eb929be59544237d9cee6bd21",
+      "contextHash": "6f5d0f08ff99d382ace0ad9c72bc503ee9e479e2e46f3a5f1483c2e28212344f",
+      "judgment": {
+        "choice": "contradicts",
+        "confidence": 0.96,
+        "probabilities": {
+          "supports": 0.02,
+          "contradicts": 0.97,
+          "unrelated": 0,
+          "insufficient_context": 0.01
+        }
+      }
+    },
+    {
+      "id": "current-bin",
+      "mode": "semantic",
+      "topic": "Package installation and supplied CLI binary",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "current-bin",
+        "path": ".jev-lint/freshness-fixtures/current-bin.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nInstall @example/new-cli 2.0, then run new-cli.",
+        "contentHash": "5059767b01aceddf0bd82ebf054c1dbccc8b425f70503cabe4b1f9a79837dd25"
+      },
+      "context": [],
+      "candidateId": "6153abb7cb201fd1e2d44a3168e470dfe2b19842935f356099f76b594547aa39",
+      "contextHash": "d69db318edd64a1369d01f4cbbe86e7c8ec05316526b912ab22c9bdac8b24007",
+      "judgment": {
+        "choice": "supports",
+        "confidence": 1,
+        "probabilities": {
+          "supports": 1,
+          "contradicts": 0,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "wrong-sdk",
+      "mode": "semantic",
+      "topic": "Current SDK 3 initialization",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "wrong-sdk",
+        "path": ".jev-lint/freshness-fixtures/wrong-sdk.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nFor the current SDK 3, construct new Resource and configure spanProcessor.",
+        "contentHash": "7e4f4e8b7edbee3fd3c2207a0d2cfceecf85a4b3e4ce2467fbd3564b86e0cbea"
+      },
+      "context": [],
+      "candidateId": "5c4d2b0d0696af2a5b06dc9f2c7e377630e1d0d478cefa6595bc406c3862095c",
+      "contextHash": "a27beb3770e89ef7e06f87cc6e5c899a32bf99f256c1971b0a0fb605c66d6542",
+      "judgment": {
+        "choice": "contradicts",
+        "confidence": 1,
+        "probabilities": {
+          "supports": 0,
+          "contradicts": 1,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "historical-sdk",
+      "mode": "semantic",
+      "topic": "SDK version-specific initialization",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "historical-sdk",
+        "path": ".jev-lint/freshness-fixtures/historical-sdk.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nFor an existing pinned SDK 1 project, new Resource and spanProcessor are the historical setup. Upgrade the cohort before using SDK 3 examples.",
+        "contentHash": "e0dd383afd3fa2e40aa45d53859b951df59e2fe2030c1b8f17dc31c271fdc7e9"
+      },
+      "context": [],
+      "candidateId": "ca5efd692915dd408eaab25766b54b7e2ea9c5f544381f76cf531db8c2f4293a",
+      "contextHash": "1b1e57d2281c2042afb7ce494af9c9bd89518f83edec4c88d3d45ff986172c00",
+      "judgment": {
+        "choice": "supports",
+        "confidence": 1,
+        "probabilities": {
+          "supports": 1,
+          "contradicts": 0,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "wrong-schema",
+      "mode": "semantic",
+      "topic": "Current pnpm report top-level structure",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "wrong-schema",
+        "path": ".jev-lint/freshness-fixtures/wrong-schema.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nRead the current pnpm report top-level vulnerabilities member; all advisories are stored there.",
+        "contentHash": "6e5874495677dc06210b763d85ed18100d00f1f12808ad30384885605852dcc0"
+      },
+      "context": [],
+      "candidateId": "505332ba2789cd62ee71d7676db01550c281e309280c7df153aa42f53f17bba7",
+      "contextHash": "388ca3c428e13320367ef05e31cd0561431b2655a4cbdb3a7b7c7176b2548326",
+      "judgment": {
+        "choice": "contradicts",
+        "confidence": 1,
+        "probabilities": {
+          "supports": 0,
+          "contradicts": 1,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "custom-sub",
+      "mode": "semantic",
+      "topic": "AWS reusable workflow subject conditions",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "custom-sub",
+        "path": ".jev-lint/freshness-fixtures/custom-sub.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nCustomize sub to include job_workflow_ref for a reusable workflow, then compare that entire subject using the AWS sub condition and audience.",
+        "contentHash": "62d09f63ba42ca4a247cf9b59d2c87972a35d5dd3efe1535b33d7462e822746c"
+      },
+      "context": [],
+      "candidateId": "b6406162359f723044a18366b2fb267fc93b718ed5bfb449bcbf7f24a4dbe4fd",
+      "contextHash": "4a353daec2f46fcc8a497496cee763e63fcbb0eb416d7281134602b66dab7075",
+      "judgment": {
+        "choice": "supports",
+        "confidence": 0.92,
+        "probabilities": {
+          "supports": 0.94,
+          "contradicts": 0.04,
+          "unrelated": 0,
+          "insufficient_context": 0.02
+        }
+      }
+    },
+    {
+      "id": "wrong-oidc",
+      "mode": "semantic",
+      "topic": "AWS supported condition keys",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "wrong-oidc",
+        "path": ".jev-lint/freshness-fixtures/wrong-oidc.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nAdd the direct AWS job_workflow_ref condition key alongside a wildcard sub to restrict a normal workflow.",
+        "contentHash": "5b5325d69043c2aa73550be8eab491bf454f308b9154482009cd3a4357d7c10a"
+      },
+      "context": [],
+      "candidateId": "7caa28fe7090d647db3d6b7be6658e6c1a9a0d2d409fe1003fbac4565ad4ec77",
+      "contextHash": "0d8085aee954ca96a162d81e966b08ddeeaf633a3456c7cc2cb8cf02b9a62a81",
+      "judgment": {
+        "choice": "contradicts",
+        "confidence": 1,
+        "probabilities": {
+          "supports": 0,
+          "contradicts": 1,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "supported-older-action",
+      "mode": "semantic",
+      "topic": "Action runtime and version scope",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "supported-older-action",
+        "path": ".jev-lint/freshness-fixtures/supported-older-action.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nKeep the pinned supported v6 Action with its node24 runtime. v7 is a newer release; no claim is made that v6 is the latest.",
+        "contentHash": "ebb5fa0cda9169e3fb975c3a71d305813719ec81bac7c7edee4a4e8ea6ba7bd2"
+      },
+      "context": [],
+      "candidateId": "0e745c8cc378633b1265de30f62ae6c9a009586d46b0db74b10ef545766b874a",
+      "contextHash": "58a114184ca6bd038903a83d5b67418860eee9d0dbc8b907de17927e12c49423",
+      "judgment": {
+        "choice": "supports",
+        "confidence": 0.97,
+        "probabilities": {
+          "supports": 0.98,
+          "contradicts": 0.01,
+          "unrelated": 0,
+          "insufficient_context": 0.01
+        }
+      }
+    },
+    {
+      "id": "quoted-old-sdk",
+      "mode": "semantic",
+      "topic": "Current SDK initialization and corrected historical examples",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "quoted-old-sdk",
+        "path": ".jev-lint/freshness-fixtures/quoted-old-sdk.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nIncorrect SDK 3 example: new Resource with spanProcessor. Replace it with resourceFromAttributes and spanProcessors.",
+        "contentHash": "6b87f67500d8ea4b1270b9553bdf19d1f9fd43d8736480e85afd74cc1dc34c00"
+      },
+      "context": [],
+      "candidateId": "2d10810d9d28524e624c29b7dc181065c0038ec75cdfdb47ffadcc8c765b5e30",
+      "contextHash": "eac34dac5d3a111d1d4f7542423baa193bba0e704769c47902cd10502c7ebaa2",
+      "judgment": {
+        "choice": "supports",
+        "confidence": 0.89,
+        "probabilities": {
+          "supports": 0.92,
+          "contradicts": 0.08,
+          "unrelated": 0,
+          "insufficient_context": 0
+        }
+      }
+    },
+    {
+      "id": "missing-context",
+      "mode": "semantic",
+      "topic": "Promise-cache invalidation semantics",
+      "reference": {
+        "source": "facts",
+        "path": ".jev-lint/freshness-fixtures/facts.md",
+        "startLine": 1,
+        "endLine": 8,
+        "quote": "# Current published contracts\n\nThe current package @example/new-cli 2.0 provides the binary new-cli. The legacy @example/old-cli 1.0 provides only old-cli.\nSDK 3 uses resourceFromAttributes and the spanProcessors array. SDK 1 used new Resource and spanProcessor.\nThe current pnpm report has advisories and metadata.vulnerabilities counts. It has no top-level vulnerabilities member.\nAWS trust can compare aud and sub. A custom job_workflow_ref claim is not a direct AWS condition key. It can be embedded in a customized sub for a reusable workflow.\nAction v7 uses node24. The supported v6 also uses node24. Current project Node is 24 or newer.\nThe next-cli has no published promise-cache API documentation in this reference.",
+        "contentHash": "0342320ccc155acc27821e4ebd0315f6615d332a07b525b77d59cd6518aa93ed"
+      },
+      "target": {
+        "source": "missing-context",
+        "path": ".jev-lint/freshness-fixtures/missing-context.md",
+        "startLine": 1,
+        "endLine": 3,
+        "quote": "# Recipe\n\nThe next-cli promise cache evicts rejected promises immediately.",
+        "contentHash": "abe4b99274309ff9c74d35a4c5571b389d8b2bf12a26d74ebe87e05c66c9c22f"
+      },
+      "context": [],
+      "candidateId": "02ca2324d9708e3f32afa8937b2b688054affd2a16ed78ebf85a44f0a0c314fd",
+      "contextHash": "1df6ade67dbb1689e1d20cde624de031c9ae92d585040fa03bfb7c7dba64bd31",
+      "judgment": {
+        "choice": "insufficient_context",
+        "confidence": 0.63,
+        "probabilities": {
+          "supports": 0.04,
+          "contradicts": 0.01,
+          "unrelated": 0.23,
+          "insufficient_context": 0.72
+        }
+      }
+    }
+  ],
+  "coverage": {
+    "expected": 10,
+    "selected": 10,
+    "answered": 10,
+    "missing": 0,
+    "contradictions": 4,
+    "unassessed": 1,
+    "deferred": 0,
+    "issues": 0,
+    "unboundDocuments": 0
+  },
+  "usage": {
+    "requests": 10,
+    "inputTokens": 11119,
+    "usd": 0.00046699800000000004
+  },
+  "errors": []
+}

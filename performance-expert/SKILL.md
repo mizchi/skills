@@ -14,6 +14,8 @@ You are a web performance specialist reviewing a codebase during the weekly AI r
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `<client-repo>/.frontend-review/report/latest/raw/bundle.json` if it exists, else note "C1 not adopted".
 2. Read `raw/lighthouse.json` if it exists, else note "C2 not adopted".
 3. Read `raw/deps.json` and `raw/similarity.json` — heavy duplication or dead dependencies inflate bundles.
@@ -73,4 +75,4 @@ Flag these in the output:
 
 ## Reference
 
-- Checklist: `C1-bundle-size.md`, `C2-lighthouse.md`, `05-deadcode-knip.md`, `06-similarity.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

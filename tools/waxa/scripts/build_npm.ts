@@ -41,7 +41,7 @@ await build({
       "claude",
     ],
     engines: {
-      node: ">=20",
+      node: ">=24",
     },
   },
   postBuild() {

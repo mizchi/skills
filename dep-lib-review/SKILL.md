@@ -21,12 +21,8 @@ Run in parallel:
 # Outdated packages (name, current, wanted, latest)
 pnpm outdated 2>/dev/null || true
 
-# Security vulnerabilities (runtime + dev)
-pnpm audit --json 2>/dev/null | jq '
-  .vulnerabilities | to_entries[] |
-  { name: .key, severity: .value.severity,
-    isDirect: .value.isDirect,
-    via: [.value.via[] | select(type=="object") | .title] }'
+# Security vulnerabilities (runtime + dev); use this skill's absolute path
+node <skill-dir>/scripts/audit-report.mjs --repo "$PWD"
 
 # Check if Renovate / Dependabot is configured
 ls .github/renovate.json renovate.json .github/dependabot.yml 2>/dev/null || echo "no bot configured"
@@ -42,28 +38,39 @@ Do not use CVSS score alone. Apply attack-vector weight:
 
 | CVE type | devDep only | browser SPA | SSR / Edge |
 |---|---|---|---|
-| RCE | ignore | ignore | **P0** |
-| XSS via library | ignore | **P0** | **P0** |
-| Prototype Pollution | ignore | **P1** (check input path) | **P0** |
-| ReDoS | ignore | **P1** (check user input reach) | **P0** |
+| RCE | Review CI/build/dev-server reachability | Review affected execution path | **P0** if reachable |
+| XSS via library | Review generated output/dev-server reachability | **P0** if reachable | **P0** if reachable |
+| Prototype Pollution | Review build/input path | **P1** (check input path) | **P0** if reachable |
+| ReDoS | Review CI/dev-server input path | **P1** (check user input reach) | **P0** if reachable |
 | Supply chain (postinstall) | **P0** | **P0** | **P0** |
-| Path Traversal / SSRF | ignore | ignore | **P0** |
+| Path Traversal / SSRF | Review CI/dev-server input and credentials | Review affected execution path | **P0** if reachable |
+
+The checked pnpm 10.28.2 `pnpm audit --json` report stores advisories in
+`advisories` and severity counts in `metadata.vulnerabilities`, rather than a
+top-level npm-style `vulnerabilities` map. Check the actual installed version's
+schema when upgrading.
+
+The bundled [audit normalizer](scripts/audit-report.mjs) accepts pnpm's
+`advisories` schema and npm-style `vulnerabilities`, requiring complete numeric
+counts. It keeps findings from audit exit 1; unknown JSON, registry errors and
+failed commands exit 3 rather than becoming an empty result. Use Node 24+.
 
 ```bash
-# Exclude devDeps to focus on runtime CVEs
-# Fallback to plain text if jq parsing fails (pnpm JSON schema varies by version)
-pnpm audit --prod --json 2>/dev/null | jq -r '
-  .vulnerabilities | to_entries[] |
-  .value.via[] | select(type=="object") |
-  "\(.severity)\t\(.name)\t\(.title)"' 2>/dev/null | sort -k1 \
-  || pnpm audit --prod 2>/dev/null
+node <skill-dir>/scripts/audit-report.mjs --repo "$PWD" --prod
+# Or inspect an already captured report without requesting the registry again:
+node <skill-dir>/scripts/audit-report.mjs --input audit.json
 ```
+
+Exit 0 means a completed audit with zero reported vulnerabilities, 1 means
+reported vulnerabilities, and 3 means the check could not complete. Inspect the
+normalized `advisories` and `counts`; `--prod` is a runtime view, not permission
+to ignore vulnerabilities in CI, build tools or development servers.
 
 ### Version updates — batch strategy
 
 | Update type | Strategy |
 |---|---|
-| **Patch** (1.2.3 → 1.2.4) | Batch all in one PR. No changelog read needed. |
+| **Patch** (1.2.3 → 1.2.4) | Batch compatible updates; inspect release/security notes and validate. |
 | **Minor** (1.2.x → 1.3.x) | Check changelog for deprecations. Batch non-breaking ones. |
 | **Major** (1.x → 2.x) | One PR per package. Read migration guide. Never batch with other changes. |
 
@@ -87,7 +94,7 @@ pnpm outdated --json 2>/dev/null | jq -r '
 
 ### Trend watch (manual check)
 
-Flag any package that matches:
+Treat these as investigation candidates, not evidence of deprecation. Confirm upstream support, required behavior and migration cost before recommending a replacement:
 - `jest` → migrate to vitest
 - `axios` → migrate to `fetch` / `ky`
 - `moment` → migrate to `Temporal` / `date-fns` / native `Date`
@@ -95,7 +102,7 @@ Flag any package that matches:
 - `webpack` → migrate to Vite
 - `mocha`/`chai` → migrate to vitest
 - CJS-only packages in an ESM project (check `exports` field in their `package.json`)
-- `@types/<pkg>` marked deprecated → the base package likely ships its own types now. Verify: `cat node_modules/<pkg>/package.json | jq '.types, .typings'`. If non-null, remove the `@types/<pkg>` devDep — zero migration cost.
+- `@types/<pkg>` marked deprecated → the base package likely ships its own types now. Verify: `cat node_modules/<pkg>/package.json | jq '.types, .typings'`. If non-null, remove the `@types/<pkg>` devDep and typecheck the consumer before removing the redundant package.
 
 ## Step 3 — Execute updates
 
@@ -144,9 +151,9 @@ If `pnpm install` fails after editing `package.json`:
 | Error | Cause | Fix |
 |---|---|---|
 | `ERR_PNPM_MISSING_TIME` | Stale metadata in pnpm store | `pnpm store prune` then retry |
-| `ERR_PNPM_NO_MATCHING_VERSION` for a package that exists on the registry | Stale lockfile entries conflict with new transitive deps | Delete `pnpm-lock.yaml`, then `pnpm install` for a fresh resolution |
+| `ERR_PNPM_NO_MATCHING_VERSION` for a package that exists on the registry | Stale lockfile entries conflict with new transitive deps | Check the configured registry, release version, overrides and package constraints; preserve the lockfile while diagnosing |
 
-After deleting the lockfile, commit the new lockfile alongside the `package.json` change in the same PR.
+Commit intentional dependency and lockfile changes together after validation. Do not delete a lockfile as a routine metadata troubleshooting step.
 
 ## Step 4 — Validation checklist
 

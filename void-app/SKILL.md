@@ -5,7 +5,14 @@ description: "Build full-stack apps with Void (the void npm package from VoidZer
 
 # Void app cheat sheet
 
-Tested on 2026-10-18 with **Void / @void/react 1.1.11, Vite+ 1.3.0, Node 24.21.0+, pnpm 12.14.0**. These are a working baseline, not evergreen version requirements. For another version, check its `engines`, CLI help, peer dependencies, and bundled docs before copying a workaround.
+Current check (2026-11-16): **Void / @void/react 1.9.1, Vite+ 1.6.0,
+Node 24.22.2, pnpm 10.28.2**. The Void runtime requires Node `^24.22.0 || >=26.12.0`.
+A fresh React/SQLite app passed local migration, Playwright create/reset,
+reload persistence, failed-input retention and redirect checks. See the
+[validation record](references/current-validation.md) for scope.
+The earlier 2026-10-18 baseline used Void 1.1.11 / Vite+ 1.3.0; version-specific
+workarounds below are historical where the current API supersedes them.
+Check installed `engines`, help, peer dependencies and bundled docs when upgrading.
 
 Japanese counterpart: [SKILL-ja.md](SKILL-ja.md).
 
@@ -127,14 +134,10 @@ export const actions = {
 ```tsx
 // pages/index.tsx
 import { Form, useForm } from '@void/react';
-import { useEffect } from 'react';
 import type { Props } from './index.server';
 
 export default function Home({ notes }: Props) {
-  const form = useForm('/?create', { body: '' });
-  useEffect(() => {
-    if (form.wasSuccessful) form.setData('body', '');
-  }, [form.wasSuccessful]);
+  const form = useForm('/?create', { body: '' }, { resetOnSuccess: true });
 
   return <main>
     <ul>{notes.map((note) => <li key={note.id}>{note.body}</li>)}</ul>
@@ -150,19 +153,24 @@ export default function Home({ notes }: Props) {
 - `loader` runs on GET and returns typed component props. An action returning nothing refreshes the loader.
 - Export singular `action` for one mutation or plural `actions` for named mutations; do not mix them. A named action URL ends in `?create`, `?update`, etc.
 - Use `Form` + `useForm` for form state/errors; use `action()` for buttons. Check `result.ok` and handle thrown failures.
-- **After a successful submit, `reset()` restores the submitted values**, because they became the new initial values. Clear a create form with `setData`; keep input intact on failure.
+- In 1.9.1, `reset()` restores current defaults (normally the last successful submit). Use `{ resetOnSuccess: true }` in the third `useForm` argument for a create form, or `form.reset({ initial: true })` to restore mount-time values manually. Failed validation retains input. The old `setData` effect is only a fallback for versions without these options.
 - Use `Link` from `@void/react` for page navigation. For dynamic forms: `useForm('/notes/:id?update', data, { params: { id } })`.
 - Validate IDs as positive safe integers before querying. Return 404 for malformed or missing records.
 - Set `head.htmlAttrs.lang` and viewport defaults in `void.config.ts`; use `defineHead<Props>` in `.server.ts` for titles.
 
-**Void 1.1.11 redirect pitfall:** a path-absolute `c.redirect('/')` inherits the request query. After a named delete action this produced `/?delete`. When the destination should have a clean query, return a same-origin absolute URL:
+### Current redirect behavior
 
-```ts
-// After a successful deletion in pages/notes/[id].server.ts:
-return c.redirect(new URL('/', c.req.url).href, 303);
-```
+In 1.9.1, `c.redirect('/')` does not copy the current page query by default.
+A named action retains its own ordinary query parameters, removing the action
+key when the redirect changes the method to GET. The local check confirmed
+`POST /?clean&tab=profile` → `303 /?tab=profile` and an ordinary GET redirect
+from `/api/redirect?obsolete=1` → `/`. Method-preserving 307/308 redirects
+retain the action key; test the intended method and final URL.
 
-Check the final URL in E2E; do not just assert that the old card disappeared. Recheck this behavior before carrying the workaround to a later release.
+The old 1.1.11 behavior could leave `?delete` after `c.redirect('/')`.
+Its same-origin absolute-URL workaround is historical; do not copy it into
+current code as a required fix. Read the installed `reference/api/rewrites.md`
+and assert the final URL in E2E when upgrading.
 
 ## Typed API routes
 

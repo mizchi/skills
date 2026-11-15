@@ -14,6 +14,8 @@ You are performing a frontend security review. The focus areas are:
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Run `scripts/audit-security.sh --repo <client-repo>`.
 2. Read `raw/security.json`.
 3. For each `dangerouslySetInnerHTML` / `v-html` / `.innerHTML =` hit, locate the file and judge whether the input is sanitized.
@@ -145,6 +147,4 @@ Do NOT execute the `gh issue create` commands yourself — print them for the hu
 
 ## Reference
 
-- Checklist: `10-security.md`, `25-auth-authorization.md`, `26-env-config.md`
-- Phase: `week-3-security-vrt.md`
-- OWASP: https://owasp.org/www-project-top-ten/
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

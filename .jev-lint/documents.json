@@ -1,0 +1,681 @@
+{
+  "schema": "jev-lint-documents-manifest-1",
+  "roots": [
+    "apm-usage/SKILL.md",
+    "apm-usage/SKILL-ja.md",
+    "ast-grep-practice/SKILL.md",
+    "ast-grep-practice/SKILL-ja.md",
+    "chezmoi-management/SKILL.md",
+    "chezmoi-management/SKILL-ja.md",
+    "conventional-changelog/SKILL.md",
+    "conventional-changelog/SKILL-ja.md",
+    "dotenvx/SKILL.md",
+    "dotenvx/SKILL-ja.md",
+    "empirical-prompt-tuning/SKILL.md",
+    "empirical-prompt-tuning/SKILL-ja.md",
+    "formal-methods-drift-guard/SKILL.md",
+    "formal-methods-drift-guard/SKILL-ja.md",
+    "formal-methods-reconciler/SKILL.md",
+    "formal-methods-reconciler/SKILL-ja.md",
+    "gleam-practice/SKILL.md",
+    "gleam-practice/SKILL-ja.md",
+    "multi-agent-orchestration/SKILL.md",
+    "multi-agent-orchestration/SKILL-ja.md",
+    "nix-setup/SKILL.md",
+    "nix-setup/SKILL-ja.md",
+    "playwright-test/SKILL.md",
+    "playwright-test/SKILL-ja.md",
+    "retrospective-codify/SKILL.md",
+    "retrospective-codify/SKILL-ja.md",
+    "tech-article-reproducibility/SKILL.md",
+    "tech-article-reproducibility/SKILL-ja.md",
+    "translate-programming-language/SKILL.md",
+    "translate-programming-language/SKILL-ja.md",
+    "void-app/SKILL.md",
+    "void-app/SKILL-ja.md"
+  ],
+  "files": {
+    "apm-usage-en": {
+      "path": "apm-usage/SKILL.md",
+      "role": "reference"
+    },
+    "apm-usage-ja": {
+      "path": "apm-usage/SKILL-ja.md",
+      "role": "document"
+    },
+    "ast-grep-practice-en": {
+      "path": "ast-grep-practice/SKILL.md",
+      "role": "reference"
+    },
+    "ast-grep-practice-ja": {
+      "path": "ast-grep-practice/SKILL-ja.md",
+      "role": "document"
+    },
+    "chezmoi-management-en": {
+      "path": "chezmoi-management/SKILL.md",
+      "role": "reference"
+    },
+    "chezmoi-management-ja": {
+      "path": "chezmoi-management/SKILL-ja.md",
+      "role": "document"
+    },
+    "conventional-changelog-en": {
+      "path": "conventional-changelog/SKILL.md",
+      "role": "reference"
+    },
+    "conventional-changelog-ja": {
+      "path": "conventional-changelog/SKILL-ja.md",
+      "role": "document"
+    },
+    "dotenvx-en": {
+      "path": "dotenvx/SKILL.md",
+      "role": "reference"
+    },
+    "dotenvx-ja": {
+      "path": "dotenvx/SKILL-ja.md",
+      "role": "document"
+    },
+    "empirical-prompt-tuning-en": {
+      "path": "empirical-prompt-tuning/SKILL.md",
+      "role": "reference"
+    },
+    "empirical-prompt-tuning-ja": {
+      "path": "empirical-prompt-tuning/SKILL-ja.md",
+      "role": "document"
+    },
+    "formal-methods-drift-guard-en": {
+      "path": "formal-methods-drift-guard/SKILL.md",
+      "role": "reference"
+    },
+    "formal-methods-drift-guard-ja": {
+      "path": "formal-methods-drift-guard/SKILL-ja.md",
+      "role": "document"
+    },
+    "formal-methods-reconciler-en": {
+      "path": "formal-methods-reconciler/SKILL.md",
+      "role": "reference"
+    },
+    "formal-methods-reconciler-ja": {
+      "path": "formal-methods-reconciler/SKILL-ja.md",
+      "role": "document"
+    },
+    "gleam-practice-en": {
+      "path": "gleam-practice/SKILL.md",
+      "role": "reference"
+    },
+    "gleam-practice-ja": {
+      "path": "gleam-practice/SKILL-ja.md",
+      "role": "document"
+    },
+    "multi-agent-orchestration-en": {
+      "path": "multi-agent-orchestration/SKILL.md",
+      "role": "reference"
+    },
+    "multi-agent-orchestration-ja": {
+      "path": "multi-agent-orchestration/SKILL-ja.md",
+      "role": "document"
+    },
+    "nix-setup-en": {
+      "path": "nix-setup/SKILL.md",
+      "role": "reference"
+    },
+    "nix-setup-ja": {
+      "path": "nix-setup/SKILL-ja.md",
+      "role": "document"
+    },
+    "playwright-test-en": {
+      "path": "playwright-test/SKILL.md",
+      "role": "reference"
+    },
+    "playwright-test-ja": {
+      "path": "playwright-test/SKILL-ja.md",
+      "role": "document"
+    },
+    "retrospective-codify-en": {
+      "path": "retrospective-codify/SKILL.md",
+      "role": "reference"
+    },
+    "retrospective-codify-ja": {
+      "path": "retrospective-codify/SKILL-ja.md",
+      "role": "document"
+    },
+    "tech-article-reproducibility-en": {
+      "path": "tech-article-reproducibility/SKILL.md",
+      "role": "reference"
+    },
+    "tech-article-reproducibility-ja": {
+      "path": "tech-article-reproducibility/SKILL-ja.md",
+      "role": "document"
+    },
+    "translate-programming-language-en": {
+      "path": "translate-programming-language/SKILL.md",
+      "role": "reference"
+    },
+    "translate-programming-language-ja": {
+      "path": "translate-programming-language/SKILL-ja.md",
+      "role": "document"
+    },
+    "void-app-en": {
+      "path": "void-app/SKILL.md",
+      "role": "reference"
+    },
+    "void-app-ja": {
+      "path": "void-app/SKILL-ja.md",
+      "role": "document"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "apm-usage",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "apm-usage-en"
+      },
+      "target": {
+        "source": "apm-usage-ja"
+      }
+    },
+    {
+      "id": "apm-usage-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "apm-usage-en",
+        "contains": "name: apm-usage"
+      },
+      "target": {
+        "source": "apm-usage-ja",
+        "contains": "name: apm-usage"
+      },
+      "context": [
+        {
+          "source": "apm-usage-en"
+        },
+        {
+          "source": "apm-usage-ja"
+        }
+      ]
+    },
+    {
+      "id": "ast-grep-practice",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "ast-grep-practice-en"
+      },
+      "target": {
+        "source": "ast-grep-practice-ja"
+      }
+    },
+    {
+      "id": "ast-grep-practice-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "ast-grep-practice-en",
+        "contains": "name: ast-grep-practice"
+      },
+      "target": {
+        "source": "ast-grep-practice-ja",
+        "contains": "name: ast-grep-practice"
+      },
+      "context": [
+        {
+          "source": "ast-grep-practice-en"
+        },
+        {
+          "source": "ast-grep-practice-ja"
+        }
+      ]
+    },
+    {
+      "id": "chezmoi-management",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "chezmoi-management-en"
+      },
+      "target": {
+        "source": "chezmoi-management-ja"
+      }
+    },
+    {
+      "id": "chezmoi-management-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "chezmoi-management-en",
+        "contains": "name: chezmoi-management"
+      },
+      "target": {
+        "source": "chezmoi-management-ja",
+        "contains": "name: chezmoi-management"
+      },
+      "context": [
+        {
+          "source": "chezmoi-management-en"
+        },
+        {
+          "source": "chezmoi-management-ja"
+        }
+      ]
+    },
+    {
+      "id": "conventional-changelog",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "conventional-changelog-en"
+      },
+      "target": {
+        "source": "conventional-changelog-ja"
+      }
+    },
+    {
+      "id": "conventional-changelog-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "conventional-changelog-en",
+        "contains": "name: conventional-changelog"
+      },
+      "target": {
+        "source": "conventional-changelog-ja",
+        "contains": "name: conventional-changelog"
+      },
+      "context": [
+        {
+          "source": "conventional-changelog-en"
+        },
+        {
+          "source": "conventional-changelog-ja"
+        }
+      ]
+    },
+    {
+      "id": "dotenvx",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "dotenvx-en"
+      },
+      "target": {
+        "source": "dotenvx-ja"
+      }
+    },
+    {
+      "id": "dotenvx-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "dotenvx-en",
+        "contains": "name: dotenvx"
+      },
+      "target": {
+        "source": "dotenvx-ja",
+        "contains": "name: dotenvx"
+      },
+      "context": [
+        {
+          "source": "dotenvx-en"
+        },
+        {
+          "source": "dotenvx-ja"
+        }
+      ]
+    },
+    {
+      "id": "empirical-prompt-tuning",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "empirical-prompt-tuning-en"
+      },
+      "target": {
+        "source": "empirical-prompt-tuning-ja"
+      }
+    },
+    {
+      "id": "empirical-prompt-tuning-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "empirical-prompt-tuning-en",
+        "contains": "name: empirical-prompt-tuning"
+      },
+      "target": {
+        "source": "empirical-prompt-tuning-ja",
+        "contains": "name: empirical-prompt-tuning"
+      },
+      "context": [
+        {
+          "source": "empirical-prompt-tuning-en"
+        },
+        {
+          "source": "empirical-prompt-tuning-ja"
+        }
+      ]
+    },
+    {
+      "id": "formal-methods-drift-guard",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "formal-methods-drift-guard-en"
+      },
+      "target": {
+        "source": "formal-methods-drift-guard-ja"
+      }
+    },
+    {
+      "id": "formal-methods-drift-guard-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "formal-methods-drift-guard-en",
+        "contains": "name: formal-methods-drift-guard"
+      },
+      "target": {
+        "source": "formal-methods-drift-guard-ja",
+        "contains": "name: formal-methods-drift-guard"
+      },
+      "context": [
+        {
+          "source": "formal-methods-drift-guard-en"
+        },
+        {
+          "source": "formal-methods-drift-guard-ja"
+        }
+      ]
+    },
+    {
+      "id": "formal-methods-reconciler",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "formal-methods-reconciler-en"
+      },
+      "target": {
+        "source": "formal-methods-reconciler-ja"
+      }
+    },
+    {
+      "id": "formal-methods-reconciler-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "formal-methods-reconciler-en",
+        "contains": "name: formal-methods-reconciler"
+      },
+      "target": {
+        "source": "formal-methods-reconciler-ja",
+        "contains": "name: formal-methods-reconciler"
+      },
+      "context": [
+        {
+          "source": "formal-methods-reconciler-en"
+        },
+        {
+          "source": "formal-methods-reconciler-ja"
+        }
+      ]
+    },
+    {
+      "id": "gleam-practice",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "gleam-practice-en"
+      },
+      "target": {
+        "source": "gleam-practice-ja"
+      }
+    },
+    {
+      "id": "gleam-practice-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "gleam-practice-en",
+        "contains": "name: gleam-practice"
+      },
+      "target": {
+        "source": "gleam-practice-ja",
+        "contains": "name: gleam-practice"
+      },
+      "context": [
+        {
+          "source": "gleam-practice-en"
+        },
+        {
+          "source": "gleam-practice-ja"
+        }
+      ]
+    },
+    {
+      "id": "multi-agent-orchestration",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "multi-agent-orchestration-en"
+      },
+      "target": {
+        "source": "multi-agent-orchestration-ja"
+      }
+    },
+    {
+      "id": "multi-agent-orchestration-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "multi-agent-orchestration-en",
+        "contains": "name: multi-agent-orchestration"
+      },
+      "target": {
+        "source": "multi-agent-orchestration-ja",
+        "contains": "name: multi-agent-orchestration"
+      },
+      "context": [
+        {
+          "source": "multi-agent-orchestration-en"
+        },
+        {
+          "source": "multi-agent-orchestration-ja"
+        }
+      ]
+    },
+    {
+      "id": "nix-setup",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "nix-setup-en"
+      },
+      "target": {
+        "source": "nix-setup-ja"
+      }
+    },
+    {
+      "id": "nix-setup-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "nix-setup-en",
+        "contains": "name: nix-setup"
+      },
+      "target": {
+        "source": "nix-setup-ja",
+        "contains": "name: nix-setup"
+      },
+      "context": [
+        {
+          "source": "nix-setup-en"
+        },
+        {
+          "source": "nix-setup-ja"
+        }
+      ]
+    },
+    {
+      "id": "playwright-test",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "playwright-test-en"
+      },
+      "target": {
+        "source": "playwright-test-ja"
+      }
+    },
+    {
+      "id": "playwright-test-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "playwright-test-en",
+        "contains": "name: playwright-test"
+      },
+      "target": {
+        "source": "playwright-test-ja",
+        "contains": "name: playwright-test"
+      },
+      "context": [
+        {
+          "source": "playwright-test-en"
+        },
+        {
+          "source": "playwright-test-ja"
+        }
+      ]
+    },
+    {
+      "id": "retrospective-codify",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "retrospective-codify-en"
+      },
+      "target": {
+        "source": "retrospective-codify-ja"
+      }
+    },
+    {
+      "id": "retrospective-codify-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "retrospective-codify-en",
+        "contains": "name: retrospective-codify"
+      },
+      "target": {
+        "source": "retrospective-codify-ja",
+        "contains": "name: retrospective-codify"
+      },
+      "context": [
+        {
+          "source": "retrospective-codify-en"
+        },
+        {
+          "source": "retrospective-codify-ja"
+        }
+      ]
+    },
+    {
+      "id": "tech-article-reproducibility",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "tech-article-reproducibility-en"
+      },
+      "target": {
+        "source": "tech-article-reproducibility-ja"
+      }
+    },
+    {
+      "id": "tech-article-reproducibility-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "tech-article-reproducibility-en",
+        "contains": "name: tech-article-reproducibility"
+      },
+      "target": {
+        "source": "tech-article-reproducibility-ja",
+        "contains": "name: tech-article-reproducibility"
+      },
+      "context": [
+        {
+          "source": "tech-article-reproducibility-en"
+        },
+        {
+          "source": "tech-article-reproducibility-ja"
+        }
+      ]
+    },
+    {
+      "id": "translate-programming-language",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "translate-programming-language-en"
+      },
+      "target": {
+        "source": "translate-programming-language-ja"
+      }
+    },
+    {
+      "id": "translate-programming-language-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "translate-programming-language-en",
+        "contains": "name: translate-programming-language"
+      },
+      "target": {
+        "source": "translate-programming-language-ja",
+        "contains": "name: translate-programming-language"
+      },
+      "context": [
+        {
+          "source": "translate-programming-language-en"
+        },
+        {
+          "source": "translate-programming-language-ja"
+        }
+      ]
+    },
+    {
+      "id": "void-app",
+      "topic": "Skill workflow, authorization requirements, and declared tool behavior",
+      "mode": "translation",
+      "reference": {
+        "source": "void-app-en"
+      },
+      "target": {
+        "source": "void-app-ja"
+      }
+    },
+    {
+      "id": "void-app-activation",
+      "topic": "Advertised capabilities and activation conditions, including explicit-only versus automatic invocation",
+      "mode": "translation",
+      "reference": {
+        "source": "void-app-en",
+        "contains": "name: void-app"
+      },
+      "target": {
+        "source": "void-app-ja",
+        "contains": "name: void-app"
+      },
+      "context": [
+        {
+          "source": "void-app-en"
+        },
+        {
+          "source": "void-app-ja"
+        }
+      ]
+    }
+  ]
+}

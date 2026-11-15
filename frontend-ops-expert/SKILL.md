@@ -15,6 +15,8 @@ You are a frontend platform / ops specialist reviewing a codebase during the wee
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `<client-repo>/.frontend-review/report/latest/raw/ci.json`, `deps.json`, `triage.json`.
 2. Check `.github/workflows/` for scheduled workflows. Are they passing?
 3. `gh pr list --state open --author dependabot --limit 50` — how many open, how old?
@@ -39,5 +41,4 @@ Keep under 200 lines.
 
 ## Reference
 
-- Checklist: `02-dependencies.md`, `09-ci-optimization.md`, `13-kpi-tracking.md`, `14-release-process.md`, `15-vrt.md`
-- Phase: `ongoing.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

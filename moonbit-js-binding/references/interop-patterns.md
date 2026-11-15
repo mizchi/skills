@@ -40,7 +40,7 @@ pub extern "js" fn JsValue::set(self : JsValue, key : String, value : JsValue) -
 pub extern "js" fn JsValue::call_method(
   self : JsValue,
   name : String,
-  args : Array[JsValue],
+  args : FixedArray[JsValue],
 ) -> JsValue =
   #| (obj, name, args) => obj[name](...args)
 ```
@@ -94,7 +94,7 @@ extern "js" fn path_basename(p : String) -> String = "basename"
 
 ///|
 #module("simple-statistics")
-extern "js" fn std_dev(xs : Array[Double]) -> Double = "standardDeviation"
+extern "js" fn std_dev(xs : FixedArray[Double]) -> Double = "standardDeviation"
 ```
 
 The compiler emits a real `import { basename as ... } from "node:path"` (ESM) or destructured `require(...)` (CJS) depending on `link.js.format`. Bundlers can statically trace and tree-shake. Works uniformly for Node built-ins (`"node:path"`, `"node:fs"`, ...), npm packages (`"lodash"`), and relative JS files (`"./helpers.js"`).
@@ -162,7 +162,7 @@ Pass `make_counter()` directly to any `() -> Int` parameter.
 |---|---|---|
 | `String` | `string` | no |
 | `Bytes`, `FixedArray[Byte]` | `Uint8Array` | no |
-| `Array[T]` | `Array<T>` | no |
+| `FixedArray[T]` | `Array<T>` | no (byte arrays use `Uint8Array`) |
 
 Zero-copy across the boundary — passing a `Bytes` to a JS function does not allocate.
 
@@ -174,7 +174,7 @@ Numeric arrays (`FixedArray[Double]`) may migrate to `Float64Array` / `Int32Arra
 
 ```moonbit nocheck
 ///|
-pub extern "js" fn js_new(cls : JsValue, args : Array[JsValue]) -> JsValue =
+pub extern "js" fn js_new(cls : JsValue, args : FixedArray[JsValue]) -> JsValue =
   #| (cls, args) => new cls(...args)
 
 let regex = js_new(

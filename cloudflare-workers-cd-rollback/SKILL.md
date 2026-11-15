@@ -28,11 +28,11 @@ The project must have `cloudflare.config.ts` before CI. Migrate an existing Wran
 
 Configure:
 
-- DevDependencies: `cf`, `@cloudflare/vite-plugin@beta`, Vite, TypeScript and `@dotenvx/dotenvx`.
+- DevDependencies: `cf`, `@cloudflare/vite-plugin@beta`, Vite and TypeScript. An environment loader is not required.
 - `build:core` package script: `moon build --target js --release && node scripts/prepare-worker.ts`. For a TypeScript-only project remove the MoonBit install/build steps and use cf build directly.
 - `smoke` package script: `node scripts/smoke.ts`, with project-specific paths/status expectations.
 - GitHub variables `D1_DATABASE_ID_PRODUCTION`, `D1_DATABASE_ID_STAGING`, `WORKERS_SUBDOMAIN`; optional `WORKER_NAME_PRODUCTION` and `WORKER_NAME_STAGING` default to `cf-mbt-app` and `cf-mbt-app-staging`. Match those names and IDs to the corresponding config modes.
-- The encrypted `.env.cloudflare` with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; GitHub secret `DOTENV_PRIVATE_KEY_CLOUDFLARE` decrypts it. Access smoke credentials can also come from this file.
+- GitHub secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, exposed to the cf process through environment variables. Optional Access smoke secrets are `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` and their `_STAGING` counterparts. Retain an existing secret provider when adapting the template; dotenvx is only an existing or explicitly selected option.
 
 Adapt D1 steps if the project has no D1 or several databases. cf expects IDs, remote is the default, and `--dir` selects the migration directory. Use compatible schema migrations: Worker rollback does not undo database changes.
 
@@ -46,8 +46,8 @@ An empty successful list or the specific missing-Worker error 10007 means first 
 
 On smoke failure, restore the saved allocation with `cf workers deployments create --worker <name> --strategy percentage --versions @file`. Do not add `--force` automatically to bypass a rollback blocked by secret changes. First deployments cannot restore an earlier version. Serialize deployments per target mode; avoid other deployment pipelines racing this workflow.
 
-Messages enter shell steps through environment variables. Never interpolate commit bodies or arbitrary dispatch input directly into shell source. The wrappers gate deployment on the dotenvx key and watch `cloudflare.config.ts` and `vite.config.ts`.
+Messages enter shell steps through environment variables. Never interpolate commit bodies or arbitrary dispatch input directly into shell source. The wrappers gate deployment on the Cloudflare token and account ID, and watch `cloudflare.config.ts` and `vite.config.ts`.
 
 ## Verification
 
-The [deployment-state tests](assets/scripts/deployment-state.test.ts) cover latest-first selection, gradual traffic, first deployment and malformed/API-error data. Validate YAML and run a dry run before enabling the copied workflow. Sources and limitations: [cd-traps.md](references/cd-traps.md), [cf API guide](../cloudflare-deploy/references/cf/api.md).
+The [deployment-state tests](assets/scripts/deployment-state.test.ts) cover latest-first selection, gradual traffic, first deployment and malformed/API-error data. The [workflow credential tests](assets/scripts/workflow-credentials_test.rb) execute prechecks, migration and smoke commands without dotenvx or remote calls. Validate YAML and run a dry run before enabling the copied workflow. Sources and limitations: [cd-traps.md](references/cd-traps.md), [cf API guide](../cloudflare-deploy/references/cf/api.md).

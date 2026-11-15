@@ -3,13 +3,13 @@ description: |
   Evaluation suite for nix-setup (the merged devbox + pure-flake skill).
   Tests whether the executor reads the Decision matrix correctly and
   produces a setup that matches the project signals:
-  - default to devbox for standard nixpkgs packages
-  - escalate to pure flake.nix for overlays / custom derivations / buildNpmPackage
+  - use devbox only when already adopted or explicitly selected
+  - use pure flake.nix for requested Nix overlays / custom derivations / buildNpmPackage
   Verifies that the executor cites the right Quick-start commands and
   GitHub Actions integration for the chosen path.
 
 skill: nix-setup
-version: "1.0"
+version: "1.1"
 
 config:
   trials_per_task: 2

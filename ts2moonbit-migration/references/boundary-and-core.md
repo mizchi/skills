@@ -98,7 +98,7 @@ shape_area({ kind: "tri", a: 1 });        // throws Error: unknown shape: tri
 | Numbers | the right type (`Int`, `Double`, `BigInt`) for the domain | whatever the contract's `number`/`bigint` is; convert at the edge |
 | Async | `async fn` + `.wait()` | wrap with `@core.promisify*` to return `@core.Promise[T]` |
 | Nullability | `Option`, real sum types | `is_nullish`/`nullable`/`from_option` against JS `null`/`undefined` |
-| Collections | `Array`, `Map`, views | `Array[(String, V)]` / `Any` object — never pass `Map`/trait objects out |
+| Collections | `Array`, `Map`, views | `FixedArray` of ABI-safe elements / explicit JS object — never pass `Array`, tuples, `Map`, or trait objects by identity |
 
 ## Why not "just use Any everywhere"
 

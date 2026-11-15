@@ -62,7 +62,7 @@ Definition found at file src/parse.mbt
 2 | priv struct Parser {
   |             ^^^^^^
   |   bytes : Bytes
-  |   mut pos : Int
+  |   mut pos : Int32
   | }
 ```
 
@@ -119,7 +119,7 @@ moon ide doc "*parse*"           # any symbol containing "parse"
 $ moon ide doc "@buffer.new"
 package "moonbitlang/core/buffer"
 
-pub fn new(size_hint? : Int) -> Buffer
+pub fn new(size_hint? : Int32) -> Buffer
   Creates ...
 ```
 
@@ -130,7 +130,7 @@ type plus doc comments at a specific location.
 
 ```bash
 $ moon ide hover my_func -loc src/lib.mbt:10:4
-fn my_func(x : Int) -> String
+fn my_func(x : Int32) -> String
 ---
 Documentation for my_func...
 

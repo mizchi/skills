@@ -20,6 +20,8 @@ moon build --target js --release
 
 Preparation must run before every build that will ship MoonBit changes. For local development, prepare the generated JS first, run `pnpm exec cf dev`, and regenerate it when MoonBit sources change; Vite does not invoke `moon build` automatically.
 
+For [MoonBit v0.10.19 and newer](https://www.moonbitlang.com/updates/2026/11/05/index), migrate JSON manifests with `moon fmt` and remove dependency-sync uses of `moon install`. At JS boundaries, pass `FixedArray` rather than identity-casting an internal `Array`; exercise D1 bind collections and Promise callbacks through the built Worker. Keep the existing async runtime until a deliberate migration: the new `core/async` is experimental and does not establish compatibility with these generated-symbol rewrites.
+
 MoonBit emits plain ESM JS. The TypeScript entry side-effect imports the **prepared** file, which registers `globalThis.__appServerFetch`. Importing the original `_build/` file bypasses the rewrites and can produce a Worker that hangs.
 
 Two source rewrites are required for the runtime versions this template targets:

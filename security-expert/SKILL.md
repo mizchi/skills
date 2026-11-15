@@ -15,6 +15,8 @@ You are a web security specialist reviewing a codebase during the weekly AI revi
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `<client-repo>/.frontend-review/report/latest/raw/security.json` and `deps.json`.
 2. For each high/critical CVE, judge reachability: is the affected module actually imported from client code?
 3. For each `dangerouslySetInnerHTML` hit, read the surrounding 20 lines and decide: is the input sanitized?
@@ -39,5 +41,4 @@ Keep under 200 lines.
 
 ## Reference
 
-- Checklist: `10-security.md`, `02-dependencies.md`
-- OWASP: https://owasp.org/www-project-top-ten/
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

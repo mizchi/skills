@@ -1,0 +1,66 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "example/js_binding_proj"
+
+// Values
+pub fn add(Int32, Int32) -> Int32
+
+pub fn backend_name() -> String
+
+pub fn basename(String) -> String
+
+pub fn console_log(String) -> Unit
+
+pub fn extname(String) -> String
+
+pub fn global_this() -> JsValue
+
+pub fn greet(String) -> String
+
+pub fn[A, B] identity(A) -> B
+
+pub fn is_undefined(JsValue) -> Bool
+
+pub fn[T] js_get_opt(JsValue, String) -> T?
+
+pub fn json_parse(String) -> JsValue
+
+pub fn json_stringify(JsValue) -> String
+
+pub fn math_max(Double, Double) -> Double
+
+pub fn math_sqrt(Double) -> Double
+
+pub fn new_object() -> JsValue
+
+pub fn now_ms() -> Double
+
+pub async fn resolve_later(Int32, Int32) -> Int32
+
+pub fn run_async(async () -> Unit noraise) -> Unit
+
+pub async fn sleep(Int32) -> Unit
+
+pub async fn[T, E : Error] suspend(((T) -> Unit, (E) -> Unit) -> Unit) -> T raise E
+
+pub fn typeof_(JsValue) -> String
+
+pub fn undefined() -> JsValue
+
+// Errors
+
+// Types and methods
+#external
+pub type JsValue
+pub fn JsValue::call_method(Self, String, FixedArray[Self]) -> Self
+pub fn JsValue::get(Self, String) -> Self
+pub fn JsValue::set(Self, String, Self) -> Unit
+
+#external
+pub type Promise[T]
+pub fn[T] Promise::all(Array[Self[T]]) -> Self[FixedArray[T]]
+pub fn[T] Promise::to_any(Self[T]) -> JsValue
+pub async fn[T] Promise::wait(Self[T]) -> T
+
+// Type aliases
+
+// Traits

@@ -8,7 +8,7 @@
 6. **Rollback affects Worker traffic, not storage.** Use expand/contract D1 migrations and preserve previous schema compatibility. Secret changes can block restoring an old version; surface the failure instead of forcing it.
 7. **First branch pushes may have no path diff.** Use workflow_dispatch for initial bring-up. Keep filters aligned with `cloudflare.config.ts`, `vite.config.ts` and generated-source inputs.
 8. **Keep shell source separate from inputs.** Pass messages through `env`; avoid direct interpolation of commit messages and arbitrary workflow inputs into `run` scripts.
-9. **Secrets have separate roles.** dotenvx's private key decrypts CLI credentials. Worker secrets still require bindings and deploy `--secrets-file`. A PR dry run uses dummy Worker secret values and requires no Cloudflare API credentials.
+9. **Secrets have separate roles.** CI supplies Cloudflare CLI credentials through environment variables. An existing or explicitly selected dotenvx setup can decrypt those values, but is not required. Worker secrets still require bindings and deploy `--secrets-file`. A PR dry run uses dummy Worker secret values and requires no Cloudflare API credentials.
 10. **No live cf log streaming in the checked beta.** Use Workers Logs or telemetry. Deployment lists describe traffic/version history, not request logs.
 
 Reference: [cf CI docs](https://developers.cloudflare.com/cf/ci/), [cf-example](https://github.com/mizchi/cf-example), [configuration guide](../../cloudflare-deploy/references/cf/configuration.md).

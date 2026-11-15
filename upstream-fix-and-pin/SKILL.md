@@ -106,12 +106,11 @@ The git-hosted package "<pkg>@<ver>" needs to execute build scripts but is not i
 PR が merge されたら下流の SHA を更新:
 
 ```bash
-# main の HEAD SHA を取得
-git -C ~/ghq/github.com/<owner>/<repo> fetch origin main
-git -C ~/ghq/github.com/<owner>/<repo> rev-parse origin/main
+# 対象 PR の merge commit を取得（未 merge なら null）
+gh pr view <PR-URL> --json mergeCommit --jq .mergeCommit.oid
 ```
 
-その SHA を下流の `package.json` に貼り、`pnpm install` → tests → commit。merge SHA は GitHub の PR ページにも出る (`Merged commit <sha>`)。
+返された 40 桁の commit SHA が対象 PR の merge 結果であることを確認し、下流の `package.json` に指定する。`pnpm install` → tests → commit の順で検証する。`git rev-parse origin/main` はその時点のブランチ先端であり、後続の commit を含むことがある。意図的に後続修正も取り込むなら、merge commit と区別して branch tip として記録する。
 
 ## merge が長期化したら `link:` に退避
 

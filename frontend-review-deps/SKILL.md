@@ -13,8 +13,10 @@ You are auditing the dependency health of a frontend project. This covers three 
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. In parallel, run:
-   - `scripts/audit-deps.sh --repo <client-repo>`
+   - `<skill-dir>/scripts/audit-deps.sh --repo <client-repo> --run-checks`
    - `scripts/audit-trend-watch.sh --repo <client-repo>`
 2. Read `raw/deps.json` and `raw/trend-watch.json`.
 3. For each CVE finding, apply the attack-vector triage matrix below before assigning priority.
@@ -22,16 +24,16 @@ You are auditing the dependency health of a frontend project. This covers three 
 
 ## CVE Triage — Attack Vector Matrix
 
-Do not use CVSS score alone. A CVSS 9.8 RCE in a devDependency has zero production impact for a browser-only SPA.
+Do not use CVSS score alone. A devDependency can execute in CI, build pipelines or a development server; assess those paths even when it is absent from the final browser bundle.
 
 | CVE Type | devDep only | Runtime (SPA) | Runtime (SSR/Edge) |
 |---|---|---|---|
-| RCE | ignore | **ignore** | **P0** |
-| Prototype Pollution | ignore | **P1** (check input path) | **P0** |
-| ReDoS | ignore | **P1** (check user input reach) | **P0** |
-| Path Traversal | ignore | **ignore** | **P0** |
-| XSS via library | ignore | **P0** (HTML-generating libs) | **P0** |
-| SSRF | ignore | **ignore** | **P0** |
+| RCE | Review CI/dev-server path | Review affected execution path | **P0** |
+| Prototype Pollution | Review CI/dev-server path | **P1** (check input path) | **P0** |
+| ReDoS | Review CI/dev-server path | **P1** (check user input reach) | **P0** |
+| Path Traversal | Review CI/dev-server path | **ignore** | **P0** |
+| XSS via library | Review CI/dev-server path | **P0** (HTML-generating libs) | **P0** |
+| SSRF | Review CI/dev-server path | **ignore** | **P0** |
 | Supply Chain (postinstall malware) | CI **P0** | CI **P0** | **P0** |
 
 **Triage procedure:**
@@ -42,26 +44,22 @@ Do not use CVSS score alone. A CVSS 9.8 RCE in a devDependency has zero producti
 4. For SSR / Edge Functions, treat RCE / Path Traversal / SSRF as P0.
 5. Document every ignored CVE in `kpi/audit-triage.md` with the reason.
 
-```bash
-# Runtime-only CVEs (excludes devDeps)
-pnpm audit --prod --audit-level=moderate --json | jq '
-  .vulnerabilities | to_entries[] |
-  { name: .key, severity: .value.severity,
-    via: [.value.via[] | select(type=="object") | .title] }'
+The checked pnpm 10.28.2 `pnpm audit --json` report stores advisories in
+`advisories` and severity counts in `metadata.vulnerabilities`, rather than a
+top-level npm-style `vulnerabilities` map. Check the actual installed version's
+schema when upgrading.
 
-# Prototype Pollution / ReDoS only
-pnpm audit --prod --json 2>/dev/null | jq -r '
-  .vulnerabilities | to_entries[] |
-  .value.via[] | select(type=="object") |
-  select(.title | test("prototype|pollution|redos|regex denial"; "i")) |
-  "\(.severity) \(.title) in \(.name)"' | sort -u
-```
+Use `<skill-dir>/scripts/audit-report.mjs --repo <client-repo> --prod`
+for a normalized runtime-only view. The parser validates pnpm's advisories schema
+and npm-style vulnerability reports. Audit exit 1 preserves findings; unknown
+schemas or transport errors do not become a clean result. Read `advisories` and
+`counts`, and inspect development/CI exposure separately before dismissing a CVE.
 
 ## Trend Watch — Library Tiers
 
-Cross-references `package.json` against `data/trend-watch-config.json`:
+The bundled trend collector inventories declared packages. It leaves deprecation verdicts unassessed until current upstream notices and the installed version are checked. Suggested review priorities:
 
-- **Tier 1 (migrate now)**: Deprecated / abandoned / superseded — no rational reason to continue. Includes libraries where migration cost is low and a mature alternative exists, even if not officially deprecated (`jest` → vitest, `axios` → ky/fetch, `cypress` → Playwright).
+- **Tier 1 (address now)**: A confirmed security, support or compatibility problem affecting this project. Choose an upgrade, mitigation or replacement from the actual requirements; package names alone do not imply deprecation.
 - **Tier 2 (plan migration)**: Maintenance mode / satisfaction declining / RSC-incompatible.
 - **Tier 3 (watch)**: EOL versions exist / satisfaction trending down.
 
@@ -78,14 +76,14 @@ Before recommending a new dependency as a replacement, apply this order:
 | Use case | Avoid | Use instead |
 |---|---|---|
 | Date / time | moment, date-fns, dayjs | `Temporal` (polyfill), or `Date` for simple cases |
-| Array / object utilities | lodash, ramda | `Array.prototype.{flatMap,findLast,groupBy}`, `Object.{entries,fromEntries,groupBy}`, `structuredClone()` |
+| Array / object utilities | lodash, ramda | `Array.prototype.{flatMap,findLast}`, `Object.{entries,fromEntries,groupBy}`, `structuredClone()` |
 | HTTP requests | axios, request | `fetch` + `AbortController` |
 | UUID generation | uuid, nanoid | `crypto.randomUUID()` |
 | URL / query params | qs, query-string | `URL`, `URLSearchParams` |
 | Number / date formatting | numeral.js | `Intl.NumberFormat`, `Intl.DateTimeFormat` |
 
 2. **Tree-shakable?** Only what is imported should end up in the bundle.
-3. **Actively maintained?** Release within the last 6 months.
+3. **Supported for this use?** Check current upstream support, security response and compatibility; release age alone is not proof of abandonment.
 4. **Bundle impact < 5 kb gzip?** Verify with `pnpm build` and a bundle analyser.
 
 ## Breaking Update Procedure
@@ -113,7 +111,4 @@ Write `<client-repo>/.frontend-review/report/latest/md/deps-review.md` with:
 
 ## Reference
 
-- Checklist: `02-dependencies.md`, `27-dependency-audit.md`, `28-trend-watch.md`
-- Data: `data/trend-watch-config.json`, `data/trend-watch-history.json`
-- Scripts: `scripts/audit-deps.sh`, `scripts/audit-trend-watch.sh`, `scripts/fetch-trend-data.sh`
-- Phase: `week-1-ci-baseline.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

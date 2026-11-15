@@ -1,0 +1,13 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "example/update_smoke/native"
+
+// Values
+pub fn add(Int32, Int32) -> Int32
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

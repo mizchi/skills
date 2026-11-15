@@ -111,6 +111,12 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [translate-programming-language](translate-programming-language/) | `translate-programming-language` | Plan and execute language-to-language migrations with behavior parity — oracles, fixtures, parity tests, compatibility layers. |
 | [ts2moonbit-migration](ts2moonbit-migration/) | `ts2moonbit-migration` | Migrate TypeScript to MoonBit on the `js` target — JS-compatible exported boundary over an idiomatic MoonBit core, using mizchi/js, mizchi/x, mizchi/npm_typed; contract capture, type classification, `.d.ts` diff gate, parity verification. |
 
+### Graphics / GPU
+
+| Skill | Install path | Description |
+| --- | --- | --- |
+| [metal-practice](metal-practice/) | `metal-practice` | Apple Metal rendering and compute — MetalKit, shader ABI, resource synchronization, Metal 4, GPU validation and profiling. |
+
 ### Testing / Browser
 
 | Skill | Install path | Description |
@@ -141,9 +147,9 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [ast-grep-practice](ast-grep-practice/) | `ast-grep-practice` | Run ast-grep as a project lint tool — `sgconfig.yml`, fix/rewrite rules, constraints, CI. |
 | [chezmoi-management](chezmoi-management/) | `chezmoi-management` | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
 | [conventional-changelog](conventional-changelog/) | `conventional-changelog` | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
-| [dotenvx](dotenvx/) | `dotenvx` | dotenvx env-var management reference (encryption, multi-env, CI). |
+| [dotenvx](dotenvx/) | `dotenvx` | dotenvx reference for existing adoption or explicit user choice (encryption, multi-env, CI). |
 | [justfile](justfile/) | `justfile` | `just` command runner reference with GitHub Actions examples. |
-| [nix-setup](nix-setup/) | `nix-setup` | Reproducible dev environments via devbox (Nix-backed) or pure Nix flakes — per-language templates, direnv, GitHub Actions. |
+| [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |
 | [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a Worker secret through cf. |
@@ -181,6 +187,48 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [tech-article-reproducibility](tech-article-reproducibility/) | `tech-article-reproducibility` | Simulate a first-time reader reproducing a technical article and list missing information. |
 
 ## Tools
+
+### Freshness review
+
+The [2026-11-16 skill freshness audit](docs/skill-freshness-audit-2026-11-16.md)
+inventories all 76 maintained entrypoints, separates confirmed stale guidance
+from version-specific examples needing revalidation, and prioritizes update
+detection. The [upstream watchlist](docs/skill-upstream-watchlist.json) records
+sources and validation gates for ten groups affecting 38 skills. The [daily freshness check](docs/skill-freshness.md) fetches current upstream evidence,
+compares declared topics with jev-lint and fails on unreviewed upstream drift.
+It reports candidates without rewriting skills or accepting a baseline automatically.
+Run `just --justfile skill-freshness.justfile check`. Maintained Node examples use Node 24+.
+
+### Markdown links
+
+```sh
+pnpm links:install
+just --justfile markdown-links.justfile check
+just --justfile markdown-links.justfile online
+```
+
+Pinned lychee checks local files and heading fragments on every Markdown PR.
+External URL status checks run manually and weekly. See
+[scope, reports, and configuration](docs/markdown-links.md).
+
+### Skill consistency checks
+
+The repository uses pinned `jev-lint` tooling and the upstream `jev-lint` skill.
+Custom rules check description/body agreement, conflicting instructions and
+terminology across all maintained skill entrypoints. English/Japanese pairs also
+receive explicit translation and activation-condition comparisons.
+
+```sh
+pnpm install --frozen-lockfile
+apm install --frozen
+just --justfile skill-lint.justfile plan
+just --justfile skill-lint.justfile check
+just --justfile skill-lint.justfile translations
+```
+
+Live checks read `TYPESAFE_API_KEY` from the environment. CI tests source selection
+and replays calibrated rule fixtures without making API requests. See the
+[configuration and workflow](.jev-lint/README.md) and [initial audit](.jev-lint/AUDIT.md).
 
 ### `waxa` — skill evaluation CLI
 

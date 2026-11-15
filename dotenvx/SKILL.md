@@ -1,11 +1,15 @@
 ---
 name: dotenvx
-description: Use when working with the `dotenvx` env-var management tool — encrypting .env files, juggling multiple environments (.env.production / .env.staging / .env.ci), committing encrypted secrets to git with `.env.vault` / `.env.keys` / `.env.encrypted`, or wiring dotenvx into GitHub Actions. Trigger on `.env.vault` / `.env.keys` / `dotenvx` commands or symptoms (env-var leak risk, env per-stage management, encrypted secrets workflow) even if the user does not say "dotenvx" by name.
+description: Use when a project already uses dotenvx or the user explicitly selects it for environment-variable loading, encryption, multiple environments, or CI. Do not adopt dotenvx by default or activate this skill solely because a project has .env files, multiple environments, or secrets to manage.
 ---
 
 # dotenvx Skill
 
 dotenvx is an environment variable management tool that loads and encrypts .env files. Language- and framework-agnostic.
+
+## Adoption boundary
+
+Use this reference when dotenvx is already configured in the project or the user explicitly selects it. Preserve the project's existing environment-variable and secret-management tools. Ordinary `.env` files, environment separation, or a need for encryption do not by themselves select dotenvx. Install it or copy its CI template only after that tool choice has been made.
 
 ## Installation
 

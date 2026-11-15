@@ -17,7 +17,6 @@ on:
       - "scripts/**"
       - ".github/workflows/cd-staging.yml"
       - ".github/workflows/deploy.yml"
-      - ".env.cloudflare"
       - "cloudflare.config.ts"
       - "vite.config.ts"
       - "package.json"
@@ -29,12 +28,8 @@ permissions:
   contents: read
 
 jobs:
-  # Skip the deploy in the upstream starter-kit repo (and any fork that
-  # hasn't configured the dotenvx key yet) — both lack the secret that
-  # decrypts .env.cloudflare, so the called deploy job would fail at
-  # the first cf call. We can't reference `secrets.X` directly in
-  # `jobs.<id>.if:`, so a precheck job materializes the boolean into a
-  # job output.
+  # Skip until the repository has both Cloudflare credentials. A precheck
+  # exposes readiness as a job output because job-level if cannot read secrets.
   precheck:
     runs-on: ubuntu-latest
     outputs:
@@ -42,12 +37,13 @@ jobs:
     steps:
       - id: check
         env:
-          KEY: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          if [ -n "$KEY" ]; then
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::DOTENV_PRIVATE_KEY_CLOUDFLARE is not set on this repo — skipping deploy. Configure the secret (see docs/cd-overview.md) to enable staging CD."
+            echo "::notice::Configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID secrets to enable staging CD."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -64,4 +60,9 @@ jobs:
       # is enough; the deploy step adds a short sha already.
       message: "cd-staging ${{ github.sha }}"
     secrets:
-      DOTENV_PRIVATE_KEY_CLOUDFLARE: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CF_ACCESS_CLIENT_ID_STAGING: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
+      CF_ACCESS_CLIENT_SECRET_STAGING: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}

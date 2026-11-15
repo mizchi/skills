@@ -1,0 +1,14 @@
+name: skills
+version: 1.0.0
+description: Development skills for the mizchi skills repository
+author: mizchi
+targets:
+  - claude
+  - codex
+
+dependencies:
+  apm:
+    - mizchi/jev-lint/skills/jev-lint#v0.8.0
+  mcp: []
+includes: auto
+scripts: {}

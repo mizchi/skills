@@ -80,7 +80,7 @@ env:
 ## Node.js Version
 
 **"Node.js version not supported"**  
-**Fix:** Install Node.js 18+ (`nvm install 20`)
+**Fix:** Use Node.js 24 or newer (`nvm install 24`), with a supported patch release satisfying the installed CLI's `engines`.
 
 ## Quick Reference
 

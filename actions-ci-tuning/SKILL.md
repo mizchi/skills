@@ -34,7 +34,7 @@ A cache miss means re-downloading hundreds of packages on every run. This is the
 
 - uses: actions/setup-node@v7
   with:
-    node-version-file: .nvmrc  # or node-version: '24' (current LTS)
+    node-version-file: .nvmrc  # Must select Node 24+; or use node-version: '24'
     cache: 'pnpm'              # ← must be present; omitting it silently skips caching
 ```
 
@@ -203,28 +203,40 @@ uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
 - Dependabot or Renovate can keep SHA pins up to date automatically. Check that `.github/dependabot.yml` includes the `github-actions` ecosystem.
 
-**Node.js 20 deprecation warning**: GitHub started issuing "Node.js 20 actions are deprecated" warnings in 2025/2026. This refers to the action's own runtime (`runs.using: node20`), not the project's Node version. Fix by upgrading to the first major version that uses `node24`:
+**Node.js 24+ policy**: use Node 24 or newer for project commands. GitHub
+[removed Node 20 from the Actions runtime on 2026-09-23](https://github.blog/changelog/2026-09-23-node-20-is-no-longer-available-in-github-actions/).
+This concerns each JavaScript action's own `runs.using`, independently of
+`actions/setup-node` and the project's Node version. Check the action metadata
+at the exact tag or SHA; for composite actions, inspect nested `uses` too.
+Do not rely on the removed insecure-runtime opt-out.
 
-| action | first node24 major | current major (2026-09) |
-|---|---|---|
-| `actions/checkout` | v6.0.0 | v7 |
-| `actions/setup-node` | v6.0.0 | v7 |
-| `actions/cache` | v5.0.0 | v6 |
-| `actions/upload-artifact` | v7.0.0 | v7 |
-| `actions/download-artifact` | v8.0.0 | v8 |
-| `aws-actions/configure-aws-credentials` | v6.0.0 | v6 |
+The following release commits were checked against their exact `action.yml` on
+2026-11-16. Their JavaScript runtime is Node 24 (including nested composite
+steps); supported older references may also work. This table records the checked
+release rather than a minimum compatible major.
 
-Latest pinned SHAs (verified 2026-09):
+| Action | Checked release |
+| --- | --- |
+| `actions/checkout` | v7.0.1 |
+| `actions/setup-node` | v7.1.0 |
+| `actions/cache` | v6.1.0 |
+| `actions/upload-artifact` | v7.0.2 |
+| `actions/download-artifact` | v8.0.2 |
+| `pnpm/action-setup` | v6.1.1 |
+| `aws-actions/configure-aws-credentials` | v6.3.0 |
+
+Pinned examples (release commits verified 2026-11-15):
 ```yaml
 uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
 uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
+uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
 ```
 
-Note: SHAs drift — always verify with `gh release view --repo <owner>/<action>` before pinning.
+Release tags can move; commit SHAs identify fixed revisions. Always verify with `gh release view --repo <owner>/<action>` before pinning.
 
 ---
 

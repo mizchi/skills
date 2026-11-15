@@ -15,13 +15,14 @@ the toolchain. But that does not mean every core package is in scope for free.
 
 - ❌ **DO NOT** use `moon add moonbitlang/core/*`
 - ❌ **DO NOT** add `moonbitlang/core` to the `import` block in `moon.mod` (module deps)
-- ✅ **DO** use prelude packages directly, with no import at all:
-  `@strconv.parse_int()`, `@json.parse()`, `@buffer.new()`
-- ✅ **DO** add a **`moon.pkg`** import for a core package outside the prelude —
-  that is a package import, not a dependency:
+- ✅ **DO** use language builtins such as `Int32`, `Array`, and `Option` directly.
+- ✅ **DO** import core packages referenced through `@alias` in **`moon.pkg`**.
+  The old implicit `@json` / `@strconv` / `@buffer` package aliases are not a
+  substitute for imports on v0.10.19. A package import is not a module dependency:
 
   ```moonbit
   import {
+    "moonbitlang/core/json",           // used as @json
     "moonbitlang/core/immut/vector",   // used as @immut/vector
     "moonbitlang/core/quickcheck",     // used as @quickcheck
   }
@@ -30,8 +31,10 @@ the toolchain. But that does not mean every core package is in scope for free.
   The default alias is the path after `moonbitlang/core/`, so a nested package
   keeps its slash: `moonbitlang/core/immut/sorted_set` → `@immut/sorted_set`.
 
-When in doubt, try it without the import first: an unimported non-prelude package
-is a compile error naming the package, which tells you exactly what to add.
+Use `moon ide doc` to identify the package and import the aliases used by the
+source. September also added warnings for unused imports, including method-only
+imports: keep imports for explicit package references, rather than adding every
+package that implements a method on a builtin type.
 
 ## Exploring the Standard Library
 
@@ -53,11 +56,29 @@ moon ide doc "String::*find*"
 
 ## Common Packages
 
+Since v0.10.19, check `moonbitlang/core/path` for `Path` and joining paths with
+`/`, `moonbitlang/core/compress` for DEFLATE/gzip/zlib, and
+`moonbitlang/core/archive/zip` for ZIP/ZIP64 and entry metadata. Inspect the
+selected compiler's APIs before adding an external replacement. `core/abort`
+can no longer be substituted as a virtual package.
+
+From the August release, `core/diff` offers Myers/Patience sequence differences
+and edit distances; `core/lexbuf` provides the scanners consumed by `lexscan`.
+Inspect their selected-compiler interfaces through `moon ide doc '@diff'` or
+`moon ide doc '@lexbuf'`. QuickCheck's generation, filtering, observation, and
+shrinking APIs are covered in [testing.md](testing.md), including September's
+derived `Shrink` support.
+
 ### @json - JSON Parsing and Serialization
+
+Import `"moonbitlang/core/json"` explicitly. `Json` and `ToJson` now live in
+this package. The qualified names below avoid relying on prelude aliases or
+implicit method attachment. Use `#derive(@json.ToJson)` for user types; attach
+derived methods explicitly when the API needs dot calls.
 
 ```moonbit
 // Parse JSON
-let value : @json.JsonValue = @json.parse("{\"name\": \"Alice\"}")
+let value : @json.Json = @json.parse("{\"name\": \"Alice\"}")
 
 // Access fields
 match value {
@@ -66,10 +87,11 @@ match value {
 }
 
 // Serialize to JSON (derive ToJson)
-struct User { name: String; age: Int } derive(ToJson)
+#derive(@json.ToJson)
+struct User { name: String; age: Int32 }
 
-let user = { name: "Bob", age: 30 }
-let json_str = user.to_json().stringify()
+let user : User = { name: "Bob", age: 30 }
+let json_str = @json.Json(user).stringify()
 ```
 
 ### @buffer - Mutable Byte Buffer
@@ -189,7 +211,8 @@ none.unwrap_or(0)          // 0
 ### Show - String Representation
 
 ```moonbit
-struct Point { x: Int; y: Int } derive(Show)
+#derive(Show)
+struct Point { x: Int; y: Int }
 
 let p = { x: 1, y: 2 }
 println(p.to_string())  // "{x: 1, y: 2}"
@@ -198,10 +221,11 @@ println(p.to_string())  // "{x: 1, y: 2}"
 ### ToJson / FromJson - JSON Serialization
 
 ```moonbit
+#derive(@json.ToJson, @json.FromJson)
 struct Config {
   name: String
   value: Int
-} derive(ToJson, FromJson)
+}
 
 let config : Config = @json.from_json(@json.parse(json_str))
 ```
@@ -209,7 +233,8 @@ let config : Config = @json.from_json(@json.parse(json_str))
 ### Eq / Compare - Equality and Ordering
 
 ```moonbit
-struct Version { major: Int; minor: Int } derive(Eq, Compare)
+#derive(Eq, Compare)
+struct Version { major: Int; minor: Int }
 
 let v1 = { major: 1, minor: 0 }
 let v2 = { major: 1, minor: 1 }
@@ -219,7 +244,8 @@ v1 < v2  // true
 ### Hash - Hashing
 
 ```moonbit
-struct Key { id: Int; name: String } derive(Hash, Eq)
+#derive(Hash, Eq)
+struct Key { id: Int; name: String }
 
 // Can be used as HashMap key
 let map : @hashmap.HashMap[Key, String] = @hashmap.new()
@@ -228,10 +254,11 @@ let map : @hashmap.HashMap[Key, String] = @hashmap.new()
 ### Default - Default Values
 
 ```moonbit
+#derive(Default)
 struct Config {
   timeout: Int
   retries: Int
-} derive(Default)
+}
 
 let config = Config::default()  // { timeout: 0, retries: 0 }
 ```
@@ -311,6 +338,11 @@ moon add moonbitlang/x
 
 ### Common Packages
 
+Re-check package ownership before copying an older `x` example: path operations
+now also have a core package. September consolidates Unicode APIs under
+`moonbitlang/x/unicode` and adds `jwt` / `bcrypt`; check the resolved package's
+signatures rather than inventing constructors or assuming browser/native parity.
+
 ```moonbit
 // @x/fs - File system operations (native/node backend)
 let content = @x/fs.read_to_string("file.txt")
@@ -333,19 +365,29 @@ moon ide doc "@x/fs"
 moon ide doc "@env"
 ```
 
-## moonbitlang/async - Asynchronous Programming
+## Async runtimes
 
-Async/await support for MoonBit.
+The new `moonbitlang/core/async` is experimental as of v0.10.19. It offers
+corresponding packages such as `core/async/http`. Opt in only after checking
+its current signatures and backend support; consumers must allow experimental
+packages. An existing external `moonbitlang/async` setup can stay in place.
+Coexistence with `core/async` requires external runtime 0.22.7 or newer.
 
-### Installation
+The following sections describe the external runtime, not the experimental core
+API. Re-check with `moon ide doc` before changing the import family.
+For August's file/header changes and September's implemented cancellation
+semantics, read [async.md](async.md). An old `catch`-based cancellation branch
+is not current guidance for external async 0.22.x.
+
+### External runtime installation
 
 ```bash
 moon add moonbitlang/async
 ```
 
-### Important: Import Required for async main/test
+### Import the selected runtime for async main/test
 
-To use `async fn main` or `async test`, you **must** import `moonbitlang/async` in your `moon.pkg`:
+To use `async fn main` or `async test`, with the external runtime, import `moonbitlang/async` in your `moon.pkg`:
 
 ```moonbit
 import {
@@ -353,7 +395,8 @@ import {
 }
 ```
 
-Without this import, `async fn main` and `async test` will not work.
+For `async test`, put this import in the test import block (`for "test"`).
+Do not mix runtime-specific helper APIs without checking their compatibility.
 
 ### Basic Usage
 

@@ -79,7 +79,7 @@ The N+1 detector is engine-agnostic, but the `--callee-prefix` heuristic depends
 
 ## Requirements
 
-- Node 22 or newer (uses the built-in `node:sqlite` module).
+- Node 24 or newer (uses the built-in `node:sqlite` module).
 - A sqlc-style query catalog or compatible format.
 
 ## Files

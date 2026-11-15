@@ -1,8 +1,8 @@
-id: nix-setup-devbox-default-001
-name: Devbox default for a standard TS+pnpm project
+id: nix-setup-devbox-opt-in-001
+name: Explicit devbox choice for a standard TS+pnpm project
 description: |
-  Median case — the project's needs are fully covered by stock nixpkgs
-  packages. The Decision matrix says: pick devbox.
+  The user explicitly selects devbox for a project whose dependencies are
+  covered by stock nixpkgs. Standard dependencies alone would not select it.
 
 tags:
   - devbox
@@ -18,6 +18,8 @@ inputs:
     - 標準的な npm package で完結 (custom Nix derivation や overlay は不要)
     - GitHub Actions で CI を回す
     - チーム全員 macOS / Linux で direnv 利用可能
+
+    環境ツールには devbox を明示的に選ぶ。
 
     "再現可能な dev 環境をセットアップしてほしい。何をどこに置けば動く?"
 
@@ -70,7 +72,7 @@ graders:
     config:
       rubric: |
         deliverable は次をすべて満たしているか?
-        1. nix-setup の "Decision matrix" を踏まえて **devbox** を選ぶ判断を明示している (理由: 標準 nixpkgs で足り、overlay や custom derivation 不要)
+        1. ユーザーが明示的に選んだ **devbox** を使う。標準パッケージで足りることだけを標準採用の理由にしない
         2. `devbox.json` の最小構成 (packages に nodejs / pnpm 等) を具体的に提示
         3. devbox の基本コマンド (`devbox shell`, `devbox add`, `devbox run` のいずれか) を言及
         4. GitHub Actions に `jetify-com/devbox-install-action` を使う形を提示

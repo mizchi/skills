@@ -8,9 +8,8 @@ name: deploy
 # cd-production.yml (push to release → production). Also available via
 # workflow_dispatch for manual hot fixes.
 #
-# .env.cloudflare is the single source of truth for Cloudflare creds.
-# It's committed encrypted via dotenvx; the only repo secret needed is
-# DOTENV_PRIVATE_KEY_CLOUDFLARE. Rotating one key rotates every cred.
+# Cloudflare credentials arrive as CI secrets in the process environment.
+# No environment loader or encrypted environment file is required.
 
 on:
   workflow_dispatch:
@@ -55,8 +54,18 @@ on:
         type: boolean
         default: false
     secrets:
-      DOTENV_PRIVATE_KEY_CLOUDFLARE:
+      CLOUDFLARE_API_TOKEN:
         required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+      CF_ACCESS_CLIENT_ID:
+        required: false
+      CF_ACCESS_CLIENT_SECRET:
+        required: false
+      CF_ACCESS_CLIENT_ID_STAGING:
+        required: false
+      CF_ACCESS_CLIENT_SECRET_STAGING:
+        required: false
 
 permissions:
   contents: read
@@ -69,7 +78,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      DOTENV_PRIVATE_KEY_CLOUDFLARE: ${{ secrets.DOTENV_PRIVATE_KEY_CLOUDFLARE }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
     steps:
       - name: Checkout
@@ -114,9 +124,6 @@ jobs:
       - name: Update MoonBit package index
         run: moon update
 
-      - name: Install MoonBit dependencies
-        run: moon install
-
       - name: Resolve deployment target
         id: target
         env:
@@ -146,8 +153,7 @@ jobs:
           set -uo pipefail
           # cf API output is JSON; keep progress/errors separate from stdout.
           set +e
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            pnpm exec cf workers deployments list --worker "$TARGET_WORKER" \
+          pnpm exec cf workers deployments list --worker "$TARGET_WORKER" \
             > /tmp/deployments.json 2> /tmp/deployments.err
           rc=$?
           set -e
@@ -172,8 +178,7 @@ jobs:
         run: |
           set -euo pipefail
           # Resource APIs default to remote; IDs replace old database names.
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            pnpm exec cf d1 migrations apply "$DATABASE_ID" --dir db/migrations
+          pnpm exec cf d1 migrations apply "$DATABASE_ID" --dir db/migrations
 
       - name: Prepare MoonBit core and build Worker
         env:
@@ -196,11 +201,9 @@ jobs:
           set -euo pipefail
           short_sha=$(git rev-parse --short HEAD)
           msg="${DEPLOY_MESSAGE:-ci-deploy} ($short_sha)"
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            pnpm exec cf deploy --prebuilt --mode "$TARGET_MODE" --message "$msg"
+          pnpm exec cf deploy --prebuilt --mode "$TARGET_MODE" --message "$msg"
           # Query API JSON rather than scraping cf deploy's human-readable output.
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            pnpm exec cf workers deployments list --worker "$TARGET_WORKER" > /tmp/new-deployments.json
+          pnpm exec cf workers deployments list --worker "$TARGET_WORKER" > /tmp/new-deployments.json
           node scripts/deployment-state.ts /tmp/new-deployments.json > /tmp/new-versions.json
           new_version_id=$(jq -er 'if length == 1 and .[0].percentage == 100 then .[0].version_id else error("Expected one deployed version at 100 percent") end' /tmp/new-versions.json)
           echo "new_version_id=$new_version_id" >> "$GITHUB_OUTPUT"
@@ -212,23 +215,18 @@ jobs:
         continue-on-error: true
         env:
           SMOKE_BASE_URL: ${{ steps.target.outputs.smoke_base }}
-        # Access creds (CF_ACCESS_CLIENT_ID/SECRET) come from
-        # .env.cloudflare via dotenvx, with *_STAGING entries remapped
-        # onto canonical names when targeting staging.
+          TARGET_MODE: ${{ inputs.environment }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          CF_ACCESS_CLIENT_ID_STAGING: ${{ secrets.CF_ACCESS_CLIENT_ID_STAGING }}
+          CF_ACCESS_CLIENT_SECRET_STAGING: ${{ secrets.CF_ACCESS_CLIENT_SECRET_STAGING }}
         run: |
-          if [ "${{ inputs.environment }}" = "staging" ]; then
-            access_id_var=CF_ACCESS_CLIENT_ID_STAGING
-            access_secret_var=CF_ACCESS_CLIENT_SECRET_STAGING
-          else
-            access_id_var=CF_ACCESS_CLIENT_ID
-            access_secret_var=CF_ACCESS_CLIENT_SECRET
+          set -euo pipefail
+          if [ "$TARGET_MODE" = "staging" ]; then
+            export CF_ACCESS_CLIENT_ID="${CF_ACCESS_CLIENT_ID_STAGING:-}"
+            export CF_ACCESS_CLIENT_SECRET="${CF_ACCESS_CLIENT_SECRET_STAGING:-}"
           fi
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            bash -c "
-              export CF_ACCESS_CLIENT_ID=\"\${$access_id_var:-}\"
-              export CF_ACCESS_CLIENT_SECRET=\"\${$access_secret_var:-}\"
-              pnpm run smoke
-            "
+          pnpm run smoke
 
       - name: Restore previous traffic on smoke failure
         id: rollback
@@ -237,9 +235,8 @@ jobs:
           TARGET_WORKER: ${{ steps.target.outputs.worker }}
         run: |
           set -euo pipefail
-          pnpm exec dotenvx run -f .env.cloudflare --quiet -- \
-            pnpm exec cf workers deployments create --worker "$TARGET_WORKER" \
-              --strategy percentage --versions @/tmp/previous-versions.json
+          pnpm exec cf workers deployments create --worker "$TARGET_WORKER" \
+            --strategy percentage --versions @/tmp/previous-versions.json
           echo "Restored previous traffic allocation for $TARGET_WORKER"
 
       - name: "Note: no rollback target on first deploy"

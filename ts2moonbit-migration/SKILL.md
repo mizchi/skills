@@ -82,6 +82,13 @@ Rules of thumb:
 - **`mizchi/js`'s `Any` is a boundary tool, not the destination.** Its `Any` type + zero-cost casts (`any(x)`, `Any::cast`, property access `_get`/`_set`, method `_call`/`_invoke`) mirror TypeScript's `any` and let you get the port compiling. Keep them in the boundary adapter and replace them with typed core code as you go (see the Architecture section).
 - **`mizchi/x` is the cross-target backend.** If the TS service does process/fs/http/websocket work and you want it to also run on `--target native` later, port onto `mizchi/x` (which delegates to `moonbitlang/async` natively and to JS FFI on the js target) instead of binding `node:*` directly.
 
+When porting resource cleanup or cancellation from TypeScript, use MoonBit's
+`defer` / `errdefer` ownership scopes. Since external async 0.22.0, `catch` cannot
+capture cancellation; `noraise` and `nocancel` are separate contracts. Follow the
+newest applicable release when older adapter examples disagree; see
+[the three-release baseline](../moonbit-practice/reference/updates.md) and
+[async migration](../moonbit-practice/reference/async.md).
+
 ## Workflow
 
 Eight phases. Do not skip Phase 0 — porting without the captured contract is how you ship a silent behavior change.
@@ -93,7 +100,7 @@ Read `references/contract-capture.md`.
 - Record the module format(s) the package ships (`esm`, `cjs`, dual) and the entry points in `package.json`.
 
 ### Phase 1 — Project setup
-- `moon.mod`: set `preferred_target = "js"` so `moon check/build/test` default to JS. Since v0.10.9 the toolchain default target is `wasm`, so skipping this means passing `--target js` everywhere. (`moon.mod.json` with the hyphenated key is deprecated; `moon fmt` migrates it.)
+- `moon.mod`: set `preferred_target = "js"` so `moon check/build/test` default to JS. Since v0.10.9 the toolchain default target is `wasm`, so skipping this means passing `--target js` everywhere. (JSON manifests are no longer accepted in v0.10.19; `moon fmt` migrates older files.)
 - `moon add` the toolkit packages you mapped in Phase 0.
 - Lay out `src/moon.pkg` with `link.js` (exports + format) — empty exports for now, filled in Phase 6.
 - Decide the npm interop shape: a thin `package.json` whose `exports` point at the `moon build --release` output (see `references/build-and-publish.md`).
@@ -145,7 +152,7 @@ Full table with edge cases in `references/type-mapping.md`.
 | `string` (text) | `String` | UTF-16 length, not bytes |
 | `string` (binary) | `Bytes` | classify by meaning |
 | `Uint8Array` | `Bytes` | no-copy |
-| `T[]` | `Array[T]` | — |
+| `T[]` | `Array[T]` internally; `FixedArray[T]` at JS FFI | Convert before crossing; never identity-cast `Array` to JS |
 | `any` / `unknown` | `Any` (mizchi/js) | cast with `Any::cast` |
 | `object` / record | `struct` | don't pass `Map`/trait objects across the boundary |
 | discriminated union | `enum` | data-carrying enums are awkward from JS; prefer constructor fns |
@@ -185,7 +192,7 @@ Full table with edge cases in `references/type-mapping.md`.
 
 ## Verified Against
 
-The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were verified end-to-end with **moon 0.1.20260522 / moonc v0.9.3** and **mizchi/js 0.12.1** (round-tripping objects and Promises through Node); config syntax was re-checked against **MoonBit v0.10.12**. Package boundaries and the `Any` method names (`_get`/`_set`/`_call`/`cast`) shift across releases — re-check against the resolved version in your `moon.mod` if a signature mismatches. Language-level changes since v0.9.3 that affect ported code: `try?` was removed (catch into a `Result`), `trait`/`impl` methods need the `fn` keyword, and `impl` no longer attaches methods implicitly (declare `extend Type with Trait::{..}`).
+The build/export/FFI workflow and the `mizchi/js` `Any` API in this skill were verified end-to-end with **moon 0.1.20260522 / moonc v0.9.3** and **mizchi/js 0.12.1** (round-tripping objects and Promises through Node); migration guidance was updated for **MoonBit v0.10.19 (2026-11-05)**. The historical `mizchi/js` integration has not been revalidated against a newer library release; see the current compiler checks in `moonbit-js-binding`. Package boundaries and the `Any` method names (`_get`/`_set`/`_call`/`cast`) shift across releases — re-check against the resolved version in your `moon.mod` if a signature mismatches. Language-level changes since v0.9.3 that affect ported code: `try?` was removed (catch into a `Result`), `trait`/`impl` methods need the `fn` keyword, and `impl` no longer attaches methods implicitly (declare `extend Type with Trait::{..}`).
 
 ## References
 

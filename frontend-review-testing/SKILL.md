@@ -13,6 +13,8 @@ You are auditing the testing posture of a frontend project. The phase is Week 2:
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Run `scripts/audit-coverage.sh --repo <client-repo>`.
 2. Read `coverage/coverage-summary.json` if it exists.
 3. Inspect:
@@ -103,5 +105,4 @@ This avoids tests that pass even when the integration contract breaks.
 
 ## Reference
 
-- Checklist: `07-unit-test.md`, `08-e2e-playwright.md`, `15-vrt.md`, `13-kpi-tracking.md`
-- Phase: `week-2-testing.md`, `week-3-security-vrt.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

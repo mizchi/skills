@@ -1,0 +1,167 @@
+{
+  "schema": "jev-lint-documents-manifest-1",
+  "roots": [
+    "CLAUDE.md",
+    "nix-setup/SKILL.md",
+    "nix-setup/SKILL-ja.md",
+    "dotenvx/SKILL.md",
+    "dotenvx/SKILL-ja.md",
+    "skill-selector/references/catalog.md",
+    "optimizing-descriptions/SKILL.md",
+    "utels-project-bootstrap/SKILL.md",
+    "cloudflare-workers-cd-rollback/SKILL.md",
+    "cloudflare-workers-cd-rollback/assets/workflows/deploy.yml"
+  ],
+  "files": {
+    "policy": {
+      "path": "CLAUDE.md",
+      "role": "reference"
+    },
+    "nix-en": {
+      "path": "nix-setup/SKILL.md",
+      "role": "document"
+    },
+    "nix-ja": {
+      "path": "nix-setup/SKILL-ja.md",
+      "role": "document"
+    },
+    "dotenvx-en": {
+      "path": "dotenvx/SKILL.md",
+      "role": "document"
+    },
+    "dotenvx-ja": {
+      "path": "dotenvx/SKILL-ja.md",
+      "role": "document"
+    },
+    "catalog": {
+      "path": "skill-selector/references/catalog.md",
+      "role": "document"
+    },
+    "description-example": {
+      "path": "optimizing-descriptions/SKILL.md",
+      "role": "document"
+    },
+    "bootstrap": {
+      "path": "utels-project-bootstrap/SKILL.md",
+      "role": "document"
+    },
+    "cd-guide": {
+      "path": "cloudflare-workers-cd-rollback/SKILL.md",
+      "role": "document"
+    },
+    "cd-template": {
+      "path": "cloudflare-workers-cd-rollback/assets/workflows/deploy.yml",
+      "role": "document"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "nix-en",
+      "topic": "devbox adoption: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "nix-en"
+      }
+    },
+    {
+      "id": "nix-ja",
+      "topic": "devbox adoption: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "nix-ja"
+      }
+    },
+    {
+      "id": "dotenvx-en",
+      "topic": "dotenvx adoption: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "dotenvx-en"
+      }
+    },
+    {
+      "id": "dotenvx-ja",
+      "topic": "dotenvx adoption: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "dotenvx-ja"
+      }
+    },
+    {
+      "id": "catalog",
+      "topic": "devbox and dotenvx adoption: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "catalog"
+      }
+    },
+    {
+      "id": "description-example",
+      "topic": "dotenvx adoption in the recommended rewritten description: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "description-example"
+      }
+    },
+    {
+      "id": "bootstrap",
+      "topic": "dotenvx adoption for supplying credentials: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "id": "cd-guide",
+      "topic": "dotenvx adoption for CI credential loading: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "cd-guide"
+      }
+    },
+    {
+      "id": "cd-template",
+      "topic": "dotenvx adoption for CI credential loading: an existing tool or explicit user choice, never automatic adoption from generic environment or secret needs",
+      "mode": "semantic",
+      "reference": {
+        "source": "policy",
+        "heading": "Tool adoption policy"
+      },
+      "target": {
+        "source": "cd-template"
+      }
+    }
+  ]
+}

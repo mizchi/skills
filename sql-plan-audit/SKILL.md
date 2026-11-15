@@ -112,7 +112,7 @@ The runner is SQLite-specific. To support Postgres / MySQL: swap the `node:sqlit
 
 ## Requirements
 
-- Node 22 or newer (uses the built-in `node:sqlite` module).
+- Node 24 or newer (uses the built-in `node:sqlite` module).
 - A sqlc-style query catalog (`-- name: X :type` markers). Other named-query formats can be supported by adjusting `parseQueryCatalog` in the runner.
 
 ## Files

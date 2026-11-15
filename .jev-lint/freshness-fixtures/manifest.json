@@ -1,0 +1,174 @@
+{
+  "schema": "jev-lint-documents-manifest-1",
+  "roots": [
+    ".jev-lint/freshness-fixtures/facts.md",
+    ".jev-lint/freshness-fixtures/wrong-bin.md",
+    ".jev-lint/freshness-fixtures/current-bin.md",
+    ".jev-lint/freshness-fixtures/wrong-sdk.md",
+    ".jev-lint/freshness-fixtures/historical-sdk.md",
+    ".jev-lint/freshness-fixtures/wrong-schema.md",
+    ".jev-lint/freshness-fixtures/custom-sub.md",
+    ".jev-lint/freshness-fixtures/wrong-oidc.md",
+    ".jev-lint/freshness-fixtures/supported-older-action.md",
+    ".jev-lint/freshness-fixtures/quoted-old-sdk.md",
+    ".jev-lint/freshness-fixtures/missing-context.md"
+  ],
+  "files": {
+    "facts": {
+      "path": ".jev-lint/freshness-fixtures/facts.md",
+      "role": "reference"
+    },
+    "wrong-bin": {
+      "path": ".jev-lint/freshness-fixtures/wrong-bin.md",
+      "role": "document"
+    },
+    "current-bin": {
+      "path": ".jev-lint/freshness-fixtures/current-bin.md",
+      "role": "document"
+    },
+    "wrong-sdk": {
+      "path": ".jev-lint/freshness-fixtures/wrong-sdk.md",
+      "role": "document"
+    },
+    "historical-sdk": {
+      "path": ".jev-lint/freshness-fixtures/historical-sdk.md",
+      "role": "document"
+    },
+    "wrong-schema": {
+      "path": ".jev-lint/freshness-fixtures/wrong-schema.md",
+      "role": "document"
+    },
+    "custom-sub": {
+      "path": ".jev-lint/freshness-fixtures/custom-sub.md",
+      "role": "document"
+    },
+    "wrong-oidc": {
+      "path": ".jev-lint/freshness-fixtures/wrong-oidc.md",
+      "role": "document"
+    },
+    "supported-older-action": {
+      "path": ".jev-lint/freshness-fixtures/supported-older-action.md",
+      "role": "document"
+    },
+    "quoted-old-sdk": {
+      "path": ".jev-lint/freshness-fixtures/quoted-old-sdk.md",
+      "role": "document"
+    },
+    "missing-context": {
+      "path": ".jev-lint/freshness-fixtures/missing-context.md",
+      "role": "document"
+    }
+  },
+  "comparisons": [
+    {
+      "id": "wrong-bin",
+      "mode": "semantic",
+      "topic": "Package installation and supplied CLI binary",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "wrong-bin"
+      }
+    },
+    {
+      "id": "current-bin",
+      "mode": "semantic",
+      "topic": "Package installation and supplied CLI binary",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "current-bin"
+      }
+    },
+    {
+      "id": "wrong-sdk",
+      "mode": "semantic",
+      "topic": "Current SDK 3 initialization",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "wrong-sdk"
+      }
+    },
+    {
+      "id": "historical-sdk",
+      "mode": "semantic",
+      "topic": "SDK version-specific initialization",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "historical-sdk"
+      }
+    },
+    {
+      "id": "wrong-schema",
+      "mode": "semantic",
+      "topic": "Current pnpm report top-level structure",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "wrong-schema"
+      }
+    },
+    {
+      "id": "custom-sub",
+      "mode": "semantic",
+      "topic": "AWS reusable workflow subject conditions",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "custom-sub"
+      }
+    },
+    {
+      "id": "wrong-oidc",
+      "mode": "semantic",
+      "topic": "AWS supported condition keys",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "wrong-oidc"
+      }
+    },
+    {
+      "id": "supported-older-action",
+      "mode": "semantic",
+      "topic": "Action runtime and version scope",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "supported-older-action"
+      }
+    },
+    {
+      "id": "quoted-old-sdk",
+      "mode": "semantic",
+      "topic": "Current SDK initialization and corrected historical examples",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "quoted-old-sdk"
+      }
+    },
+    {
+      "id": "missing-context",
+      "mode": "semantic",
+      "topic": "Promise-cache invalidation semantics",
+      "reference": {
+        "source": "facts"
+      },
+      "target": {
+        "source": "missing-context"
+      }
+    }
+  ]
+}

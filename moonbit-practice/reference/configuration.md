@@ -5,11 +5,11 @@ title: "MoonBit Configuration Reference"
 # MoonBit Configuration Reference
 
 > **Use the DSL formats `moon.mod` / `moon.pkg`.** The JSON formats
-> `moon.mod.json` / `moon.pkg.json` are deprecated and scheduled for removal;
-> they are kept only so existing projects still build. New projects use the DSL.
+> `moon.mod.json` / `moon.pkg.json` are no longer accepted as of v0.10.19.
+> Migrate older projects with `moon fmt` before checking or building them.
 > Ready-to-copy samples live at `assets/moon.mod` and `assets/moon.pkg`.
 >
-> Verified against MoonBit v0.10.12.
+> Updated for MoonBit v0.10.19 (2026-11-05).
 
 ## File Structure
 
@@ -125,6 +125,14 @@ Local path dependencies inside `moon.mod` are deprecated. For cross-module work
 use a workspace (`moon.work`, below); members resolve each other by module name
 with no path entry at all.
 
+### Major-version paths (November)
+
+A module can use `owner/library/v2` to distinguish a major API line while the
+root package's default alias stays `@library`. Give explicit aliases when
+importing multiple majors. This path convention does not lift the pre-1.0
+restriction: the reviewed v0.10.19 registry temporarily rejects published module
+versions at 1.0 or later. Pin dependencies only to versions that exist.
+
 ---
 
 ## moon.pkg (Package Configuration, new DSL)
@@ -176,6 +184,24 @@ options(
   `and`, `or`, `not`.
 - `:embed` converts a file to MoonBit source (`--text` / `--binary`, `--name`).
 
+### Conditional imports and experimental packages
+
+Conditional imports (v0.10.19) can select implementations under one alias:
+
+```moonbit
+#cfg(target="native")
+import { "username/project/native_impl" @platform }
+
+#cfg(target="js")
+import { "username/project/js_impl" @platform }
+```
+
+Both implementation packages must expose the API used at `@platform` call sites.
+The same mechanism supports `for "test"` / `for "wbtest"` imports. Experimental
+packages declare `experimental = true`; a consumer opting in can use
+`options("allow-experimental-packages": true)`. This is an explicit adoption
+choice, especially for the experimental `moonbitlang/core/async` runtime.
+
 ### Package type: `pkgtype`, not `is-main` / `link: true`
 
 One `pkgtype` declaration says what the package builds. The kinds are mutually
@@ -198,7 +224,7 @@ backend-specific `exports` link configuration for new exports.
 
 ```moonbit
 #export_name("attr_add")
-pub fn add_by_attr(n : Int) -> Int {
+pub fn add_by_attr(n : Int32) -> Int32 {
   n + 42
 }
 ```
@@ -210,10 +236,20 @@ the artifact — an attribute in a dependency does not add symbols to your outpu
 
 ---
 
-## Legacy JSON formats (existing projects only)
+## Prebuild script migration
 
-Equivalent JSON for reference when reading older code. Support is deprecated and
-will be removed — run `moon fmt` in the module root to migrate both files.
+For experimental Native prebuild integration, September adds `.mbtx` support. Read metadata
+from the current build environment rather than introducing a new stdin-based
+integration: `MOON_MOD` points to the module configuration, `MOON_BUILD_DIR` is
+the writable script output directory, and `MOON_BACKEND` identifies the selected backend.
+Reserve stdout for the declared JSON build result and send diagnostics to stderr.
+See the [official build-script contract](https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html#experimental-pre-build-config-script)
+for the resolved toolchain's exact variables and output schema.
+
+## Legacy JSON formats (migration input only)
+
+Equivalent JSON for reading older revisions. These are not valid build manifests
+on v0.10.19; run `moon fmt` in the module root to migrate both files.
 
 ### moon.mod.json
 
@@ -328,5 +364,5 @@ them across members.
 
 ## References
 
-- Module: https://docs.moonbitlang.com/en/stable/toolchain/moon/module
-- Package: https://docs.moonbitlang.com/en/stable/toolchain/moon/package
+- Module: https://docs.moonbitlang.com/en/stable/toolchain/moon/module.html
+- Package: https://docs.moonbitlang.com/en/stable/toolchain/moon/package.html

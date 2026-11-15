@@ -4,7 +4,7 @@ Use this reference when publishing a MoonBit executable to
 [skills.mooncakes.io](https://skills.mooncakes.io/) or authoring its agent-facing
 `SKILL.md`.
 
-> Verified against MoonBit v0.10.12. **`moon runwasm` is deprecated** — registry
+> Updated for MoonBit v0.10.19. **`moon runwasm` is deprecated** — registry
 > packages now run with `moonx`, local packages with
 > `moon run <pkg> --target wasm`.
 
@@ -14,13 +14,13 @@ Keep these two layers distinct:
 
 1. A MoonBit executable package supplies the command implementation. It must
    compile to `wasm` and is run by `moonx`.
-2. A package-local `SKILL.md` supplies agent metadata and operating
-   instructions. The Marketplace exposes it next to the prebuilt Wasm asset.
+2. A `SKILL.md` supplies agent metadata and operating instructions. Module
+   publication and Marketplace skill uploads are separate in v0.10.19; verify
+   the current skill-upload flow and resulting page independently of the module.
 
-Publishing an executable without `SKILL.md` can still create a Marketplace
-entry, but its name/description metadata and agent instructions are empty.
-Conversely, a well-written `SKILL.md` does not make a stub executable useful;
-test the published command's real workflow.
+Do not infer that `moon publish` created or updated a skill page. Keep the
+command contract and version in the uploaded instructions consistent with the
+published executable, and test the command's real workflow before uploading.
 
 ## Package layout
 
@@ -129,7 +129,7 @@ moonx author/module/cmd/tool <args>
 Pin reproducible automation to the published module version:
 
 ```bash
-moonx author/module@1.2.3/cmd/tool <args>
+moonx author/module/cmd/tool@1.2.3 <args>
 ```
 
 `@latest` refreshes the registry index before resolving; an unpinned coordinate
@@ -139,8 +139,8 @@ Marketplace Wasm asset, verifies its SHA-256 checksum, caches it under
 — including hyphen-prefixed values — to the guest command. An explicit `--` is
 accepted but not required.
 
-`moonx` defaults to the Wasm backend and is a second entry point into the `moon`
-executable, not a separate binary.
+`moonx` supports only the linear-memory Wasm backend. Use `moon run` for local
+packages on JS or Native.
 
 ## Filesystem, environment, and network policy
 
@@ -237,9 +237,9 @@ default and what the Marketplace serves. `wasm-gc` is a different backend: check
 if you also support it, but the asset users get is `wasm`, so that is the target
 your tests must cover.
 
-`moon info` regenerates `.mbti` interface files. An executable package exposes no
-public API, so it is a no-op there — run it for the library packages the command
-depends on, not for `cmd/tool` itself.
+`moon check` regenerates `.mbti` for checked local packages when the preferred
+backend is included; `moon info` remains an explicit generation command. Review
+library interface changes, and use `moon check --no-mbti` for a read-only check.
 
 Also exercise the restrictive policy, in both directions — an allowed path must
 succeed and a path outside the granted roots must be denied:
@@ -275,9 +275,9 @@ differs from an existing one only by letter case.
 After publication, verify both metadata and instructions:
 
 ```bash
-curl -fsSL https://skills.mooncakes.io/api/v0/skills/author/module@1.2.3/cmd/tool
-curl -fsSL https://skills.mooncakes.io/assets/author/module@1.2.3/cmd/tool/SKILL.md
-moonx author/module@1.2.3/cmd/tool --help
+curl -fsSL https://skills.mooncakes.io/api/v0/skills/author/module/cmd/tool@1.2.3
+curl -fsSL https://skills.mooncakes.io/assets/author/module/cmd/tool@1.2.3/SKILL.md
+moonx author/module/cmd/tool@1.2.3 --help
 ```
 
 The Marketplace may need time to build the optimized Wasm asset. Diagnose the
@@ -285,7 +285,8 @@ executable locally before treating an absent remote asset as a code failure.
 
 ## Sources
 
+- [v0.10.19 release: separate skill uploads](https://www.moonbitlang.com/updates/2026/11/05/index)
 - [MoonBit Skills Marketplace](https://skills.mooncakes.io/)
-- [Marketplace skill loading and run-command construction](https://github.com/moonbitlang/mooncakes.io/blob/main/src/page/skills/state.mbt)
+- [Marketplace skill loading and run-command construction](https://github.com/moonbitlang/mooncakes.io/tree/main/src/page/skills)
 - [Moonrun policy semantics](https://github.com/moonbitlang/moon/blob/main/crates/moonrun/README.md#experimental-policy)
 - [Agent Skills specification](https://agentskills.io/specification)

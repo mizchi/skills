@@ -1,6 +1,6 @@
 ---
 name: node-sqlite-vec
-description: Use when setting up Node 24+ built-in `node:sqlite` with the loadable `sqlite-vec` extension for vector / RAG storage in TypeScript without `better-sqlite3`, or when debugging vec0 BigInt rowids, vitest hanging on sqlite-vec, `.ts` import errors under `node:sqlite`, or "sqlite extension not loadable". Covers extension loading, vitest incompatibility (use `node --test`), tsconfig flags, and CLI shebang. Trigger on `node:sqlite`, `sqlite-vec`, vec0 / vector storage even when the user does not name better-sqlite3.
+description: Use when setting up Node 24+ built-in `node:sqlite` with the loadable `sqlite-vec` extension for vector / RAG storage in TypeScript without `better-sqlite3`, or when debugging vec0 BigInt rowids, vitest hanging on sqlite-vec, `.ts` import errors under `node:sqlite`, or "sqlite extension not loadable". Covers extension loading, version-specific test-runner resolution issues, tsconfig flags, and CLI shebang. Trigger on `node:sqlite`, `sqlite-vec`, vec0 / vector storage even when the user does not name better-sqlite3.
 ---
 
 # node-sqlite-vec
@@ -15,16 +15,16 @@ Recipe for combining Node 24's built-in `node:sqlite` with the [`sqlite-vec`](ht
 
 Skip this skill if:
 
-- Your runtime is Node ≤ 22 (no built-in `node:sqlite`) — use `better-sqlite3`
+- Your deployment requires Node below 24 — upgrade to Node 24+ before using this recipe, or evaluate an adapter compatible with that deployment separately.
 - You need server-grade concurrency / replication — SQLite is the wrong tool
 
 ## Pitfalls (read first)
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `Failed to load url sqlite (resolved id: sqlite)` from vitest | vite strips the `node:` prefix and looks up plain `sqlite`, which does not exist | Drop vitest. Use `node --test` (built-in, no vite layer) |
+| `Failed to load url sqlite (resolved id: sqlite)` in an older runner | A version-specific resolver/runtime mismatch | Check the resolved Vite/Vitest versions and Node test environment. The current smoke passes in both Node and Vitest; retain the project's runner. |
 | `ERR_SQLITE_ERROR: Only integers are allows for primary key values on <table>_vec` on insert | JS `number` gets bound as REAL; `vec0` virtual tables require strict integer rowids | Wrap rowid bindings with `BigInt(id)` |
-| `loadExtension is not a function` or "Not authorized to use load_extension" | Both extension-load gates must be opened | `new DatabaseSync(path, { allowExtension: true })` **and** `db.enableLoadExtension(true)` |
+| `loadExtension is not a function` or "Not authorized to use load_extension" | Extension loading is disabled by the constructor or a later call | `new DatabaseSync(path, { allowExtension: true })` (re-enable with `db.enableLoadExtension(true)` only if previously disabled) |
 | `ExperimentalWarning: SQLite is an experimental feature` printed every CLI run | Node 24 emits this for any `node:sqlite` import | `#!/usr/bin/env -S node --no-warnings=ExperimentalWarning` in the bin shebang |
 | `An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled` | tsc rejects `import "./x.ts"` by default; `--experimental-strip-types` requires `.ts` extensions | Set `allowImportingTsExtensions: true` and `rewriteRelativeImportExtensions: true` in `tsconfig.json` |
 
@@ -79,8 +79,9 @@ this skill targets, and the flag is now a no-op. Node still prints an
 `ExperimentalWarning` because the module sits at stability 1.2 (release candidate
 as of Node 25.7); see "Silencing the ExperimentalWarning" below.
 
-`--experimental-strip-types` is a separate flag and *is* still needed to run
-`.ts` files directly on Node 22; Node 23+ strips types by default.
+`--experimental-strip-types` is a separate flag. Node 24+ strips supported
+TypeScript syntax by default, so it is optional in this recipe. Type stripping
+does not typecheck the program; keep the separate `tsc --noEmit` check.
 
 ## Open + load extension
 
@@ -98,7 +99,7 @@ export function openDB(path: string) {
 }
 ```
 
-Both `allowExtension: true` (constructor) **and** `enableLoadExtension(true)` (instance) are required. If either is missing, the load throws.
+`allowExtension: true` permits loading from the start. A later `enableLoadExtension(false)` disables it; re-enable only when loading another trusted extension is intended. The explicit `enableLoadExtension(true)` in the example is redundant for a newly opened handle, not a second mandatory startup gate.
 
 Verify:
 
@@ -171,15 +172,14 @@ const rows = db.prepare(sql).all(blob, k, k);
 
 `v.k = ?` pre-filters to the top-k inside vec0; the outer `LIMIT` is the same number for clarity. When you also need a non-vector filter (e.g. `WHERE kind = 'X'`), pull more candidates via a larger `v.k` so the secondary filter does not starve.
 
-## Testing: do NOT use vitest
+## Testing with the project's runner
 
-vitest depends on vite, and vite's resolver strips the `node:` prefix when resolving imports. `node:sqlite` has no plain-name fallback, so vitest fails before any test runs:
-
-```
-Error: Failed to load url sqlite (resolved id: sqlite). Does the file exist?
-```
-
-Use Node's built-in test runner instead:
+Checked 2026-11-16 on Node 24.22.2, sqlite-vec 0.1.9 and Vitest 5.1.0.
+The [smoke fixture](assets/smoke/package.json) loads the real extension, inserts
+vectors and verifies the nearest neighbor in both `node --test` and Vitest's
+Node environment. The historical resolver error is not a blanket Vitest limitation.
+Keep the project's runner; reproduce a failure with its actual versions before
+changing it. Node's built-in runner remains a small standalone option:
 
 ```ts
 // tests/db.test.ts
@@ -240,11 +240,12 @@ This becomes annoying in scripts that capture stderr. Suppress it at the entry p
 | v22.13.0 / v23.4.0 | Flag no longer required; still experimental (warning stays) |
 | v25.7.0+ | Stability 1.2 — release candidate; warning still emitted |
 
-Practical consequences today (Node 24 LTS "Krypton", Node 26 current):
+For this recipe, use Node 24 or newer and check the selected release's SQLite
+stability status rather than relying on a fixed "current" release label:
 
 - Drop `--experimental-sqlite` from every script — it does nothing
 - Keep `--no-warnings=ExperimentalWarning` while the module is pre-1.0; remove it once the stability index reaches 2
-- Everything else (BigInt rowids, vitest avoidance, tsconfig flags) is independent of stability and continues to apply
+- Test rowid binding, extension loading and TypeScript imports against the selected runtime/runner; module stability does not establish those integration contracts.
 
 ## References
 

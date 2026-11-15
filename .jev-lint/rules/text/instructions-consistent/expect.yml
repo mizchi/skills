@@ -1,0 +1,98 @@
+{
+  "fixtures/a.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "The required update changes the dependency versions the other directive forbids changing."
+    }
+  ],
+  "fixtures/b.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Existing-project scope is an explicit exception to the new-project default."
+    }
+  ],
+  "fixtures/c.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "The same test execution is required and prohibited."
+    }
+  ],
+  "fixtures/d.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Prior authorization satisfies the prerequisite."
+    }
+  ],
+  "fixtures/e.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Every handled request requires and prohibits a code modification."
+    }
+  ],
+  "fixtures/f.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Generated updates do not violate the by-hand prohibition."
+    }
+  ],
+  "fixtures/g.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Application state persistence and CI test artifacts have distinct scopes."
+    }
+  ],
+  "fixtures/h.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Every refactor requires breaking the preservation guarantee."
+    }
+  ],
+  "fixtures/i.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "The commands apply to alternative project configurations."
+    }
+  ],
+  "fixtures/j.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "The same run must finish before and start after the same delivery."
+    }
+  ],
+  "fixtures/k.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Local preparation and hosted-service mutation are different actions."
+    }
+  ],
+  "fixtures/l.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "The contradictory text is explicitly an incorrect example, not operative instructions."
+    }
+  ]
+}

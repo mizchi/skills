@@ -1,0 +1,767 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-11-16",
+  "nodePolicy": ">=24",
+  "automationStatus": "implemented: fetched upstream evidence, deterministic drift checks and jev-lint document comparisons",
+  "groups": [
+    {
+      "id": "github-actions",
+      "cadence": "daily",
+      "skills": [
+        "actions-ci-tuning",
+        "playwright-test",
+        "justfile",
+        "nix-setup",
+        "gleam-practice",
+        "moonbit-practice",
+        "cloudflare-workers-cd-rollback",
+        "stryker-js",
+        "aws-github-oidc-scoped-role",
+        "dotenvx",
+        "flaker-storage-cache-on-ci",
+        "ast-grep-practice"
+      ],
+      "sources": [
+        {
+          "kind": "github-release",
+          "repository": "actions/checkout",
+          "observed": "v7.0.1"
+        },
+        {
+          "kind": "github-release",
+          "repository": "actions/setup-node",
+          "observed": "v7.1.0"
+        },
+        {
+          "kind": "github-release",
+          "repository": "actions/cache",
+          "observed": "v6.1.0"
+        },
+        {
+          "kind": "github-release",
+          "repository": "actions/upload-artifact",
+          "observed": "v7.0.2"
+        },
+        {
+          "kind": "github-release",
+          "repository": "actions/download-artifact",
+          "observed": "v8.0.2"
+        },
+        {
+          "kind": "github-release",
+          "repository": "pnpm/action-setup",
+          "observed": "v6.1.1"
+        },
+        {
+          "kind": "github-release",
+          "repository": "aws-actions/configure-aws-credentials",
+          "observed": "v6.3.0"
+        },
+        {
+          "kind": "github-action",
+          "repository": "actions/checkout",
+          "ref": "3d3c42e5aac5ba805825da76410c181273ba90b1"
+        },
+        {
+          "kind": "github-action",
+          "repository": "actions/setup-node",
+          "ref": "949feb2413d6458794dcd2491c4babbbce0c15c1"
+        },
+        {
+          "kind": "github-action",
+          "repository": "actions/cache",
+          "ref": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9"
+        },
+        {
+          "kind": "github-action",
+          "repository": "actions/upload-artifact",
+          "ref": "cf430e030ddbb5b0abf93d22962f4752f3646cd9"
+        },
+        {
+          "kind": "github-action",
+          "repository": "actions/download-artifact",
+          "ref": "9000827ccba6bdab643e8b6fd33ac0654aef8333"
+        },
+        {
+          "kind": "github-action",
+          "repository": "pnpm/action-setup",
+          "ref": "73e46992e05b19abd31f2f3c20e0e7370d762115"
+        },
+        {
+          "kind": "github-action",
+          "repository": "aws-actions/configure-aws-credentials",
+          "ref": "e1253824e5c10ff9df46874f81ed3ec929e19cfd"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://github.blog/changelog/2026-09-23-node-20-is-no-longer-available-in-github-actions/"
+        }
+      ],
+      "validation": [
+        "Resolve release tags to commits",
+        "Inspect runs.using at each pinned commit, including composite action dependencies",
+        "Validate real workflows and extracted Markdown examples",
+        "Preserve existing action behavior and runner requirements"
+      ],
+      "targets": [
+        ".github/workflows/skills.yml",
+        ".github/workflows/markdown-links.yml",
+        "cloudflare-workers-cd-rollback/assets/workflows/deploy.yml",
+        "stryker-js/assets/mutation-diff.yml",
+        "gleam-practice/assets/github-actions/ci.yml",
+        "nix-setup/assets/devbox/gh_action_example.yaml",
+        ".github/workflows/skill-freshness.yml"
+      ],
+      "topic": "Only project Node 24+ and the embedded Node runtime of named GitHub Actions, including supported pinned older releases. Release examples need not track the newest patch; exclude unrelated deployment, caching and framework behavior.",
+      "comparisons": [
+        {
+          "path": "actions-ci-tuning/SKILL.md",
+          "heading": "Action Version Pinning"
+        },
+        {
+          "path": ".github/workflows/skills.yml"
+        },
+        {
+          "path": ".github/workflows/markdown-links.yml"
+        },
+        {
+          "path": "cloudflare-workers-cd-rollback/assets/workflows/deploy.yml"
+        },
+        {
+          "path": "stryker-js/assets/mutation-diff.yml"
+        },
+        {
+          "path": "gleam-practice/assets/github-actions/ci.yml"
+        },
+        {
+          "path": "nix-setup/assets/devbox/gh_action_example.yaml"
+        },
+        {
+          "path": ".github/workflows/skill-freshness.yml"
+        }
+      ]
+    },
+    {
+      "id": "cloudflare",
+      "cadence": "daily",
+      "skills": [
+        "cloudflare-deploy",
+        "cloudflare-access-app-setup",
+        "cloudflare-mbt-worker-bundle",
+        "cloudflare-workers-cd-rollback",
+        "cloudflare-workers-otel-utels",
+        "utels-project-bootstrap"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "cf",
+          "tag": "latest",
+          "observed": "1.0.0-beta.32"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@cloudflare/vite-plugin",
+          "tag": "latest",
+          "observed": "1.69.1"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://developers.cloudflare.com/changelog/"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://developers.cloudflare.com/workers/runtime-apis/nodejs/",
+          "focus": [
+            "fs",
+            "http",
+            "net",
+            "supported"
+          ]
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@cloudflare/vite-plugin",
+          "tag": "beta",
+          "observed": "2.0.0-beta.v.17"
+        },
+        {
+          "kind": "github-path",
+          "repository": "cloudflare/cf",
+          "path": "packages/cli/README.md"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://developers.cloudflare.com/cf/get-started/resources/",
+          "focus": [
+            "cli search",
+            "schema",
+            "JSON",
+            "stdout",
+            "stderr",
+            "--local"
+          ]
+        }
+      ],
+      "validation": [
+        "Compare installed cf help/schema and config types with the beta.5 guide baseline",
+        "Check engines against the selected Node patch",
+        "Run local Worker bundle, secret-delivery and deployment-state tests",
+        "Review compatibility-date-dependent API availability",
+        "Use dry runs; no account mutations in an update check"
+      ],
+      "targets": [
+        "cloudflare-deploy/references/workerd/api.md",
+        "cloudflare-deploy/references/cf/README.md",
+        "cloudflare-deploy/references/cf/auth.md",
+        "cloudflare-deploy/references/cf/gotchas.md",
+        "cloudflare-deploy/references/cf/configuration.md",
+        "cloudflare-workers-cd-rollback/references/cd-traps.md"
+      ],
+      "topic": "Only cf npm package naming, CLI discovery and current project prerequisites; or Workers support for node:fs, node:http and node:net. Historical beta baselines are not claims that newer versions are unavailable. Exclude app-specific utels, telemetry and rollback contracts.",
+      "comparisons": [
+        {
+          "path": "cloudflare-deploy/SKILL.md",
+          "heading": "Prerequisites"
+        },
+        {
+          "path": "cloudflare-deploy/SKILL.md",
+          "heading": "Discover Commands Before Running Them"
+        },
+        {
+          "path": "cloudflare-deploy/references/workerd/api.md",
+          "contains": "**Check API-specific support:**"
+        }
+      ]
+    },
+    {
+      "id": "moonbit",
+      "cadence": "daily",
+      "skills": [
+        "moonbit-practice",
+        "moonbit-js-binding",
+        "ts2moonbit-migration",
+        "cloudflare-mbt-worker-bundle",
+        "sqlc-gen-moonbit-safety"
+      ],
+      "sources": [
+        {
+          "kind": "documentation",
+          "url": "https://www.moonbitlang.com/updates",
+          "observed": "2026-11-05 v0.10.19",
+          "focus": [
+            "Array",
+            "FixedArray",
+            "v0.10.19",
+            "2026-11-05"
+          ]
+        },
+        {
+          "kind": "github-branch",
+          "repository": "moonbitlang/moon",
+          "branch": "main"
+        },
+        {
+          "kind": "github-path",
+          "repository": "moonbitlang/async",
+          "path": "moon.mod"
+        },
+        {
+          "kind": "github-path",
+          "repository": "mizchi/js.mbt",
+          "path": "CHANGELOG.md"
+        },
+        {
+          "kind": "github-path",
+          "repository": "mizchi/x",
+          "path": "moon.mod"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://www.moonbitlang.com/updates/2026/09/21/index",
+          "focus": [
+            "Array",
+            "FixedArray",
+            "JavaScript",
+            "next release"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://www.moonbitlang.com/updates/2026/11/05/index",
+          "focus": [
+            "Array",
+            "FixedArray",
+            "JavaScript",
+            "next release"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://docs.moonbitlang.com/en/latest/language/ffi.html",
+          "focus": [
+            "Uint8Array",
+            "FixedArray",
+            "Array"
+          ]
+        }
+      ],
+      "validation": [
+        "Read at least the latest three applicable articles; newer guidance wins",
+        "Record actual moon/moonc and library versions",
+        "Run the existing Wasm, JS, Native and FFI smoke suite",
+        "Revalidate external adapter APIs separately",
+        "Treat open PRs as unreleased until they land in a usable toolchain"
+      ],
+      "topic": "Published release baseline and announced JS Array/FixedArray FFI migration, distinguishing v0.10.19 announcements from explicitly tested v0.10.20 compiler behavior. Do not infer external library API signatures from an update article.",
+      "comparisons": [
+        {
+          "path": "moonbit-practice/SKILL.md",
+          "contains": "Updated against the latest three releases"
+        },
+        {
+          "path": "moonbit-js-binding/SKILL.md",
+          "contains": "**Array migration:**"
+        }
+      ]
+    },
+    {
+      "id": "agent-distribution",
+      "cadence": "daily",
+      "skills": [
+        "apm-usage",
+        "publish-agent-skill",
+        "skill-finder",
+        "skill-selector",
+        "chezmoi-management",
+        "pi-coding-agent"
+      ],
+      "sources": [
+        {
+          "kind": "github-release",
+          "repository": "microsoft/apm",
+          "observed": "v0.35.1"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@mariozechner/pi-coding-agent",
+          "tag": "latest",
+          "observed": "0.73.1"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@earendil-works/pi-coding-agent",
+          "tag": "latest",
+          "observed": "1.5.2"
+        },
+        {
+          "kind": "github-path",
+          "repository": "earendil-works/pi",
+          "path": "packages/coding-agent/docs/sdk.md"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://microsoft.github.io/apm/reference/cli/update/"
+        },
+        {
+          "kind": "github-path",
+          "repository": "earendil-works/pi",
+          "path": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+        }
+      ],
+      "validation": [
+        "Track renamed packages and repository redirects",
+        "Compile SDK examples against an explicit package version without model requests",
+        "Inspect CLI update/help and target deployment paths in temporary directories",
+        "Verify consumer provenance and reload semantics",
+        "Do not overwrite global installations during verification"
+      ],
+      "targets": [
+        "publish-agent-skill/references/apm.md",
+        "publish-agent-skill/references/updates.md"
+      ],
+      "topic": "Current APM targeted dependency update commands and the current Pi ModelRuntime/session SDK generation. Keep CLI tool upgrades, dependency updates and explicit old-version baselines distinct.",
+      "comparisons": [
+        {
+          "path": "apm-usage/SKILL.md",
+          "heading": "Install, replay and update are different"
+        },
+        {
+          "path": "apm-usage/SKILL-ja.md",
+          "heading": "導入・再現・更新を分ける"
+        },
+        {
+          "path": "pi-coding-agent/SKILL.md",
+          "heading": "Model and credential runtime"
+        },
+        {
+          "path": "publish-agent-skill/references/updates.md",
+          "heading": "APM dependency refresh",
+          "topic": "APM targeted dependency update versus upgrading the APM tool, including global scope and frozen replay. Other distribution channels are separate."
+        }
+      ]
+    },
+    {
+      "id": "vlmkit",
+      "cadence": "daily",
+      "skills": [
+        "vlmkit"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@mizchi/vrt",
+          "tag": "latest",
+          "observed": "0.5.0",
+          "bin": "vrt"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@mizchi/vlmkit",
+          "tag": "latest",
+          "observed": "0.24.0",
+          "bin": "vlmkit"
+        },
+        {
+          "kind": "github-release",
+          "repository": "mizchi/vlmkit",
+          "observed": "v0.9.1"
+        },
+        {
+          "kind": "github-path",
+          "repository": "mizchi/vlmkit",
+          "path": "CHANGELOG.md",
+          "observed": "main documents 0.27.0"
+        }
+      ],
+      "validation": [
+        "Keep npm, GitHub release and main revisions distinct",
+        "Verify that the installed package actually provides the documented binary",
+        "Check CLI help and referenced sub-skill paths",
+        "Run a deterministic HTML comparison without model credentials"
+      ],
+      "targets": [
+        "vlmkit/assets/smoke/package.json"
+      ],
+      "topic": "Published package name and provided CLI binary; npm and upstream main are distinct channels and a pinned smoke dependency is a versioned baseline."
+    },
+    {
+      "id": "otel",
+      "cadence": "weekly",
+      "skills": [
+        "opentelemetry",
+        "otel-node",
+        "cloudflare-workers-otel-utels"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@opentelemetry/sdk-node",
+          "tag": "latest",
+          "observed": "0.301.2"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@opentelemetry/resources",
+          "tag": "latest",
+          "observed": "3.1.1"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@opentelemetry/sdk-trace-base",
+          "tag": "latest",
+          "observed": "2.12.0; deprecated in favor of @opentelemetry/sdk-trace"
+        },
+        {
+          "kind": "github-path",
+          "repository": "open-telemetry/opentelemetry-js",
+          "path": "doc/3.x/migration-guide.md",
+          "focus": [
+            "BatchSpanProcessor",
+            "spanProcessors",
+            "resourceFromAttributes",
+            "sdk-trace-base"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://opentelemetry.io/docs/specs/semconv/"
+        }
+      ],
+      "validation": [
+        "Resolve SDK, API, exporter and semconv packages as a compatible cohort",
+        "Compile the exact initialization and propagation examples",
+        "Verify parent/child IDs and an in-memory export",
+        "Test bundled and unbundled ESM separately",
+        "Review semantic attribute renames"
+      ],
+      "targets": [
+        "otel-node/assets/smoke/instrumentation.ts"
+      ],
+      "topic": "Only SDK 3/API 1.10 initialization: resourceFromAttributes, sdk-trace and BatchSpanProcessor object options, spanProcessors and provider registration. SDK 2/API 1.9 historical guidance remains valid for that older cohort.",
+      "comparisons": [
+        {
+          "path": "opentelemetry/SKILL.md",
+          "heading": "OTLP Exporter Config"
+        },
+        {
+          "path": "otel-node/SKILL.md",
+          "heading": "Initialize before application imports"
+        }
+      ]
+    },
+    {
+      "id": "void",
+      "cadence": "weekly",
+      "skills": [
+        "void-app"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "void",
+          "tag": "latest",
+          "observed": "1.9.1"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "@void/react",
+          "tag": "latest",
+          "observed": "1.9.1"
+        },
+        {
+          "kind": "npm-dist-tag",
+          "package": "vite-plus",
+          "tag": "latest",
+          "observed": "1.6.0"
+        },
+        {
+          "kind": "github-path",
+          "repository": "voidzero-dev/void",
+          "path": "docs/guide/pages-routing/actions-and-forms.md",
+          "focus": [
+            "resetOnSuccess",
+            "initial: true"
+          ]
+        },
+        {
+          "kind": "github-path",
+          "repository": "voidzero-dev/void",
+          "path": "docs/reference/api/rewrites.md",
+          "focus": [
+            "redirect",
+            "action key",
+            "query"
+          ]
+        }
+      ],
+      "validation": [
+        "Read the resolved package's bundled docs and engines",
+        "Recheck the recorded 1.1.11 redirect/reset workarounds",
+        "Run local CRUD, migration preservation and Playwright checks before changing guidance"
+      ],
+      "topic": "Current package generation, Node engines and the scope of explicitly dated historical application baselines. Do not require every old workaround to be removed without current behavior evidence.",
+      "comparisons": [
+        {
+          "path": "void-app/SKILL.md",
+          "contains": "Current check (2026-11-16)"
+        },
+        {
+          "path": "void-app/SKILL-ja.md",
+          "contains": "現行確認（2026-11-16）"
+        },
+        {
+          "path": "void-app/SKILL.md",
+          "heading": "Current redirect behavior",
+          "topic": "Current Void redirect behavior: ordinary queries versus named actions and method-preserving redirects. Historical 1.1.11 workaround is distinct."
+        }
+      ]
+    },
+    {
+      "id": "browser-testing",
+      "cadence": "weekly",
+      "skills": [
+        "playwright-test",
+        "playwright-cli",
+        "actions-ci-tuning",
+        "node-sqlite-vec",
+        "stryker-js",
+        "frontend-review-testing"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "@playwright/test",
+          "tag": "latest",
+          "observed": "1.65.1"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://playwright.dev/docs/release-notes"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://nodejs.org/docs/latest-v24.x/api/sqlite.html"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://playwright.dev/docs/test-cli",
+          "focus": [
+            "--shard",
+            "--project",
+            "--trace",
+            "playwright test"
+          ]
+        }
+      ],
+      "validation": [
+        "Pair browser binaries and container tags with the project's locked Playwright version",
+        "Compile runner configuration and verify sharding/report flags",
+        "Reproduce version-specific incompatibilities before retaining blanket workarounds"
+      ],
+      "topic": "The documented Playwright terminal CLI commands and flags, especially test, codegen, screenshot, pdf, browser installation and sharding. Exclude unrelated test-quality, sqlite or Stryker behavior.",
+      "comparisons": [
+        {
+          "path": "playwright-cli/SKILL.md",
+          "heading": "Quick Reference"
+        }
+      ]
+    },
+    {
+      "id": "pnpm-and-review-inputs",
+      "cadence": "weekly",
+      "skills": [
+        "dep-lib-review",
+        "frontend-review-deps",
+        "upstream-fix-and-pin",
+        "frontend-review-weekly",
+        "tech-trend-watch"
+      ],
+      "sources": [
+        {
+          "kind": "npm-dist-tag",
+          "package": "pnpm",
+          "tag": "latest",
+          "observed": "12.21.0"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://pnpm.io/cli/audit"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://www.thoughtworks.com/radar/faq",
+          "focus": [
+            "twice a year",
+            "twice",
+            "often",
+            "publish"
+          ]
+        },
+        {
+          "kind": "documentation",
+          "url": "https://stateofjs.com/"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://stateofcss.com/"
+        },
+        {
+          "kind": "pnpm-audit-schema"
+        }
+      ],
+      "validation": [
+        "Preserve project packageManager and lockfile; test multiple supported report schemas explicitly",
+        "Fail on unknown report structure instead of treating it as no vulnerabilities",
+        "Verify bundled audit scripts/checklists exist",
+        "Check survey/Radar editions on publication; do not infer migration needs from popularity alone"
+      ],
+      "targets": [
+        "dep-lib-review/scripts/audit-report.mjs",
+        "frontend-review-deps/scripts/audit-report.mjs"
+      ],
+      "topic": "Only the current pnpm audit report schema versus the documented normalizer, and the Thoughtworks Radar publication frequency (distinct from a quarterly review schedule). Do not infer package deprecation from release age.",
+      "comparisons": [
+        {
+          "path": "dep-lib-review/SKILL.md",
+          "contains": "The checked pnpm 10.28.2",
+          "topic": "The JSON schema of the explicitly tested pnpm 10.28.2 audit command: advisories and metadata.vulnerabilities versus npm-style top-level vulnerabilities. Other pnpm versions and our own normalizer logic are separate."
+        },
+        {
+          "path": "frontend-review-deps/SKILL.md",
+          "contains": "The checked pnpm 10.28.2",
+          "topic": "The JSON schema of the explicitly tested pnpm 10.28.2 audit command: advisories and metadata.vulnerabilities versus npm-style top-level vulnerabilities. Other pnpm versions and our own normalizer logic are separate."
+        },
+        {
+          "path": "tech-trend-watch/SKILL.md",
+          "heading": "Data Sources"
+        }
+      ]
+    },
+    {
+      "id": "aws-oidc",
+      "cadence": "weekly",
+      "skills": [
+        "aws-github-oidc-scoped-role"
+      ],
+      "sources": [
+        {
+          "kind": "documentation",
+          "url": "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws"
+        },
+        {
+          "kind": "documentation",
+          "url": "https://docs.github.com/en/actions/reference/security/oidc",
+          "focus": [
+            "include_claim_keys",
+            "job_workflow_ref",
+            "context",
+            "customizing"
+          ]
+        }
+      ],
+      "validation": [
+        "Distinguish AWS-supported IAM keys from claims merely present in a JWT",
+        "Check reusable-workflow claim semantics and the repository's actual sub format",
+        "Require a reviewed isolated policy validation before replacing the trust example"
+      ],
+      "targets": [
+        "aws-github-oidc-scoped-role/references/oidc-subjects.md"
+      ],
+      "topic": "Only AWS IAM audience and subject trust conditions, custom job_workflow_ref embedded inside a customized sub for reusable workflows, and immutable subject formats. Exclude Bedrock and TLS provider setup.",
+      "comparisons": [
+        {
+          "path": "aws-github-oidc-scoped-role/SKILL.md",
+          "heading": "Scope trust through `aud` and `sub`"
+        },
+        {
+          "path": "aws-github-oidc-scoped-role/references/oidc-subjects.md"
+        }
+      ]
+    }
+  ],
+  "requiredResources": [
+    "frontend-review-triage/scripts/audit-report.mjs",
+    "frontend-review-triage/scripts/audit-triage.sh",
+    "frontend-review-triage/scripts/frontend-audit.mjs",
+    "frontend-review-ci/scripts/audit-ci.sh",
+    "frontend-review-ci/scripts/audit-report.mjs",
+    "frontend-review-ci/scripts/frontend-audit.mjs",
+    "frontend-review-deps/scripts/audit-deps.sh",
+    "frontend-review-deps/scripts/audit-report.mjs",
+    "frontend-review-deps/scripts/audit-trend-watch.sh",
+    "frontend-review-deps/scripts/frontend-audit.mjs",
+    "frontend-review-hygiene/scripts/audit-lint.sh",
+    "frontend-review-hygiene/scripts/audit-report.mjs",
+    "frontend-review-hygiene/scripts/audit-similarity.sh",
+    "frontend-review-hygiene/scripts/audit-typescript.sh",
+    "frontend-review-hygiene/scripts/frontend-audit.mjs",
+    "frontend-review-security/scripts/audit-report.mjs",
+    "frontend-review-security/scripts/audit-security.sh",
+    "frontend-review-security/scripts/frontend-audit.mjs",
+    "frontend-review-testing/scripts/audit-coverage.sh",
+    "frontend-review-testing/scripts/audit-report.mjs",
+    "frontend-review-testing/scripts/frontend-audit.mjs",
+    "dep-lib-review/scripts/audit-report.mjs"
+  ]
+}

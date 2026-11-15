@@ -17,6 +17,16 @@ description: mizchi 個人の chezmoi dotfiles 運用メモ (Meta-skill)。 ~/.c
 | pre-push | [pkfire](https://github.com/mizchi/pkfire) (`Taskfile.pkl` + `pkf hooks install`) + [secretlint](https://github.com/secretlint/secretlint) |
 | apply 後フック | `run_after_apm-install.sh` → `apm install --global --target claude` |
 
+### nix home-manager との役割分担
+
+home-manager と並行して運用し、互いを包含する仕組みとは扱わない。
+
+- home-manager: `home.packages`、`programs.*`、Nix derivation から入るCLI。`dot_config/home-manager/common.nix` を編集し、`darwin-rebuild switch --flake .#macos` または `home-manager switch` で反映する。
+- chezmoi: `programs.*` で扱わない dotfile 本文、`~/.claude/`、`~/.codex/`、`~/.apm/`、独自の設定やtemplate。home-manager の設定ファイルも配布するが、実際のパッケージ導入はNixが担当する。
+- APM: 公開スキル。`.chezmoiignore` に列挙し、chezmoi から上書きしない。
+
+対象に home-manager の `programs.*` があるなら、そこで設定する。同じdotfileをchezmoiからも配布して二重管理しない。
+
 ## レイアウト早見表
 
 ```
@@ -93,16 +103,27 @@ chezmoi cd                              # source dir に cd
 
 ## 新マシン初期化
 
+導入順は **Nix → chezmoi → APM**。chezmoi の `run_once_before_install-brew.sh` が `~/brew` を用意し、nix-darwin 初回適用で参照できるようにする。
+
 ```bash
-# chezmoi 本体: brew install chezmoi など
+# 1. Nix を導入する（Determinate Systems installer）。
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 
+# 2. chezmoi を初期化・適用。brew のbootstrapはここで一度実行される。
 chezmoi init https://github.com/mizchi/chezmoi-dotfiles.git --apply
-# ↑ clone + apply までやる。run_after_apm-install.sh が走って
-#   apm install --global --target claude で外部スキルが入る
 
-# pre-push gate を有効化（新マシンで一度だけ）
+# 3. home-manager / nix-darwin を適用し、pkfire、pkl、awscli2 等を導入する。
+nix run nix-darwin -- switch --flake ~/.config/home-manager#macos
+# system層を変更しない standalone home-manager の場合:
+# nix run home-manager/master -- switch --flake ~/.config/home-manager#macos
+
+# 4. sourceのpre-push gateを有効化。
 cd $(chezmoi source-path)
-pkf hooks install   # .git/hooks/pre-push を書き出す (outgoing diff に secretlint)
+pkf hooks install
+
+# 5. step 2 の run_after_apm-install.sh で apm install -g は実行済み。
+# 後で依頼されたパッケージを更新する場合:
+# apm update -g <requested-package> --yes
 ```
 
 ## スキル追加フロー（自分向け定型）

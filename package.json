@@ -1,0 +1,33 @@
+{
+  "name": "mizchi-skills",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "lint:skills": "node scripts/lint-skills.mjs",
+    "lint:skills:plan": "node scripts/lint-skills.mjs --dry-run --show-subjects",
+    "lint:skills:eval": "cd .jev-lint && jev-lint eval rules --repeat 3",
+    "lint:skills:replay": "cd .jev-lint && jev-lint eval rules --replay",
+    "lint:translations": "node scripts/lint-translations.mjs",
+    "lint:translations:plan": "node scripts/lint-translations.mjs --dry-run",
+    "lint:tool-policy": "jev-lint docs --document-manifest .jev-lint/tool-policy.json",
+    "test:skill-lint": "node --test scripts/skill-lint_test.mjs",
+    "links:install": "node scripts/install-lychee.mjs",
+    "lint:links": "node scripts/check-markdown-links.mjs",
+    "lint:links:online": "node scripts/check-markdown-links.mjs --online",
+    "test:links": "node --test scripts/markdown-links_test.mjs",
+    "lint:freshness": "node scripts/lint-freshness.mjs",
+    "test:freshness": "node --test scripts/skill-freshness_test.mjs scripts/lint-freshness_test.mjs",
+    "test:frontend-audit": "node --test scripts/frontend-audit_test.mjs",
+    "test:audit-report": "node --test dep-lib-review/scripts/audit-report_test.mjs",
+    "freshness:controls": "node scripts/check-freshness-controls.mjs",
+    "frontend:sync": "node scripts/sync-frontend-audit.mjs",
+    "frontend:sync:check": "node scripts/sync-frontend-audit.mjs --check"
+  },
+  "devDependencies": {
+    "jev-lint": "0.8.0"
+  }
+}

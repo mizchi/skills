@@ -1,22 +1,24 @@
 ---
 name: nix-setup
-description: Set up reproducible dev environments via devbox (Nix-backed) or pure Nix flakes. Templates for MoonBit, Rust, TypeScript+pnpm, Python+uv, Haskell, OCaml, OxCaml preloaded with just / ast-grep / apm. Covers devbox.json, buildNpmPackage, direnv, GitHub Actions, and bootstrapping in sandboxed envs (Claude Code web). Use when starting, adding, or troubleshooting a Nix or devbox setup.
+description: Set up or troubleshoot requested or existing Nix environments, including flakes, buildNpmPackage, direnv, CI, and per-language templates. Use the devbox reference only when the project already uses devbox or the user explicitly selects it; do not introduce devbox by default for new projects.
 ---
 
 # Nix Setup Skill
 
 Reference for setting up reproducible development environments. Two paths share the same Nix backend:
 
-- **devbox** — thin layer over Nix; `devbox.json` is concise JSON. Default for new projects.
+- **devbox** — an optional Nix-based workflow for projects that already use it or users who explicitly select it.
 - **pure flake.nix** — full Nix expression power; per-language templates ship under `assets/` for `cp`-and-go bootstrap.
 
 ## Decision: devbox or pure flake?
 
-`devbox` runs on top of Nix (uses Nix store + nixpkgs internally), so picking one or the other is a UX choice, not a stack choice. Defaults for mizchi/<repo>:
+Preserve the existing project environment. A request for a reproducible setup does not by itself select devbox or require introducing Nix. When Nix is requested or already in use, choose from the project's requirements:
 
 | When | Use |
 |---|---|
-| New project, standard nixpkgs packages cover the need | **devbox** |
+| Existing environment configuration | Retain the selected tool and lockfile |
+| User explicitly selects devbox, or the project already uses it | **devbox** |
+| New project without an environment-tool choice | Follow the requested toolchain; do not introduce devbox automatically |
 | Need a custom derivation, input override, overlay, or `buildNpmPackage` | **flake.nix** |
 | Need `flake.lock` as the authoritative reproducibility source (vs `devbox.lock`) | **flake.nix** |
 | Targeting Claude Code web / sandboxed env where the devbox installer is too heavy | **flake.nix** with `setup_nix.sh` |
@@ -24,12 +26,12 @@ Reference for setting up reproducible development environments. Two paths share 
 
 `devbox.json` packages map near-1:1 to nixpkgs attribute paths, so switching to flake.nix later is straightforward.
 
-**When picking pure flake.nix, write the reason `devbox is rejected` into the proposal (one short line).** Example: "Choosing pure flake.nix here because rust-overlay's input override cannot be expressed in `devbox.json`." This keeps reviewers from having to re-derive why the heavier flake path was chosen, and forces the matrix to be applied consciously rather than by reflex.
+Explain a tool choice when it helps the requested setup. There is no requirement to reject devbox before using flakes or another environment setup.
 
 ## When to use
 
 - "Create a nix dev shell" / "Write a flake.nix" / "Set up devbox"
-- "Add a reproducible env to a new project"
+- Add a reproducible environment when Nix is requested or already selected
 - "Make nix work on claude code web / in a container"
 - General questions about `flake.nix` / `flake.lock` / `.envrc` / `devbox.json`
 - Troubleshooting `nix develop` / `nix build` / `devbox shell`
@@ -65,6 +67,8 @@ The templates assume you place `flake.nix` + `apm.nix` side-by-side at the proje
 
 ## Using devbox
 
+Use this section only for an existing devbox project or an explicit devbox choice. Its installer and templates are not general new-project defaults.
+
 `devbox` provides isolated, reproducible environments per project on top of Nix without writing Nix expressions.
 
 ### Install
@@ -77,7 +81,7 @@ curl -fsSL https://get.jetify.com/devbox | bash
 
 ```bash
 devbox init                       # creates devbox.json
-devbox add nodejs@20              # add packages by name@version
+devbox add nodejs@24              # add packages by name@version
 devbox add python@3.12 go@1.22
 devbox rm nodejs                  # remove
 devbox shell                      # enter the env shell
@@ -95,7 +99,7 @@ Package search index: <https://www.nixhub.io>.
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/main/.schema/devbox.schema.json",
   "packages": [
-    "nodejs@20",
+    "nodejs@24",
     "python@3.12",
     "github:NixOS/nixpkgs#hello"
   ],
@@ -154,7 +158,7 @@ steps:
 ### Devbox references
 
 - <https://github.com/jetify-com/devbox>
-- <https://www.jetify.com/devbox/docs/>
+- [Devbox installation and usage](https://github.com/jetify-com/devbox#installing-devbox)
 - <https://www.nixhub.io>
 
 ## Quick install

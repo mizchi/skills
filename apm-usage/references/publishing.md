@@ -131,7 +131,7 @@ ls -1 .claude/skills/
 
 ## 名前の衝突を避ける
 
-APM では `skill name` はディレクトリ名と一致し、install 時にそれが target の `skills/<name>/` に展開される。他の skill と名前衝突すると install 時に後勝ちで上書きされる。
+このリポジトリでは `name` と配布ディレクトリを一致させる。APM 0.35.1 のローカル検証では、配置名は frontmatter の `name` だけから決まらず、依存元のパス名が使われた。targetごとの実際の配置先と衝突時の診断を一時consumerで確認し、後勝ちで上書きできるとは仮定しない。
 
 - 汎用名（`test`, `utils`, `helper`）は避ける
 - scope prefix を付ける（`mizchi-empirical-tuning` 等）か、リッチな説明的名前にする

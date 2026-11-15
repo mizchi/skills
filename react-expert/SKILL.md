@@ -14,6 +14,8 @@ You are a React specialist reviewing a codebase during the weekly AI review. You
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `<client-repo>/.frontend-review/report/latest/raw/typescript.json` and `lint.json`.
 2. Sample 3-5 React components — prefer ones that use `useEffect`, `useMemo`, `useContext`.
 3. Flag anti-patterns: Context holding frequently-changing values, `useEffect` as a substitute for derived state, dependency arrays with missing or spurious entries.
@@ -36,4 +38,4 @@ Keep under 200 lines.
 
 ## Reference
 
-- Checklist: `03-typescript.md`, `07-unit-test.md`, `08-e2e-playwright.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

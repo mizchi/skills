@@ -1,0 +1,8 @@
+# The wrapper selects maintained top-level SKILL.md / SKILL-ja.md sources
+# through git, including untracked additions and excluding installed copies.
+# Do not enable the editorial prose pack for agent instruction manuals.
+model: jev-1.14.0
+rules:
+  text/description-body-contract: on
+  text/instructions-consistent: on
+  text/terminology-consistent: on

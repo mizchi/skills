@@ -46,7 +46,7 @@ extern "wasm" fn identity(d : Double) -> Double =
 ### C Backend
 
 ```moonbit
-extern "C" fn put_char(ch : UInt) = "putchar"
+extern "C" fn put_char(ch : UInt32) = "putchar"
 ```
 
 ## Type Mapping
@@ -57,11 +57,18 @@ extern "C" fn put_char(ch : UInt) = "putchar"
 |---------|-----------|
 | `String` | `string` |
 | `Bool` | `boolean` |
-| `Int`, `Double` | `number` |
+| `Int32`, `UInt32`, `Double` | `number` |
 | `BigInt` | `bigint` |
 | `Bytes` | `Uint8Array` |
-| `Array[T]` | `T[]` |
+| `FixedArray[T]` (except bytes) | `T[]` |
 | `#external type` | `any` |
+
+`Array[T]` is an internal growable container, not a supported JS array ABI.
+Pass `FixedArray::from_array(xs[:])` to an FFI function, and convert nested arrays at each
+boundary. v0.10.19 announced a new JS `Array` layout for the next release;
+the local v0.10.20 development compiler already uses it. Byte arrays use
+`Uint8Array`; numeric fixed arrays may use typed arrays in future versions.
+See the [official ABI table](https://docs.moonbitlang.com/en/latest/language/ffi.html).
 
 ### Wasm
 
@@ -225,5 +232,5 @@ Useful for compatibility with C library flags.
 
 ## References
 
-- FFI: https://docs.moonbitlang.com/en/stable/language/ffi
+- FFI: https://docs.moonbitlang.com/en/stable/language/ffi.html
 - JS FFI Guide: https://www.moonbitlang.com/pearls/moonbit-jsffi

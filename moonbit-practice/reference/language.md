@@ -6,6 +6,76 @@ title: MoonBit Language Features Reference
 
 Detailed examples of language features not covered in moonbit-agent-guide.
 
+For release-sensitive syntax use the newest applicable entry in
+[updates.md](updates.md), which covers August, September and November 2026.
+The checked examples below use the current syntax; external async cancellation
+is covered separately in [async.md](async.md).
+
+## Patterns and control flow from the reviewed releases
+
+- **Error narrowing (September):** `ParseError::_ as e` matches that suberror
+  type and narrows `e` from `Error`, without enumerating its constructors.
+- **Iteration patterns (September):** `for (name, count) in items { ... }`
+  destructures elements. A labelled block (August) can return a value through
+  `break done~ value`; a direct break inside the block must name its target.
+- **Non-exhaustive enums (September):** When consuming another package's
+  `#non_exhaustive` enum, match all known constructors then add `Type::..`.
+  The compiler then warns if a later upstream version adds a known constructor
+  you have not handled. Use `_` when intentionally ignoring remaining known
+  cases too; it does not provide that same evolution check.
+
+The checked [semantics fixture](../assets/update-smoke/semantics_wbtest.mbt)
+combines error narrowing and destructuring with a labelled early exit. Its enum
+is declared in a separate [variants package](../assets/update-smoke/variants/types.mbt),
+so the `Type::..` test exercises an actual external-package boundary.
+
+## Choose a lexical matcher
+
+Since August, `lexscan` is stable and consumes a `moonbitlang/core/lexbuf`
+scanner: `StringScanner` for an in-memory cursor, `Lexbuf` for synchronous
+streams, and `AsyncLexbuf` for async streams. It does not accept a bare String
+or StringView. Use `lexmatch` for a value, or `=~` for a boolean regex search.
+
+```moonbit
+fn whole_word(text : StringView) -> String? {
+  lexmatch text {
+    re"^[A-Za-z]+$" as word => Some(word.to_owned())
+    _ => None
+  }
+}
+```
+
+For successive tokens, construct `@lexbuf.StringScanner(text)` and pass it to
+`lexscan`; the scanner retains and advances its cursor. Regexes start with `^`,
+and a catch-all does not advance the cursor. A fallback is unnecessary only when
+the regex cases are exhaustive. See the
+[official matcher documentation](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan)
+and the cursor/whole-value regression case in the fixture above.
+
+November's `reb"..."` adds byte matching to `=~` and `lexmatch`; it does **not**
+add byte scanning to `lexscan`. Byte captures have static Byte/BytesView types;
+non-ASCII bytes use `\xHH`. August also adds `v128le` byte patterns for extracting
+16 little-endian bytes into a V128; check the chosen backend's SIMD support.
+
+## Declarations from November
+
+Write derives above their type as `#derive(...)`, and spell 32-bit widths as
+`Int32` / `UInt32`; old integer names remain aliases. Extensible enum declaration
+and extension are separate:
+
+```moonbit
+pub extenum Event
+
+extenum Event += {
+  Started
+}
+```
+
+Use `declare pub let limit : Int32` when declaring a top-level interface value;
+provide the matching `pub let limit : Int32 = ...` definition in the same
+package. Attribute arguments now accept `@pkg.id` and arrays; do not copy the
+old `qual.id` spelling. `moon fmt` handles supported syntax migrations.
+
 ## .mbti Files - Package Interface Documentation
 
 MoonBit interface files (`pkg.generated.mbti`) are compiler-generated summaries of each package's public API surface.
@@ -32,13 +102,13 @@ $ tree -P '*.mbti' -I 'internal' --prune ~/.moon/lib/core
 - **Start with `builtin/pkg.generated.mbti`** - contains core types (String, Int, Array, etc.)
 - Some builtin types like `String` expose APIs in both `builtin` and their dedicated packages
 - **Local dependencies**: Find `.mbti` files in the `.mooncakes` directory
-- **Your own packages**: After running `moon info`, check the generated `.mbti` in each package directory
+- **Your own packages**: A successful `moon check` refreshes `.mbti` for local packages whose preferred backend was checked. `moon info` remains available explicitly; use `moon check --no-mbti` when the check must not write interfaces
 
 ## Complex Types
 
 ```mbt check
 ///|
-type UserId = Int // Int is aliased to UserId - like symlink
+type UserId = Int32 // Int32 is aliased to UserId - like symlink
 
 ///|
 ///  Tuple-struct for callback
@@ -46,19 +116,20 @@ struct Handler((String) -> Unit) // A newtype wrapper
 
 ///|
 /// Tuple-struct syntax for single-field newtypes
-struct Meters(Int) // Tuple-struct syntax
+struct Meters(Int32) // Tuple-struct syntax
 
 ///|
 let distance : Meters = Meters(100)
 
 ///|
-let raw : Int = distance.0 // Access first field with .0
+let raw : Int32 = distance.0 // Access first field with .0
 
 ///|
+#derive(Show, Eq, Debug, @json.ToJson, @json.FromJson)
 struct Addr {
   host : String
-  port : Int
-} derive(Show, Eq, Debug, ToJson, FromJson)
+  port : Int32
+}
 
 ///|
 /// Structural types with literal syntax
@@ -76,7 +147,7 @@ enum Tree[T] {
 }
 
 ///|
-fn sum_tree(tree : Tree[Int]) -> Int {
+fn sum_tree(tree : Tree[Int32]) -> Int32 {
   match tree {
     Leaf(x) => x
     Node(left~, x, right~) => sum_tree(left) + x + sum_tree(right)
@@ -86,34 +157,42 @@ fn sum_tree(tree : Tree[Int]) -> Int {
 
 ## Common Derivable Traits
 
-Most types can automatically derive standard traits using the `derive(...)` syntax:
+Most types can automatically derive standard traits using the `#derive(...)` syntax:
+
+Place the attribute **above** the type. `moon fmt` migrates suffix derives.
+Derivation creates trait implementations; declare the corresponding `extend`
+when methods should be attached to the type. The implicit-attachment warning is
+enabled by default, including for derived implementations. For a checked
+`Debug`/`Eq`/`ToJson` example, see [the smoke fixture](../assets/update-smoke/lib.mbt).
 
 - **`Show`** - Enables `to_string()` and string interpolation with `\{value}` (human-facing formatting)
 - **`Debug`** - Structural debug output; required by `debug_inspect` and `@debug.to_string`
 - **`Eq`** - Enables `==` and `!=` equality operators
 - **`Compare`** - Enables `<`, `>`, `<=`, `>=` comparison operators
-- **`ToJson`** - Enables `@json.inspect()` for readable test output
+- **`ToJson`** - Enables `@json.json_inspect()` for readable test output
 - **`Hash`** - Enables use as Map keys
 - **`Arbitrary` / `Shrink`** - Property-test generation and shrinking (`@quickcheck`)
 
 ```mbt check
 ///|
+#derive(Show, Eq, Debug, @json.ToJson)
 struct Coordinate {
-  x : Int
-  y : Int
-} derive(Show, Eq, Debug, ToJson)
+  x : Int32
+  y : Int32
+}
 
 ///|
+#derive(Show, Eq, Debug, Compare)
 enum Status {
   Active
   Inactive
-} derive(Show, Eq, Debug, Compare)
+}
 ```
 
 **Best practice**: derive `Debug` and `Eq` on every data type — `debug_inspect` and
 `@debug.assert_eq` need them, and since v0.9 `Show` on container types is
 deprecated in favour of `Debug`. Keep `Show` for human-facing formatting, and add
-`ToJson` if you plan to test with `@json.inspect()`.
+`ToJson` if you plan to test with `@json.json_inspect()`.
 
 ## Reference Semantics by Default
 
@@ -123,7 +202,7 @@ MoonBit passes most types by reference semantically:
 ///|
 ///  Structs with 'mut' fields are always passed by reference
 struct Counter {
-  mut value : Int
+  mut value : Int32
 }
 
 ///|
@@ -133,13 +212,13 @@ fn increment(c : Counter) -> Unit {
 
 ///|
 /// Arrays and Maps are mutable references
-fn modify_array(arr : Array[Int]) -> Unit {
+fn modify_array(arr : Array[Int32]) -> Unit {
   arr[0] = 999 // Modifies original array
 }
 
 ///|
 ///  Use Ref[T] for explicit mutable references to primitives
-fn swap_values(a : Ref[Int], b : Ref[Int]) -> Unit {
+fn swap_values(a : Ref[Int32], b : Ref[Int32]) -> Unit {
   let temp = a.val
   a.val = b.val
   b.val = temp
@@ -147,8 +226,8 @@ fn swap_values(a : Ref[Int], b : Ref[Int]) -> Unit {
 
 ///|
 test "ref swap" {
-  let x : Ref[Int] = Ref::new(10)
-  let y : Ref[Int] = Ref::new(20)
+  let x : Ref[Int32] = Ref::new(10)
+  let y : Ref[Int32] = Ref::new(20)
   swap_values(x, y)
 }
 ```
@@ -160,12 +239,12 @@ MoonBit's pattern matching is comprehensive and exhaustive:
 ```mbt check
 ///|
 /// Destructure arrays with rest patterns
-fn process_array(arr : Array[Int]) -> String {
+fn process_array(arr : Array[Int32]) -> String {
   match arr {
     [] => "empty"
     [single] => "one: \{single}"
     [first, .. _middle, last] => "first: \{first}, last: \{last}"
-    // middle is of type ArrayView[Int]
+    // middle is of type ArrayView[Int32]
   }
 }
 
@@ -197,7 +276,7 @@ The `loop` construct is unique to MoonBit:
 ```mbt check
 ///|
 /// Functional loop with pattern matching on loop variables
-fn sum_list(list : @list.List[Int]) -> Int {
+fn sum_list(list : @list.List[Int32]) -> Int32 {
   loop (list, 0) {
     (Empty, acc) => acc
     (More(x, tail=rest), acc) => continue (rest, x + acc)
@@ -206,7 +285,7 @@ fn sum_list(list : @list.List[Int]) -> Int {
 
 ///|
 ///  Multiple loop variables with complex control flow
-fn find_pair(arr : Array[Int], target : Int) -> (Int, Int)? {
+fn find_pair(arr : Array[Int32], target : Int32) -> (Int32, Int32)? {
   loop (0, arr.length() - 1) {
     (i, j) if i >= j => None
     (i, j) => {
@@ -283,7 +362,7 @@ MoonBit supports operator overloading through traits:
 
 ```mbt check
 ///|
-struct Vector(Int, Int)
+struct Vector(Int32, Int32)
 
 ///|
 pub impl Add for Vector with fn add(self, other) {
@@ -296,9 +375,10 @@ pub impl Mul for Vector with fn mul(self, other) {
 }
 
 ///|
+#derive(Eq)
 struct Person {
-  age : Int
-} derive(Eq)
+  age : Int32
+}
 
 ///|
 pub impl Compare for Person with fn compare(self, other) {
@@ -325,7 +405,7 @@ fn internal_helper() -> Unit {
 }
 
 ///|
-pub fn get_value() -> Int {
+pub fn get_value() -> Int32 {
   ...
 }
 

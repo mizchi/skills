@@ -1,0 +1,1 @@
+// Separate package so the non-exhaustive enum is matched by an external consumer.

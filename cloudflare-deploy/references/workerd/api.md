@@ -165,7 +165,13 @@ const random = randomBytes(16);
 ```
 
 **Available:** `node:buffer`, `node:crypto`, `node:stream`, `node:util`, `node:events`, `node:assert`, `node:path`, `node:querystring`, `node:url`
-**NOT available:** `node:fs`, `node:http`, `node:net`, `node:child_process`
+**Check API-specific support:** Workers supports `node:fs`, `node:http` and
+`node:net` with runtime-specific limits and compatibility-date requirements.
+`node:fs` uses an isolate virtual file system, not a durable host disk;
+network/server APIs do not imply an unrestricted Node process.
+Do not infer subprocess support from the availability of these modules.
+Use the [current Node compatibility table](https://developers.cloudflare.com/workers/runtime-apis/nodejs/)
+and each API's page before choosing a package (checked 2026-11-16).
 
 ## CLI Commands
 

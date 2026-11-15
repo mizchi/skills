@@ -7,11 +7,11 @@
 ## Quick Decision Tree
 
 **Need to:**
-- **Transform in Worker?** → [api.md](api.md#workers-binding-api-2026-primary-method) (Workers Binding API)
-- **Upload from Worker?** → [api.md](api.md#upload-from-worker) (REST API)
-- **Upload from client?** → [patterns.md](patterns.md#upload-from-client-direct-creator-upload) (Direct Creator Upload)
+- **Transform in Worker?** → [api.md](api.md#workers-binding-api) (Workers Binding API)
+- **Upload from Worker?** → [api.md](api.md#upload-image) (REST API)
+- **Upload from client?** → [patterns.md](patterns.md#direct-creator-upload) (Direct Creator Upload)
 - **Set up variants?** → [configuration.md](configuration.md#variants-configuration)
-- **Serve responsive images?** → [patterns.md](patterns.md#responsive-images)
+- **Serve responsive images?** → [patterns.md](patterns.md#responsive-images-srcset)
 - **Add watermarks?** → [patterns.md](patterns.md#watermarking)
 - **Fix errors?** → [gotchas.md](gotchas.md#common-errors)
 
@@ -19,14 +19,14 @@
 
 **For building image upload/transform feature:**
 1. [configuration.md](configuration.md) - Setup Workers binding
-2. [api.md](api.md#workers-binding-api-2026-primary-method) - Learn transform API
-3. [patterns.md](patterns.md#upload-from-client-direct-creator-upload) - Direct upload pattern
+2. [api.md](api.md#workers-binding-api) - Learn transform API
+3. [patterns.md](patterns.md#direct-creator-upload) - Direct upload pattern
 4. [gotchas.md](gotchas.md) - Check limits and errors
 
 **For URL-based transforms:**
 1. [configuration.md](configuration.md#variants-configuration) - Create variants
 2. [api.md](api.md#url-transform-api) - URL syntax
-3. [patterns.md](patterns.md#responsive-images) - Responsive patterns
+3. [patterns.md](patterns.md#responsive-images-srcset) - Responsive patterns
 
 **For troubleshooting:**
 1. [gotchas.md](gotchas.md#common-errors) - Error messages

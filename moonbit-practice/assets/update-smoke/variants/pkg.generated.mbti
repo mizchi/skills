@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "example/update_smoke/variants"
+
+// Values
+
+// Errors
+
+// Types and methods
+#non_exhaustive
+pub(all) enum Status {
+  Ready
+  Waiting
+}
+
+// Type aliases
+
+// Traits

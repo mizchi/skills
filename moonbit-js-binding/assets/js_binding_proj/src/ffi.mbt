@@ -50,7 +50,7 @@ pub extern "js" fn JsValue::set(
 pub extern "js" fn JsValue::call_method(
   self : JsValue,
   name : String,
-  args : Array[JsValue],
+  args : FixedArray[JsValue],
 ) -> JsValue =
   #| (obj, name, args) => obj[name](...args)
 

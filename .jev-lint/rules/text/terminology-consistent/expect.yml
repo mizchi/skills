@@ -1,0 +1,98 @@
+{
+  "fixtures/a.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Baseline is assigned incompatible artifact contents in one workflow."
+    }
+  ],
+  "fixtures/b.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Distinct terms identify distinct artifacts."
+    }
+  ],
+  "fixtures/c.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Frame slot changes from in-flight storage ownership to visible-frame identity."
+    }
+  ],
+  "fixtures/d.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Queue is explicitly qualified by two different contexts."
+    }
+  ],
+  "fixtures/e.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Input size switches incompatible units without a conversion or scope distinction."
+    }
+  ],
+  "fixtures/f.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Element and byte units are consistently distinguished."
+    }
+  ],
+  "fixtures/g.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Contract changes which artifact the agent regenerates."
+    }
+  ],
+  "fixtures/h.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "The aliases are explicit and compatible."
+    }
+  ],
+  "fixtures/i.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Historical and current command names are distinguished."
+    }
+  ],
+  "fixtures/j.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Dry run has incompatible side-effect semantics in the same workflow."
+    }
+  ],
+  "fixtures/k.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Two artifacts with different purposes retain different names."
+    }
+  ],
+  "fixtures/l.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "The word cache has explicitly separated software and hardware scopes."
+    }
+  ]
+}

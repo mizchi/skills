@@ -33,7 +33,7 @@ The "Install" column may also be:
 |---|---|---|---|
 | T1 | node-sqlite-vec | `mizchi/skills/node-sqlite-vec` | Project uses Node 24+ `node:sqlite` with `sqlite-vec` extension for vectors / RAG |
 | T1 | pi-coding-agent | `mizchi/skills/pi-coding-agent` | Embedding `@mariozechner/pi-coding-agent` as a coding-agent runtime in Node scripts |
-| T1 | dotenvx | `mizchi/skills/dotenvx` | Repo uses or considers `dotenvx` for env-var encryption / multi-env |
+| T1 | dotenvx | `mizchi/skills/dotenvx` | Repo already uses dotenvx or the user explicitly selects it. Do not propose adoption solely for .env files, multiple environments, or secrets |
 | T1 | opentelemetry | `mizchi/skills/opentelemetry` | Signal design (traces/metrics/logs), span naming, context propagation, sampling strategy, OTLP exporter config — read before writing any OTel code |
 | T1 | otel-node | `mizchi/skills/otel-node` | Node.js OTel SDK setup; esbuild ESM bundle silently drops `instrumentation-*` auto-instrumentation — use when spans don't arrive after bundling |
 
@@ -70,7 +70,7 @@ The "Install" column may also be:
 | T | Skill | Install | Use when |
 |---|---|---|---|
 | T0 | pkfire | `mizchi/pkfire/skills/pkfire` | Adding, editing, or troubleshooting tasks in a project that uses `pkf` / `Taskfile.pkl`; choosing pkfire over just / Taskfile.yml |
-| T1 | nix-setup | `mizchi/skills/nix-setup` | Reproducible dev environment via devbox (Nix-backed, default) or pure Nix flakes (cutting-edge customization). Includes per-language flake templates and a devbox.json template |
+| T1 | nix-setup | `mizchi/skills/nix-setup` | Requested or existing Nix environments, flakes and per-language templates. Devbox is optional for existing adoption or explicit user choice; it is not a new-project default |
 | T3 | justfile | `mizchi/skills/justfile` | Existing repo already uses `just` — respect as-is; for new repos prefer pkfire |
 
 ### Static analysis / lint
@@ -138,7 +138,7 @@ The "Install" column may also be:
 |---|---|---|---|
 | T1 | conventional-changelog | `mizchi/skills/conventional-changelog` | Setting up or unifying a release flow with Conventional Commits + auto changelog |
 | T3 | upstream-fix-and-pin | `mizchi/skills/upstream-fix-and-pin` | A dependency has a bug or missing feature; you need to pin a fork while waiting for upstream merge |
-| T2 | npm-release | `(out-of-band)` | Setting up npm publishing via release-please + OIDC. chezmoi-local; ask mizchi |
+| T2 | npm-release | `(out-of-band)` | npm publishing: manual first publish, `npm trust`, tag-triggered OIDC publish. Local-only; ask mizchi |
 
 ### Dependency management
 **Signals**: `pnpm outdated` results, security alert, major ecosystem release, annual maintenance
@@ -260,7 +260,7 @@ The "Install" column may also be:
 | T2 | mnemo-article-to-skill | `mizchi/mnemo/skills/mnemo-article-to-skill` | Turning an article, blog post, paper, or pasted long-form note into a hosted mnemo skill draft |
 | T2 | mnemo-session-journal | `mizchi/mnemo/skills/session/mnemo-session-journal` | `mnemo` for creating / appending / inspecting / resolving / searching session records |
 | T2 | mnemo-skill-select | `mizchi/mnemo/skills/mnemo-skill-select` | Selecting agent skills from hosted mnemo (list / search uploaded skills, then load matching local) |
-| T3 | dotenvx-in-actions | `mizchi/mnemo/skills/dotenvx-in-actions` | Sourcing secrets in GitHub Actions from a dotenvx-encrypted `.env` committed to the repo — gated by a single repo secret (private key) |
+| T3 | dotenvx-in-actions | `mizchi/mnemo/skills/dotenvx-in-actions` | Existing or explicitly selected dotenvx encryption in GitHub Actions; never a default secrets setup |
 | T3 | worker-deploy-auto-rollback | `mizchi/mnemo/skills/worker-deploy-auto-rollback` | GitHub Actions manual-trigger CD for a Cloudflare Worker with automatic rollback on smoke failure |
 
 ### Security review (suite)

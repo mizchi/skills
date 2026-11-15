@@ -4,254 +4,91 @@ title: ".mbtx Single-File Script Mode"
 
 # .mbtx Single-File Script Mode
 
-> Stable since v0.10.x and documented upstream at
-> [Running `.mbtx` Scripts](https://docs.moonbitlang.com/en/stable/toolchain/moon/script-mode.html).
-> Verified against MoonBit v0.10.12.
+Updated for [MoonBit v0.10.19](https://www.moonbitlang.com/updates/2026/11/05/index).
+A script combines configuration and code without a `moon.mod` or `moon.pkg`.
+The current header parser is also covered by the upstream
+[Moon tests](https://github.com/moonbitlang/moon/blob/main/crates/moonbuild-rupes-recta/src/mbtx.rs).
+Older script documentation may still show an undelimited import block.
 
-## Overview
+## Configuration header
 
-`.mbtx` is a single-file script format that combines `import` declarations and MoonBit code. No `moon.mod` or `moon.pkg` required.
+Put configuration between `---` delimiters at the beginning of the file. The
+header uses the module/package configuration DSL, not YAML. Keep MoonBit
+functions after the closing delimiter.
 
-Two runners exist:
+```moonbit
+---
+import {
+  "moonbitlang/core/env",
+  "moonbitlang/core/queue" @q *,
+}
+permission(env: { "set": { "MODE": "example" } })
+---
 
-| Runner | Use for |
-|---|---|
-| `moon run script.mbtx` | Inside or outside a project; full `moon run` flag surface |
-| `moonx script.mbtx` | Standalone script runner; also runs registry packages (`moonx author/mod/cmd/tool`) |
+fn main raise {
+  assert_eq(Queue([1, 2]).length(), 2)
+  assert_eq(@q.Queue([3, 4, 5]).length(), 3)
+  assert_true(@env.get_env_var("MODE") is Some("example"))
+}
+```
+
+An import can combine an alias and `*`. Both `Queue` and `@q.Queue` are then
+available. Core imports do not specify versions. External imports can pin a
+module version, for example `"owner/module@0.1.2/package" @pkg`; use one version
+for all packages from that module. Pin automation dependencies to versions that
+actually exist. An unversioned dependency depends on the local registry index;
+refresh it with `moon update` when needed.
+
+Explicitly import every package used. Do not depend on implicit core imports.
+A missing import is an error on the current compiler, rather than a warning.
+Use a full module for cross-file packages and custom export/link configuration;
+sharing the header DSL does not imply that every package option is meaningful
+for a standalone script.
+
+## Run and check
 
 ```bash
-moon run script.mbtx
+moon check script.mbtx
+moon run script.mbtx                  # Wasm by default
 moon run script.mbtx --target js
 moon run script.mbtx --target native -- arg1 arg2
+moon run script.mbtx --target js --release --build-only
 
-# Read .mbtx source from stdin
+# Source on stdin or supplied inline
 moon run - < script.mbtx
-moon run - <<'EOF'
-fn main { println("hi") }
-EOF
-
-# Pass a short script inline
 moon run -c 'fn main { println("hello") }'
 
-# CLI args propagate to @env.args() (positional args after the file)
-moon run script.mbtx foo bar             # OK when no other flags follow
-moon run script.mbtx --target native -- foo bar   # use `--` to disambiguate
-
-# moonx forwards everything after the path to the program; `--` is optional
-moonx script.mbtx --port 8080
+# Registry/standalone Wasm runner
+moonx script.mbtx arg1 arg2
+moonx owner/module/cmd/tool@0.1.2 arg1 arg2
 ```
 
-`moonx` runs `.mbtx` only on the linear-memory Wasm backend (`--target wasm`, the
-default); `--target native` is rejected for standalone scripts. Use `moon run` when
-you need another backend.
+`moonx` supports only linear-memory Wasm. Select JS or Native through
+`moon run`; use the backend supported by the script's I/O dependencies.
+Pass `--` before program arguments when also using runner flags.
 
-Note: `async fn main` and `@stdio.stdin` need a backend with the corresponding
-runtime support — use `--target native` when a script blocks on stdio.
+Build artifacts are placed in `_build` beneath the script's directory, with
+external packages downloaded under `.mooncakes`. Use `--target-dir` or inspect
+build output for the exact artifact path instead of assuming a generated JS
+filename across compiler versions.
 
-## Sandboxing a script (experimental)
+## Test and policy
 
-Both `moon run` and `moonx` accept a Moonrun policy. A standalone `.mbtx` may also
-embed one as a leading `// policy:` YAML comment block; an explicit
-`--experimental-policy <file.json>` overrides it. Policy files themselves are
-**JSON** — see reference/skills-marketplace.md for the schema.
+Check `moon test --help`: the verified v0.10.20 development CLI accepts an
+explicit `.mbtx` path, generates a test entrypoint, and does not execute the
+script's main during tests. Package-wide tests do not automatically include
+standalone scripts. The v0.10.19 release also introduces experimental
+`moon testcli`; use the installed CLI's help for its fixture format.
 
-## Import Block Syntax
+Runtime permissions belong in `permission(...)` in the header. The old leading
+`// policy:` comments are migration material, not the form to write in new
+scripts. An explicit `--experimental-policy policy.json` overrides the embedded
+policy; external policy files remain JSON. See
+[skills-marketplace.md](skills-marketplace.md) for policy scope and limitations.
 
-The `import { }` block must appear at the top of the file (comments/blank lines allowed before it). It uses the same parser as `moon.pkg`.
+Treat embedded permission requests as code to review, especially before reading
+host environment variables. Grant only the required capabilities. Script
+execution policy does not constrain the runner's dependency downloads.
 
-```moonbit
-import {
-  // Core packages: no version, prefix with moonbitlang/core/
-  "moonbitlang/core/json",
-  "moonbitlang/core/math",
-
-  // External deps: version required, alias optional
-  "moonbitlang/x@0.4.40/json5" @json5,
-  "moonbitlang/x@0.4.40/sys" @xsys,
-}
-
-fn main {
-  let result = try { @json5.parse("{a: 1}") } catch { _ => Json::Null }
-  println(result)
-  println(@xsys.get_cli_args())
-}
-```
-
-### Import Rules
-
-| Rule | Example | Result |
-|------|---------|--------|
-| Core: no version | `"moonbitlang/core/json"` | OK, alias `@json` |
-| Core: version specified | `"moonbitlang/core@0.1.0/json"` | Error (`moonbitlang/core imports must not specify a version`) |
-| External: version pinned | `"moonbitlang/x@0.4.43/codec/base64"` | OK |
-| External: no version | `"moonbitlang/x/codec/base64"` | OK — resolved from local registry index (run `moon update` if missing) |
-| Same module, multiple versions | `x@0.4.38` + `x@0.4.40` | Error |
-| Custom alias | `"moonbitlang/x@0.4.43/codec/base64" @b64` | OK, use as `@b64` |
-| No alias | `"moonbitlang/x/codec/base64"` | Auto alias `@base64` |
-| Object-form entry | `{ "path": "...", "alias": "..." }` | Error — only string entries |
-| `for "test"` / `for "wbtest"` | — | Error (`test-import and wbtest-import are not supported in .mbtx import prelude`) |
-| `options(...)` block | — | Parse error |
-
-### Import Block vs No Import Block
-
-| | With `import { }` | Without |
-|---|---|---|
-| Available packages | **Only specified + prelude** | All core packages |
-| Unimported core use | Warning (deprecated) | Works (all loaded) |
-| External deps | Resolved and downloaded | Not available |
-
-## Supported Commands
-
-| Command | Status | Notes |
-|---------|--------|-------|
-| `moon run file.mbtx` | Works | Primary use case |
-| `moon run file.mbtx --build-only` | Works | Build without executing |
-| `moon check file.mbtx` | Works | Type checking |
-| `moon test file.mbtx` | Broken | Tests not discovered; `fn main` conflicts |
-| `moon build file.mbtx` | Error | Requires moon project; use `--build-only` instead |
-
-## Build Targets and Output
-
-```bash
-moon run script.mbtx --target js --build-only
-moon run script.mbtx --target wasm-gc --build-only
-moon run script.mbtx --target native --build-only
-moon run script.mbtx --target js --release --build-only
-```
-
-| Target | Output | Standalone? |
-|--------|--------|-------------|
-| `js` | `_build/js/.../single.js` | Yes, runs with `node` |
-| `wasm-gc` | `_build/wasm-gc/.../single.wasm` | Needs `moonrun` |
-| `native` | `_build/native/.../single.c` + runtime | Needs `moonrun` to link |
-
-### JS Target: Single-File Bundle
-
-JS output bundles all dependencies into one file, including external deps:
-
-```bash
-moon run script.mbtx --target js --release --build-only
-node _build/js/release/build/single/single.js
-```
-
-## Build Artifacts Location
-
-Generated in the `.mbtx` file's parent directory:
-
-```
-/path/to/
-├── script.mbtx           # Source
-├── _build/
-│   ├── script.mbt        # Preprocessed (import block → spaces)
-│   └── wasm-gc/...       # Build output
-└── .mooncakes/            # Downloaded external deps (if any)
-```
-
-## What Does NOT Work in .mbtx
-
-### No `options()` / `link` Configuration
-
-`moon.pkg` settings like `options()`, `link`, `warn-list` are **not supported inline**. They are build-system-level config, not compiler syntax.
-
-```moonbit
-// DOES NOT WORK in .mbtx:
-options("warn-list": "-2")          // moonc parse error
-///|link(wasm-gc, exports=["add"])  // silently ignored
-```
-
-Workaround: use CLI flags.
-
-```bash
-moon run script.mbtx --warn-list "-2"
-moon run script.mbtx --deny-warn
-moon run script.mbtx --release
-```
-
-### No Wasm/JS Custom Exports
-
-Wasm output only exports `_start`. There is no way to configure `exports` in `.mbtx`. Use a full project with `moon.pkg` for custom exports.
-
-### No Cross-File Imports
-
-`.mbtx` is strictly single-file. Multiple `.mbtx` files cannot reference each other. `moon run a.mbtx b.mbtx` runs only the first file.
-
-### No `moon test` Support
-
-Tests in `.mbtx` are not discovered. `fn main` and `test` blocks conflict (`fn main` makes it a main package; tests need non-main).
-
-## Troubleshooting
-
-### `Front matter import '...' could not be resolved. Make sure its module is listed in moonbit.deps.`
-
-Misleading message. There is **no** `moonbit.deps` key inside `.mbtx` — that key
-belongs to the YAML frontmatter of `.mbt.md` files, not `.mbtx`. In a `.mbtx`
-file the only frontmatter is the `import { ... }` block itself.
-
-The real cause is almost always that **the package path does not exist in the
-target module**. The resolver cannot tell which segments are the module name and
-which are the sub-package, so it complains about an unknown module.
-
-Diagnosis steps:
-
-1. Inspect the actual layout of the module zip:
-   ```bash
-   unzip -l ~/.moon/registry/cache/<owner>/<module>/<version>.zip | grep moon.pkg
-   ```
-2. Confirm the sub-package path matches a directory containing `moon.pkg`.
-3. Re-run with the corrected path. Pin `@version` if you want determinism.
-
-Example: writing `"moonbitlang/x/encoding/base64"` fails because base64 actually
-lives at `codec/base64`. The correct import is `"moonbitlang/x/codec/base64"`.
-
-### `Package "<alias>" not found in the loaded packages.`
-
-The import block resolved successfully but the code uses an unknown alias.
-Either fix the alias or add the missing import. Auto alias is the **last path
-segment**, so `"moonbitlang/x/codec/base64"` becomes `@base64`, not `@codec`.
-
-### `failed to read .mbtx file` when piping from stdin
-
-`moon run -` only accepts `.mbtx` source on stdin (per the help text). Anything
-else — including a path passed instead of `-` — must end in `.mbt` or `.mbt.md`
-or `.mbtx`.
-
-## Internal: How Preprocessing Works
-
-1. Regex extracts the first `import { ... }` block from file start
-2. Import block is parsed by `moonutil::moon_pkg::parse` (same as `moon.pkg`)
-3. Import paths are split into module (+ version) and package path
-4. External deps are fetched to `.mooncakes/`
-5. Import block is **replaced with spaces** (preserving line numbers) and written to `_build/<stem>.mbt`
-6. `moonc build-package` receives only the specified packages via `-i` flags
-
-## Quick Reference
-
-```bash
-# Run simple script
-moon run hello.mbtx
-
-# Run from stdin
-moon run - < hello.mbtx
-moon run - <<'EOF'
-fn main { println("hi") }
-EOF
-
-# Run with external deps, JS target
-moon run server.mbtx --target js
-
-# Build JS bundle without running
-moon run app.mbtx --target js --release --build-only
-node _build/js/release/build/single/single.js
-
-# Native with CLI args (use `--` to separate program args from moon flags)
-moon run cli.mbtx --target native -- --port 8080
-
-# Suppress warnings
-moon run script.mbtx --warn-list "-2"
-```
-
-## References
-
-- PR: https://github.com/moonbitlang/moon/pull/1479
-- Implementation: `crates/moonbuild-rupes-recta/src/mbtx.rs`
-- Test fixtures: `crates/moon/tests/test_cases/moon_test_single_file.in/import_block_ok.mbtx`
+For a complete executable check of alias/import-all and the permission header,
+run `just --justfile moonbit.justfile test-script` from this repository.

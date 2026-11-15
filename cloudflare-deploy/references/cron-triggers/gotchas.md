@@ -198,4 +198,4 @@ export default {
 - [Cloudflare Workflows](https://developers.cloudflare.com/workflows/)
 - [Workers Limits](https://developers.cloudflare.com/workers/platform/limits/)
 - [Crontab Guru](https://crontab.guru/) - Validator
-- [Vitest Pool Workers](https://github.com/cloudflare/workers-sdk/tree/main/fixtures/vitest-pool-workers-examples)
+- [Vitest Pool Workers](https://github.com/cloudflare/workers-sdk/tree/main/fixtures/vitest-plugin-examples)

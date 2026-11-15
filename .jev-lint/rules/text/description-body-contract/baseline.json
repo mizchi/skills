@@ -1,0 +1,595 @@
+{
+  "schema": "jev-lint-eval-1",
+  "recorded": "2026-11-15T09:22:02.963Z",
+  "model": "jev-1.14.0",
+  "suite": "text/description-body-contract",
+  "rules": [
+    {
+      "id": "description-body-contract",
+      "draft": "12adbec7d331",
+      "at": 0.33
+    }
+  ],
+  "cutoffs": {},
+  "passes": [
+    [
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.11,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.99,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/p.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.08,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/n.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/r.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/o.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/q.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/m.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.45,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/s.md",
+        "line": 1,
+        "endLine": 69,
+        "kind": "noul",
+        "value": 0.22,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/t.md",
+        "line": 1,
+        "endLine": 111,
+        "kind": "noul",
+        "value": 0.24,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/u.md",
+        "line": 1,
+        "endLine": 251,
+        "kind": "noul",
+        "value": 0.24,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.99,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.93,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/n.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/m.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.48,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/o.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/p.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.08,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/t.md",
+        "line": 1,
+        "endLine": 111,
+        "kind": "noul",
+        "value": 0.17,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/q.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/r.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/u.md",
+        "line": 1,
+        "endLine": 251,
+        "kind": "noul",
+        "value": 0.26,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/s.md",
+        "line": 1,
+        "endLine": 69,
+        "kind": "noul",
+        "value": 0.2,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.99,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/p.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.98,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/m.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.52,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/o.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/s.md",
+        "line": 1,
+        "endLine": 69,
+        "kind": "noul",
+        "value": 0.18,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/t.md",
+        "line": 1,
+        "endLine": 111,
+        "kind": "noul",
+        "value": 0.19,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/r.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/q.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/u.md",
+        "line": 1,
+        "endLine": 251,
+        "kind": "noul",
+        "value": 0.27,
+        "confidence": null
+      },
+      {
+        "rule": "description-body-contract",
+        "file": "rules/text/description-body-contract/fixtures/n.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      }
+    ]
+  ],
+  "spent": {
+    "calls": 63,
+    "inputTokens": 97920,
+    "usd": 0.00411264,
+    "ms": 503
+  }
+}

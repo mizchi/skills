@@ -77,11 +77,10 @@ Distilled from a single-pass audit of mizchi/skills (12 rewrites, 2026-05-12).
 # Before: passive, no trigger
 Reference for the dotenvx environment variable management tool.
 
-# After: imperative + symptom + pushy
-Use when working with the dotenvx env-var tool — encrypting .env, juggling
-.env.production / .env.staging, committing .env.vault / .env.keys, wiring
-into GitHub Actions. Trigger on `.env.vault` / `.env.keys` symptoms even
-when the user does not say "dotenvx".
+# After: capability + actual adoption boundary
+Use when the project already uses dotenvx or the user explicitly selects
+it for environment-variable loading, encryption, or CI. Ordinary .env
+files, multiple environments, or secrets alone do not select dotenvx.
 ```
 
 ```

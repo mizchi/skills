@@ -1,6 +1,19 @@
 # Target Gating: `#cfg()` vs `moon.pkg` `targets`
 
-MoonBit offers two mechanisms for conditional compilation by backend. Understanding the trade-off keeps cross-backend libraries clean.
+Use file-level gates or declaration-level guards for implementations. Since
+v0.10.19, `moon.pkg` imports can also be guarded while sharing one alias:
+
+```moonbit
+#cfg(target="native")
+import { "example/lib/native_impl" @platform }
+
+#cfg(target="js")
+import { "example/lib/js_impl" @platform }
+```
+
+The imported packages must provide the same API used by `@platform` call sites.
+This also works for test imports. A doc test needs its own `#cfg` on its `test`
+block; it no longer inherits the documented function's backend guard.
 
 ## `#cfg()` — declaration-level
 

@@ -9,6 +9,8 @@ You are reviewing the rendering performance of a React frontend. The most common
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Check `package.json` for performance-related packages (`@tanstack/react-virtual`, `react-window`, `@welldone-software/why-did-you-render`, etc.).
 2. Grep for existing memo usage:
    ```bash
@@ -151,5 +153,4 @@ Keep under 200 lines. Recommendations without profiling evidence must be explici
 
 ## Reference
 
-- Checklist: `24-rendering-performance.md`, `23-state-management.md`, `C2-lighthouse.md`
-- Tools: React DevTools Profiler, `@welldone-software/why-did-you-render`, `@tanstack/react-virtual`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

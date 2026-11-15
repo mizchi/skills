@@ -80,7 +80,7 @@ Examples:
 
 ```moonbit
 // Bytes: length-aware
-extern "C" fn read_message(buf : Bytes) -> Int = "read_message"
+extern "C" fn read_message(buf : Bytes) -> Int32 = "read_message"
 
 fn read_message_string() -> String {
   let buf = Bytes::make(256, 0)
@@ -91,7 +91,7 @@ fn read_message_string() -> String {
 
 ```moonbit
 // FixedArray: fixed-size buffer
-extern "C" fn fill_buffer(buf : FixedArray[Byte], len : Int) = "fill_buffer"
+extern "C" fn fill_buffer(buf : FixedArray[Byte], len : Int32) = "fill_buffer"
 
 fn read_fixed() -> Bytes {
   let buf = FixedArray::make(256, Byte::default())
@@ -120,8 +120,8 @@ extern "C" fn config_new() -> Config = "config_new"
 #owned(cfg)
 extern "C" fn config_free(cfg : Config) = "config_free"
 
-extern "C" fn config_get_timeout_ms(cfg : Config) -> Int = "config_get_timeout_ms"
-extern "C" fn config_set_timeout_ms(cfg : Config, ms : Int) = "config_set_timeout_ms"
+extern "C" fn config_get_timeout_ms(cfg : Config) -> Int32 = "config_get_timeout_ms"
+extern "C" fn config_set_timeout_ms(cfg : Config, ms : Int32) = "config_set_timeout_ms"
 ```
 
 ```c
@@ -158,7 +158,7 @@ If C writes into a buffer and returns a length, use `#borrow(buf)` and slice.
 
 ```moonbit
 #borrow(buf)
-extern "C" fn read_message(buf : Bytes) -> Int = "read_message"
+extern "C" fn read_message(buf : Bytes) -> Int32 = "read_message"
 
 fn read_message_string() -> String {
   let buf = Bytes::make(256, 0)
@@ -184,6 +184,23 @@ const uint8_t* wasmtime_version_bytes(void) {
 Then bind it from MoonBit with `extern "C" fn`.
 
 ## Build / link (native)
+
+### Export a static library (v0.10.19)
+
+Set `pkgtype(kind: "foreign_library")` in the exporting package's `moon.pkg`,
+give public functions a `#export_name("c_symbol")`, then run
+`moon build --target native path/to/package`. The artifact is an `.a` archive
+(`.lib` on Windows). Link it into the C host with MoonBit's include directory;
+**call `moonbit_init()` before any MoonBit export**, so top-level values and
+the runtime are initialized. Do not declare or guess private generated symbols.
+
+The complete [native smoke example](../assets/update-smoke/native) exports an
+addition function using initialized module state. From this repository, run
+`just --justfile moonbit.justfile test-native` to build, link, and execute it.
+The checked macOS debug archive also requires `libbacktrace.a` from the selected
+MoonBit toolchain at host link time; the recipe supplies it explicitly.
+
+### Import C stubs
 
 Configure native linking in `moon.pkg`.
 

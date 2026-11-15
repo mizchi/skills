@@ -1,0 +1,44 @@
+lockfile_version: '1'
+generated_at: '2026-11-15T09:14:07.446199+00:00'
+apm_version: 0.21.0
+dependencies:
+- repo_url: mizchi/jev-lint
+  host: github.com
+  resolved_commit: ca479e1b6091ff87d5aa53bc7c37c2dadb784a1d
+  resolved_ref: v0.8.0
+  virtual_path: skills/jev-lint
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/jev-lint
+  - .agents/skills/jev-lint/SKILL.md
+  - .agents/skills/jev-lint/references/calibration.md
+  - .agents/skills/jev-lint/references/cookbook.md
+  - .agents/skills/jev-lint/references/initializing-project.md
+  - .agents/skills/jev-lint/references/rule-fields.md
+  - .agents/skills/jev-lint/references/using-shipped-rules.md
+  - .agents/skills/jev-lint/references/writing-project-rules.md
+  - .claude/skills/jev-lint
+  - .claude/skills/jev-lint/SKILL.md
+  - .claude/skills/jev-lint/references/calibration.md
+  - .claude/skills/jev-lint/references/cookbook.md
+  - .claude/skills/jev-lint/references/initializing-project.md
+  - .claude/skills/jev-lint/references/rule-fields.md
+  - .claude/skills/jev-lint/references/using-shipped-rules.md
+  - .claude/skills/jev-lint/references/writing-project-rules.md
+  deployed_file_hashes:
+    .agents/skills/jev-lint/SKILL.md: sha256:73c4cb45711c94039342d1f029ba0c78aefc46d183ada722c009243119202813
+    .agents/skills/jev-lint/references/calibration.md: sha256:ab3f2c596ff11e55379bb4ba2752d38ea85f4a2647a36851ec4a68b92222ee1d
+    .agents/skills/jev-lint/references/cookbook.md: sha256:88e43ccc581187a342b626c92e6c064db73007c62f18ab4af2866ff6f7613653
+    .agents/skills/jev-lint/references/initializing-project.md: sha256:eae62cd71b11d0ae50dca19ace28e9a8152de9e7fccaa7b568203feefc49e3ec
+    .agents/skills/jev-lint/references/rule-fields.md: sha256:c693cd63671e75a627818fc45a7be3a1aa8dd71d0df4d5102314a6698fa3bc81
+    .agents/skills/jev-lint/references/using-shipped-rules.md: sha256:a8ec51fd728fc6da9908b150703f046242aedd8f9890d59826c2228d35984395
+    .agents/skills/jev-lint/references/writing-project-rules.md: sha256:d18e304f885cb584865d6cc8a9b421c20e4447e5054524e82dab09fbda3800dc
+    .claude/skills/jev-lint/SKILL.md: sha256:73c4cb45711c94039342d1f029ba0c78aefc46d183ada722c009243119202813
+    .claude/skills/jev-lint/references/calibration.md: sha256:ab3f2c596ff11e55379bb4ba2752d38ea85f4a2647a36851ec4a68b92222ee1d
+    .claude/skills/jev-lint/references/cookbook.md: sha256:88e43ccc581187a342b626c92e6c064db73007c62f18ab4af2866ff6f7613653
+    .claude/skills/jev-lint/references/initializing-project.md: sha256:eae62cd71b11d0ae50dca19ace28e9a8152de9e7fccaa7b568203feefc49e3ec
+    .claude/skills/jev-lint/references/rule-fields.md: sha256:c693cd63671e75a627818fc45a7be3a1aa8dd71d0df4d5102314a6698fa3bc81
+    .claude/skills/jev-lint/references/using-shipped-rules.md: sha256:a8ec51fd728fc6da9908b150703f046242aedd8f9890d59826c2228d35984395
+    .claude/skills/jev-lint/references/writing-project-rules.md: sha256:d18e304f885cb584865d6cc8a9b421c20e4447e5054524e82dab09fbda3800dc
+  content_hash: sha256:f602b3f5889b850ec80dee7b130bbc042a39555878524c84f68c1a7600b7145c

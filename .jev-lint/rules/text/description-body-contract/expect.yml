@@ -1,0 +1,170 @@
+{
+  "fixtures/a.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Diagnosis does not promise unapproved implementation."
+    }
+  ],
+  "fixtures/b.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Diagnostic waiting and rendering-loop waiting have different scopes."
+    }
+  ],
+  "fixtures/c.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Automatic activation directly conflicts with explicit-only invocation."
+    }
+  ],
+  "fixtures/d.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "The advertised AWS deployment is explicitly prohibited."
+    }
+  ],
+  "fixtures/e.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Publication is an explicit optional mode."
+    }
+  ],
+  "fixtures/f.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Automatic file editing contradicts the read-only workflow."
+    }
+  ],
+  "fixtures/g.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "An example does not restrict the advertised general capability."
+    }
+  ],
+  "fixtures/h.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "The offline guarantee contradicts mandatory remote source submission."
+    }
+  ],
+  "fixtures/i.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Preparing a plan does not advertise performing the deployment."
+    }
+  ],
+  "fixtures/j.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Creating and maintaining skills is prohibited by the body."
+    }
+  ],
+  "fixtures/k.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Use when alone does not promise unsolicited activation."
+    }
+  ],
+  "fixtures/l.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Suggestions and optional edits fit a review description."
+    }
+  ],
+  "fixtures/m.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "A suggested implementation is explicitly the only output, contradicting creation of a working endpoint."
+    }
+  ],
+  "fixtures/n.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Creating a draft does not promise installing a working endpoint."
+    }
+  ],
+  "fixtures/o.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Reuse across future runs is ruled out by current-response-only storage."
+    }
+  ],
+  "fixtures/p.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Current-run reuse and cross-run persistence are distinct scopes."
+    }
+  ],
+  "fixtures/q.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "The terse opening is qualified by the decision procedure; delegation is permitted conditionally."
+    }
+  ],
+  "fixtures/r.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Measuring surface patterns is compatible with declining an authorship inference."
+    }
+  ],
+  "fixtures/s.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Diagnosis and fixes remain supported; explicit approval is already stated in the description and body."
+    }
+  ],
+  "fixtures/t.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Choosing whether to delegate is compatible with a single-agent default and explicit gates."
+    }
+  ],
+  "fixtures/u.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Within this Japanese version the description and body both allow a retrospective at task completion; cross-language drift is checked separately."
+    }
+  ]
+}

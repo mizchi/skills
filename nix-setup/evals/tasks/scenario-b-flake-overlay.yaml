@@ -82,7 +82,6 @@ graders:
         3. `buildNpmPackage` の use を言及 (詳細実装の skeleton か、nix-setup の
            "Handling npm tools with Nix" を参照する形でよい)
         4. direnv `.envrc` で `use flake` を含めるべきと明示
-        5. devbox を選ばない (devbox では rust-overlay / buildNpmPackage の
-           表現が不自然になる) ことに直接または間接的に触れている
+        5. 要件に沿って flakes を使い、devbox を追加しない。devbox の不採用理由を独立した必須工程にしない
         6. flake.lock を commit する点に触れている
         全 6 項を満たすときのみ PASS: yes。1 つでも欠けたら PASS: no。

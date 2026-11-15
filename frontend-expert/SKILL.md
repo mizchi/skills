@@ -15,6 +15,8 @@ You are a senior frontend architect reviewing a codebase during the weekly AI re
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. Read `<client-repo>/.frontend-review/report/latest/raw/typescript.json`, `lint.json`, `deps.json`, `similarity.json`.
 2. Sample 3-5 components from `src/` (or the project's equivalent). Prefer the most-modified files (`git log --since='1 week' --name-only`).
 3. Judge: does the code feel like something a senior frontend architect would ship?
@@ -66,4 +68,4 @@ Flag in-place mutation of state objects. Recommend spread / `toSpliced` / `struc
 
 ## Reference
 
-- Checklist: `03-typescript.md`, `04-lint-format.md`, `05-deadcode-knip.md`, `06-similarity.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

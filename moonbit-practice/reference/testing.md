@@ -6,6 +6,11 @@ title: "MoonBit Testing Reference"
 
 ## Doc Tests
 
+As of v0.10.19, doc tests do not inherit a function's `#cfg`. Add the backend
+guard to the `test` block itself. Test executables run in parallel by default:
+`moon test -j 4` caps concurrency; `--no-parallelize` runs executables serially
+while keeping builds parallel. It does not serialize async tests within a package.
+
 Doc tests can be written in `.mbt.md` files or inline docstrings.
 
 ### Code Block Types
@@ -20,7 +25,7 @@ Doc tests can be written in `.mbt.md` files or inline docstrings.
 
 ````moonbit
 ///|
-/// Get the largest element of a non-empty `Array`.
+/// Sum the elements of an `Array`.
 ///
 /// # Example
 /// ```mbt test
@@ -29,9 +34,7 @@ Doc tests can be written in `.mbt.md` files or inline docstrings.
 /// }
 /// ```
 ///
-/// # Panics
-/// Panics if the `xs` is empty.
-pub fn sum_array(xs : Array[Int]) -> Int {
+pub fn sum_array(xs : Array[Int32]) -> Int32 {
   xs.fold(init=0, fn(a, b) { a + b })
 }
 ````
@@ -84,17 +87,17 @@ test "snapshot" {
 |---|---|---|
 | `inspect()` | `Show` | Primitives and strings |
 | `debug_inspect()` | `Debug` | `Array` / `Map` / `Set` / `Option` / `Result` / tuples and custom types |
-| `@json.inspect()` | `ToJson` | Deeply nested structures — JSON stays readable when formatted |
+| `@json.json_inspect()` | `ToJson` | Deeply nested structures — JSON stays readable when formatted |
 
 `Show` for container types is deprecated: the debugging interface moved to the
 `Debug` trait in v0.9, so container snapshots go through `debug_inspect`. Pick by
-the expression's **static** type, and `derive(Debug)` any custom type you snapshot
+the expression's **static** type, and `#derive(Debug)` any custom type you snapshot
 (add `Eq` for `@debug.assert_eq`).
 
 ```moonbit
 test "complex structure" {
   let data = { "name": "Alice", "scores": [90, 85, 92] }
-  @json.inspect(data, content={"name":"Alice","scores":[90,85,92]})
+  @json.json_inspect(data, content={"name":"Alice","scores":[90,85,92]})
 }
 ```
 
@@ -199,16 +202,17 @@ test "custom generator" {
 
 ### Generators for custom types
 
-`derive(Arbitrary)` generates values of a custom type; `derive(Shrink)` implements
+`#derive(Arbitrary)` generates values of a custom type; `#derive(Shrink)` implements
 `@quickcheck.Shrink` so failures can be minimised. Build bespoke generators from
 the `@quickcheck.Generator[T]` combinators.
 
 ```moonbit
 ///|
+#derive(Arbitrary, Shrink, Debug)
 struct User {
   name : String
   age : Int
-} derive(Arbitrary, Shrink, Debug)
+}
 ```
 
 ### Statistics
@@ -272,5 +276,5 @@ test "parse error" {
 ```
 
 `Result` is a container type, so snapshot it with `debug_inspect` and
-`derive(Debug)` the error type. To assert that a call panics instead, use
+`#derive(Debug)` the error type. To assert that a call panics instead, use
 `try!` inside a `panic test`.

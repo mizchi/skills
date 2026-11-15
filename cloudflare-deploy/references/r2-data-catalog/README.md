@@ -13,7 +13,7 @@ Expert guidance for Cloudflare R2 Data Catalog - Apache Iceberg catalog built in
 
 **Quick reference?** Jump to:
 - [Enable catalog on bucket](configuration.md#enable-catalog-on-bucket)
-- [PyIceberg connection pattern](patterns.md#pyiceberg-connection-pattern)
+- [PyIceberg connection pattern](patterns.md#pyiceberg-connection)
 - [Permission errors](gotchas.md#permission-errors)
 
 ## What is R2 Data Catalog?

@@ -36,7 +36,7 @@ Inputs (env or CLI):
 | `--allow-emails` | one of allow-emails / service-token | — |
 | `--create-service-token` | optional | false |
 | `--session-duration` | optional | 24h |
-| `--api-base` | optional | https://api.cloudflare.com/client/v4 |
+| `--api-base` | optional | `https://api.cloudflare.com/client/v4` |
 
 ## When NOT to invoke
 

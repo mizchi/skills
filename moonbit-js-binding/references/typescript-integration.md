@@ -42,7 +42,7 @@ options(
 
 | Format | When to use |
 |---|---|
-| `esm` | modern bundlers (Vite, esbuild, Rollup), Node 18+ with `"type": "module"` |
+| `esm` | modern bundlers (Vite, esbuild, Rollup), Node 24+ with `"type": "module"` |
 | `cjs` | legacy Node, `require()` consumers |
 | `iife` | directly included via `<script>` tag; exposes `exports` on a global |
 
@@ -78,7 +78,7 @@ If you export a MoonBit `async fn`, wrap it with `run_async` + `PromiseResolvers
 
 1. **Trait objects leak MoonBit internals.** `pub fn foo(x : SomeTrait)` generates a `.d.ts` signature using MoonBit's internal dictionary representation. Expose concrete types or opaque `#external` types at the boundary.
 
-2. **`Int64` / `UInt64` in signatures.** TypeScript users see `MoonBit.Int64` which is a `bigint`, not `number`. Converting back to `number` may truncate. Document at the API level whether the caller should pass a `bigint` or a `number`.
+2. **`Int64` / `UInt64` in signatures.** Inspect the generated declaration and runtime representation for the selected compiler. The FFI ABI does not promise direct JS `number` or `bigint` mapping for these types. Export an explicit `BigInt`, checked numeric, or string conversion according to the consumer contract.
 
 3. **Enums with associated data.** `enum Result { Ok(Int), Err(String) }` generates a tagged-object representation that's awkward to construct from TypeScript. Prefer a pair of functions (`ok`, `err`) or a plain struct with discriminant fields.
 

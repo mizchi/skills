@@ -19,7 +19,7 @@ Operational rules live in `SKILL.md`. This file holds attribution and author-rep
 | Prune or cheap-replace redundant agents; author-reported up to 78.9% token reduction | [AgentSlimming](https://arxiv.org/abs/2605.08813) (Chen et al.; arXiv:2605.08813) |
 | Mediate shared-workspace writes instead of deferring conflicts to worktree merge; +18.7 on Commit0-Lite vs git-worktree baseline | [STORM: Multi-agent Collaboration with State Management](https://arxiv.org/abs/2605.20563) (Liu et al.; arXiv:2605.20563) |
 | Effort scaling (1 vs 2–4 vs 10+); internal eval +90.2% vs single Opus 4; ~15× chat tokens | [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) (Anthropic, 2025-06-13) |
-| Parallel coding succeeds when tests are the queue, write locks exist, CI is frequent, and non-decomposable stages are not forced parallel | [Building a C compiler with a team of parallel Claudes](https://www.anthropic.com/engineering/building-a-c-compiler-with-a-team-of-parallel-claudes) (Carlini, Anthropic, 2026-02-05) |
+| Parallel coding succeeds when tests are the queue, write locks exist, CI is frequent, and non-decomposable stages are not forced parallel | [Building a C compiler with a team of parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler) (Carlini, Anthropic, 2026-02-05) |
 
 ## Flue (runtime mapping)
 

@@ -1,0 +1,25 @@
+set shell := ["bash", "-cu"]
+set positional-arguments
+
+default:
+    @just --list
+
+# Compile and link MSL independently of the runtime source-compilation smoke test.
+shader-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    build_dir="$(mktemp -d "${TMPDIR:-/tmp}/metal-practice.XXXXXX")"
+    trap 'rm -rf "$build_dir"' EXIT
+    xcrun -sdk macosx metal -c vector-add.metal -o "$build_dir/vector-add.air"
+    xcrun -sdk macosx metallib "$build_dir/vector-add.air" -o "$build_dir/vector-add.metallib"
+
+# Pass another shader path to verify the same observable contract.
+test shader="vector-add.metal":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    build_dir="$(mktemp -d "${TMPDIR:-/tmp}/metal-practice.XXXXXX")"
+    trap 'rm -rf "$build_dir"' EXIT
+    xcrun -sdk macosx swiftc main.swift -o "$build_dir/compute-smoke"
+    "$build_dir/compute-smoke" "$1"
+
+check: shader-check test

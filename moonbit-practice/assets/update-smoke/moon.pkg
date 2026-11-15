@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+import {
+  "moonbitlang/core/lexbuf",
+  "example/update_smoke/variants",
+} for "wbtest"

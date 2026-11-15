@@ -1,0 +1,352 @@
+{
+  "schema": "jev-lint-eval-1",
+  "recorded": "2026-11-15T09:17:39.177Z",
+  "model": "jev-1.14.0",
+  "suite": "text/instructions-consistent",
+  "rules": [
+    {
+      "id": "instructions-consistent",
+      "draft": "cad02009555a",
+      "at": 0.7
+    }
+  ],
+  "cutoffs": {},
+  "passes": [
+    [
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.93,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.93,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.85,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.92,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.84,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.92,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.88,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "instructions-consistent",
+        "file": "rules/text/instructions-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      }
+    ]
+  ],
+  "spent": {
+    "calls": 36,
+    "inputTokens": 37029,
+    "usd": 0.0015552180000000001,
+    "ms": 293
+  }
+}

@@ -1,153 +1,111 @@
 ---
 name: otel-node
-description: Node.js OpenTelemetry setup — SDK init, auto-instrumentation packages, and the esbuild ESM silent-failure gotcha (instrumentation-* packages produce no spans when bundled with esbuild --format=esm). Use when adding OTel to a Node.js/Hono/Express service or debugging missing spans after bundling. See opentelemetry for signal design decisions.
+description: Set up or debug OpenTelemetry in a Node.js service, including compatible SDK/API versions, ESM load order, bundled auto-instrumentation, async context propagation and exporter verification. Use when adding instrumentation or investigating missing spans. See opentelemetry for signal and span design.
 ---
 
 # OpenTelemetry — Node.js
 
-## SDK Initialization
+Use Node 24+ and the project's existing build tools. Checked on 2026-11-16 with
+SDK 3.1.1, sdk-node/exporter 0.301.2 and API 1.10.0. The
+[smoke project](assets/smoke/package.json) pins the compatible package cohort.
+SDK 2.x consumers keep API 1.9.x until migrating the SDK too; API and SDK majors
+do not track each other. Read the [SDK 3 migration guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/3.x/migration-guide.md)
+before upgrading an existing service.
 
-```typescript
-// otel.ts — import before everything else
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { Resource } from "@opentelemetry/resources";
-import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+## Initialize before application imports
 
-const exporter = new OTLPTraceExporter({
-  url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT + "/v1/traces",
-});
+```ts
+// otel.ts — preload before the server entry point
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace';
 
-export const sdk = new NodeSDK({
-  resource: new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: process.env.SERVICE_NAME ?? "my-service",
+const sdk = new NodeSDK({
+  resource: resourceFromAttributes({
+    'service.name': process.env.OTEL_SERVICE_NAME ?? 'my-service',
   }),
-  spanProcessor: new BatchSpanProcessor(exporter),
+  spanProcessors: [new BatchSpanProcessor({ exporter: new OTLPTraceExporter() })],
 });
-
 sdk.start();
-process.on("SIGTERM", () => sdk.shutdown());
+process.once('SIGTERM', () => { void sdk.shutdown(); });
 ```
 
-Load before the app entry: `node --import ./otel.js server.js` or `tsx --import ./otel.ts server.ts`.
+Load with `node --import ./otel.ts server.ts` on Node 24, or preload the compiled
+`.js` module. Configure OTLP through its standard environment variables.
+`OTEL_EXPORTER_OTLP_ENDPOINT` is a base URL; the trace-specific
+`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is a full endpoint URL. Avoid appending
+`/v1/traces` twice. Include shutdown in the service's existing graceful-stop path
+so pending exports finish before process termination.
 
-## Auto-instrumentation packages
+SDK 3 uses `resourceFromAttributes`, `spanProcessors` and
+`new BatchSpanProcessor({ exporter })`. Do not copy the SDK 1/2 constructor
+examples into this cohort. `@opentelemetry/sdk-trace` replaces the old
+sdk-trace-base/node/web packages. `NodeSDK.start()` handles global registration;
+the API exposes `trace.getTracer()`, not a `NodeSDK.getTracerProvider()` method.
 
-Add only what you need — each package patches a specific module:
+## Instrumentation and ESM
 
-```bash
-pnpm add @opentelemetry/instrumentation-http       # node:http / node:https
-pnpm add @opentelemetry/instrumentation-express    # Express routing spans
-pnpm add @opentelemetry/instrumentation-pg         # postgres queries
-pnpm add @opentelemetry/instrumentation-ioredis    # Redis commands
+Add instrumentations only for modules the service uses, keeping their peer
+requirements compatible with the SDK cohort. Register them through
+`NodeSDK({ instrumentations: [...] })` before importing the application.
+
+Unbundled ESM can be instrumented using the package's documented loader hook.
+Consult the resolved instrumentation release and the
+[official ESM instructions](https://opentelemetry.io/docs/languages/js/getting-started/nodejs/).
+CJS require hooks and ESM loader hooks are different mechanisms.
+
+An esbuild/Vite/SWC bundle can inline the target modules and bypass both hooks.
+This is a packaging-specific limitation, not proof that all ESM instrumentation
+is unsupported. Reproduce against the actual output. Keep instrumented dependencies
+external where supported, run unbundled with the proper hook, or add explicit
+spans at a stable application boundary. Switching output to CJS alone does not
+restore module boundaries that the bundler already erased.
+
+## Explicit request boundary
+
+[instrumentation.ts](assets/smoke/instrumentation.ts) contains a tested SDK factory
+and `incomingSpan(tracer, headers, routeName, operation)`. It converts Web
+`Headers` to a text carrier, passes the extracted context as the third
+`startActiveSpan` argument, awaits work, records errors and always ends the span.
+
+Use a declared route such as `GET /users/:id`, not the concrete URL containing
+an ID. In a Hono/Express handler, pass that route pattern and run the handler's
+async work inside the callback. Add stable semantic attributes such as
+`http.request.method`, `http.route` and `http.response.status_code`; do not mark
+an HTTP 5xx as successful merely because the handler returned normally.
+
+For outgoing Web requests, inject into a plain carrier and merge it into the
+request headers:
+
+```ts
+import { context, propagation } from '@opentelemetry/api';
+const carrier: Record<string, string> = {};
+propagation.inject(context.active(), carrier);
+const headers = new Headers(existingHeaders);
+for (const [name, value] of Object.entries(carrier)) headers.set(name, value);
+await fetch(url, { headers });
 ```
 
-Register in SDK init:
+For gRPC metadata, supply a setter that calls `metadata.set(key, value)`.
+Neither a Web `Headers` instance nor gRPC metadata is a plain text carrier by
+default. Check parent span IDs across the boundary, not just span counts.
 
-```typescript
-import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
-import { ExpressInstrumentation } from "@opentelemetry/instrumentation-express";
+## Verify the pipeline
 
-export const sdk = new NodeSDK({
-  instrumentations: [new HttpInstrumentation(), new ExpressInstrumentation()],
-  // ...
-});
+```sh
+pnpm --dir assets/smoke install --frozen-lockfile --ignore-scripts
+pnpm --dir assets/smoke check
+pnpm --dir assets/smoke test
 ```
 
-**Hono**: no official instrumentation package. Use manual middleware (see below).
+The local test makes no collector/model requests. It verifies an incoming remote
+parent, async child context, outgoing `traceparent`, error status/event, ended
+spans and shutdown export. The old initialization fails compilation against the
+current cohort. This does not prove a live collector or a bundled service works.
+For that, temporarily add the Collector's `debug` exporter, send a request through
+the built service and inspect the resulting trace IDs before removing the debug
+exporter. Separate exporter/authentication failures from missing instrumentation.
 
-## esbuild ESM — Silent Auto-Instrumentation Failure
-
-### Symptom
-
-App starts normally, SDK init log appears, but **no spans arrive at the collector**. No errors. Happens when:
-
-- Output format is `--format=esm`
-- Using `@opentelemetry/instrumentation-*` auto-instrumentation
-- Bundler is esbuild (also Vite / SWC — same root cause)
-
-### Root cause
-
-`@opentelemetry/instrumentation-*` uses `require-in-the-middle` to hook `require()` and monkey-patch target modules (`node:http` etc.). In an esbuild ESM bundle, `import` is resolved statically at bundle time — `require()` is never called at runtime → hook never fires → no patches → no spans. No error is raised (silent failure).
-
-### Fix A — Manual spans (recommended for Hono/esbuild)
-
-Write a middleware that creates spans explicitly:
-
-```typescript
-import { context, propagation, SpanKind, SpanStatusCode, trace } from "@opentelemetry/api";
-
-const tracer = trace.getTracer("app");
-
-app.use(async (c, next) => {
-  const ctx = propagation.extract(context.active(), c.req.raw.headers);
-  const route = new URL(c.req.url).pathname;
-
-  await tracer.startActiveSpan(
-    `${c.req.method} ${route}`,
-    { kind: SpanKind.SERVER, attributes: { "http.method": c.req.method, "http.route": route } },
-    ctx,
-    async (span) => {
-      try {
-        await next();
-        span.setAttribute("http.status_code", c.res.status);
-        span.setStatus({ code: SpanStatusCode.OK });
-      } catch (e: any) {
-        span.recordException(e);
-        span.setStatus({ code: SpanStatusCode.ERROR, message: e?.message });
-        throw e;
-      } finally {
-        span.end();
-      }
-    }
-  );
-});
-```
-
-Propagate context to outgoing gRPC calls via metadata:
-
-```typescript
-const callUnary = (method, req) => {
-  const metadata = new grpc.Metadata();
-  propagation.inject(context.active(), metadata, {
-    set: (carrier, key, value) => (carrier as grpc.Metadata).set(key, value),
-  });
-  return new Promise((resolve, reject) =>
-    client[method](req, metadata, (err, res) => (err ? reject(err) : resolve(res)))
-  );
-};
-```
-
-### Fix B — Switch to CJS output
-
-Change esbuild to `--format=cjs`. `require()` hook fires normally. Works when no ESM-only dependencies are present. Hono supports CJS.
-
-### Fix C — Run unbundled
-
-Use `tsx` or `node --loader ts-node/esm` + `--import @opentelemetry/auto-instrumentations-node/register`. Skip bundling for the Node process. Increases container image size; not recommended for production.
-
-## Verifying the Pipeline
-
-Add a debug exporter to the OTel Collector temporarily:
-
-```yaml
-exporters:
-  debug:
-    verbosity: detailed
-
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      exporters: [otlphttp/tempo, debug]
-```
-
-Collector logs show `Trace ID: ... Name: GET /api/users` when spans arrive. No output = broken before the collector.
-
-## Related
-
-- `opentelemetry` — signal design, span naming, sampling, W3C propagation
-- `cloudflare-workers-otel-utels` — Cloudflare Workers telemetry (no Node runtime, fetch-boundary approach)
-- esbuild + Vite + SWC all share the same `require-in-the-middle` failure mode
-- `instrumentation-*` packages do not support static import patching as of 2026-05
+Related: `opentelemetry` for signal design and `cloudflare-workers-otel-utels`
+for Workers-specific instrumentation.

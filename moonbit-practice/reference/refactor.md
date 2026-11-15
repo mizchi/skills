@@ -7,7 +7,7 @@ title: "MoonBit Refactoring Patterns"
 ## Prefer match-if Pattern for Two-way Branches with No-op
 
 ```moonbit
-let opt : Int? = Some(1)
+let opt : Int32? = Some(1)
 
 ///|
 /// BAD
@@ -30,7 +30,7 @@ Use `guard` when you want to exit early if a condition is not met.
 ```moonbit
 ///|
 /// BAD: Deep nesting
-fn get_value(array : Array[Int], index : Int) -> Int? {
+fn get_value(array : Array[Int32], index : Int32) -> Int32? {
   if index >= 0 && index < array.length() {
     Some(array[index])
   } else {
@@ -40,7 +40,7 @@ fn get_value(array : Array[Int], index : Int) -> Int? {
 
 ///|
 /// Good: Early return with guard
-fn get_value(array : Array[Int], index : Int) -> Int? {
+fn get_value(array : Array[Int32], index : Int32) -> Int32? {
   guard index >= 0 && index < array.length() else { None }
   Some(array[index])
 }
@@ -129,8 +129,8 @@ arr.map(fn { x => x * 2 })
 ```moonbit
 ///|
 /// BAD: Using variable to hold result
-fn find_first(arr : Array[Int], target : Int) -> Int? {
-  let mut result : Int? = None
+fn find_first(arr : Array[Int32], target : Int32) -> Int32? {
+  let mut result : Int32? = None
   for i in arr {
     if i == target {
       result = Some(i)
@@ -142,7 +142,7 @@ fn find_first(arr : Array[Int], target : Int) -> Int? {
 
 ///|
 /// Good: Return directly with for-else
-fn find_first(arr : Array[Int], target : Int) -> Int? {
+fn find_first(arr : Array[Int32], target : Int32) -> Int32? {
   for i in arr {
     if i == target {
       break Some(i)

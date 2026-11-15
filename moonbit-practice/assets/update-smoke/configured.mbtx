@@ -1,0 +1,14 @@
+---
+import {
+  "moonbitlang/core/env",
+  "moonbitlang/core/queue" @q *,
+}
+permission(env: { "set": { "MOONBIT_SKILL_SMOKE": "configured" } })
+---
+
+fn main raise {
+  assert_eq(Queue([1, 2]).length(), 2)
+  assert_eq(@q.Queue([3, 4, 5]).length(), 3)
+  assert_true(@env.get_env_var("MOONBIT_SKILL_SMOKE") is Some("configured"))
+  println("configured script passed")
+}

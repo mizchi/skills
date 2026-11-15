@@ -24,6 +24,14 @@ An update without an explicit package can update unrelated skills; target the re
 
 Pinned immutable refs remain pinned. To move an APM consumer from `#v0.1.0` to `#v0.2.0`, update its dependency declaration and intentionally regenerate the lock, then verify frozen replay. Do not overwrite the old tag. For rollback, reinstall the known good source/ref and verify its contents; bump a Claude plugin release version if rolling its contents back, so hosted consumers receive the rollback.
 
+### APM dependency refresh
+
+Use `apm update <owner/repo/path> --dry-run` to preview the requested dependency,
+then `apm update <owner/repo/path> --yes` to update it. Add `-g` only for a
+requested user-global dependency. Review the manifest, lock and installed files;
+verify the resulting lock with `apm install --frozen`. This is distinct from
+upgrading the APM executable with `apm self-update`.
+
 ## Diagnose a stale update
 
 Compare the source commit/ref, plugin computed version, consumer lock and installed content. Check that the correct marketplace and scope were updated, the catalog points to the intended plugin source, and the agent was reloaded. Distinguish an in-place local plugin from a hosted cached copy and a symlink from an independent copy.

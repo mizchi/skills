@@ -47,11 +47,11 @@ If the contract never produces `null` (only `undefined`), `T?` is fine — confi
 
 | TypeScript | MoonBit | Notes |
 |---|---|---|
-| `T[]` / `Array<T>` | `Array[T]` | growable; `FixedArray[T]` for fixed |
+| `T[]` / `Array<T>` | `Array[T]` internally; `FixedArray[T]` at JS FFI | `FixedArray::from_array(xs[:])` before JS; no `Array` identity cast |
 | `readonly T[]` | `ArrayView[T]` / `ReadOnlyArray[T]` | cheap read-only slice |
 | `[A, B]` tuple | `(A, B)` | direct |
 | object / interface / record | `struct` | update syntax `{ ..old, field: v }` |
-| `Record<string, V>` / `Map` | **don't pass `Map` across the boundary** | use `struct`, `Array[(String, V)]`, or `Any` at the edge |
+| `Record<string, V>` / `Map` | **don't pass `Map` across the boundary** | build a JS object explicitly, or use `FixedArray` of ABI-safe elements; tuples/ordinary structs need marshalling |
 | discriminated union | `enum` | data-carrying enums are awkward to build from JS — see below |
 | string-literal union `"a" \| "b"` | `enum` (no payload) or `String` | enum if used internally; keep `String` at the boundary if JS passes raw strings |
 | `Date` | `mizchi/js` `Date` binding | not a MoonBit primitive |

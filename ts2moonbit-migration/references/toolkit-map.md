@@ -17,7 +17,7 @@ import {
   "mizchi/js",
 }
 ```
-(The JSON form `moon.pkg.json` with `{ "import": ["mizchi/js/core", "mizchi/js"] }` still parses, but its support is deprecated and scheduled for removal. Pick one per package — don't mix — and prefer the DSL.)
+(JSON manifests are no longer accepted as of v0.10.19. Run `moon fmt` to migrate an older `moon.pkg.json` to this DSL.)
 
 Module sub-layout (import only what you use):
 - `mizchi/js/core` — `Any`, unsafe casts, the FFI primitives

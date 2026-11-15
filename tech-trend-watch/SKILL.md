@@ -11,14 +11,13 @@ description: Long-term technology stack review using State of JS, State of CSS, 
 |---|---|---|---|
 | State of JS | Annual (autumn) | https://stateofjs.com | JS libraries, frameworks, tools — usage + satisfaction |
 | State of CSS | Annual (autumn) | https://stateofcss.com | CSS tools, frameworks, features — usage + satisfaction |
-| Thoughtworks Tech Radar | Quarterly | https://www.thoughtworks.com/radar | Broad tech (langs, platforms, tools, techniques) — ring assignments |
+| Thoughtworks Tech Radar | Twice yearly | https://www.thoughtworks.com/radar | Broad tech (langs, platforms, tools, techniques) — ring assignments |
 
-Fetch the latest edition of each before starting the review. State of JS/CSS also publish a public JSON API:
-
-```
-https://assets.devographics.com/surveys/js<YYYY>/en-US/results.json
-https://assets.devographics.com/surveys/css<YYYY>/en-US/results.json
-```
+Fetch the latest published edition of each before reviewing. Discover the data
+download or API from that edition's official site and validate its schema;
+do not construct an unverified JSON URL from a year template. Record the survey
+year, publication date and source URL. The Radar's [official FAQ](https://www.thoughtworks.com/radar/faq)
+describes a twice-yearly publication cadence (checked 2026-11-16).
 
 ## Step 1 — Inventory current stack
 
@@ -152,7 +151,7 @@ Write a review doc with:
 ## Cadence
 
 - **Annual**: Run full review aligned with State of JS/CSS release (typically November–January).
-- **Quarterly**: Check Tech Radar new volume for changes to existing stack items.
+- **Quarterly review**: Check whether a new Radar volume has appeared; publication is twice yearly, so a quarterly check may find no new volume.
 - **On-demand (new adoption)**: Run Step 3 (Radar only) when evaluating whether to add a new library with no existing incumbent.
 - **On-demand (replacement decision)**: Run Steps 2–5 for both the current tool and the candidate. Omit Step 1 stack inventory and Step 6 full output doc — produce a single migration evaluation instead. Use this path when the question has an incumbent ("should we switch from X to Y?" or "should we add Y or keep X?").
 

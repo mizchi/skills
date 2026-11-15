@@ -19,7 +19,7 @@ This skill ships **two** linters, with different cost / coverage trade-offs.
 
 ### Layer 1: catalog-lint (built-in, zero deps)
 
-`scripts/catalog-lint.mjs` is a Node 20+ script with no dependencies. It catches:
+`scripts/catalog-lint.mjs` is a Node 24+ script with no dependencies. It catches:
 
 - **duplicate-name**: two queries with the same `-- name: X` header. Some codegens silently shadow; others break.
 - **missing-semicolon**: queries that omit the trailing `;`. sqlc rejects these at build time, but catalog-lint surfaces them in fmt-time.
@@ -81,7 +81,7 @@ For full sqlfluff in CI, run a separate `sql-lint-style` step so the cheap catal
 
 ## Requirements
 
-- Node 20 or newer for `scripts/catalog-lint.mjs`.
+- Node 24 or newer for `scripts/catalog-lint.mjs`.
 - (Optional) `uv` / `pipx` / `pip` for sqlfluff.
 
 ## Files

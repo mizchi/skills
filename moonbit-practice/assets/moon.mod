@@ -1,4 +1,4 @@
-// moon.mod — module configuration (new DSL, replaces the deprecated moon.mod.json)
+// moon.mod — module configuration (DSL; JSON build manifests removed in v0.10.19)
 //
 // The DSL allows comments and trailing commas. Top-level settings use `key = value`;
 // build-affecting settings go inside the `options( ... )` block.

@@ -1,6 +1,15 @@
 # MoonBit FFI rewrites for Cloudflare Workers
 
-Two source rewrites that `prepare-worker.ts` applies to the moon JS output between `moon build --target js --release` and `cf deploy`. Both are not optional for Cloudflare Workers.
+Two source rewrites that `prepare-worker.ts` applies to the moon JS output between `moon build --target js --release` and `cf deploy`. They target the template's historical external async runtime, and must be revalidated when its compiler or runtime changes. They are not universal rewrites for experimental `core/async`.
+
+The v0.10.19 release announces the JS `Array` layout change for the next release. Migrate raw JS array boundaries to `FixedArray` before upgrading; source-level spread or `Promise.all` over a MoonBit `Array` cannot be repaired by these symbol replacements. See [the JS binding guide](../../moonbit-js-binding/SKILL.md).
+
+The September release also changes external async cancellation to a primitive
+that bypasses `catch`. A compiler/runtime upgrade needs cleanup and cancellation
+tests in addition to a reschedule-symbol check. See
+[the three-release baseline](../../moonbit-practice/reference/updates.md) and
+[runtime migration](../../moonbit-practice/reference/async.md); a newer applicable
+release overrides assumptions in the historical rewrite example.
 
 ## Rewrite 1: event_loop reschedule rename
 

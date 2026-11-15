@@ -1,6 +1,6 @@
 ---
 name: aws-github-oidc-scoped-role
-description: OpenTofu/Terraform pattern for GitHub Actions OIDC trust with AWS IAM. Covers the non-obvious `job_workflow_ref` condition (vs just `sub` for repo+branch), the Bedrock inference profile ARN patterns, required `aws-marketplace` permissions alongside Bedrock, and the ReadOnlyAccess + explicit Deny pattern for AI agent roles. Use when wiring GitHub Actions to AWS via OIDC.
+description: Configure GitHub Actions OIDC trust in AWS IAM using audience and exact subject conditions, including custom subjects for reusable workflows, Bedrock inference-profile permissions and explicit Deny guardrails. Use when designing or reviewing AWS roles assumed by GitHub Actions.
 ---
 
 # AWS GitHub Actions OIDC — Scoped IAM Role
@@ -21,36 +21,16 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 One provider per AWS account. If it already exists, use a `data` source instead.
 
-## Scope: `sub` (repo+branch) vs `job_workflow_ref` (specific workflow file)
+## Scope trust through `aud` and `sub`
 
-Most tutorials scope the OIDC trust to a repo+branch using the `sub` claim:
+AWS IAM does not expose GitHub's custom JWT claims as arbitrary condition keys.
+Use `token.actions.githubusercontent.com:aud` and an exact
+`token.actions.githubusercontent.com:sub`; a direct `:job_workflow_ref` condition
+is not a supported way to scope AWS trust. Checked against the
+[GitHub AWS guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws)
+on 2026-11-16.
 
-```hcl
-# Minimal scope — any workflow in the repo on main can assume this role
-condition {
-  test     = "StringLike"
-  variable = "token.actions.githubusercontent.com:sub"
-  values   = ["repo:ORG/REPO:ref:refs/heads/main"]
-}
-```
-
-For privileged roles (e.g., AI agents, deploy roles), scope to a **specific workflow file** using `job_workflow_ref`. This prevents any new workflow added to the repo from assuming the role:
-
-```hcl
-# Tight scope — only the specific workflow file from main can assume this role
-condition {
-  test     = "StringLike"
-  variable = "token.actions.githubusercontent.com:sub"
-  values   = ["repo:ORG/REPO:*"]  # AWS requires sub to be non-empty; use wildcard here
-}
-condition {
-  test     = "StringEquals"
-  variable = "token.actions.githubusercontent.com:job_workflow_ref"
-  values   = ["ORG/REPO/.github/workflows/my-workflow.yml@refs/heads/main"]
-}
-```
-
-The `aud` condition is always required:
+For a repository using the legacy default subject, a branch-bound policy is:
 
 ```hcl
 condition {
@@ -58,7 +38,36 @@ condition {
   variable = "token.actions.githubusercontent.com:aud"
   values   = ["sts.amazonaws.com"]
 }
+condition {
+  test     = "StringEquals"
+  variable = "token.actions.githubusercontent.com:sub"
+  values   = ["repo:ORG/REPO:ref:refs/heads/main"]
+}
 ```
+
+The exact subject is repository-specific. New repositories using immutable
+subjects include owner/repository IDs. Environment jobs use an environment
+subject rather than the branch subject. Check the repository's subject settings
+and the actual claim format; preserve environment protection rules.
+
+To bind a reusable workflow, first configure GitHub to include
+`job_workflow_ref` inside the **subject**, then compare that complete subject in
+AWS. For the legacy-name format, a corresponding example is:
+
+```hcl
+condition {
+  test     = "StringEquals"
+  variable = "token.actions.githubusercontent.com:sub"
+  values   = ["repo:ORG/REPO:environment:production:job_workflow_ref:ORG/REPO/.github/workflows/deploy.yml@refs/heads/main"]
+}
+# Keep the aud condition above as well.
+```
+
+This requires the matching GitHub subject template; it does not work with the
+default subject. `job_workflow_ref` describes the called reusable workflow, not
+an arbitrary normal workflow. Do not broaden `sub` to `repo:ORG/REPO:*` to make
+an absent claim pass. Read [subject customization and migration](references/oidc-subjects.md)
+before changing an existing trust configuration.
 
 ## AI Agent Role Pattern (ReadOnlyAccess + Bedrock + Deny overrides)
 

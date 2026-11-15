@@ -1,6 +1,14 @@
 # APM dependencies
 apm_modules/
 .apm/
+.agents/skills/
+.claude/skills/
+
+# Reproducible evaluation baselines are tracked; ad-hoc lint output is not.
+.jev-lint/latest.json
+.jev-lint/translations-latest.json
+.jev-lint/baseline.json
+.jev-lint/rules/**/last.json
 
 # MoonBit build artifacts (inside asset project dirs)
 _build/
@@ -9,6 +17,12 @@ target/
 
 # Node / JS
 node_modules/
+
+# Pinned local documentation tools and transient link-check results
+.tools/lychee/
+.lycheecache
+.cache/markdown-links/
+.cache/skill-freshness/
 
 # Editor / OS
 .DS_Store

@@ -124,16 +124,26 @@ pub async fn sleep(ms : Int) -> Unit {
 
 ## Promise.all / race / any
 
-All three share a uniform signature shape:
+All three consume a native JS array of Promises; their resolved result types differ:
 
 ```moonbit nocheck
-extern "js" fn ffi_promise_all(ps : Array[Promise[JsValue]]) -> Promise[JsValue] =
+extern "js" fn ffi_promise_all(
+  ps : FixedArray[Promise[JsValue]],
+) -> Promise[JsValue] =
   #| (ps) => Promise.all(ps)
 
-pub fn[T] Promise::all(ps : Array[Promise[T]]) -> Promise[Array[T]] {
-  ffi_promise_all(ps |> identity) |> identity
+pub fn[T] Promise::all(ps : Array[Promise[T]]) -> Promise[FixedArray[T]] {
+  let args = FixedArray::from_array(ps[:])
+  ffi_promise_all(args |> identity) |> identity
 }
 ```
+
+`Promise.all` resolves to a native JS array, hence the `FixedArray[T]` result.
+Convert an internal `Array` before crossing the boundary; `%identity` performs
+no representation conversion. The casts here erase only the opaque Promise
+types after constructing a real `FixedArray`; they do not cast a growable array.
+Use appropriate result types for `race` and `any`
+(one `T`, rather than an array).
 
 ## `async test` requirements
 

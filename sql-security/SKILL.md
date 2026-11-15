@@ -103,7 +103,7 @@ The scanner regex is engine-agnostic. The SQL-keyword set works for SQLite / Pos
 
 ## Requirements
 
-- Node 20 or newer.
+- Node 24 or newer.
 
 ## Files
 

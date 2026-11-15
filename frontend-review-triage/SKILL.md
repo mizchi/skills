@@ -9,11 +9,13 @@ You are performing Day 0 triage for a frontend consulting engagement. Your job i
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 0. **Classify the app** before running any script.
    - Ask the user (or infer from README / package.json) which app type applies:
      `admin` / `toc` / `btob-saas` / `ec` / `fintech` / `healthcare` / `iot-ops` / `media`
    - Note any regulatory context (GDPR, PCI DSS, HIPAA, …) and authentication requirements.
-   - Read `checklist/00-app-classification.md` Step 3 to determine which security, performance, TypeScript strictness, lint, coverage targets, and dependency freshness checks are P0 vs P1 vs skip for this app type.
+   - Derive security, performance, type/lint, coverage and dependency priorities from the client's explicit requirements and deployed data paths. Record assumptions; a domain label alone does not establish regulatory compliance or a KPI target.
    - Save the result to `<client-repo>/.frontend-review/kpi/app-classification.json`.
 1. Run `scripts/audit-triage.sh --repo <client-repo>` where `<client-repo>` is the absolute path to the user's repository.
 2. Read the resulting JSON at `<client-repo>/.frontend-review/report/latest/raw/triage.json`.
@@ -22,7 +24,7 @@ You are performing Day 0 triage for a frontend consulting engagement. Your job i
    - `README.md` — is it up-to-date, does it describe how to run things
    - `.github/workflows/` — which workflows exist
    - `gh issue list --state open --limit 20 --json number,title,labels` — what's already flagged
-4. Cross-reference against `checklist/12-known-issues.md` for the "known issues" collection routine.
+4. Compare repository issue history and documented limitations with the collected facts; record missing evidence explicitly.
 
 ## Output
 
@@ -33,7 +35,7 @@ Write a Markdown report to `<client-repo>/.frontend-review/report/latest/md/tria
 - **Scorecard table** (copy from `raw/triage.json` and annotate)
 - **Top 3 risks** — what would you fix first? Flag whether each risk is P0 or P1 per the classification matrix.
 - **Open questions** for the client (things you can't tell from the code)
-- **Next phase** — which `checklist/` items the Week 1 plan should target, ordered by the classification priority
+- **Next phase** — the checks and measurements to establish next, ordered by the recorded client requirements
 
 Keep the entire report under 400 lines. If you find yourself writing more, you're analyzing instead of triaging.
 
@@ -46,5 +48,4 @@ Keep the entire report under 400 lines. If you find yourself writing more, you'r
 
 ## Reference
 
-- Checklist: `checklist/00-app-classification.md`, `checklist/12-known-issues.md`, `checklist/01-package-manager.md`, `checklist/02-dependencies.md`
-- Phase: `phase/day-0-triage.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

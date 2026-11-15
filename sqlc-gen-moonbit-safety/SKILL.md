@@ -57,6 +57,10 @@ Reference test pattern: spins up a tmpdir project with synthetic `sqlc_types.mbt
 
 `db:verify` should fire in CI (and ideally in the build pipeline) so a regen drift can't ship.
 
+## Compiler upgrades
+
+With [MoonBit v0.10.19](https://www.moonbitlang.com/updates/2026/11/05/index), also inspect the generated JS boundary: `Array` in JS FFI is deprecated and the next release changes its layout. A D1 bind argument collection must reach JS as a native array; convert an internal collection to `FixedArray` at that boundary. These scripts check scalar bind conversion and SQL placeholder styles; they do not verify array ABI compatibility. Keep this check in the generator or its typed adapter and test the generated Worker against D1.
+
 ## References
 
 - [`references/d1-bind-hang.md`](references/d1-bind-hang.md) — the BigInt → 1101 chain in detail, including how to recognize it from a `Workers Logs` session.

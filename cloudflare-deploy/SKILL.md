@@ -9,8 +9,8 @@ Use `cf` for Cloudflare operations. Use the decision trees below to pick a produ
 
 ## Prerequisites
 
-- Node.js 24+ and pnpm. Install the npm package **`cf`**, not `@cloudflare/cf`.
-- Keep `cf` in project devDependencies and commit the lockfile. The checked example uses `cf@1.0.0-beta.5` and `@cloudflare/vite-plugin@beta`; recheck help and types when upgrading.
+- Node.js 24+ and pnpm; satisfy the installed packages' exact `engines` patch floors. Install the npm package **`cf`**, not `@cloudflare/cf`.
+- Keep `cf` in project devDependencies and commit the lockfile. The [smoke project](assets/smoke/package.json) checks `cf@1.0.0-beta.32` with `@cloudflare/vite-plugin@2.0.0-beta.v.17`, Vite 8.3.8 and Node 24.22.2 (2026-11-16). The stable plugin channel is a different version line; keep the generated compatible beta cohort. Recheck help and types when upgrading.
 - Workers use `cloudflare.config.ts`. For an existing Wrangler project, run `cf migrate --dry-run`, then `cf migrate` and resolve its follow-up items before project commands. Automatic configuration does not import the old bindings.
 
 ## Authentication (Required Before Deploy)
@@ -57,7 +57,7 @@ export default defineConfig({
   worker: {
     name: "my-worker",
     entrypoint,
-    compatibilityDate: "2026-09-30", // Today's date for a new Worker
+    compatibilityDate: "2026-11-16", // Example: select a date deliberately for this Worker
     observability: { enabled: true },
     env: {
       CACHE: bindings.kv({ id: "REPLACE_WITH_KV_ID" }),
@@ -96,7 +96,7 @@ pnpm exec cf deploy --secrets-file .env.production
 
 Put `API_SECRET` in an ignored `.env.production` for deployment and `.dev.vars` for local development. Declaring `bindings.secret()` makes that value required at deploy validation; dotenvx values in the CLI process are not automatically Worker secrets. Include `.cloudflare/types` in `tsconfig.json`; see the configuration reference for the full TypeScript setup. Change an existing Worker's compatibility date deliberately.
 
-Live log streaming and legacy Pages asset deployment are not implemented in the checked cf beta, even when a command appears in search/help. Use Workers Logs in the dashboard for inspection and Workers static assets for new web projects. For a legacy Pages project, keep its deployment working while planning migration; do not invent a `cf pages deploy` replacement. See [limitations](references/cf/gotchas.md).
+The earlier beta.5 baseline did not implement live log streaming or legacy Pages asset deployment. Those two operations have not been revalidated in beta.32; a command appearing in help does not prove it works. Use Workers Logs in the dashboard for inspection and Workers static assets for new web projects. For a legacy Pages project, keep its deployment working while planning migration; do not invent a `cf pages deploy` replacement. See [limitations](references/cf/gotchas.md).
 
 For Pages / D1 / Durable Objects / multi-env / CI — descend into `references/`.
 

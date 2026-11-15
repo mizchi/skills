@@ -125,7 +125,7 @@ cd $(chezmoi source-path)
 pkf hooks install   # writes .git/hooks/pre-push (secretlint over outgoing diff)
 
 # 5. apm install -g already fired via run_after_apm-install.sh during step 2.
-#    To pick up upstream updates later: apm install -g --update
+#    To pick up upstream updates later: apm update -g <requested-package> --yes
 ```
 
 ## Skill-addition flow (my personal routine)

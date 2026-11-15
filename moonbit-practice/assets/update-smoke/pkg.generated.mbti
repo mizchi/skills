@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "example/update_smoke"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn request_path(Bytes) -> BytesView?
+
+// Errors
+
+// Types and methods
+#derive(Eq, @debug.Debug, @json.ToJson)
+pub(all) struct Point {
+  x : Int32
+  y : Int32
+}
+pub fn Point::equal(Self, Self) -> Bool
+pub fn Point::not_equal(Self, Self) -> Bool
+pub fn Point::to_json(Self) -> @json.Json
+pub fn Point::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

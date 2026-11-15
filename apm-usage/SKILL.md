@@ -1,255 +1,127 @@
 ---
 name: apm-usage
-description: Reference for APM (Agent Package Manager) — apm.yml syntax, install / uninstall / update commands, target detection, lockfile workflow. Read when you need exact field names, but do NOT auto-invoke on every apm-related task; user prompts about projects with installed skills can be handled with general APM knowledge. Invoke explicitly when the user mentions APM by name, asks to author or audit an apm.yml, or runs into an unfamiliar APM command / error.
+description: Reference for APM manifests, installation, targeted updates, deployment paths and lockfiles. Invoke when the user explicitly asks about APM or apm.yml, or an unfamiliar APM command/error needs exact CLI details. Do not automatically invoke for every project that happens to have installed skills.
 ---
 
-# APM (Agent Package Manager)
+# APM — Agent Package Manager
 
-APM is a dependency manager for AI agent skills, instructions, prompts, and MCP servers. Think of it as npm for agent configuration.
+APM distributes skills, instructions, prompts, plugins and MCP declarations.
+Checked on 2026-11-16 with APM 0.35.1. Preserve a project's installed version and
+consumer lock until a deliberate upgrade; inspect that version's help when it
+predates this guide. [Official CLI reference](https://microsoft.github.io/apm/reference/).
 
-## When this skill applies
+## Install, replay and update are different
 
-- "add a skill to this project"
-- "install skills globally"
-- "create a skill for this repo"
-- "set up apm.yml"
-- "update agent dependencies"
+```sh
+apm --version
+apm install --help
+apm install owner/repo/path --target claude
+apm install --frozen
 
-## Core commands
+# Preview and update the requested dependency only
+apm update owner/repo/path --dry-run
+apm update owner/repo/path --yes
 
-```bash
-# Install all dependencies from apm.yml
-apm install
+# User scope, only when requested
+apm install -g owner/repo/path --target claude
+apm update -g owner/repo/path --dry-run
+apm update -g owner/repo/path --yes
 
-# Install a specific package
-apm install owner/repo
-apm install owner/repo/skills/skill-name    # subdirectory skill
-apm install owner/repo#v1.0.0               # pinned version
-
-# Global (user-scope) install → ~/.claude/skills/
-apm install -g owner/repo/skills/skill-name
-
-# Update all to latest
-apm install --update        # project scope
-apm install -g --update     # global scope
-
-# Remove
-apm uninstall owner/repo
-apm uninstall -g owner/repo
-
-# Inspect
-apm deps list               # project deps
-apm deps list -g             # global deps
-apm deps tree                # dependency tree
-apm deps tree -g
-
-# Security scan
+apm uninstall owner/repo/path
+apm deps list
+apm deps tree
 apm audit
-
-# Dry run (preview without changes)
-apm install --dry-run
 ```
 
-## apm.yml manifest
+`apm install` installs/replays the dependency graph; `--frozen` requires an existing
+matching lockfile. `apm update` refreshes selected dependencies. The old
+`apm install --update` spelling is a deprecated compatibility path, not the normal
+update command. An update without a package selects a wider scope, so use it only
+when that wider update is intended. `apm self-update` updates the tool itself,
+not the installed skills. See [update behavior](https://microsoft.github.io/apm/reference/cli/update/).
+
+A tag/full-SHA pin stays pinned. Change the declared ref intentionally before
+moving to another release, regenerate the lock and verify frozen replay. Do not
+move an existing Git tag to publish a replacement. `--force` can overwrite local
+content and bypass critical install findings; it is not the ordinary refresh flag.
+
+## Explicit manifest and scope
 
 ```yaml
 name: my-project
 version: 1.0.0
-# Deployment targets. APM 0.12+ requires this when no marker directory
-# (.claude/ / .github/ / etc.) exists at the repo root. Declare it
-# unconditionally to make the install reproducible.
 targets:
   - claude
+  - codex
 dependencies:
   apm:
-    # GitHub shorthand
-    - owner/repo
-    - owner/repo#v1.0.0                  # pinned tag
-    - owner/repo/skills/skill-name       # subdirectory
-
-    # Non-GitHub hosts
-    - gitlab.com/org/repo
-    - git: git@gitlab.com:org/repo.git
-      path: skills/my-skill
-      ref: main
-
-    # Local path (dev only, not for -g)
-    - ./packages/my-skill
-
-  mcp:
-    - io.github.github/github-mcp-server
-scripts: {}
-```
-
-### `scripts:` examples
-
-`scripts:` is a name → command map. Register post-`apm install` setup or one-shot tasks used during development:
-
-```yaml
+    - owner/repo/skills/my-skill#v1.0.0
+    - ./packages/local-skill
 scripts:
-  postinstall: "echo 'skills installed; restart Claude Code to pick them up'"
-  verify: "ls -1 .claude/skills | sort"
-  audit: "apm audit"
+  verify: "echo verify installed resources"
 ```
 
-Invoke with `apm run <name>` (e.g. `apm run verify`). `postinstall` runs automatically when `apm install` succeeds (hook). One-shot tasks (e.g. `apm run audit`) must be called explicitly.
+Explicit `targets` avoid depending on which marker directories happen to exist.
+Inspect `apm targets --json`; target support expands across releases. Local-path
+dependencies are for project development, not global installs. Commit the consumer
+manifest and `apm.lock.yaml` together for reproducibility.
 
-### Lockfile (`apm.lock.yaml`) workflow
+| Scope | Manifest / lock | Module cache |
+| --- | --- | --- |
+| Project | `./apm.yml`, `./apm.lock.yaml` | `./apm_modules/` |
+| User | `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml` | `~/.apm/apm_modules/` |
 
-`apm install` generates `apm.lock.yaml`. To guarantee reproducibility:
+Installed paths depend on target and namespace rules. The verified Claude+Codex
+local consumer deployed to `.claude/skills/source/` and `.agents/skills/source/`;
+APM used the source directory name, not an assumed frontmatter name. Read the
+reported path and inspect its files instead of constructing a path from the
+package name. Other targets can share `.agents/skills`; use the current target
+matrix/help rather than copying an older `.cursor/skills` table. Compatibility
+flags such as `--legacy-skill-paths` must be an explicit choice.
 
-- **project scope**: **commit** `apm.lock.yaml` so teammates resolve the same skill versions. Same idea as `package-lock` in `node_modules`.
-- **global scope**: sync `~/.apm/apm.lock.yaml` via chezmoi so a new machine installs the same versions.
-- In CI / on a new machine, use `apm install --frozen` to prevent drift (fails if the lockfile does not match the manifest).
-- Only run `apm install --update` when you intentionally want to update the lockfile.
+## Named scripts versus lifecycle hooks
 
-### Coexisting with chezmoi
+`scripts` is a named command map used by `apm run <name>` where that experimental
+feature is enabled. A command named `postinstall` in that map is not by itself an
+automatic install hook. The local install test confirmed it did not run.
+Current lifecycle automation uses a separate `lifecycle` feature and trust rules;
+inspect `apm lifecycle --help` and the official lifecycle documentation before
+adopting it. Do not silently run dependency-provided scripts during installation.
 
-If you manage dotfiles with chezmoi, the boundary with APM is:
+## Verify a consumer
 
-| path | chezmoi | APM |
-|---|---|---|
-| `~/.apm/apm.yml` | managed (copied into source) | reads |
-| `~/.apm/apm.lock.yaml` | managed (for new-machine reproducibility) | generates |
-| `~/.apm/apm_modules/` | ignore (large cache) | manages |
-| `~/.claude/skills/<name>/` | ignore (APM-managed is outside chezmoi) | deploy target |
+Use a temporary project with explicit targets and a local source dependency:
 
-Add the following to chezmoi's `.chezmoiignore`:
+1. Run `apm install --dry-run`, then the real `apm install`.
+2. Check the manifest/lock, reported deployment paths and every required resource.
+3. Run `apm install --frozen` and `apm update <package> --dry-run`.
+4. Verify discovery after the relevant agent reload/new session.
 
-```
-.apm/apm_modules
-.claude/skills/<apm-managed-name>
-```
+The 0.35.1 local check verified install, frozen replay, target output and update
+planning without changing global installations. It did not verify a hosted update
+or an agent's behavioral performance. See the distribution skill's
+[consumer validation guide](../publish-agent-skill/references/apm.md) for those
+additional steps; the installed skill remains self-contained through the steps
+above when that optional companion is absent.
 
-Watch for name collisions with your own skills (those copied into the chezmoi source with `chezmoi add`). On collision APM overwrites at install time. See the `chezmoi-management` skill for details.
+## Coexist with chezmoi
 
-## Creating skills in a repository
+Keep APM's module cache and its installed skill copies outside chezmoi ownership.
+Manage only the intended manifest/lock or self-authored source through chezmoi.
+Confirm actual deployment paths before changing ignore rules; a skill name can
+collide with a local source. Preserve the user's current ownership boundary.
+Do not overwrite locally authored content just to make an install succeed.
 
-Follow the [agentskills.io](https://agentskills.io/specification) open standard. Publishing-focused guide (repo layout, tag/release, dependency declaration, verification checklist) is in [references/publishing.md](references/publishing.md).
+For private sources, use the user's configured provider/gh credentials or CI
+credential mechanism; consult `apm auth --help` and the selected host's auth guide
+rather than assuming one credential priority across releases. Never put tokens
+inside a manifest, lockfile or example command.
 
-### Directory structure
+## Author portable skills
 
-```
-my-repo/
-└── skills/
-    └── my-skill/
-        ├── SKILL.md           # Required
-        ├── scripts/           # Optional: executable code
-        ├── references/        # Optional: detailed docs
-        └── assets/            # Optional: templates, resources
-```
-
-### SKILL.md format
-
-```markdown
----
-name: my-skill
-description: One-line description of what this skill does and when to use it.
----
-
-# Skill body
-
-Instructions for the AI agent. Keep under 500 lines.
-Move detailed reference material to references/ directory.
-```
-
-### Frontmatter fields
-
-| Field | Required | Constraints |
-|-------|----------|-------------|
-| `name` | Yes | 1-64 chars, lowercase alphanumeric + hyphens, must match directory name |
-| `description` | Yes | 1-1024 chars, describe what + when |
-| `license` | No | SPDX identifier or license file reference |
-| `compatibility` | No | Environment requirements (max 500 chars) |
-| `metadata` | No | Arbitrary key-value pairs |
-
-### Name validation rules
-
-- Lowercase letters, numbers, hyphens only
-- Cannot start or end with hyphen
-- No consecutive hyphens (`--`)
-- Must match the parent directory name
-
-### Users install with
-
-```bash
-apm install owner/my-repo/skills/my-skill
-```
-
-## Skill patterns for library authors
-
-### Single skill in a library repo
-
-```
-my-library/
-├── skills/
-│   └── my-library-guide/
-│       └── SKILL.md
-├── src/
-└── package.json
-```
-
-### Multiple skills (monorepo)
-
-```
-my-org-skills/
-├── skill-a/
-│   └── SKILL.md
-├── skill-b/
-│   └── SKILL.md
-└── skill-c/
-    └── SKILL.md
-```
-
-Users install individually: `apm install owner/my-org-skills/skill-a`
-
-## Target detection
-
-APM tries to auto-detect deployment targets from project structure:
-
-| Directory exists | Target | Skills deployed to |
-|-----------------|--------|-------------------|
-| `.claude/` | claude | `.claude/skills/` |
-| `.github/` | copilot | `.github/skills/` |
-| `.cursor/` | cursor | `.cursor/skills/` (if supported) |
-| `.codex/` | codex | `.agents/skills/` |
-
-**APM 0.12+ no longer falls back to `copilot` when no marker directory exists** — the previous default was removed and `apm install` now errors out asking for an explicit target. **Always declare `targets:` in `apm.yml`** so the install never depends on the working tree's directory layout:
-
-```yaml
-name: my-project
-version: 1.0.0
-targets:
-  - claude
-dependencies:
-  apm:
-    - owner/repo
-```
-
-Or override per command with `--target claude`.
-
-## Global vs project scope
-
-| | Project (`apm install`) | Global (`apm install -g`) |
-|---|---|---|
-| Manifest | `./apm.yml` | `~/.apm/apm.yml` |
-| Modules | `./apm_modules/` | `~/.apm/apm_modules/` |
-| Lockfile | `./apm.lock.yaml` | `~/.apm/apm.lock.yaml` |
-| Deploy to | `./.claude/skills/` | `~/.claude/skills/` |
-| Local `.apm/` content | Deployed | Skipped |
-
-## Authentication
-
-For private repos, APM resolves auth automatically:
-
-1. `gh auth login` (GH_TOKEN) — zero-config if already logged in
-2. `git credential fill` — OS keychain, SSH keys
-3. `GITHUB_APM_PAT` environment variable — for CI or explicit setup
-
-No extra configuration needed if `gh auth login` is done.
-
-## Priority and conflict resolution
-
-- Local skills always override dependency skills on name collision
-- Dependencies processed in declaration order; first wins
-- `apm install --force` overwrites local files on collision
+A skill directory contains SKILL.md and any referenced scripts, references or
+assets. Follow [the skill specification](https://agentskills.io/specification):
+matching lowercase directory/name, a descriptive trigger, and self-contained
+resources. An APM install or audit proves delivery/integrity, not that the skill's
+instructions work. Run a representative task and the bundled checks before
+publishing. More authoring detail: [publishing.md](references/publishing.md).

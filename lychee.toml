@@ -1,0 +1,24 @@
+# Local Markdown fragments are checked offline; HTTP(S) status checks are a
+# separate opt-in command. See docs/markdown-links.md for scope and exceptions.
+include_fragments = "anchor-only"
+include_verbatim = false
+include_mail = false
+index_files = ["README.md", "index.html", "."]
+max_concurrency = 8
+host_concurrency = 2
+host_request_interval = "250ms"
+timeout = 15
+max_retries = 2
+max_cache_age = "1d"
+cache_exclude_status = "400.."
+exclude_all_private = true
+
+# npm's website blocks automated requests; validate the exact package against
+# its official registry metadata. This checks package existence, not page HTML.
+remap = ['^https://www\.npmjs\.com/package/((@[^/?#]+/)?[^/?#]+)/?([?#].*)?$ https://registry.npmjs.org/${1}']
+
+# Reserved example domains in templates are deliberately not live endpoints.
+exclude = [
+  '^https?://([^/?#]+\.)?example\.(com|org|net)([/:?#]|$)',
+  '^https?://([^/?#]+\.)?(invalid|test)([/:?#]|$)',
+]

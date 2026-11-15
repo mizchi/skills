@@ -1,0 +1,352 @@
+{
+  "schema": "jev-lint-eval-1",
+  "recorded": "2026-11-15T09:17:39.545Z",
+  "model": "jev-1.14.0",
+  "suite": "text/terminology-consistent",
+  "rules": [
+    {
+      "id": "terminology-consistent",
+      "draft": "1965d8e80759",
+      "at": 0.35
+    }
+  ],
+  "cutoffs": {},
+  "passes": [
+    [
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.51,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.76,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.72,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.09,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.87,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.08,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.86,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.79,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.63,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.75,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.69,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/g.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.6,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.7,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.88,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.09,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "terminology-consistent",
+        "file": "rules/text/terminology-consistent/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      }
+    ]
+  ],
+  "spent": {
+    "calls": 36,
+    "inputTokens": 37953,
+    "usd": 0.0015940260000000001,
+    "ms": 363
+  }
+}

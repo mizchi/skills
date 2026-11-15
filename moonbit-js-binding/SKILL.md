@@ -7,7 +7,10 @@ description: Write MoonBit bindings to JavaScript with `extern "js"`. Use for FF
 
 Step-by-step workflow for binding JavaScript APIs (browser DOM, Node built-ins, npm packages) to MoonBit through the `js` backend.
 
-> Verified against MoonBit v0.10.12 and `moonbitlang/async` 0.21.0.
+> Updated for [MoonBit v0.10.19 (2026-11-05)](https://www.moonbitlang.com/updates/2026/11/05/index).
+> The bundled project passes with `moonc v0.10.20+65efd5b93`, Node 24, and
+> `moonbitlang/async` 0.22.7. This is an external-runtime example; experimental
+> `core/async` adoption is a separate decision, not a prerequisite for JS FFI.
 
 ## When To Use
 
@@ -39,12 +42,12 @@ Map JS types to MoonBit types before writing any declarations.
 | JavaScript | MoonBit | Notes |
 |---|---|---|
 | `boolean` | `Bool` | Direct |
-| `number` (integer) | `Int`, `UInt` | JS is IEEE-754; large `Int64` will lose precision — use `BigInt` instead |
+| `number` (32-bit integer) | `Int32`, `UInt32` | Preserve the signed/unsigned range; `Int` / `UInt` remain aliases |
 | `number` (float) | `Float`, `Double` | Direct |
 | `bigint` | `BigInt` | Direct |
 | `string` | `String` | Direct (both UTF-16) |
 | `Uint8Array` | `Bytes`, `FixedArray[Byte]` | Direct — no copy |
-| `Array<T>` | `Array[T]`, `FixedArray[T]` | Direct |
+| `Array<T>` | `FixedArray[T]` | JS boundary; use `Array[T]` internally and `FixedArray::from_array(xs[:])` when crossing |
 | `Function` | `FuncRef[(...) -> R]` or closure | Direct |
 | `any` (opaque) | `#external pub type JsValue` | Wrap in a nominal type |
 | `T \| undefined` | `T?` via `is_undefined` check | See Null/Undefined section |
@@ -52,7 +55,14 @@ Map JS types to MoonBit types before writing any declarations.
 | `Promise<T>` | `#external pub type Promise[T]` | Bridge with `async fn`/`wait()` |
 | constant `enum` | `number` | `pub(all) enum E { A; B }` |
 
-> **Warning — Number precision:** JavaScript has no integer type. Values crossing the FFI boundary round to IEEE-754 doubles. `Int` is fine for `\|x\| < 2^53`; beyond that use `BigInt`. `UInt64` / `Int64` currently map through JS `number` and lose bits above `2^53`.
+> **Number precision:** `Int32` / `UInt32` are 32-bit values, even though their JS ABI is `number`. The safe-integer limit of JS `number` does not widen their range. The current JS ABI does not promise a direct `Int64` / `UInt64` representation: convert deliberately to `BigInt`, a checked `Double`, or strings according to the JS contract.
+
+> **Array migration:** v0.10.19 announces the JS `Array` layout change for the next release; `Array` in JS FFI is already deprecated. Never spread a MoonBit `Array` in raw JS or identity-cast it to a native JS array. Use `FixedArray`, including nested array boundaries. `Bytes` / `FixedArray[Byte]` map to `Uint8Array`; other numeric fixed arrays may change to typed arrays in the future.
+
+The checked v0.10.20 development compiler uses the new layout; this is a local
+smoke result, distinct from the v0.10.19 release announcement. See the
+[binding smoke project](assets/js_binding_proj/src/ffi.mbt) and
+[release baseline](../moonbit-practice/reference/updates.md).
 
 > **Warning — Trait objects & MoonBit enums:** Passing `Map[K, V]`, `Result[_]`, `Json`, or non-`#external` trait objects across FFI exposes MoonBit's internal runtime shape. Convert to plain structs, `JsValue`, or primitives first.
 
@@ -76,17 +86,17 @@ source = "src"
 preferred_target = "js"
 
 import {
-  "moonbitlang/async@0.21.0",
+  "moonbitlang/async@0.22.7",
 }
 ```
 
 > The JSON form `moon.mod.json` (with the hyphenated `preferred-target`, `source`
-> and `deps` keys) is deprecated and slated for removal. `moon fmt` migrates an
+> and `deps` keys) is no longer accepted as of v0.10.19. `moon fmt` migrates an
 > existing project to the DSL.
 
 **Package (`src/moon.pkg`)** — gate `.mbt` files to the `js` backend and configure link output.
 
-> **File format — `moon.pkg` (DSL) vs `moon.pkg.json` (JSON):** MoonBit still reads either filename, but JSON support is deprecated and scheduled for removal. This skill uses the **DSL form `moon.pkg`** (no extension) throughout. Do NOT write `moon.pkg.json`; it is a different syntax (pure JSON, no `options(...)` wrapper, no trailing commas). Mixing them mid-project causes "Unable to read `moon.pkg`" parse errors. If you cloned an older template using `.pkg.json`, run `moon fmt` to convert it.
+> **File format:** Use **`moon.pkg`** (DSL). JSON manifests are no longer accepted in v0.10.19. If you cloned an older template using `moon.pkg.json`, run `moon fmt` to convert it before building.
 
 > **`targets:` — only needed for backend-specific files:** The `targets:` block gates individual `.mbt` files to a subset of backends. Files that contain `extern "js"`, `extern "c"`, or backend-specific `#cfg` blocks **must** be listed. Pure MoonBit files (no FFI) do NOT need a `targets:` entry — if every file in the package is pure MoonBit, omit the `targets:` block entirely. The example above lists `ffi.mbt` / `async.mbt` because they contain `extern "js"`; a simple library with no FFI only needs `link: { ... }`.
 
@@ -280,7 +290,7 @@ pub extern "js" fn JsValue::set(
 pub extern "js" fn JsValue::call_method(
   self : JsValue,
   name : String,
-  args : Array[JsValue],
+  args : FixedArray[JsValue],
 ) -> JsValue =
   #| (obj, name, args) => obj[name](...args)
 ```
@@ -417,7 +427,7 @@ async test "fetch_text resolves" {
 }
 ```
 
-> **Note — `moonbitlang/async`:** `async test` blocks require `import { "moonbitlang/async" } for "test"` in `moon.pkg`. The dependency is only needed at test time. Add with `moon add moonbitlang/async` — **version 0.17.0 or later** is required (older 0.1.x releases don't support the current `%async.suspend` ABI). Verified with `0.21.0`.
+> **Note — `moonbitlang/async`:** `async test` blocks require `import { "moonbitlang/async" } for "test"` in `moon.pkg`. This sample pins **0.22.7** and uses the runtime only in tests; re-check the resolved package before copying a lower-level suspension bridge into another runtime.
 >
 > Breaking changes to watch when upgrading past 0.20: `@http.Headers` is now a
 > case-insensitive map rather than `Map[String, String]`; `@fs` dropped the
@@ -425,6 +435,14 @@ async test "fetch_text resolves" {
 > `CreateOrTruncate`; `@stdio.{Input,Output}::fd` raises instead of returning;
 > `@async.protect_from_cancel` defaults to `resume_on_cancel=true`. The runtime
 > also aborts on detected deadlocks (`@async.set_deadlock_handler` to configure).
+
+> **Cancellation since external async 0.22.0:** It is a compiler primitive that
+> bypasses `catch` and still triggers `defer` / `errdefer`. `noraise` does not mean
+> `nocancel`; `handle_cancellation` returns `None` without clearing task cancellation.
+> Replace deprecated `is_cancellation_error` / `with_cancellation_handler` patterns
+> and use non-cancellable cleanup where required. The bundled test exercises this
+> behavior. See [cleanup and cancellation](../moonbit-practice/reference/async.md)
+> for the August-to-November migration and pinned interface.
 
 ### Phase 5: Testing
 
@@ -482,9 +500,9 @@ A runnable end-to-end example lives under `assets/js_binding_proj/` in this skil
 
 2. **Using `T?` to model `T | null | undefined`.** MoonBit's `None` is not JS `null`, and `Some(null)` is a nonsense value. Split with `is_undefined` and `is_null` before lifting.
 
-3. **Relying on `Int64` across FFI.** JS `number` is IEEE-754 double. Any 64-bit integer > 2^53 silently rounds. Use `BigInt` or split into two `Int`s.
+3. **Assuming a direct `Int64` ABI.** Inspect generated types and use an explicit conversion. Choose `BigInt` or a string for exact 64-bit values; a JS `number` loses integer precision beyond its safe range.
 
-4. **Exposing MoonBit internals by passing `Map`/`Result`/trait objects directly.** These have a MoonBit-specific runtime layout. Convert to plain structs, `Array[(K, V)]`, or `JsValue` at the boundary.
+4. **Exposing MoonBit internals by passing `Map`/`Result`/trait objects directly.** These have a MoonBit-specific runtime layout. Build a JS object explicitly or convert to `FixedArray` of boundary-safe elements. A tuple or ordinary MoonBit struct also needs an explicit JS shape contract.
 
 5. **Missing `moonbitlang/async` for `async test`.** The test-only import is easy to forget. Add `import { "moonbitlang/async" } for "test"` to `moon.pkg` before writing the first `async test`.
 

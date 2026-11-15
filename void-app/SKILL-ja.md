@@ -5,7 +5,7 @@ description: "Build full-stack apps with Void (the void npm package from VoidZer
 
 # Void でアプリを作るチートシート
 
-**2026-10-18 確認: Void / @void/react 1.1.11、Vite+ 1.3.0、Node 24.21.0 以上、pnpm 12.14.0。** 以下は動作を確認した組み合わせ。別バージョンでは `engines`、CLI のヘルプ、peer dependencies、同梱ドキュメントを確認してから使う。英語の [SKILL.md](SKILL.md) を正本とする。
+**現行確認（2026-11-16）: Void / @void/react 1.9.1、Vite+ 1.6.0、Node 24.22.2、pnpm 10.28.2。** Void runtime の Node 条件は `^24.22.0 || >=26.12.0`。新規 React/SQLite アプリでローカル migration、Playwright による追加・成功時 reset・再読み込み後の保持・検証失敗時の入力保持・redirect を確認した。[検証記録](references/current-validation.md)を参照。以前の 2026-10-18 確認は Void 1.1.11 / Vite+ 1.3.0 で、現行 API に置き換わった回避策は履歴として扱う。更新時は `engines`、help、peer dependencies、同梱 docs を再確認する。英語の [SKILL.md](SKILL.md) を正本とする。
 
 ## 最初に読むもの
 
@@ -132,14 +132,10 @@ export const actions = {
 ```tsx
 // pages/index.tsx
 import { Form, useForm } from '@void/react';
-import { useEffect } from 'react';
 import type { Props } from './index.server';
 
 export default function Home({ notes }: Props) {
-  const form = useForm('/?create', { body: '' });
-  useEffect(() => {
-    if (form.wasSuccessful) form.setData('body', '');
-  }, [form.wasSuccessful]);
+  const form = useForm('/?create', { body: '' }, { resetOnSuccess: true });
 
   return <main>
     <ul>{notes.map((note) => <li key={note.id}>{note.body}</li>)}</ul>
@@ -163,22 +159,17 @@ export default function Home({ notes }: Props) {
 
 action が何も返さなければ loader を再実行して表示を更新する。`action()` の結果は `result.ok` を確認し、throw される失敗も扱う。
 
-**`useForm` は成功すると送信値を新しい初期値にする。`reset()` では追加フォームは空にならない。** 成功時に `setData` で空にし、失敗時には入力を残す。
+1.9.1 の `reset()` は現在の既定値（通常は最後に成功した送信値）へ戻す。追加フォームは `useForm` の第3引数に `{ resetOnSuccess: true }` を指定する。元の値へ手動で戻す場合は `form.reset({ initial: true })`。検証失敗時には入力を保持する。`setData` の effect はこれらの API がない旧版向けの代替とする。
 
 動的ルートのフォームは `useForm('/notes/:id?update', data, { params: { id } })`。ID は正の安全な整数か検証し、形式が不正・行が存在しない場合は 404 にする。
 
 日本語 UI の `lang` と viewport は `void.config.ts` の `head` で設定する。ページタイトルは `.server.ts` の `defineHead<Props>` から返す。
 
-### 削除後に `?delete` が残る場合
+### 現行の redirect
 
-Void 1.1.11 では `c.redirect('/')` が元のクエリを引き継ぎ、削除後に `/?delete` が残った。クエリを残したくない場合は、同一オリジンの絶対 URL と 303 を返す。
+1.9.1 の `c.redirect('/')` は現在のページのクエリを自動で引き継がない。名前付き action 自身の通常パラメータは保持し、GET へ変わる redirect では action キーを除く。ローカル検証では `POST /?clean&tab=profile` → `303 /?tab=profile`、通常の GET は `/api/redirect?obsolete=1` → `/` となった。307/308 などメソッドを保持する redirect では action キーも残るため、メソッドと最終 URL を検証する。
 
-```ts
-// pages/notes/[id].server.ts の削除成功後
-return c.redirect(new URL('/', c.req.url).href, 303);
-```
-
-E2E で最終 URL まで確認する。別バージョンでも回避策が必要かは、その実装と実際の遷移で確かめる。
+1.1.11 では `c.redirect('/')` の後に `?delete` が残る場合があった。同一オリジンの絶対 URL を返す旧回避策を、現行版で必須としない。更新時は同梱の `reference/api/rewrites.md` と E2E の最終 URL を確認する。
 
 ## API ルートと型付き fetch
 

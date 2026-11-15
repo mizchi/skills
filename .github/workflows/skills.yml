@@ -17,6 +17,11 @@ on:
       - "stryker.justfile"
       - "publish-agent-skill/**"
       - "publish-agent-skill.justfile"
+      - ".jev-lint/**"
+      - ".jev-lint.yaml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "skill-lint.justfile"
   pull_request:
     paths:
       - ".github/workflows/skills.yml"
@@ -33,6 +38,11 @@ on:
       - "stryker.justfile"
       - "publish-agent-skill/**"
       - "publish-agent-skill.justfile"
+      - ".jev-lint/**"
+      - ".jev-lint.yaml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "skill-lint.justfile"
   workflow_dispatch:
 
 permissions:
@@ -58,8 +68,18 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+      - name: Install pinned skill lint tooling
+        run: |
+          npm install --global pnpm@10.28.2
+          pnpm install --frozen-lockfile
+      - name: Test maintained skill selection
+        run: pnpm test:skill-lint
+      - name: Replay calibrated skill rules without API requests
+        run: pnpm lint:skills:replay
       - name: Test cf deployment and secret helpers
         run: node --test cloudflare-workers-cd-rollback/assets/scripts/deployment-state.test.ts utels-project-bootstrap/assets/scripts/setup-utels.test.ts cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.test.ts
+      - name: Test CD workflow credential delivery
+        run: ruby cloudflare-workers-cd-rollback/assets/scripts/workflow-credentials_test.rb
       - name: Test Stryker setup helpers
         run: node --test stryker-js/tests/*.test.mjs
       - name: Test skill installation verifier

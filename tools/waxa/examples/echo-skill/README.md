@@ -44,9 +44,8 @@ waxa variant evals/echo-skill/eval.yaml \
 ## What this example deliberately does NOT show
 
 - Production-grade rubrics for the `llm` grader (the echo task is too
-  trivial to need one). The `skill-selector` eval at
-  [mizchi/skills:evals/skill-selector/](https://github.com/mizchi/skills/tree/main/evals/skill-selector)
-  exercises every grader type with realistic rubrics.
+  trivial to need one). The [grader reference](../../README.md#grader-types) describes
+  the available grader types and rubric configuration.
 - `parallel: true` (overkill for a 2-task eval).
 - A populated `ledger.yaml` (you produce one yourself by running
   `waxa iterate`).

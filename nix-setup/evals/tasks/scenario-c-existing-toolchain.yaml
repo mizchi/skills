@@ -1,0 +1,36 @@
+id: nix-setup-no-default-adoption-001
+name: Preserve an existing toolchain without adopting devbox or dotenvx
+description: |
+  Negative adoption control: reproducibility and secrets alone do not select
+  devbox, dotenvx, or a replacement environment stack.
+
+tags:
+  - adoption-policy
+  - existing-project
+
+inputs:
+  prompt: |
+    既存の TypeScript プロジェクトの開発手順と CI を整理したい。
+    - Node.js 24 と pnpm の lockfile を採用済み
+    - package.json に build / test スクリプトがある
+    - ローカルの環境変数は既存の起動スクリプトで読み込む
+    - CI はリポジトリの Secrets を環境変数で渡している
+    - Nix、devbox、dotenvx は未導入で、今回それらを採用する指定はない
+
+    再現可能なセットアップと環境別の秘密情報の扱いを、既存構成に沿って説明して。
+
+expected:
+  require_self_report: true
+
+graders:
+  - name: preserves_adoption_boundary
+    type: llm
+    config:
+      rubric: |
+        次の全項目を満たした場合だけ PASS: yes。
+        1. Node.js 24、pnpm の lockfile、既存 build/test を維持する。
+        2. 再現性を理由に devbox や Nix を自動導入しない。
+        3. 環境変数・秘密情報を扱うことだけを理由に dotenvx を追加しない。
+        4. 既存の起動スクリプトと CI の Secrets → 環境変数の経路を使う。
+        5. devbox や dotenvx への言及自体は失敗ではないが、導入コマンドや
+           設定ファイルを既定の成果物として作らない。

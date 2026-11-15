@@ -2,7 +2,7 @@
 
 ///|
 /// Plain MoonBit function — exported to JS via moon.pkg `exports`.
-pub fn add(a : Int, b : Int) -> Int {
+pub fn add(a : Int32, b : Int32) -> Int32 {
   a + b
 }
 

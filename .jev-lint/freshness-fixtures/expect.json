@@ -1,0 +1,12 @@
+{
+  "wrong-bin": "contradicts",
+  "current-bin": "supports",
+  "wrong-sdk": "contradicts",
+  "historical-sdk": "supports",
+  "wrong-schema": "contradicts",
+  "custom-sub": "supports",
+  "wrong-oidc": "contradicts",
+  "supported-older-action": "supports",
+  "quoted-old-sdk": "supports",
+  "missing-context": "insufficient_context"
+}

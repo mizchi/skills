@@ -640,7 +640,7 @@ Gleam project を参照実装として見せるなら、位置づけを曖昧に
 - Gleam docs: https://gleam.run/
 - Gleam `gleam.toml`: https://gleam.run/writing-gleam/gleam-toml/
 - Gleam externals: https://gleam.run/documentation/externals/
-- Gleam CLI: https://gleam.run/reference/cli/
+- Gleam CLI: https://gleam.run/documentation/command-line-reference/
 - Wisp docs: https://hexdocs.pm/wisp/
 - Mist docs: https://hexdocs.pm/mist/
 - just manual: https://just.systems/man/en/

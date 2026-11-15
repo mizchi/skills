@@ -42,7 +42,7 @@ moonbit-overlay を使って再現可能な開発環境とパッケージビル�
           };
           moonHome = pkgs.moonPlatform.bundleWithRegistry {
             cachedRegistry = pkgs.moonPlatform.buildCachedRegistry {
-              moonModJson = ./moon.mod.json;
+              moonModJson = ./nix/moon-deps.json;
               registryIndexSrc = inputs.moon-registry;
             };
           };
@@ -82,7 +82,7 @@ direnv allow   # or auto-enter with direnv
 }:
 moonPlatform.buildMoonPackage {
   src = ./.;
-  moonModJson = ./moon.mod.json;
+  moonModJson = ./nix/moon-deps.json;
   inherit moonRegistryIndex;
 
   doCheck = false;
@@ -173,7 +173,7 @@ cc -O2 -o my-app \
 let
   moonHome = moonPlatform.bundleWithRegistry {
     cachedRegistry = moonPlatform.buildCachedRegistry {
-      moonModJson = ./moon.mod.json;
+      moonModJson = ./nix/moon-deps.json;
       registryIndexSrc = moonRegistryIndex;
     };
   };
@@ -252,10 +252,11 @@ options(
 ## Key Points
 
 - `moon-registry` input は `flake = false` にする（Git リポジトリで flake ではない）
-- `buildMoonPackage` は `moon.mod.json` の `preferred-target` を読んでターゲットを決定。
-  overlay の `moonModJson` 引数は今のところ JSON マニフェストを前提としているため、
-  モジュールを `moon.mod` DSL に移行した場合も Nix 用に `moon.mod.json` を残すか、
-  overlay 側の DSL 対応状況を確認してから削除する
+- このページの `moonModJson` は旧 overlay API の例。v0.10.19 でのビルドは未検証。
+  使用中の lock revision が DSL と対象コンパイラに対応するか確認する。
+  JSON 専用 helper を残す場合は `nix/moon-deps.json` などの別ファイルを使い、
+  `moon.mod` と同期する。`moon.mod.json` をビルド用 manifest として残さない。
+- 既存の環境管理方法を維持する。Nix / devbox の導入は利用者が選択した場合に限る。
 - `moonTarget` パラメータでオーバーライド可能
 - `moonFlags` で追加の `moon build` フラグを渡せる
 - `doCheck = false` でテストをスキップ（CI 側で別途実行する場合）

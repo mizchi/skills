@@ -15,6 +15,9 @@ View types are **zero-copy, non-owning, read-only slices**. They don't allocate 
 | `Array[T]` | `ArrayView[T]` | `a[:]`, `a[start:end]` |
 | `FixedArray[T]` | `ArrayView[T]` | `a[:]`, `a[start:end]` |
 
+As of v0.10.14, slice syntax clamps bounds. Use `exact_view` for strict bounds
+checking; negative bounds do not represent offsets from the end.
+
 ## StringView
 
 ### Creating StringView
@@ -49,15 +52,16 @@ process_string_view(some_string[:])
 
 ### Unicode Safety
 
-StringView slicing may raise at surrogate boundaries (UTF-16 edge case):
+Slice syntax clamps invalid bounds, including UTF-16 surrogate boundaries, as
+of v0.10.14. `exact_view` retains strict checking and can panic:
 
 ```moonbit
-fn safe_slice(s : String, start : Int, end : Int) -> StringView raise {
-  s[start:end]  // May raise on invalid boundaries
+fn clamped_slice(s : String, start : Int32, end : Int32) -> StringView {
+  s[start:end]
 }
 
-// Or use try! if you're certain
-let view = try! s[start:end]
+// Only when the caller has validated the bounds and surrogate boundaries:
+let view = s.exact_view(start=0, end=2)
 ```
 
 ### StringView Methods
@@ -68,18 +72,25 @@ moon ide doc StringView
 
 Common operations:
 - `view.length()` - Length in code units
-- `view.to_string()` - Convert back to owned String
+- `view.to_owned()` - Allocate an owned String; the old `StringView::to_string` alias warns on the checked compiler
 - `view.iter()` - Iterate over characters
 
 ## ArrayView
+
+September's `Array` cleanup changes may leave references in unused backing slots
+after `pop`, `truncate`, or `clear`. If retaining a large backing buffer keeps
+discarded objects alive, measure retention against the selected core implementation.
+The September article mentions `fill_unused`, but it is absent from the checked
+v0.10.20 interfaces; do not generate that call without finding a matching API.
+Logical length alone does not establish the lifetime of backing-slot references.
 
 ### Creating ArrayView
 
 ```moonbit
 let arr = [1, 2, 3, 4, 5]
-let view : ArrayView[Int] = arr[:]      // Entire array
-let first3 : ArrayView[Int] = arr[0:3]  // [1, 2, 3]
-let last2 : ArrayView[Int] = arr[3:]    // [4, 5]
+let view : ArrayView[Int32] = arr[:]      // Entire array
+let first3 : ArrayView[Int32] = arr[0:3]  // [1, 2, 3]
+let last2 : ArrayView[Int32] = arr[3:]    // [4, 5]
 ```
 
 ### ArrayView for Function Parameters
@@ -87,13 +98,13 @@ let last2 : ArrayView[Int] = arr[3:]    // [4, 5]
 ```moonbit
 ///|
 /// BAD: Takes ownership
-fn sum_array(arr : Array[Int]) -> Int {
+fn sum_array(arr : Array[Int32]) -> Int32 {
   arr.fold(init=0, fn(a, b) { a + b })
 }
 
 ///|
 /// Good: Zero-copy, accepts slices
-fn sum_view(arr : ArrayView[Int]) -> Int {
+fn sum_view(arr : ArrayView[Int32]) -> Int32 {
   arr.fold(init=0, fn(a, b) { a + b })
 }
 
@@ -106,7 +117,7 @@ sum_view(arr[1:4])         // Slice
 ### Pattern Matching with Views
 
 ```moonbit
-fn process(view : ArrayView[Int]) -> Unit {
+fn process(view : ArrayView[Int32]) -> Unit {
   match view {
     [] => println("empty")
     [x] => println("single: \{x}")
@@ -186,7 +197,7 @@ fn join_with_separator(parts : Array[String], sep : String) -> String {
 ```moonbit
 ///|
 /// Good: No copying in recursion
-fn binary_search(arr : ArrayView[Int], target : Int) -> Int? {
+fn binary_search(arr : ArrayView[Int32], target : Int32) -> Int32? {
   guard arr.length() > 0 else { None }
   let mid = arr.length() / 2
   if arr[mid] == target {
@@ -205,10 +216,10 @@ When you need ownership:
 
 ```moonbit
 let string_view : StringView = "hello"[:]
-let owned_string : String = string_view.to_string()
+let owned_string : String = string_view.to_owned()
 
-let array_view : ArrayView[Int] = [1, 2, 3][:]
-let owned_array : Array[Int] = array_view.to_array()
+let array_view : ArrayView[Int32] = [1, 2, 3][:]
+let owned_array : Array[Int32] = array_view.to_array()
 
 let bytes_view : BytesView = b"data"[:]
 let owned_bytes : Bytes = bytes_view.to_bytes()

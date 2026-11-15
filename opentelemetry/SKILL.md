@@ -5,6 +5,11 @@ description: Platform-agnostic OpenTelemetry reference — signal selection (tra
 
 # OpenTelemetry — Core Patterns
 
+JavaScript examples use Node 24+ and the SDK 3.x/API 1.10 generation, checked
+on 2026-11-16. SDK 2.x requires API 1.9.x; do not upgrade only the API package.
+See the [SDK 3 migration guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/3.x/migration-guide.md)
+and the tested example in `otel-node` before choosing package versions.
+
 ## Signal Selection
 
 Pick the right signal before writing code:
@@ -32,9 +37,9 @@ Never put variable data (IDs, values) in the span name — use attributes. A spa
 
 ```typescript
 span.setAttributes({
-  "db.system": "sqlite",
-  "db.operation": "select",
-  "db.sql.table": "users",
+  "db.system.name": "sqlite",
+  "db.operation.name": "SELECT",
+  "db.collection.name": "users",
   "user.id": userId,          // high-cardinality: OK as attribute, not in name
 });
 ```
@@ -87,9 +92,13 @@ propagation.inject(context.active(), carrier);
 fetch(url, { headers: carrier });
 
 // Incoming (server handler)
-const ctx = propagation.extract(context.active(), request.headers);
-tracer.startActiveSpan("handle request", { context: ctx }, (span) => {
-  // span is now a child of the upstream trace
+const ctx = propagation.extract(context.active(), Object.fromEntries(request.headers));
+tracer.startActiveSpan("handle request", {}, ctx, (span) => {
+  try {
+    // Do synchronous work here. For async work, await it before ending the span.
+  } finally {
+    span.end();
+  }
 });
 ```
 
@@ -110,28 +119,34 @@ tracer.startActiveSpan("handle request", { context: ctx }, (span) => {
 
 ```typescript
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { BatchSpanProcessor, TracerProvider } from "@opentelemetry/sdk-trace";
+import { trace } from "@opentelemetry/api";
 
 const exporter = new OTLPTraceExporter({
-  url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT + "/v1/traces",
-  headers: { Authorization: `Bearer ${process.env.OTEL_API_KEY}` },
+  // Or use OTEL_EXPORTER_OTLP_TRACES_ENDPOINT for a signal-specific full URL.
+  url: "https://collector.example.com/v1/traces",
 });
 
-provider.addSpanProcessor(
-  new BatchSpanProcessor(exporter, {
+const provider = new TracerProvider({
+  spanProcessors: [new BatchSpanProcessor({
+    exporter,
     maxQueueSize: 512,
     scheduledDelayMillis: 2000,
     exportTimeoutMillis: 10_000,
-  })
-);
+  })],
+});
+trace.setGlobalTracerProvider(provider);
 ```
 
-Use `BatchSpanProcessor` in production — it is async and low-overhead. `SimpleSpanProcessor` blocks the event loop; use only for local debugging.
+Use `BatchSpanProcessor` to batch production exports. `SimpleSpanProcessor`
+exports each ended span separately; it does not inherently imply a synchronous
+network request. Flush/shut down the provider before process exit. For Node,
+prefer `NodeSDK`, which also configures context propagation and resource detection.
 
 ## Common Pitfalls
 
-- **`provider.register()` not called**: SDK is configured but nothing is exported. Call before any instrumentation runs.
-- **ESM + auto-instrumentation (Node.js)**: `require-in-the-middle` hooks do not fire for ESM static imports. See `otel-node` for the workaround.
-- **Cloudflare Workers**: no Node.js runtime, fetch-boundary instrumentation needed. See `cloudflare-workers-otel-utels`.
+- **Provider never installed**: start `NodeSDK`, or explicitly install the tracer provider, context manager and propagator before application imports. SDK 3's `TracerProvider` has no old `register()` step.
+- **ESM + auto-instrumentation (Node.js)**: supported unbundled ESM needs the instrumentation loader hook. Bundled dependencies can bypass module hooks; see `otel-node`.
+- **Cloudflare Workers**: a Workers isolate with partial Node compatibility still needs an exporter and instrumentation suited to that runtime. See `cloudflare-workers-otel-utels`.
 - **Span name includes dynamic data**: explodes trace index cardinality. Move to attributes.
 - **No W3C propagation on outbound calls**: distributed trace breaks — downstream spans appear as orphaned roots.

@@ -9,6 +9,8 @@ You are assessing the baseline code quality hygiene of a frontend project: types
 
 ## Procedure
 
+Collector reports use a versioned envelope: read values under `data`, inspect `status` and `issues`, and keep missing measurements distinct from zero. See the local collection contract.
+
 1. In parallel, run:
    - `scripts/audit-typescript.sh --repo <client-repo>`
    - `scripts/audit-lint.sh --repo <client-repo>`
@@ -52,6 +54,4 @@ Auto-generated files (lock files, generated schemas, tool artefacts) must be exc
 
 ## Reference
 
-- Checklist: `03-typescript.md`, `04-lint-format.md`, `05-deadcode-knip.md`, `06-similarity.md`, `13-kpi-tracking.md`
-- Related: `frontend-review-deps` (dependency health), `frontend-review-security` (CVEs + auth + env)
-- Phase: `week-1-ci-baseline.md`, `week-4-ai-review.md`
+Read the bundled [collection contract](references/collection-contract.md) for report schemas, standalone script paths, partial results and verification limits. The operational guidance above does not require an external checklist bundle.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/main/.schema/devbox.schema.json",
   "packages": [
-    "nodejs@20"
+    "nodejs@24"
   ],
   "shell": {
     "init_hook": [],

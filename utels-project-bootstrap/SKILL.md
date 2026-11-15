@@ -15,7 +15,7 @@ Inputs:
 
 | Input | Purpose |
 | --- | --- |
-| `UTELS_BOOTSTRAP_TOKEN` | Required registration credential, normally decrypted by dotenvx |
+| `UTELS_BOOTSTRAP_TOKEN` | Required registration credential in the process environment; use the project's existing secret source |
 | `APP_WORKER_PROD` / `APP_WORKER_STAGING` | Required Worker names for each selected target; cf resource commands do not use old `--env` selection |
 | `APP_SERVER_DIR` | Worker project directory; defaults to the parent of the copied script directory |
 | `APP_UTELS_PROJECT_PROD` / `APP_UTELS_PROJECT_STAGING` | Project slugs; replace the example defaults |

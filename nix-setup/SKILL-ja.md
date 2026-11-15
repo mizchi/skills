@@ -1,11 +1,26 @@
 ---
 name: nix-setup
-description: Set up Nix flakes for development environments. Includes ready-to-use flake.nix templates for MoonBit, Rust, TypeScript (with pnpm), Python+uv, each preloaded with just / ast-grep / apm. Covers installation on sandboxed environments like Claude Code web, the buildNpmPackage idiom, direnv integration, and GitHub Actions. Use when starting a new project with Nix, adding a flake to an existing project, bootstrapping Nix in a container or CI image, or troubleshooting a broken Nix setup.
+description: 指定された、または既存の Nix 開発環境をセットアップ・調査する。flakes、buildNpmPackage、direnv、CI、言語別テンプレートを扱う。devbox はプロジェクトで採用済みかユーザーが明示的に選んだ場合に限って参照し、新規プロジェクトへ標準導入しない。
 ---
 
 # Nix Setup Skill
 
-Nix flake (flakes + `nix-command`) 前提の開発環境セットアップ リファレンス。各言語の雛形を `assets/` にまとめ、`cp` 一発で使えるようにしてある。
+Nix の導入が指定されている、または既に採用されている開発環境のリファレンス。Nix flakes の言語別テンプレートを `assets/` にまとめている。devbox の資料・テンプレートは採用済みのプロジェクトか、ユーザーが明示的に選んだ場合に使う。
+
+## 環境ツールの選択
+
+既存プロジェクトの環境設定を維持する。「再現可能な環境がほしい」という依頼だけで devbox や Nix を新たに導入しない。Nix が指定済み・採用済みの場合は、要件に沿って選ぶ。
+
+| 条件 | 選択 |
+| --- | --- |
+| 既存の環境設定がある | 採用中のツールと lockfile を維持 |
+| devbox を採用済み、またはユーザーが明示的に選択 | devbox |
+| 新規プロジェクトで環境ツールの指定がない | 指定されたツールチェーンに従い、devbox を自動導入しない |
+| custom derivation、input override、overlay、buildNpmPackage が必要 | flake.nix |
+| flake.lock を再現性の基準にする、または既存 flake を維持する | flake.nix |
+| devbox インストーラが重いコンテナ環境で Nix を利用する | flake.nix と setup_nix.sh |
+
+選択理由が依頼の判断に役立つ場合に説明する。flakes や別の環境構築手段を使うために「devbox を不採用にした理由」を書く必要はない。devbox の導入方法とテンプレートは英語版の `Using devbox` 節を参照する。
 
 ## When to use
 
