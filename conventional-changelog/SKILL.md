@@ -215,7 +215,7 @@ Write commits following the Conventional Commits spec and push to main; a "Relea
 
 **Selection guidance**: For a single package with a single publish target (npm only), a single workflow is concise. If there are multiple publish targets (npm + GitHub Container Registry etc.) or manual releases are also allowed, use a separate `on: release` workflow. When using OIDC Trusted Publishing, attaching `id-token: write` only to the publish job is sufficient, and either form works.
 
-See the publish flow in the `npm-release` skill (locally managed) for details.
+The locally managed `npm-release` skill does not use release-please: it publishes from a `v*` tag push via OIDC Trusted Publishing, with a hand-written CHANGELOG.
 
 ### Pre-release (beta / rc) staged releases
 
@@ -437,7 +437,7 @@ git cz
 
 ## Related
 
-- `npm-release` — automates all the way to publish with release-please + OIDC Trusted Publishing (session-specific local management)
+- `npm-release` — manual first publish, `npm trust`, then tag-triggered publish via OIDC Trusted Publishing (no release-please; locally managed)
 - `apm-usage` references/publishing.md — CHANGELOG conventions when publishing a skill
 - `gh-fix-ci` — when the release workflow fails in CI
 - Keep a Changelog: https://keepachangelog.com/
