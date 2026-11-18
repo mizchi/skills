@@ -350,7 +350,7 @@
         {
           "kind": "github-release",
           "repository": "microsoft/apm",
-          "observed": "v0.35.1"
+          "observed": "v0.36.0"
         },
         {
           "kind": "npm-dist-tag",

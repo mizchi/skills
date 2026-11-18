@@ -3,7 +3,7 @@ default:
 
 # Exercise Cloudflare deployment snapshots and secret delivery without remote mutations.
 test-cloudflare:
-    node --test cloudflare-workers-cd-rollback/assets/scripts/deployment-state.test.ts utels-project-bootstrap/assets/scripts/setup-utels.test.ts cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.test.ts
+    node --test cloudflare-workers-cd-rollback/assets/scripts/deployment-state.test.ts utels-project-bootstrap/assets/scripts/setup-utels.test.ts cloudflare-mbt-worker-bundle/assets/scripts/check-worker-bundle.test.ts cloudflare-workers-otel-utels/assets/tests/local-telemetry.test.ts
     ruby cloudflare-workers-cd-rollback/assets/scripts/workflow-credentials_test.rb
 
 check-cloudflare: test-cloudflare

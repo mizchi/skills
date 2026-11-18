@@ -5,7 +5,7 @@ description: Cloudflare Worker telemetry at the fetch boundary — OTLP traces /
 
 # Cloudflare Workers OTel + utels boundary
 
-Two wrappers that compose around a Worker's `{fetch, scheduled}` handler. Both are no-op pass-throughs unless their env vars are present, so you can run with neither, just one, or both.
+Two wrappers compose around a Worker's `fetch` handler. OTLP and utels export activate when configured; D1 slow-query logging works even without an OTLP endpoint.
 
 ```
 withUtelsErrorTracking(withTelemetry(coreHandler))
@@ -43,6 +43,8 @@ Exports a `Recorder = (query: RecordedQuery) => void` so you can plug it into so
 
 Reference tests. The d1-wrap test uses mock D1 bindings to validate the Proxy chain + slow-threshold + recorder shape. The telemetry test asserts that 5xx responses + thrown exceptions both produce utels events.
 
+[local-telemetry.test.ts](assets/tests/local-telemetry.test.ts) runs directly with Node 24 and the bundled sources. It verifies that a 225ms D1 query logs a warning at the default 200ms threshold without an OTLP endpoint or a network request.
+
 ## Wiring
 
 ```typescript
@@ -74,7 +76,7 @@ const telemetryBindings = {
 };
 ```
 
-Choose mode-specific service/project names for staging. Supply local secret values in `.dev.vars`; deployment values go in an ignored JSON or dotenv file. Declared secret bindings are required during deploy validation. Values decrypted into the CLI process with dotenvx are not automatically Worker bindings.
+Choose mode-specific service/project names for staging. Supply local secret values in `.dev.vars`; deployment values go in an ignored JSON or dotenv file passed with `--secrets-file`. Check required keys and non-empty values separately, without printing them: RC.1 deploy dry-run can succeed when the secret file is omitted. CLI process variables do not automatically become Worker bindings. See the [secret preflight guidance](../cloudflare-deploy/references/cf/configuration.md#secrets-and-remote-development).
 
 ```bash
 pnpm exec cf workers types
@@ -82,13 +84,13 @@ pnpm exec cf deploy --dry-run --secrets-file .env.production
 pnpm exec cf deploy --secrets-file .env.production
 ```
 
-For direct utels registration and secret delivery without argv/log exposure, use [utels-project-bootstrap](../utels-project-bootstrap/SKILL.md). The checked cf beta has no live-log streaming; use Workers Logs in the dashboard or the OTLP backend to inspect `d1.slow_query` events.
+For direct utels registration and secret delivery without argv/log exposure, use [utels-project-bootstrap](../utels-project-bootstrap/SKILL.md). cf RC supports `pnpm exec cf observability tail --worker <name>` with Workers Logs enabled; output is newline-delimited JSON. Use `--filters @filters.json`, the dashboard or the OTLP backend to inspect `d1.slow_query` events. See the [live observability guide](../cloudflare-deploy/references/cf/api.md#live-observability) for selectors and filters.
 
 Disable individually with `OTEL_SDK_DISABLED=true` or `UTELS_DISABLED=true`.
 
 ## Slow-query independence
 
-`withTelemetry` always wraps D1 bindings with the Proxy. Even when OTLP is unconfigured, every query whose duration crosses `APP_D1_SLOW_THRESHOLD_MS` (default 250ms) gets logged as a structured `console.warn` visible in Workers Logs. This works independently of OTLP configuration.
+`withTelemetry` always wraps D1 bindings with the Proxy. Even when OTLP is unconfigured, every query whose duration reaches `APP_D1_SLOW_THRESHOLD_MS` (default 200ms) gets logged as a structured `console.warn` visible in Workers Logs. This works independently of OTLP configuration.
 
 ## References
 

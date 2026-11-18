@@ -5,9 +5,10 @@ description: APMのmanifest、導入、対象を絞った更新、配置先、lo
 
 # APM — Agent Package Manager
 
-2026-11-16にAPM 0.35.1で確認。英語のSKILL.mdを正本とする。
+2026-11-18にAPM 0.36.0のmacOS arm64バイナリで確認。英語のSKILL.mdを正本とする。
 プロジェクトで固定したCLIとlockfileは、意図した更新まで維持する。
 古いCLIを使う場合は、その版のhelpを先に確認する。
+pip・ソースからの導入にはPython 3.11以上が必要。native版は実行環境を同梱する。
 
 ## 導入・再現・更新を分ける
 
@@ -33,7 +34,13 @@ apm audit
 依存の更新は`apm update`を使う。`apm install --update`はdeprecatedな互換経路。
 対象packageを省略した広い更新は、その範囲が意図されている場合だけ行う。
 CLI本体の更新は`apm self-update`等であり、スキルの更新とは別。
-固定tag・SHAを動かすときはmanifestのrefを意図的に変更し、lockと配置物を検証する。
+`apm install --frozen`は対応するlockfileを再現する。APM 0.36.0の`apm update`は、
+full SHA pinも更新対象にし、適格なstable annotated semver tagのうち最も高い版のcommitへ進める。
+`--dry-run`で旧・新SHAとtagを確認し、計画を承認するとmanifestとlockが書き換わる。
+拒否した場合はmanifest・lock・配置物が変わらない。branchやlightweight tagはSHA pinの更新先にならず、
+適格なannotated releaseがなければ警告してそのSHAを維持し、他の依存を更新する。
+明示的なGit tag指定は同じtagを選び続ける。別のtagに移るときは宣言を変更し、既存tagを付け替えない。
+registryの完全一致version指定も維持される。[0.36.0の検証記録](references/update-validation.md)に確認範囲を記載する。
 `--force`はローカルの内容を書き換え、重大な導入検査も回避し得るため通常の更新には使わない。
 
 ## manifestと配置先
@@ -55,7 +62,7 @@ scripts:
 プロジェクトでは`apm.yml`と`apm.lock.yaml`を同時に管理する。
 ユーザー全体のmanifest/lock/cacheは`~/.apm/`配下、プロジェクトcacheは`apm_modules/`。
 
-確認したClaude+Codexのローカル導入では`.claude/skills/source/`と
+0.35.1で確認したClaude+Codexのローカル導入では`.claude/skills/source/`と
 `.agents/skills/source/`に配置された。frontmatter名から配置先を決め打ちしない。
 他のtargetでは共有`.agents/skills`を使う場合もあるため、古いtarget表を転用せず、
 その版が報告したpathと配置物を確認する。legacy pathの利用は明示的に選ぶ。
@@ -73,7 +80,9 @@ trustルールがある。採用する場合だけ`apm lifecycle --help`と公�
 一時プロジェクトに明示targetとローカルsource依存を置き、dry-run、実導入、
 配置pathと必要resource、frozen再現、対象を絞ったupdateのdry-runを確認する。
 その後、新しいagentセッションまたはreloadで検出を確認する。
-今回確認したのはファイル配布と更新計画までで、hosted更新やagentの行動品質ではない。
+0.36.0ではローカルGitでSHA pinのdry-run・適用・未リリースpinの維持・不正tagの拒否・lock整合性も確認した。
+実TTYで更新を拒否し、manifest・lock・配置物が変わらないことも確認した。
+隔離したバイナリとconsumerでの検証であり、hosted更新やagentの行動品質の検証ではない。
 必要に応じて[消費側検証](../publish-agent-skill/references/apm.md)も参照する。
 
 ## chezmoi・認証・配布

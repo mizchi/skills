@@ -6,9 +6,10 @@ description: Reference for APM manifests, installation, targeted updates, deploy
 # APM — Agent Package Manager
 
 APM distributes skills, instructions, prompts, plugins and MCP declarations.
-Checked on 2026-11-16 with APM 0.35.1. Preserve a project's installed version and
-consumer lock until a deliberate upgrade; inspect that version's help when it
-predates this guide. [Official CLI reference](https://microsoft.github.io/apm/reference/).
+Checked on 2026-11-18 with the APM 0.36.0 macOS arm64 binary. Preserve a project's
+installed version and consumer lock until a deliberate upgrade; inspect that
+version's help when it predates this guide. Python 3.11+ is required for pip or
+source installs; native bundles include their runtime. [Official CLI reference](https://microsoft.github.io/apm/reference/).
 
 ## Install, replay and update are different
 
@@ -40,10 +41,20 @@ update command. An update without a package selects a wider scope, so use it onl
 when that wider update is intended. `apm self-update` updates the tool itself,
 not the installed skills. See [update behavior](https://microsoft.github.io/apm/reference/cli/update/).
 
-A tag/full-SHA pin stays pinned. Change the declared ref intentionally before
-moving to another release, regenerate the lock and verify frozen replay. Do not
-move an existing Git tag to publish a replacement. `--force` can overwrite local
-content and bypass critical install findings; it is not the ordinary refresh flag.
+`apm install --frozen` replays the matching lockfile. In APM 0.36.0,
+`apm update` can advance a full-SHA revision pin to the commit behind the highest
+eligible stable annotated semver tag. Review the proposed old/new SHA and tag
+with `--dry-run`; accepting the plan rewrites the manifest and lock. Declining
+leaves the manifest, lock and deployed files unchanged. Branches and lightweight
+tags are not replacement targets for these pins. With no eligible annotated
+release, APM warns and retains that SHA while continuing other updates.
+
+An exact Git tag declaration continues to select that tag. Change the declared
+tag intentionally to select another release; do not move an existing tag to
+publish a replacement. Exact registry-version constraints also remain in force.
+`--force` can overwrite local content and bypass critical install findings;
+it is not the ordinary refresh flag. See the [0.36.0 validation](references/update-validation.md)
+for the tested revision-pin and frozen-replay scope.
 
 ## Explicit manifest and scope
 
@@ -71,8 +82,8 @@ manifest and `apm.lock.yaml` together for reproducibility.
 | Project | `./apm.yml`, `./apm.lock.yaml` | `./apm_modules/` |
 | User | `~/.apm/apm.yml`, `~/.apm/apm.lock.yaml` | `~/.apm/apm_modules/` |
 
-Installed paths depend on target and namespace rules. The verified Claude+Codex
-local consumer deployed to `.claude/skills/source/` and `.agents/skills/source/`;
+Installed paths depend on target and namespace rules. With APM 0.35.1, the
+verified Claude+Codex consumer deployed to `.claude/skills/source/` and `.agents/skills/source/`;
 APM used the source directory name, not an assumed frontmatter name. Read the
 reported path and inspect its files instead of constructing a path from the
 package name. Other targets can share `.agents/skills`; use the current target
@@ -98,8 +109,11 @@ Use a temporary project with explicit targets and a local source dependency:
 4. Verify discovery after the relevant agent reload/new session.
 
 The 0.35.1 local check verified install, frozen replay, target output and update
-planning without changing global installations. It did not verify a hosted update
-or an agent's behavioral performance. See the distribution skill's
+planning. The 0.36.0 check additionally exercised SHA-pin dry-run/apply, retained
+unreleased pins, malformed/non-commit tag rejection and lock consistency with
+local Git repositories. A real terminal decline kept the manifest, lock and
+deployed files unchanged. These checks used an isolated binary and consumers;
+they do not establish hosted-source behavior or agent quality. See the distribution skill's
 [consumer validation guide](../publish-agent-skill/references/apm.md) for those
 additional steps; the installed skill remains self-contained through the steps
 above when that optional companion is absent.

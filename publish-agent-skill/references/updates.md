@@ -22,7 +22,7 @@ Publish tags/releases and change repository visibility only within the requested
 
 An update without an explicit package can update unrelated skills; target the requested package and scope. Check command support with local help, including scope flags. For APM, [dependency update](https://microsoft.github.io/apm/reference/cli/update/) differs from upgrading the APM tool itself (`apm self-update`, or the owning package manager).
 
-Pinned immutable refs remain pinned. To move an APM consumer from `#v0.1.0` to `#v0.2.0`, update its dependency declaration and intentionally regenerate the lock, then verify frozen replay. Do not overwrite the old tag. For rollback, reinstall the known good source/ref and verify its contents; bump a Claude plugin release version if rolling its contents back, so hosted consumers receive the rollback.
+An exact Git tag declaration continues to select that tag. To move an APM consumer from `#v0.1.0` to `#v0.2.0`, change its declaration and regenerate the lock, then verify frozen replay. Full-SHA revision pins have different update semantics in APM 0.36.0: `apm update` can propose the highest eligible stable annotated semver tag's commit and rewrite the SHA after consent. Review `--dry-run` before applying; use `apm install --frozen` for unchanged lockfile replay. See the [pin validation](../../apm-usage/references/update-validation.md). Do not overwrite old tags. For rollback, reinstall the known good source/ref and verify its contents; bump a Claude plugin release version if rolling its contents back, so hosted consumers receive the rollback.
 
 ### APM dependency refresh
 
