@@ -177,6 +177,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [publish-agent-skill](publish-agent-skill/) | `publish-agent-skill` | Publish and update portable skills through Claude Code marketplaces, APM and the skills CLI; verify discovery, installed resources and consumer updates. |
 | [multi-agent-orchestration](multi-agent-orchestration/) | `multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
+| [blind-api-eval](blind-api-eval/) | `blind-api-eval` | Improve API, library, CLI and DSL usability through fresh consumer agents, executable checks, independent rubric grading and held-out trials. |
 | [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
 | [skill-selector](skill-selector/) | `skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
 | [skill-finder](skill-finder/) | `skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |

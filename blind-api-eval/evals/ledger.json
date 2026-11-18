@@ -1,0 +1,413 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "purpose": "Controlled smoke of the blind API evaluation workflow, not a general usability benchmark or statistical estimate",
+  "fixture_plan": "fixtures/plan.json",
+  "rubric_sha256": "315cd1982cbbbe0d715b2897f456f289dd9d1f068972315d15bd993ce3bf80bb",
+  "isolation": {
+    "consumer_context": "New spawn_agent with fork_turns none for every trial",
+    "filesystem": "Procedural allowlist on a shared host, not enforced filesystem isolation",
+    "consumer_condition_blinding": "Trial paths for development consumers contained condition names; no author reasoning, private rubric or prior attempts were supplied",
+    "judge_condition_blinding": "Final grades use randomized opaque sample IDs and sanitized internal trace paths",
+    "audit_limit": "Self-recorded command logs and artifact checks; complete filesystem-read audit and tool metadata unavailable"
+  },
+  "fixture_versions": {
+    "baseline": {
+      "files": {
+        "README.md": "1e56b03a13d07ad96d523085a2849ee15aa373ed8e9bda8505ad012ef04f0590",
+        "package.json": "74301f47b8bf36e4614776b992ed51e870424355bd0c1c1758c21385dd9eb577",
+        "index.mjs": "81581717869fb9bdd95e38f7b7dcd74bf36c32cf2bf34cd2a5164afebbf82b8e",
+        "index.d.ts": "50cf7578b65a82ac29c9474bfdf4800c6d21da39e7674d9c9ac4e5e0d3e3ac94"
+      },
+      "artifact_hash": "b323da3a4f116b20e234bcfd8a0fb1bc54f714dfc7a8436518943e1c1292cab7"
+    },
+    "candidate": {
+      "files": {
+        "README.md": "a367d6fd510f3079ac051a0048f48c52ee34a19111b894424ef2c78cd36502ba",
+        "package.json": "74301f47b8bf36e4614776b992ed51e870424355bd0c1c1758c21385dd9eb577",
+        "index.mjs": "3e02da6c433ea0a84685a3b6269260880f3a703971707264b3581c86800b42c1",
+        "index.d.ts": "50cf7578b65a82ac29c9474bfdf4800c6d21da39e7674d9c9ac4e5e0d3e3ac94"
+      },
+      "artifact_hash": "9a29be9d182cc9cdf5bd7dc3b0554baa6042307dcc8ae507de1690b67079f4c2"
+    }
+  },
+  "trials": [
+    {
+      "id": "baseline-ordinary",
+      "task": "ordinary",
+      "revision": "baseline",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-01/consumer.mjs:1-4: Imports runQuery from the supported package root and delegates both score >= 10 filtering and id-key projection to runQuery; the final map only unwraps the projected id values.",
+              "sample-01/commands.log:19-22 and oracle.json:2-14: Representative output retains inclusive-boundary rows in order and the controller oracle passes all three cases."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "sample-01/PUBLIC.md:3-12 and commands.log:1-18: The public import, options, comparison grammar, and exact score >= 10 example are read before the documented API is used.",
+              "sample-01/consumer.mjs:4 and commands.log:19-22: The working query matches the documented grammar; the recorded attempt contains no unsupported grammar guesses."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "candidate-2-literal-key",
+      "task": "literal-key",
+      "revision": "candidate-2",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-02/consumer.mjs:1-7: The supported root import invokes runQuery with field(\"net.total\") >= 50 and pick: [\"id\"], so the package performs filtering and projection.",
+              "sample-02/commands.log:51-52 and oracle.json:2-14: Executed representative output and all three controller oracle cases pass."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "sample-02/PUBLIC.md:15-18 and commands.log:16-19,43-49: Public docs explicitly provide field(\"property.key\") syntax for literal dotted keys, and the working consumer uses that grammar.",
+              "sample-02/commands.log:24-40: The preliminary failure is an explicit Not implemented stub, rather than a query syntax guess; no unsupported grammar attempt is recorded."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "candidate-1-literal-key",
+      "task": "literal-key",
+      "revision": "candidate-1",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-03/consumer.mjs:1-7: Imports from the supported package root and calls runQuery for the literal dotted-key threshold and id-key projection; map unwraps projected records.",
+              "sample-03/commands.log:37-54 and oracle.json:2-14: Actual assertion run exits 0 for boundary, flat-key semantics, order, and empty input; all controller oracle cases pass."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "sample-03/PUBLIC.md:15-18 and commands.log:1-31: Reads the public literal-key grammar before writing the matching field(\"net.total\") >= 50 query.",
+              "sample-03/commands.log:23-54: Both recorded executions use the documented form successfully, with no unsupported query grammar guesses."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "baseline-literal-key",
+      "task": "literal-key",
+      "revision": "baseline",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 75,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-04/consumer.mjs:1-8: Copies the literal net.total value into a simple-key alias, then delegates threshold filtering and id-key projection to the supported runQuery call; the adaptation does not manually filter rows or implement package projection.",
+              "sample-04/commands.log:113-137 and oracle.json:2-14: Final supported call passes representative boundary, order, alias-collision, and empty-input checks; all controller oracle cases pass."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 1,
+            "evidence": [
+              "sample-04/commands.log:30-72: The first consumer guesses net.total >= 50, which is absent from PUBLIC.md and fails with QUERY_SYNTAX.",
+              "sample-04/commands.log:74-98: The attempt additionally guesses six undocumented quoting/escaping forms, all rejected; these abandoned discovery attempts count even though the final consumer works.",
+              "sample-04/PUBLIC.md:5-12 and consumer.mjs:4-8: The working consumer eventually uses documented simple-key comparison grammar after adapting the input; the full attempt therefore matches the unsupported-grammar-guesses anchor."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 7,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "candidate-2-ordinary",
+      "task": "ordinary",
+      "revision": "candidate-2",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-05/consumer.mjs:1-5: The supported root import calls runQuery with score >= 10 and pick: [\"id\"], delegating the requested filtering and projection to the package.",
+              "sample-05/commands.log:51-53 and oracle.json:2-14: Representative invocation succeeds and all three controller oracle cases pass."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "sample-05/PUBLIC.md:3-12 and commands.log:1-21,43-50: Reads the exact documented score >= 10 grammar and implements it unchanged.",
+              "sample-05/commands.log:22-42: The initial error is a missing consumer.mjs before implementation, not uncertainty about package syntax; the trace records no unsupported grammar guesses."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "candidate-1-ordinary",
+      "task": "ordinary",
+      "revision": "candidate-1",
+      "kind": "development",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "sample-06/consumer.mjs:1-5: Imports runQuery from the public package root and uses it for score >= 10 filtering and id-key projection, then unwraps the projected values.",
+              "sample-06/commands.log:64-74 and oracle.json:2-14: Green invocation exits 0 with boundary and order preserved, and all three controller oracle cases pass."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "sample-06/PUBLIC.md:3-12 and commands.log:1-22,55-62: Public docs provide the exact grammar used by the working consumer.",
+              "sample-06/commands.log:24-53,64-74: The explicitly marked Red run precedes implementation and fails because consumer.mjs is absent; Green uses the documented query successfully, with no unsupported grammar guess."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    },
+    {
+      "id": "final-07",
+      "task": "holdout",
+      "revision": "candidate",
+      "kind": "held-out final check",
+      "status": "completed",
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "observations": [
+          {
+            "id": "public-api-use",
+            "score": 2,
+            "evidence": [
+              "consumer.mjs:1-7: Imports runQuery from the supported record-query package entrypoint and invokes it with the gain-loss comparison and pick: ['tag']; only extracts tag values from the projected records afterward.",
+              "commands.log:36-55: Executes the submitted solve function; the representative result is ['boundary', 'positive', 'negative'], and boundary, literal-key, projection, order, empty-input and no-match assertions exit 0.",
+              "oracle.json:2-15: The controller reports passed: true and all three individual cases passed."
+            ]
+          },
+          {
+            "id": "contract-discovery",
+            "score": 2,
+            "evidence": [
+              "commands.log:1-22: The first recorded command reads the public task, docs, package metadata and declarations; the displayed docs specify field(\"property.key\") for punctuation keys, spaced comparisons and inclusive numeric thresholds.",
+              "PUBLIC.md:5-7,15-18 and consumer.mjs:4-7: The working consumer combines the documented comparison and literal-key grammar as field(\"gain-loss\") >= -5 and uses the documented pick option.",
+              "commands.log:24-55: The entire recorded implementation-and-execution attempt uses that documented form, with no unsupported grammar guesses or intervening syntax failures, and its first recorded execution succeeds."
+            ]
+          }
+        ]
+      },
+      "api_uncertainty_retries": 0,
+      "duration_ms": null,
+      "tool_uses": null,
+      "exact_model_id": null
+    }
+  ],
+  "counts": {
+    "consumer_trials": 7,
+    "valid_completed": 7,
+    "blocked": 0,
+    "known_private_answer_exposures": 0,
+    "independent_oracle_assertions": 21,
+    "superseded_judgment_batches": 3
+  },
+  "judgment_events": [
+    {
+      "issue": "Some copied logs exposed baseline/candidate labels through internal paths.",
+      "affected_judgment_batches": [
+        "judge-baseline",
+        "judge-round-1",
+        "judge-round-2"
+      ],
+      "resolution": "Retain old grades as superseded; regrade all development trials with fresh judge, randomized opaque IDs and redacted internal trace paths.",
+      "consumer_trials_reused": true,
+      "rubric_changed": false
+    }
+  ],
+  "harness_events": [
+    {
+      "stage": "controller oracle",
+      "issue": "Initial checker used -e argv positions when executed as a file; detected self-import and exited before grading.",
+      "fix": "Use file-execution argv positions; rerun checks against unchanged consumer artifacts and expected cases.",
+      "consumer_attempt_excluded": false
+    }
+  ],
+  "general_fix_rules": [
+    {
+      "pattern": "Literal-key contract absent from examples",
+      "evidence": "Baseline literal-key consumer tried unsupported forms, then adapted records to a simple alias; correctness passed but discovery scored 1/2",
+      "rule": "Publish the literal-key grammar and a diagnostic that points to it; test punctuation-bearing keys with a fresh consumer"
+    },
+    {
+      "pattern": "Version labels survive neutral directory wrappers",
+      "evidence": "An independent judge noticed original trial directory names inside commands.log",
+      "rule": "Sanitize internal paths and headers, preserve raw originals, and regrade with a new judge after exposure"
+    },
+    {
+      "pattern": "Intentional TDD Red treated as API retry",
+      "evidence": "Ordinary and repeated consumers used missing/unimplemented consumer tests before Green",
+      "rule": "Separate planned Red/Green execution from retries caused by public-interface uncertainty"
+    },
+    {
+      "pattern": "Normal stack snippets confused with source inspection",
+      "evidence": "A query syntax error emitted a normal JavaScript stack snippet",
+      "rule": "Permit ordinary diagnostics as interface feedback while forbidding deliberate implementation-file inspection"
+    }
+  ],
+  "independent_skill_forward_check": {
+    "type": "Grading/planning-only behavioral test on synthetic review records",
+    "cases": {
+      "partial_critical_high_average": {
+        "score_percent": 87.5,
+        "success": false,
+        "cli_exit": 1,
+        "decision": "Do not promote"
+      },
+      "tool_disabled_narration_and_reused_holdout": {
+        "decision": "Execution unverified; 100% not an empirical result; reused holdout becomes development data; no convergence claim"
+      }
+    },
+    "new_trials_started": 0,
+    "budget_respected": true,
+    "unresolved_instruction_ambiguity_reported": false
+  },
+  "stopping": {
+    "status": "Controlled smoke acceptance met",
+    "basis": "Two consecutive candidate development rounds met frozen per-task 100% rubric and critical/oracle gates; held-out final check passed",
+    "limits": [
+      "One fresh consumer per task per round, reduced from the skill default of two",
+      "Same inherited model/harness; exact model identity and usage metadata unavailable",
+      "Procedural public-surface blinding; development consumer paths exposed condition labels",
+      "Toy filtering/projection and embedded comparison DSL only; no general human usability inference",
+      "Historical holdout is now published as replay/regression data and cannot be treated as a new unseen holdout"
+    ]
+  },
+  "raw_artifact_root": "~/.cache/mizchi-skills/blind-api-eval-20261118"
+}

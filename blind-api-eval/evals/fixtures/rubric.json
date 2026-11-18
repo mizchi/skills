@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "criteria": [
+    {
+      "id": "public-api-use",
+      "critical": true,
+      "weight": 1,
+      "anchors": {
+        "0": "Does not use runQuery for the requested filtering and projection",
+        "1": "Uses an implementation edit, private entrypoint, or manual reimplementation",
+        "2": "Uses the supported package call for the requested filtering and projection"
+      }
+    },
+    {
+      "id": "contract-discovery",
+      "critical": false,
+      "weight": 1,
+      "anchors": {
+        "0": "No working consumer or uses an unsupported query form",
+        "1": "Working consumer found through unsupported grammar guesses or unresolved contract assumptions",
+        "2": "Public docs or diagnostics provide the grammar used by the working consumer"
+      }
+    }
+  ]
+}

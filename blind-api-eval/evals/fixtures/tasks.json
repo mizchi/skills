@@ -1,0 +1,130 @@
+{
+  "ordinary": {
+    "prompt": "Write consumer.mjs exporting solve(rows). Use record-query to retain rows with score >= 10 and return only their id values as an array, preserving order. Use the installed public package for filtering and projection; do not recreate its operations. Execute a representative call and save commands/output to commands.log.",
+    "cases": [
+      [
+        [
+          {
+            "id": "a",
+            "score": 3
+          },
+          {
+            "id": "b",
+            "score": 10
+          },
+          {
+            "id": "c",
+            "score": 21
+          }
+        ],
+        [
+          "b",
+          "c"
+        ]
+      ],
+      [
+        [],
+        []
+      ],
+      [
+        [
+          {
+            "id": "z",
+            "score": 10
+          },
+          {
+            "id": "x",
+            "score": -1
+          }
+        ],
+        [
+          "z"
+        ]
+      ]
+    ]
+  },
+  "literal-key": {
+    "prompt": "Write consumer.mjs exporting solve(rows). Rows have a literal flat property named net.total (it is not a nested object). Use record-query to retain rows with that value >= 50 and return only their id values as an array, preserving order. Use the installed public package for filtering and projection; do not recreate its operations. Execute a representative call and save commands/output to commands.log.",
+    "cases": [
+      [
+        [
+          {
+            "id": "a",
+            "net.total": 49
+          },
+          {
+            "id": "b",
+            "net.total": 50
+          },
+          {
+            "id": "c",
+            "net.total": 75
+          }
+        ],
+        [
+          "b",
+          "c"
+        ]
+      ],
+      [
+        [],
+        []
+      ],
+      [
+        [
+          {
+            "id": "y",
+            "net.total": -1
+          },
+          {
+            "id": "x",
+            "net.total": 99
+          }
+        ],
+        [
+          "x"
+        ]
+      ]
+    ]
+  },
+  "holdout": {
+    "prompt": "Write consumer.mjs exporting solve(rows). Rows have a literal flat property named gain-loss. Use record-query to retain rows whose gain-loss value is >= -5 and return only their tag values as an array, preserving order. Use the installed public package for filtering and projection; do not recreate its operations. Execute a representative call and save commands/output to commands.log.",
+    "cases": [
+      [
+        [
+          {
+            "tag": "a",
+            "gain-loss": -6
+          },
+          {
+            "tag": "b",
+            "gain-loss": -5
+          },
+          {
+            "tag": "c",
+            "gain-loss": 4
+          }
+        ],
+        [
+          "b",
+          "c"
+        ]
+      ],
+      [
+        [],
+        []
+      ],
+      [
+        [
+          {
+            "tag": "x",
+            "gain-loss": -5
+          }
+        ],
+        [
+          "x"
+        ]
+      ]
+    ]
+  }
+}

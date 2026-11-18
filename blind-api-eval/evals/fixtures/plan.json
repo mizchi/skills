@@ -1,0 +1,38 @@
+{
+  "purpose": "Small behavioral smoke of the blind-api-eval workflow, not a population estimate",
+  "development_tasks": [
+    "ordinary",
+    "literal-key"
+  ],
+  "holdout_task": "holdout",
+  "trial_budget": "One fresh consumer per development task per round; reduced repetition recorded. One final holdout.",
+  "rounds": [
+    "baseline",
+    "candidate-1",
+    "candidate-2"
+  ],
+  "acceptance": "Every valid task passes the independent oracle and critical criterion; candidate rubric score 100 per task in two consecutive rounds; holdout passes. No unassessed attempts count as passes.",
+  "isolation": "procedural; fresh context, staged public files, explicit read allowlist, shared host filesystem",
+  "settings": "Inherited parent model; fresh fork_turns none; no model override",
+  "candidate_hypothesis": "Document literal-key grammar and make syntax diagnostics actionable; same executable semantics",
+  "versions": {
+    "baseline": {
+      "files": {
+        "README.md": "1e56b03a13d07ad96d523085a2849ee15aa373ed8e9bda8505ad012ef04f0590",
+        "package.json": "74301f47b8bf36e4614776b992ed51e870424355bd0c1c1758c21385dd9eb577",
+        "index.mjs": "81581717869fb9bdd95e38f7b7dcd74bf36c32cf2bf34cd2a5164afebbf82b8e",
+        "index.d.ts": "50cf7578b65a82ac29c9474bfdf4800c6d21da39e7674d9c9ac4e5e0d3e3ac94"
+      },
+      "artifact_hash": "b323da3a4f116b20e234bcfd8a0fb1bc54f714dfc7a8436518943e1c1292cab7"
+    },
+    "candidate": {
+      "files": {
+        "README.md": "a367d6fd510f3079ac051a0048f48c52ee34a19111b894424ef2c78cd36502ba",
+        "package.json": "74301f47b8bf36e4614776b992ed51e870424355bd0c1c1758c21385dd9eb577",
+        "index.mjs": "3e02da6c433ea0a84685a3b6269260880f3a703971707264b3581c86800b42c1",
+        "index.d.ts": "50cf7578b65a82ac29c9474bfdf4800c6d21da39e7674d9c9ac4e5e0d3e3ac94"
+      },
+      "artifact_hash": "9a29be9d182cc9cdf5bd7dc3b0554baa6042307dcc8ae507de1690b67079f4c2"
+    }
+  }
+}

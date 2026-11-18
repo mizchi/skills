@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "example_only": true,
+  "status": "completed",
+  "oracle_passed": true,
+  "observations": [
+    { "id": "public-api-use", "score": 2, "evidence": ["consumer.mjs: supported import and invocation; oracle.log: assertions passed"] },
+    { "id": "discovery", "score": 2, "evidence": ["commands.log: public help inspected before implementation"] },
+    { "id": "composition", "score": 2, "evidence": ["consumer.mjs: documented operations composed without a workaround"] },
+    { "id": "recovery", "score": 1, "evidence": ["commands.log: corrected input after unsupported guesses"] }
+  ]
+}
