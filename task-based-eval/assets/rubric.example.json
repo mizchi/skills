@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "criteria": [
+    {
+      "id": "condition-compliance",
+      "critical": true,
+      "weight": 1,
+      "anchors": {
+        "0": "Does not follow the declared resource condition or permitted-action constraints",
+        "1": "Partly follows the condition but requires prohibited assistance or an undeclared bypass",
+        "2": "Follows the declared condition and constraints, including intentional resource absence in a no-resource baseline"
+      }
+    },
+    {
+      "id": "output-fitness",
+      "critical": false,
+      "weight": 1,
+      "anchors": {
+        "0": "Does not produce the task result or required final state",
+        "1": "Produces a partial result needing substantial repair to meet the public contract",
+        "2": "Produces the required result or state in a usable form under the public contract"
+      }
+    },
+    {
+      "id": "evidence-fidelity",
+      "critical": false,
+      "weight": 1,
+      "anchors": {
+        "0": "Claims results or external actions contradicted by the observed evidence",
+        "1": "Some result claims remain unsupported or are not distinguished from assumptions",
+        "2": "Result claims are supported by supplied inputs, observed interaction or checked final state; unverified parts are explicit"
+      }
+    }
+  ]
+}

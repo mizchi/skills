@@ -1,0 +1,37 @@
+{
+  "task_id": "route-support-request",
+  "goal": "Use a supplied guide to assign each support request to the correct queue and cite the applicable rule",
+  "target": {
+    "kind": "document",
+    "snapshot": "fixtures/routing-guide.md"
+  },
+  "case": {
+    "id": "five-request-batch",
+    "inputs": [
+      "inputs/requests.json"
+    ],
+    "count": 5
+  },
+  "permitted_actions": [
+    "Read staged task/input/guide",
+    "Write decisions.json and observations.md"
+  ],
+  "success_verification": {
+    "method": "programmatic",
+    "checker": "private/verify.mjs"
+  },
+  "quality_grading": "private/rubric.json",
+  "budget": {
+    "fresh_trials": 2,
+    "tool_calls_per_trial": 6,
+    "minutes_per_trial": 3
+  },
+  "purpose": "Coverage smoke of generalized non-API resource use; no candidate comparison or convergence claim",
+  "isolation": "fresh context and procedural read allowlist on shared host",
+  "model_id": null,
+  "resources_sha256": {
+    "task.md": "6949cb1e019df7f80133b6909d087c4842c207e3e4659a9c846f62bd3ee06e74",
+    "inputs/requests.json": "32c2f7467378c109ab60e423dd316d228d5adbccabfe51934ee7c94b85f0e4b2",
+    "fixtures/routing-guide.md": "a4299b75e74760b0d75864021072c025872eda824d45a111552230441fa3f7f1"
+  }
+}

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-18",
   "purpose": "Controlled smoke of the blind API evaluation workflow, not a general usability benchmark or statistical estimate",
-  "fixture_plan": "fixtures/plan.json",
+  "fixture_plan": "plan.json",
   "rubric_sha256": "315cd1982cbbbe0d715b2897f456f289dd9d1f068972315d15bd993ce3bf80bb",
   "isolation": {
     "consumer_context": "New spawn_agent with fork_turns none for every trial",
@@ -409,5 +409,7 @@
       "Historical holdout is now published as replay/regression data and cannot be treated as a new unseen holdout"
     ]
   },
-  "raw_artifact_root": "~/.cache/mizchi-skills/blind-api-eval-20261118"
+  "raw_artifact_root": "~/.cache/mizchi-skills/blind-api-eval-20261118",
+  "historical_skill_name": "blind-api-eval",
+  "layout_migration": "Moved unchanged historical measurements under evals/filter-and-project/ when generalized to task-based-eval."
 }

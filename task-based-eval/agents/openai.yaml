@@ -1,0 +1,3 @@
+interface:
+  display_name: "Task-based Evaluation"
+  short_description: "Measure goal achievement from real resource-use trials"

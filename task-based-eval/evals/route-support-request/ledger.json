@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "task_id": "route-support-request",
+  "purpose": "Coverage check of non-API resource use after generalizing the evaluation skill",
+  "plan": "plan.json",
+  "trials": [
+    {
+      "id": "trial-01",
+      "case": "five-request-batch",
+      "condition": "guide-supplied",
+      "status": "completed",
+      "verification_method": "programmatic",
+      "goal_check": {
+        "method": "programmatic",
+        "oracle_passed": true,
+        "details": {
+          "passed": true,
+          "failures": []
+        }
+      },
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "verification_method": "programmatic",
+        "observations": [
+          {
+            "id": "condition-compliance",
+            "score": 2,
+            "evidence": [
+              "task.md:3-19 permits the supplied guide/input reads and the two result files; decisions.json:1-7 and observations.md:1-8 are those requested artifacts.",
+              "observations.md:3-8 reports only the three permitted sources, guide precedence, no external action and unchanged inputs; decisions.json:2-6 cites only supplied R1-R4 and contains no external-action claim. The pack supplies no raw action trace, timing record or input hashes, so this score describes compliance visible in the supplied evidence, not a complete boundary/budget audit."
+            ]
+          },
+          {
+            "id": "output-fitness",
+            "score": 2,
+            "evidence": [
+              "decisions.json:2-6 contains each of the five request IDs exactly once with the required id/route/rule fields; compare requests.json:2-6 and task.md:4-15.",
+              "routing-guide.md:3-11 yields ordinary=support/R4, overlap=security/R1, outage=incident/R2, lockout=identity/R3 and workaround=support/R4, exactly as decisions.json:2-6 records; observations.md:3-8 supplies sources, uncertainty and revision notes. verification.json:2-6 records a programmatic pass with no failures."
+            ]
+          },
+          {
+            "id": "evidence-fidelity",
+            "score": 2,
+            "evidence": [
+              "requests.json:2-6 and routing-guide.md:3-11 directly support every route and cited rule in decisions.json:2-6, including the overlapping-condition precedence and workaround exclusion.",
+              "observations.md:4-6 explains those decisions consistently with the supplied fields and rules; observations.md:8 makes no claim of ticket creation or message sending, matching the decisions-only task.md:11-13. verification.json:2-6 independently reports the checked goal result."
+            ]
+          }
+        ]
+      },
+      "output": [
+        {
+          "id": "ordinary",
+          "route": "support",
+          "rule": "R4"
+        },
+        {
+          "id": "overlap",
+          "route": "security",
+          "rule": "R1"
+        },
+        {
+          "id": "outage",
+          "route": "incident",
+          "rule": "R2"
+        },
+        {
+          "id": "lockout",
+          "route": "identity",
+          "rule": "R3"
+        },
+        {
+          "id": "workaround",
+          "route": "support",
+          "rule": "R4"
+        }
+      ],
+      "output_sha256": "ca8f64ed4dc395457726ad42c7da22a30ec239fc17febc3829c8a951bcfb217c",
+      "duration_ms": null,
+      "tool_uses": null,
+      "model_id": null,
+      "uncertainty_retries_reported": 0
+    },
+    {
+      "id": "trial-02",
+      "case": "five-request-batch",
+      "condition": "guide-supplied",
+      "status": "completed",
+      "verification_method": "programmatic",
+      "goal_check": {
+        "method": "programmatic",
+        "oracle_passed": true,
+        "details": {
+          "passed": true,
+          "failures": []
+        }
+      },
+      "score": {
+        "status": "completed",
+        "success": true,
+        "score_percent": 100,
+        "failed_critical": [],
+        "oracle_passed": true,
+        "excluded_from_quality_rates": false
+      },
+      "grade": {
+        "schema_version": 1,
+        "status": "completed",
+        "oracle_passed": true,
+        "verification_method": "programmatic",
+        "observations": [
+          {
+            "id": "condition-compliance",
+            "score": 2,
+            "evidence": [
+              "task.md:3-19 permits the supplied guide/input reads and the two result files; decisions.json:1-7 and observations.md:1-5 are those requested artifacts.",
+              "observations.md:1-5 reports only the three permitted sources, first-match rule evaluation, no external action and unchanged inputs; decisions.json:2-6 cites only supplied R1-R4 and contains no external-action claim. The pack supplies no raw action trace, timing record or input hashes, so this score describes compliance visible in the supplied evidence, not a complete boundary/budget audit."
+            ]
+          },
+          {
+            "id": "output-fitness",
+            "score": 2,
+            "evidence": [
+              "decisions.json:2-6 contains each of the five request IDs exactly once with the required id/route/rule fields; compare requests.json:2-6 and task.md:4-15.",
+              "routing-guide.md:3-11 yields ordinary=support/R4, overlap=security/R1, outage=incident/R2, lockout=identity/R3 and workaround=support/R4, exactly as decisions.json:2-6 records; observations.md:1-5 supplies sources, uncertainty and revision notes. verification.json:2-6 records a programmatic pass with no failures."
+            ]
+          },
+          {
+            "id": "evidence-fidelity",
+            "score": 2,
+            "evidence": [
+              "requests.json:2-6 and routing-guide.md:3-11 directly support every route and cited rule in decisions.json:2-6, including the overlapping-condition precedence and workaround exclusion.",
+              "observations.md:3-5 explains those decisions consistently with the supplied fields and rules and makes no claim of ticket creation or message sending, matching the decisions-only task.md:11-13. verification.json:2-6 independently reports the checked goal result."
+            ]
+          }
+        ]
+      },
+      "output": [
+        {
+          "id": "ordinary",
+          "route": "support",
+          "rule": "R4"
+        },
+        {
+          "id": "overlap",
+          "route": "security",
+          "rule": "R1"
+        },
+        {
+          "id": "outage",
+          "route": "incident",
+          "rule": "R2"
+        },
+        {
+          "id": "lockout",
+          "route": "identity",
+          "rule": "R3"
+        },
+        {
+          "id": "workaround",
+          "route": "support",
+          "rule": "R4"
+        }
+      ],
+      "output_sha256": "ca8f64ed4dc395457726ad42c7da22a30ec239fc17febc3829c8a951bcfb217c",
+      "duration_ms": null,
+      "tool_uses": null,
+      "model_id": null,
+      "uncertainty_retries_reported": 0
+    }
+  ],
+  "counts": {
+    "fresh_executors": 2,
+    "requests_per_attempt": 5,
+    "correct_decisions": 10,
+    "valid_trials": 2,
+    "blocked": 0,
+    "known_private_answer_exposures": 0
+  },
+  "controller_input_integrity": {
+    "all_staged_inputs_match_frozen_hashes": true,
+    "resources_sha256": {
+      "task.md": "6949cb1e019df7f80133b6909d087c4842c207e3e4659a9c846f62bd3ee06e74",
+      "inputs/requests.json": "32c2f7467378c109ab60e423dd316d228d5adbccabfe51934ee7c94b85f0e4b2",
+      "fixtures/routing-guide.md": "a4299b75e74760b0d75864021072c025872eda824d45a111552230441fa3f7f1"
+    }
+  },
+  "independent_judge_notes": [
+    "Grade condition-compliance only from provided evidence; complete filesystem/action auditing was unavailable",
+    "A fully supplied text task remains valid with external tools disabled if the runner supplies inputs and materializes required outputs",
+    "Narrated browser actions do not prove interaction or resulting state"
+  ],
+  "limits": [
+    "Procedural read allowlist on shared host, not filesystem isolation",
+    "One document condition and one five-request batch; no baseline/candidate effect estimate",
+    "No optimization rounds or holdout in this coverage check, so no convergence claim",
+    "Missing exact model/timing/tool metadata remains null"
+  ],
+  "raw_artifact_root": "~/.cache/mizchi-skills/task-based-eval-20261118"
+}

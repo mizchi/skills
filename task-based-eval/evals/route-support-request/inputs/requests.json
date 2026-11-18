@@ -1,0 +1,7 @@
+[
+  { "id": "ordinary", "security_issue": false, "impact": "single-user", "workaround": true, "account_lockout": false },
+  { "id": "overlap", "security_issue": true, "impact": "company-wide", "workaround": false, "account_lockout": true },
+  { "id": "outage", "security_issue": false, "impact": "company-wide", "workaround": false, "account_lockout": true },
+  { "id": "lockout", "security_issue": false, "impact": "single-user", "workaround": false, "account_lockout": true },
+  { "id": "workaround", "security_issue": false, "impact": "company-wide", "workaround": true, "account_lockout": false }
+]

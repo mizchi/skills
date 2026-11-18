@@ -1,4 +1,7 @@
-# Blind API evaluation smoke — 2026-11-18
+# Filter and project records — historical API/DSL smoke
+
+Run on 2026-11-18 under the previous skill name `blind-api-eval`; the historical
+results below are preserved, not new trials of every generalized task modality.
 
 A small controlled API-plus-DSL experiment exercised the workflow. Seven fresh
 consumer subagents used staged package copies, with no parent conversation,
@@ -53,8 +56,8 @@ trial or a full evaluation of every possible skill workflow.
 ## Replay and evidence
 
 [ledger.json](ledger.json) records hashes, scores, observations, events and limits.
-[fixtures/plan.json](fixtures/plan.json), [fixtures/rubric.json](fixtures/rubric.json)
-and [fixtures/tasks.json](fixtures/tasks.json) preserve the frozen small experiment.
+[plan.json](plan.json), [private/rubric.json](private/rubric.json)
+and [private/cases.json](private/cases.json) preserve the frozen small experiment.
 The package revisions are in [fixtures/baseline](fixtures/baseline/README.md) and
 [fixtures/candidate](fixtures/candidate/README.md).
 
@@ -62,7 +65,7 @@ For replay, stage only one package under a new consumer workspace's
 `node_modules/record-query`, its public README, and one task's prompt. Do not give
 the consumer this report, the rubric, fixture source tree or task answer cases.
 Have a fresh tool-enabled agent create `consumer.mjs` exporting `solve(rows)`.
-The controller can then run `node fixtures/check-consumer.mjs <consumer-path>
+The controller can then run `node private/verify.mjs <consumer-path>
 <JSON-encoded-cases>` against that task's cases. Use the skill's judge template and
 scorer on the preserved artifact/trace. No package manager or network is required
 for this tiny fixture; Node.js 24+ is sufficient.

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "example_only": true,
+  "status": "completed",
+  "verification_method": "programmatic",
+  "oracle_passed": true,
+  "observations": [
+    {
+      "id": "condition-compliance",
+      "score": 2,
+      "evidence": [
+        "observations.jsonl: reads only the selected guide and inputs; writes the requested decision record"
+      ]
+    },
+    {
+      "id": "output-fitness",
+      "score": 2,
+      "evidence": [
+        "decisions.json and verification.json: required routes and output fields match the case contract"
+      ]
+    },
+    {
+      "id": "evidence-fidelity",
+      "score": 2,
+      "evidence": [
+        "decisions.json: rule identifiers resolve to supplied guide rules; no claimed external operation"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
 test:
-    node --test blind-api-eval/tests/*.test.mjs
+    node --test task-based-eval/tests/*.test.mjs
