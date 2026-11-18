@@ -161,13 +161,13 @@
           "kind": "npm-dist-tag",
           "package": "cf",
           "tag": "latest",
-          "observed": "1.0.0-beta.32"
+          "observed": "1.0.0-rc.1"
         },
         {
           "kind": "npm-dist-tag",
           "package": "@cloudflare/vite-plugin",
           "tag": "latest",
-          "observed": "1.69.1"
+          "observed": "1.70.0"
         },
         {
           "kind": "documentation",
@@ -186,8 +186,8 @@
         {
           "kind": "npm-dist-tag",
           "package": "@cloudflare/vite-plugin",
-          "tag": "beta",
-          "observed": "2.0.0-beta.v.17"
+          "tag": "rc",
+          "observed": "2.0.0-rc.1"
         },
         {
           "kind": "github-path",
@@ -208,7 +208,8 @@
         }
       ],
       "validation": [
-        "Compare installed cf help/schema and config types with the beta.5 guide baseline",
+        "Compare installed cf help/schema and config types with the 1.0 RC guide baseline",
+        "Run the pinned cf/Vite smoke project through typegen, build and prebuilt deploy dry-run using Build Output v1",
         "Check engines against the selected Node patch",
         "Run local Worker bundle, secret-delivery and deployment-state tests",
         "Review compatibility-date-dependent API availability",

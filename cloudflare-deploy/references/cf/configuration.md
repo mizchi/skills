@@ -46,14 +46,14 @@ export default defineConfig({ plugins: [cloudflare()] });
 ```
 
 ```bash
-pnpm add -D cf @cloudflare/vite-plugin@beta vite typescript
+pnpm add -D cf@1.0.0-rc.1 @cloudflare/vite-plugin@2.0.0-rc.1 vite typescript
 pnpm exec cf workers types
 pnpm exec cf dev
 pnpm exec cf build
 pnpm exec cf deploy --prebuilt --mode production --dry-run
 ```
 
-`cf dev` delegates to Vite/framework development without requiring a production build. Generated bindings/runtime types are in `.cloudflare/types/index.d.ts`. Include them in TypeScript:
+`cf dev` delegates to Vite/framework development without requiring a production build. Extra arguments reach the development server: `cf dev --port 8788` or `cf dev -- --host 0.0.0.0`. The framework decides which options it supports; `cf build` accepts only `--mode`. Generated bindings/runtime types are in `.cloudflare/types/index.d.ts`. Include them in TypeScript:
 
 ```json
 {
@@ -74,10 +74,14 @@ Use `ExportedHandler<Env>` for the handler contract or `env` from `cloudflare:wo
 
 ## Secrets and remote development
 
-`bindings.text()` is for non-secret strings; `bindings.json()` preserves structured values. `bindings.secret()` declares a required secret. Provide local values in `.dev.vars`, deployment values in an ignored JSON or dotenv file passed with `--secrets-file`. Process environment variables do not automatically satisfy secret bindings.
+`bindings.text()` is for non-secret strings; `bindings.json()` preserves structured values. `bindings.secret()` declares a Worker secret. Provide local values in `.dev.vars`, deployment values in an ignored JSON or dotenv file passed with `--secrets-file`. Process environment variables do not automatically supply Worker secret values.
+
+Check that the chosen secret source contains every key required by the application with a non-empty value; fail the local preflight without printing values when one is missing. RC.1 `cf deploy --prebuilt --dry-run` can exit successfully with the secret file omitted, even when `bindings.secret()` is declared. A successful dry run validates the build, not the completeness of required secret values or their remote delivery. Use dummy values for local/PR checks and the actual secret source only for publication.
 
 Remote resource development is configured on supported bindings, for example `bindings.r2({ name: "assets-staging", dev: { remote: true } })`. Check the installed builder types for each product; do not append an old `dev --remote` flag or route development to production resources by accident.
 
 Static asset sources are managed by the Vite/framework integration, which writes Build Output. `worker.assets` describes handling behavior, such as `runWorkerFirst` or `notFoundHandling`; it is not Wrangler's `assets.directory` field.
+
+Streaming tail consumers now belong under `worker.experimental.streamingTailConsumers`. Move an older top-level `worker.streamingTailConsumers` declaration there and check the installed config types.
 
 Sources: [typed configuration](https://developers.cloudflare.com/cf/projects/cloudflare-config/), [configuration explorer](https://developers.cloudflare.com/cf/projects/config-explorer/).

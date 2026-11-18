@@ -25,9 +25,20 @@ pnpm exec cf deploy --prebuilt --mode staging --dry-run
 pnpm exec cf deploy --prebuilt --mode staging
 ```
 
-Build Output lives in `.cloudflare/output/v0/`. The root `config.json` records the build context; each Worker has `worker.config.json`, `bundle/` and optional assets. Inspect the manifest for the emitted main module; do not assume Wrangler's `--outdir` or a custom `dist/worker.mjs`.
+Build Output lives in `.cloudflare/output/v1/`. The root `config.json` records the build context; each Worker has `worker.config.json`, `bundle/` and optional assets. Inspect the manifest for the emitted main module; do not assume Wrangler's `--outdir` or a custom `dist/worker.mjs`. Rebuild beta artifacts and update CI upload/download paths before using RC `--prebuilt`; do not rename a v0 directory to v1.
 
-`--prebuilt` deploys that artifact without rebuilding or automatic setup. Keep build/deploy modes identical. `cf deploy --dry-run` validates locally without publishing or requiring credentials. Secrets declared as required still need values during validation; use dummy values for secret-free PR checks and real values only at the authorized deploy.
+`--prebuilt` deploys that artifact without rebuilding or automatic setup. Keep build/deploy modes identical. `cf deploy --dry-run` validates locally without publishing or requiring credentials. Supply dummy Worker secret values for PR checks, but validate required keys separately: RC.1 dry-run can succeed when the secret file is omitted. Use real values only at the authorized deploy; see [secret preflight](configuration.md#secrets-and-remote-development).
+
+Use `cf deploy --no-provision` when missing binding resource IDs should fail instead of creating resources. Provisioned IDs are not written back to the config. `cf deploy --force` overrides conflicts with a remote/API deployment or remote configuration; review the difference before opting in. Redeploying preserves secrets added outside `cloudflare.config.ts`. Set `CLOUDFLARE_DEPENDENCIES_INSTRUMENTATION=false` when dependency metadata should not be uploaded.
+
+## Static assets and previews
+
+```bash
+pnpm exec cf deploy ./dist
+pnpm exec cf previews deploy --preview-name feature-check
+```
+
+A directory argument skips the build and deploys an assets-only Worker. It cannot be combined with a configured Worker entrypoint, Containers, `--prebuilt` or `--worker`; use the normal pipeline for server-side code. Preview names default to the CI/Git branch; pass `--preview-name` on detached checkouts. `cf previews deploy --dry-run` checks arguments only: it does not build or validate an artifact as `cf deploy --dry-run` does.
 
 ## Local validation
 

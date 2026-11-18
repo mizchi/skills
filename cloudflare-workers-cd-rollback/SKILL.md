@@ -28,7 +28,7 @@ The project must have `cloudflare.config.ts` before CI. Migrate an existing Wran
 
 Configure:
 
-- DevDependencies: `cf`, `@cloudflare/vite-plugin@beta`, Vite and TypeScript. An environment loader is not required.
+- DevDependencies: `cf@1.0.0-rc.1`, `@cloudflare/vite-plugin@2.0.0-rc.1`, Vite and TypeScript; see the [checked RC cohort](../cloudflare-deploy/references/cf/README.md). An environment loader is not required. Rebuild beta artifacts and update any artifact upload/download paths to `.cloudflare/output/v1/`.
 - `build:core` package script: `moon build --target js --release && node scripts/prepare-worker.ts`. For a TypeScript-only project remove the MoonBit install/build steps and use cf build directly.
 - `smoke` package script: `node scripts/smoke.ts`, with project-specific paths/status expectations.
 - GitHub variables `D1_DATABASE_ID_PRODUCTION`, `D1_DATABASE_ID_STAGING`, `WORKERS_SUBDOMAIN`; optional `WORKER_NAME_PRODUCTION` and `WORKER_NAME_STAGING` default to `cf-mbt-app` and `cf-mbt-app-staging`. Match those names and IDs to the corresponding config modes.
@@ -36,7 +36,7 @@ Configure:
 
 Adapt D1 steps if the project has no D1 or several databases. cf expects IDs, remote is the default, and `--dir` selects the migration directory. Use compatible schema migrations: Worker rollback does not undo database changes.
 
-Build and prebuilt deploy use the same mode. If enabling `bindings.secret()`, supply mock values for dry-run checks and the appropriate ignored/decrypted `--secrets-file` during publication; CLI credentials alone do not become Worker bindings.
+Build and prebuilt deploy use the same mode. The template checks `.cloudflare/output/v1/workers/default/bundle`; select the appropriate manifest/Worker directory for a multi-Worker build. If enabling `bindings.secret()`, supply mock values for dry-run checks and the appropriate ignored/decrypted `--secrets-file` during publication; CLI credentials alone do not become Worker bindings. Check required keys and non-empty values separately; RC.1 deploy dry-run can succeed with the secret file omitted.
 
 ## Rollback contract
 
@@ -46,8 +46,10 @@ An empty successful list or the specific missing-Worker error 10007 means first 
 
 On smoke failure, restore the saved allocation with `cf workers deployments create --worker <name> --strategy percentage --versions @file`. Do not add `--force` automatically to bypass a rollback blocked by secret changes. First deployments cannot restore an earlier version. Serialize deployments per target mode; avoid other deployment pipelines racing this workflow.
 
+RC `cf deploy --no-provision` can enforce existing binding IDs. Leave `cf deploy --force` out of the default workflow: it overrides remote configuration/deployment conflicts. Redeploying preserves secrets added outside the typed config.
+
 Messages enter shell steps through environment variables. Never interpolate commit bodies or arbitrary dispatch input directly into shell source. The wrappers gate deployment on the Cloudflare token and account ID, and watch `cloudflare.config.ts` and `vite.config.ts`.
 
 ## Verification
 
-The [deployment-state tests](assets/scripts/deployment-state.test.ts) cover latest-first selection, gradual traffic, first deployment and malformed/API-error data. The [workflow credential tests](assets/scripts/workflow-credentials_test.rb) execute prechecks, migration and smoke commands without dotenvx or remote calls. Validate YAML and run a dry run before enabling the copied workflow. Sources and limitations: [cd-traps.md](references/cd-traps.md), [cf API guide](../cloudflare-deploy/references/cf/api.md).
+The [deployment-state tests](assets/scripts/deployment-state.test.ts) cover latest-first selection, gradual traffic, first deployment and malformed/API-error data. The [workflow tests](assets/scripts/workflow-credentials_test.rb) execute prechecks, migration, smoke and the v1 build/check/dry-run step without remote calls; corrupt split modules block the dry run in both target modes. Validate YAML and run a dry run before enabling the copied workflow. Sources and limitations: [cd-traps.md](references/cd-traps.md), [cf API guide](../cloudflare-deploy/references/cf/api.md).

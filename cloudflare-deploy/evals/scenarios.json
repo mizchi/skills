@@ -1,0 +1,166 @@
+{
+  "name": "cf-1.0-rc-cross-skill-evaluation",
+  "date": "2026-11-18",
+  "method": "Fresh in-session executors with actual local tools; fixed item scoring: full=1, partial=0.5, fail=0. Critical items must all pass. No without-skill baseline.",
+  "scenarios": [
+    {
+      "id": "worker",
+      "skills": [
+        "cloudflare-deploy"
+      ],
+      "scenario": "Create an isolated Vite Worker project with separate production/staging names, a KV binding and a required API_SECRET. Validate staging locally with dummy IDs and secret values, prepare a live-log investigation command and state what it needs. No publication or real credentials.",
+      "requirements": [
+        {
+          "id": "W1",
+          "critical": true,
+          "text": "Produce valid typed configuration with distinct staging/production Worker names, KV IDs, required API_SECRET, and a typed Worker handler."
+        },
+        {
+          "id": "W2",
+          "critical": true,
+          "text": "Actually run type generation, TypeScript, staging build and matching prebuilt deploy dry-run successfully, using emitted v1 Build Output."
+        },
+        {
+          "id": "W3",
+          "critical": true,
+          "text": "Supply dummy required secret values through an ignored deployment secret file; make no remote writes and do not confuse CLI credentials with Worker secrets."
+        },
+        {
+          "id": "W4",
+          "critical": false,
+          "text": "Check the actual cf/plugin versions and Node engines; use the compatible RC cohort rather than the plugin 1 latest tag."
+        },
+        {
+          "id": "W5",
+          "critical": false,
+          "text": "Give a working live-log command, Workers Logs prerequisite, NDJSON format and supported filters; check its help or dry-run without claiming live delivery."
+        },
+        {
+          "id": "W6",
+          "critical": false,
+          "text": "Provide runnable validation commands and artifact paths, and distinguish executed checks from unexecuted remote behavior."
+        }
+      ]
+    },
+    {
+      "id": "pipeline",
+      "skills": [
+        "cloudflare-mbt-worker-bundle",
+        "cloudflare-workers-cd-rollback"
+      ],
+      "scenario": "Prepare an isolated MoonBit-generated-JS plus TypeScript Worker pipeline for a cf beta-to-RC CI migration. There are production/staging modes, D1 migrations and gradual traffic rollback. Use synthetic generated JS and mocked remote commands when needed; exercise local preparation and bundle checks, including corruption in a split module. Produce reusable CI files and verification evidence. No real moon package updates or remote changes.",
+      "requirements": [
+        {
+          "id": "P1",
+          "critical": true,
+          "text": "Prepare synthetic MoonBit JS with both required FFI rewrites, import the prepared file from a typed Worker, and fail loudly when a required rewrite target is absent."
+        },
+        {
+          "id": "P2",
+          "critical": true,
+          "text": "Use v1 Build Output and matching build/deploy modes; actually exercise valid and corrupt split-module bundle checks and ensure corrupt output blocks the prebuilt deploy dry-run."
+        },
+        {
+          "id": "P3",
+          "critical": true,
+          "text": "Capture and restore the complete latest-first gradual traffic allocation; distinguish genuine first deployment from auth/network/parse failures, verified with fixtures or existing tests."
+        },
+        {
+          "id": "P4",
+          "critical": false,
+          "text": "Use D1 database IDs and --dir, and explain compatible migration requirements and that rollback does not undo storage."
+        },
+        {
+          "id": "P5",
+          "critical": false,
+          "text": "Provide reusable workflows/helpers with explicit CLI credentials and secret-binding handling; do not enable deploy or rollback --force by default."
+        },
+        {
+          "id": "P6",
+          "critical": false,
+          "text": "Keep remote operations mocked, identify the Worker artifact directory correctly and state what was executed versus simulated."
+        }
+      ]
+    },
+    {
+      "id": "utels",
+      "skills": [
+        "utels-project-bootstrap"
+      ],
+      "scenario": "Adapt and validate the utels bootstrap helper for production/staging using cf RC. Register only staging in a local mocked service, capture the cf invocation and stdin, then exercise failed secret delivery and invalid target selection. Also explain which single-secret or bulk command to use after upgrade. Do not call real utels or Cloudflare APIs.",
+      "requirements": [
+        {
+          "id": "U1",
+          "critical": true,
+          "text": "Actually execute the helper against a local registration mock and intercepted pnpm child, selecting the requested Worker explicitly."
+        },
+        {
+          "id": "U2",
+          "critical": true,
+          "text": "Verify the ingest token is delivered as a secret_text JSON body through stdin and is absent from argv and observable stdout/stderr, including child failure."
+        },
+        {
+          "id": "U3",
+          "critical": true,
+          "text": "Verify failed delivery produces failure and invalid target selection is rejected; do not silently retry, delete projects or treat registration as guaranteed idempotent."
+        },
+        {
+          "id": "U4",
+          "critical": false,
+          "text": "Check the installed RC single-secret schema or argument dry-run and distinguish mocked writes from real API success."
+        },
+        {
+          "id": "U5",
+          "critical": false,
+          "text": "Use unchanged workers secrets update for single writes and identify bulk-edit as the renamed bulk operation without an old alias."
+        },
+        {
+          "id": "U6",
+          "critical": false,
+          "text": "Keep registration/CLI credentials distinct from Worker binding declarations and provide the configuration and commands needed to reproduce the safe local check."
+        }
+      ]
+    }
+  ],
+  "stopping": "Two fresh-executor rounds with no new actionable instruction issues and all critical items passing, followed by one previously unused hold-out. Steps/duration are auxiliary and unavailable tool metadata is never inferred.",
+  "holdout_reserved": true,
+  "holdout": {
+    "id": "static-holdout",
+    "skills": [
+      "cloudflare-deploy"
+    ],
+    "scenario": "A team has an already-built dist static site and wants an RC deployment plan. A sibling app still has Pages Functions and a Worker entrypoint. In isolated local fixtures, validate the static-directory path without publishing, explain how the sibling differs, and handle a CI deployment blocked by remote configuration conflict without silently bypassing it. Also clarify what Preview dry-run validates.",
+    "requirements": [
+      {
+        "id": "H1",
+        "critical": true,
+        "text": "For an assets-only fixture use the static-directory deploy form, verify its dry-run behavior locally and avoid an unnecessary delegated build."
+      },
+      {
+        "id": "H2",
+        "critical": true,
+        "text": "Do not substitute that form for server-side Worker/Pages Functions projects; preserve their publisher until verified migration and use the normal pipeline for a configured entrypoint."
+      },
+      {
+        "id": "H3",
+        "critical": true,
+        "text": "Treat conflicting remote configuration as a reason to inspect/reconcile; do not automatically add deploy --force or publish."
+      },
+      {
+        "id": "H4",
+        "critical": false,
+        "text": "Explain optional --no-provision with its actual scope and distinguish static directory publication to Workers from existing Pages publication."
+      },
+      {
+        "id": "H5",
+        "critical": false,
+        "text": "Use --preview-name when a branch name is unavailable and distinguish Preview argument dry-run from Worker build/artifact dry-run."
+      },
+      {
+        "id": "H6",
+        "critical": false,
+        "text": "Supply reproducible commands, evidence and limitations without remote changes or credential reads."
+      }
+    ]
+  }
+}

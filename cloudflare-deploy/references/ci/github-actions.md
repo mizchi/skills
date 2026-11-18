@@ -32,9 +32,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 ```
 
-Declare `packageManager` in package.json for pnpm/action-setup. This example needs no Worker secrets. If config declares `bindings.secret()`, provide dummy values through an ignored `--secrets-file` for PR validation and real values only in the publication step. Credentials are restricted to the publication step so fork PR checks can still build/typecheck/dry-run.
+Declare `packageManager` in package.json for pnpm/action-setup. This example needs no Worker secrets. If config declares `bindings.secret()`, provide dummy values through an ignored `--secrets-file` for PR validation and real values only in the publication step. Check required keys and non-empty values separately: RC.1 deploy dry-run can succeed with the secret file omitted. Credentials are restricted to the publication step so fork PR checks can still build/typecheck/dry-run.
 
 Build once, validate and deploy the same Build Output with `--prebuilt` and a matching mode. For staging, use `--mode staging` throughout and ensure the config chooses independent names/resources.
+
+RC artifacts live in `.cloudflare/output/v1/`. Update any upload/download or bundle-check paths, rebuild older v0 output and use the same lockfile in build/deploy jobs. `cf deploy --no-provision` fails on missing binding IDs instead of provisioning resources. Do not add `cf deploy --force` by default: it overrides a conflicting remote deployment/configuration. Other destructive API operations also require `--force` in CI; inspect the operation before opting in.
 
 D1 migration commands take a database ID and default to remote:
 
@@ -44,6 +46,6 @@ pnpm exec cf d1 migrations apply DATABASE_ID --dir db/migrations
 
 Apply compatible migrations before deployment. They are not undone by rolling back the Worker. For JSON traffic snapshots, smoke and automatic rollback, use [cloudflare-workers-cd-rollback](../../../cloudflare-workers-cd-rollback/SKILL.md).
 
-For PR Worker previews, inspect `pnpm exec cf previews deploy --help`; this publishes a preview and has no dry-run option. Legacy Pages deployment is not implemented by the checked cf beta; migrate to a supported Workers/framework configuration instead of substituting `cf pages deploy`.
+For PR Worker previews, use `pnpm exec cf previews deploy --preview-name <name>`; the name otherwise defaults to the CI/Git branch. Its `--dry-run` checks arguments without building or uploading; use the Worker deploy dry run above to validate an artifact. For an existing Pages project, migrate functions/assets to a supported Workers configuration before changing its publisher. `cf deploy ./dist` publishes an assets-only Worker.
 
 Authentication: [cf/auth.md](../cf/auth.md). Source: [cf CI documentation](https://developers.cloudflare.com/cf/ci/).

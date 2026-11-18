@@ -159,7 +159,7 @@ jobs:
           set -e
           if [ "$rc" -ne 0 ]; then
             cat /tmp/deployments.err >&2
-            if grep -Eq '10007|This Worker does not exist' /tmp/deployments.err; then
+            if grep -Eq '(^|[^[:digit:]])10007([^[:digit:]]|$)|This Worker does not exist' /tmp/deployments.err; then
               echo '[]' > /tmp/previous-versions.json
             else
               echo "::error::cf deployments list failed (exit $rc)"
@@ -188,7 +188,7 @@ jobs:
           pnpm run build:core
           pnpm exec cf workers types --mode "$TARGET_MODE"
           pnpm exec cf build --mode "$TARGET_MODE"
-          node scripts/check-worker-bundle.ts .cloudflare/output/v0/workers/default/bundle
+          node scripts/check-worker-bundle.ts .cloudflare/output/v1/workers/default/bundle
           pnpm exec cf deploy --prebuilt --mode "$TARGET_MODE" --dry-run
 
       - name: Deploy checked Build Output

@@ -10,7 +10,8 @@ Use `cf` for Cloudflare operations. Use the decision trees below to pick a produ
 ## Prerequisites
 
 - Node.js 24+ and pnpm; satisfy the installed packages' exact `engines` patch floors. Install the npm package **`cf`**, not `@cloudflare/cf`.
-- Keep `cf` in project devDependencies and commit the lockfile. The [smoke project](assets/smoke/package.json) checks `cf@1.0.0-beta.32` with `@cloudflare/vite-plugin@2.0.0-beta.v.17`, Vite 8.3.8 and Node 24.22.2 (2026-11-16). The stable plugin channel is a different version line; keep the generated compatible beta cohort. Recheck help and types when upgrading.
+- Keep `cf` in project devDependencies and commit the lockfile. The [smoke project](assets/smoke/package.json) checks `cf@1.0.0-rc.1` with `@cloudflare/vite-plugin@2.0.0-rc.1`, Vite 8.3.8 and Node 24.22.2 (2026-11-18). Vite projects require plugin 2.0.0-rc.0 or later; legacy Wrangler builds require Wrangler 4.163.0 or later. Select a compatible plugin 2 release explicitly; its `latest` tag still points to version 1.
+- The [1.0 release candidate](https://developers.cloudflare.com/changelog/post/2026-11-17-release-candidate/) stabilizes typed configuration, Build Output and project commands. Some generated API command paths can still change. When upgrading from beta, rebuild into `.cloudflare/output/v1/` before using `--prebuilt`; see the [upgrade guide](references/cf/README.md).
 - Workers use `cloudflare.config.ts`. For an existing Wrangler project, run `cf migrate --dry-run`, then `cf migrate` and resolve its follow-up items before project commands. Automatic configuration does not import the old bindings.
 
 ## Authentication (Required Before Deploy)
@@ -86,7 +87,7 @@ export default {
 
 Bootstrap commands:
 ```bash
-pnpm add -D cf @cloudflare/vite-plugin@beta vite typescript
+pnpm add -D cf@1.0.0-rc.1 @cloudflare/vite-plugin@2.0.0-rc.1 vite typescript
 pnpm exec cf kv namespaces create --title CACHE # Copy the returned ID into config
 pnpm exec cf workers types                      # Generates .cloudflare/types/index.d.ts
 pnpm exec cf dev                                # Vite reports the local URL
@@ -94,9 +95,11 @@ pnpm exec cf deploy --dry-run --secrets-file .env.production
 pnpm exec cf deploy --secrets-file .env.production
 ```
 
-Put `API_SECRET` in an ignored `.env.production` for deployment and `.dev.vars` for local development. Declaring `bindings.secret()` makes that value required at deploy validation; dotenvx values in the CLI process are not automatically Worker secrets. Include `.cloudflare/types` in `tsconfig.json`; see the configuration reference for the full TypeScript setup. Change an existing Worker's compatibility date deliberately.
+Put `API_SECRET` in an ignored `.env.production` for deployment and `.dev.vars` for local development. `bindings.secret()` declares the Worker binding; CLI process variables do not automatically supply its value. Before publication, check that the selected secret source contains every required key with a non-empty value, without printing values. In RC.1, deploy dry-run can succeed with the secret file omitted, so it does not prove secret completeness. Include `.cloudflare/types` in `tsconfig.json`; see the configuration reference for the full TypeScript setup. Change an existing Worker's compatibility date deliberately.
 
-The earlier beta.5 baseline did not implement live log streaming or legacy Pages asset deployment. Those two operations have not been revalidated in beta.32; a command appearing in help does not prove it works. Use Workers Logs in the dashboard for inspection and Workers static assets for new web projects. For a legacy Pages project, keep its deployment working while planning migration; do not invent a `cf pages deploy` replacement. See [limitations](references/cf/gotchas.md).
+Stream live events with `pnpm exec cf observability tail --worker my-worker`; enable Workers Logs for that Worker first. Output is newline-delimited JSON. See [observability and command discovery](references/cf/api.md) for selectors and filters.
+
+Deploy an already-built static site with `pnpm exec cf deploy ./dist`; this skips the build and creates an assets-only Worker. Projects with server-side code use the normal build/deploy pipeline. For an existing Pages project, preserve its publisher until its functions/assets have migrated; the static-directory command targets Workers. See [deployment patterns](references/cf/patterns.md).
 
 For Pages / D1 / Durable Objects / multi-env / CI — descend into `references/`.
 

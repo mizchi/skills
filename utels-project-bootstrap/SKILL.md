@@ -9,7 +9,7 @@ Register production/staging utels.dev projects and send each returned ingest tok
 
 ## Helper
 
-Copy [setup-utels.ts](assets/scripts/setup-utels.ts) to the Worker's `scripts/` directory. Use Node.js 24+ with a project-local cf dependency. The checked implementation targets cf beta.5; verify `cf schema workers secrets update` and the installed implementation when upgrading.
+Copy [setup-utels.ts](assets/scripts/setup-utels.ts) to the Worker's `scripts/` directory. Use Node.js 24+ with a project-local cf dependency. The stdin body passed a `cf@1.0.0-rc.1` argument dry run; real secret writes remain mocked. Verify `cf schema workers secrets update` when upgrading. RC renamed the separate bulk operation to `workers secrets bulk-edit`; this helper uses the unchanged single-secret update command.
 
 Inputs:
 

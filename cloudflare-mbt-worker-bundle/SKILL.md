@@ -5,7 +5,7 @@ description: Bundle a Cloudflare Worker combining MoonBit core code with a TypeS
 
 # Cloudflare Workers + MoonBit bundle pipeline
 
-Use `cf`, `cloudflare.config.ts` and the Cloudflare Vite plugin to bundle MoonBit's JS output with the TypeScript Worker entry. See [mizchi/cf-example](https://github.com/mizchi/cf-example) (`~/ghq/github.com/mizchi/cf-example`) for the current cf/Vite setup; its checked versions are cf beta.5 and the Vite plugin beta on Node.js 24.
+Use `cf`, `cloudflare.config.ts` and the Cloudflare Vite plugin to bundle MoonBit's JS output with the TypeScript Worker entry. Use the [checked RC cohort](../cloudflare-deploy/references/cf/README.md) on Node.js 24 and see [mizchi/cf-example](https://github.com/mizchi/cf-example) for integration examples; verify its dependency versions before copying them.
 
 ## Pipeline
 
@@ -37,15 +37,15 @@ Two source rewrites are required for the runtime versions this template targets:
 - [prepare-worker.ts.template](assets/scripts/prepare-worker.ts.template): copy to `scripts/prepare-worker.ts`, replace `<PKG>`, apply both FFI rewrites, write prepared JS into `src/_generated/`.
 - [cloudflare.config.ts.template](assets/templates/cloudflare.config.ts.template): copy to `cloudflare.config.ts`. Modes choose production/staging Worker names, D1 IDs and R2 names. Replace IDs after provisioning; apply D1 migrations with `cf d1 migrations apply DATABASE_ID --dir db/migrations`.
 - [vite.config.ts.template](assets/templates/vite.config.ts.template): Vite integration used by `cf dev`/`cf build`.
-- [check-worker-bundle.ts](assets/scripts/check-worker-bundle.ts): checks an emitted JS bundle for corrupt control bytes, stub output and project-specific markers. Inspect `worker.config.json`'s manifest for the main module and pass its path under `.cloudflare/output/v0/workers/<worker>/bundle/`. If Vite splits modules, check the bundle directory so markers in other modules are included.
+- [check-worker-bundle.ts](assets/scripts/check-worker-bundle.ts): checks an emitted JS bundle for corrupt control bytes, stub output and project-specific markers. Inspect `worker.config.json`'s manifest for the main module and pass its path under `.cloudflare/output/v1/workers/<worker>/bundle/`. If Vite splits modules, check the bundle directory so markers in other modules are included.
 
-Add `cf`, `@cloudflare/vite-plugin@beta`, Vite and TypeScript with pnpm, commit the lockfile, generate types with `pnpm exec cf workers types`, and include `.cloudflare/types` in TypeScript. Use the build mode again for prebuilt deploy. For required secret bindings, pass an ignored `--secrets-file` to validation and deployment.
+Add `cf@1.0.0-rc.1`, `@cloudflare/vite-plugin@2.0.0-rc.1`, Vite and TypeScript with pnpm, commit the lockfile, generate types with `pnpm exec cf workers types`, and include `.cloudflare/types` in TypeScript. RC requires plugin 2.0.0-rc.0 or later; rebuild beta v0 artifacts into v1 before prebuilt deployment. Use the build mode again for prebuilt deploy. For required secret bindings, pass an ignored `--secrets-file` to validation and deployment.
 
 When migrating an existing Worker, run `cf migrate --dry-run` then `cf migrate` before using project commands. Keep prior DO lifecycle history and resource IDs; do not bootstrap a replacement config that loses existing bindings. See the [cf configuration guide](../cloudflare-deploy/references/cf/configuration.md).
 
 ## References
 
-- [cf-traps.md](references/cf-traps.md): modes, build artifacts, resource IDs and unsupported beta operations.
+- [cf-traps.md](references/cf-traps.md): modes, RC build artifacts, resource IDs and request diagnostics.
 - [moonbit-ffi-rewrites.md](references/moonbit-ffi-rewrites.md): runtime rewrite targets and symptoms.
 - [cf-example](https://github.com/mizchi/cf-example): cf/Vite/types/Playwright example.
 - [cloudflare-starterkit-mbt](https://github.com/mizchi/cloudflare-starterkit-mbt): MoonBit handler/runtime examples; translate their older CLI setup to cf.

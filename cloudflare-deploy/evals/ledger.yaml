@@ -1,0 +1,162 @@
+evaluation: cf-1.0-rc-cross-skill
+method: Fresh in-session executors with fixed local execution tasks
+metrics_note: No independent tool-use/duration metadata is exposed by collaboration
+  tools. Counts and elapsed times are self-reported, auxiliary only. Without-skill
+  uplift and remote behavior were not measured.
+iteration_0:
+  description_body_consistent: 4
+  edits: 0
+iterations:
+- id: 1
+  scenario_requirement_passes: 18
+  scenario_requirement_total: 18
+  critical_items: all passed by generated deliverables
+  new_actionable_skill_issues: 3
+  per_scenario:
+  - id: worker
+    passed: 6
+    total: 6
+    self_reported_seconds: 289
+    self_reported_exec_calls: 13
+    executor_retries: 3
+  - id: pipeline
+    passed: 6
+    total: 6
+    self_reported_seconds: 379.34
+    self_reported_exec_calls: 18
+    executor_retries: 6
+  - id: utels
+    passed: 6
+    total: 6
+    self_reported_seconds: 238
+    self_reported_exec_calls: 10
+    executor_retries: 1
+  actions:
+  - requirements:
+    - W3
+    - W6
+    - P5
+    pattern: Dry-run mistaken for secret completeness
+    change: Separate declared binding, local required-key checks, build dry-run and
+      remote secret delivery; document observed omitted-file success.
+  - requirements:
+    - P1
+    - P2
+    - P6
+    pattern: Documented checker scope exceeds implemented assertions
+    change: Limit checker claims to aggregate JS size, corrupt bytes and configured
+      markers; require async-path checks for runtime proof.
+  - requirements:
+    - P3
+    pattern: Partial numeric error-code match permits unintended fallback
+    change: Add regression executing actual workflow; prove 100070 fails before correction
+      and bound 10007 as a complete numeric token.
+  source_regression: 'Before fix: Authentication error 100070 incorrectly returned
+    first_deploy=true. After fix: 6 Ruby tests / 58 assertions and 5 Node tests pass.'
+- id: 2
+  scenario_requirement_passes: 18
+  scenario_requirement_total: 18
+  new_actionable_skill_issues: 0
+  per_scenario:
+  - id: worker
+    passed: 6
+    total: 6
+    self_reported_seconds: 316
+    self_reported_exec_calls: 14
+    executor_retries: 3
+  - id: pipeline
+    passed: 6
+    total: 6
+    self_reported_seconds: 319
+    self_reported_exec_calls: 15
+    executor_retries: 3
+  - id: utels
+    passed: 6
+    total: 6
+    self_reported_seconds: 205
+    self_reported_exec_calls: 12
+    executor_retries: 3
+  harness_issue: A whole-directory node_modules symlink allowed Vite to write shared
+    ignored caches. Shared cache was retained; final worker validation isolated cache
+    paths, and iteration 3 receives private APFS-cloned dependencies.
+  advisory_fill_ins:
+  - Project-specific telemetry wrappers were omitted in favor of a minimal typed forwarding
+    handler.
+  - Application-specific non-empty secret preflight implementation was supplied by
+    executors.
+  actions:
+  - No skill edit after iteration 2; fresh confirmation for worker/pipeline plus unused
+    static-site hold-out.
+- id: 3
+  scope: Worker and pipeline fresh confirmation; new static-site hold-out. utels already
+    has two clean fresh rounds.
+  scenario_requirement_passes: 12
+  scenario_requirement_total: 12
+  new_actionable_skill_issues: 0
+  per_scenario:
+  - id: worker
+    passed: 6
+    total: 6
+    self_reported_seconds: 207.52
+    self_reported_exec_calls: 11
+    executor_retries: 2
+  - id: pipeline
+    passed: 6
+    total: 6
+    self_reported_seconds: 281
+    self_reported_exec_calls: 12
+    executor_retries: 3
+  holdout:
+    id: static-holdout
+    passed: 6
+    total: 6
+    critical_items: all passed
+    new_actionable_skill_issues: 0
+    self_reported_seconds: 237
+    self_reported_exec_calls: 9
+    executor_retries: 2
+  source_identity: iteration-2/manifest.json and iteration-3/manifest.json match for
+    all 346 frozen files.
+  harness_notes:
+  - Private full dependency copies removed the shared Vite-cache write issue.
+  - The network guard initially blocked loopback; permitting loopback allowed the
+    same Worker dry-run to pass. Outbound connections remained blocked.
+  - A final pipeline subprocess may have used default OS TMPDIR; bundled temporary
+    fixtures clean themselves up.
+  - Node fetch of synthetic generated JS does not prove full workerd or real MoonBit
+    runtime compatibility.
+  actions:
+  - No further skill edits needed; stop after two clean fresh runs per ordinary scenario
+    and a passing hold-out.
+failure_patterns:
+- name: Dry-run mistaken for secret completeness
+  issue: Secret file omitted but cf RC.1 prebuilt deploy dry-run still exits zero.
+  general_fix_rule: State separately which input is declared, which values are locally
+    checked, and which remote behavior remains unverified.
+  seen_in:
+  - 1
+- name: Documented checker scope exceeds implemented assertions
+  issue: FFI reference promised unresolved runtime reference detection absent from
+    bundle checker.
+  general_fix_rule: Describe only implemented assertions and identify the extra runtime
+    test needed for broader guarantees.
+  seen_in:
+  - 1
+- name: Partial numeric error-code match permits unintended fallback
+  issue: 100070 matched 10007 and allowed deployment after a listing failure.
+  general_fix_rule: Match diagnostic codes as complete tokens and exercise adjacent
+    invalid codes in the real consumer.
+  seen_in:
+  - 1
+convergence:
+  status: functionally_converged
+  per_scenario_clean_rounds:
+    worker: 2
+    pipeline: 2
+    utels: 2
+  holdout: 6/6 including every critical item; no new actionable skill issue
+  rationale: Three observed source defects were corrected after iteration 1. All ordinary
+    scenarios then achieved two independent fresh-executor runs with no new actionable
+    instruction defect, and the reserved static-site scenario passed. Timing/tool-use
+    convergence is not claimed because independent metadata is unavailable.
+  executors: 9

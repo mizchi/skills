@@ -70,7 +70,10 @@ You can't FFI your way out of these inside MoonBit because they're not function 
 ## Cross-reference
 
 - The [bundled bundle checker](../assets/scripts/check-worker-bundle.ts) and its
-  [regression tests](../assets/scripts/check-worker-bundle.test.ts) verify that
-  emitted modules contain no unresolved process/runtime references. These
-  patterns originated in the owner's internal `mizchi/mnemo` deployment; the
-  public checker and this reference provide the reproducible contract.
+  [regression tests](../assets/scripts/check-worker-bundle.test.ts) check the
+  combined JS size, stray control bytes and any configured project markers
+  across emitted modules. They do not detect arbitrary unresolved runtime
+  references or prove that an awaited request resumes. After a compiler/runtime
+  upgrade, inspect rewrite targets and exercise the built Worker's async paths.
+  These patterns originated in the owner's internal `mizchi/mnemo` deployment;
+  the public checker covers only the checks implemented in that asset.

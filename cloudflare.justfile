@@ -9,3 +9,10 @@ test-cloudflare:
 check-cloudflare: test-cloudflare
     ruby scripts/validate-skill-frontmatter.rb
     ruby scripts/gen-skill-readme.rb --check
+
+# Validate the pinned cf/Vite cohort and Build Output without account access.
+smoke-cloudflare:
+    pnpm --dir cloudflare-deploy/assets/smoke install --frozen-lockfile
+    pnpm --dir cloudflare-deploy/assets/smoke typecheck
+    pnpm --dir cloudflare-deploy/assets/smoke build
+    pnpm --dir cloudflare-deploy/assets/smoke exec cf deploy --prebuilt --mode production --dry-run
