@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "file": "fixtures/a.md",
+      "kind": "false-positive-risk",
+      "reason": "A paraphrased explicit-only boundary is valid without a literal Invoke ONLY opener."
+    },
+    {
+      "file": "fixtures/b.md",
+      "kind": "false-negative-risk",
+      "reason": "A Meta capability summary omits its required explicit-request boundary."
+    },
+    {
+      "file": "fixtures/c.md",
+      "kind": "false-positive-risk",
+      "reason": "An existing-adoption boundary for an optional tool is legitimate."
+    },
+    {
+      "file": "fixtures/d.md",
+      "kind": "false-negative-risk",
+      "reason": "An ambient alternative bypasses an otherwise explicit Meta gate."
+    },
+    {
+      "file": "fixtures/e.md",
+      "kind": "false-positive-risk",
+      "reason": "Approval before a mutation is separate from selecting a Project diagnostic skill."
+    },
+    {
+      "file": "fixtures/f.md",
+      "kind": "false-negative-risk",
+      "reason": "A Project skill incorrectly requires its exact name despite relevant symptoms."
+    },
+    {
+      "file": "fixtures/g.md",
+      "kind": "false-positive-risk",
+      "reason": "A quoted automatic-activation mistake is not the operative Meta policy."
+    },
+    {
+      "file": "fixtures/h.md",
+      "kind": "false-negative-risk",
+      "reason": "Mentioning explicit requests does not help when the description expressly permits ambient activation."
+    },
+    {
+      "file": "fixtures/i.md",
+      "kind": "false-positive-risk",
+      "reason": "Japanese wording can express the same explicit-only boundary."
+    },
+    {
+      "file": "fixtures/j.md",
+      "kind": "false-negative-risk",
+      "reason": "A Japanese Meta capability summary still lacks an explicit-request restriction."
+    },
+    {
+      "file": "fixtures/k.md",
+      "kind": "false-positive-risk",
+      "reason": "The word only can restrict the adopted project environment rather than require a skill-name invocation."
+    },
+    {
+      "file": "fixtures/l.md",
+      "kind": "false-negative-risk",
+      "reason": "The operative maintenance role is Meta even without relying on the literal word Meta."
+    },
+    {
+      "file": "fixtures/m.md",
+      "kind": "unrelated",
+      "reason": "An unrelated performance note does not change an explicit-only Meta gate."
+    },
+    {
+      "file": "fixtures/n.md",
+      "kind": "unrelated",
+      "reason": "The same unrelated performance note does not repair an ambient Meta activation route."
+    },
+    {
+      "file": "fixtures/o.md",
+      "kind": "unrelated",
+      "reason": "A build note has no skill YAML description or activation policy to judge."
+    },
+    {
+      "file": "fixtures/p.md",
+      "kind": "unrelated",
+      "reason": "An unrelated unit inconsistency does not establish a description activation-policy defect."
+    }
+  ],
+  "independencePairs": [
+    {
+      "base": "fixtures/a.md",
+      "variant": "fixtures/m.md"
+    },
+    {
+      "base": "fixtures/d.md",
+      "variant": "fixtures/n.md"
+    }
+  ]
+}

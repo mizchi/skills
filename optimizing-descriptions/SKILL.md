@@ -189,6 +189,26 @@ If you do run the empirical step by hand, follow agentskills.io's specifics:
 | Iterating five rounds with no improvement | The query set is the problem, not the description. Look at the query examples — are they too easy / too hard / mislabeled? |
 | Rewriting description and body in the same commit | Hard to review and to revert. Description-tuning is a separate batch. |
 
+## Repository lint
+
+In `mizchi/skills`, `text/description-trigger-policy` checks the semantic
+Meta-versus-Project activation boundary in each maintained `SKILL.md` and
+`SKILL-ja.md`. It reads descriptions and operative bodies as data; it does not
+invoke skills or rewrite them.
+
+```sh
+just --justfile skill-lint.justfile plan
+just --justfile skill-lint.justfile check
+just --justfile skill-lint.justfile replay
+```
+
+The implementation is `.jev-lint/rules/text/description-trigger-policy/` in that
+repository. Its fixtures include false-positive-risk, false-negative-risk and
+unrelated controls, with expected labels outside the model-visible documents.
+This rule covers activation semantics, not the whole checklist, static character
+limits, or the observed trigger rate of an installed agent. See that repository's
+`.jev-lint/README.md` for calibration and known limits.
+
 ## Related
 
 - `agentskills.io/skill-creation/optimizing-descriptions` — upstream methodology document (the framework this skill operationalizes).

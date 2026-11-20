@@ -10,10 +10,10 @@ install:
 install-skill:
     apm install --frozen
 
-plan:
+plan: cases
     pnpm lint:skills:plan
 
-check:
+check: cases
     pnpm lint:skills --record .jev-lint/latest.json
 
 translations-plan:
@@ -28,14 +28,17 @@ policy-plan:
 policy:
     pnpm lint:tool-policy --record .jev-lint/tool-policy-audit.json
 
-eval:
+eval: cases
     pnpm lint:skills:eval
 
-replay:
+replay: cases
     pnpm lint:skills:replay
 
 test:
     pnpm test:skill-lint
+
+cases:
+    pnpm lint:rule-cases
 
 review-plan base head:
     pnpm review:skills --base {{base}} --head {{head}} --dry-run

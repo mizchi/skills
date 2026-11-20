@@ -1,0 +1,40 @@
+set positional-arguments
+data := justfile_directory()
+tool := canonicalize(data / "../../../../jev-lint")
+revision := "d147550c80d814e23f5d76f8ded25e30bf190da4"
+
+# Recreate the fixed inputs in a new directory using the local Cargo dependency cache.
+inputs repo work:
+    #!/bin/bash
+    set -eu -o pipefail
+    mkdir "$2"
+    mkdir "$2/source"
+    git -C "$1" archive {{revision}} src cli crates adapters package.json tsconfig.json tsconfig.build.json | tar -x -C "$2/source"
+    for dir in "$2"/source/crates/*; do
+      cargo +nightly-2026-08-27 rustdoc --offline --locked --manifest-path "$dir/Cargo.toml" --target-dir "$2/rustdoc" --lib -- -Z unstable-options --output-format json
+    done
+    node "{{data}}/modules.mjs" "$2/source" "$2/rustdoc/doc" "$2/modules"
+    node "{{tool}}/src/cli.ts" advisory-inputs "$1" "{{data}}/architecture.json" "$2/architecture"
+    node "{{data}}/package-history.mjs" "$1" "$2/source" "$2/architecture"
+    node "{{data}}/verify.mjs" --inputs "$2/modules" "$2/architecture"
+
+verify:
+    node "{{data}}/verify.mjs"
+
+composition repo:
+    #!/bin/bash
+    set -eu -o pipefail
+    work=$(mktemp -d)
+    trap 'rmdir "$work/src" "$work" 2>/dev/null || true' EXIT
+    git -C "$1" archive {{revision}} src/compose.ts src/checker.ts | tar -x -C "$work"
+    node "{{data}}/composition-check.mjs" "$work"
+    unlink "$work/src/compose.ts"
+    unlink "$work/src/checker.ts"
+
+wasm work:
+    #!/bin/bash
+    set -eu
+    for crate in idealis-core idealis-smt ralloy; do
+      cargo build --offline --locked --release --target wasm32-unknown-unknown --target-dir "$1/wasm" --manifest-path "$1/source/crates/$crate/Cargo.toml" --lib
+    done
+    node "{{data}}/wasm-check.mjs" "$1/wasm/wasm32-unknown-unknown/release"

@@ -1,0 +1,61 @@
+# Each block joins related evidence from a fixed revision or history window.
+- id: liskov-substitution
+  language: Text
+  extensions: [lsp]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.52
+  ask: Can a caller following the shared contract observe a broken guarantee when it substitutes the shown implementation?
+  criteria:
+    "true": Trace a concrete permitted input or sequence through the replacement and name the promised result, invariant or failure behavior that breaks. A stronger precondition also breaks the guarantee.
+    "false": Results may vary within the shared contract. Documented capability boundaries, unspecified ordering, timing differences without a timing guarantee and missing contract evidence do not establish a counterexample.
+- id: interface-segregation
+  language: Text
+  extensions: [isp]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.47
+  ask: Does the required interface force the shown client or its provider to supply an operation for another role that its own job cannot meaningfully implement?
+  criteria:
+    "true": Connect a required member to a concrete burden such as a dummy method, unsupported operation or unrelated dependency that the consumer must provide solely to satisfy this contract.
+    "false": A broad interface, an optional capability, a test double standing in for a real operation, or a caller using a subset of members alone is insufficient.
+- id: parnas-information-hiding
+  language: Text
+  extensions: [parnas]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.56
+  ask: Does a consumer encode knowledge of a changeable internal design decision such that replacing the representation while preserving the intended operation would force that consumer to change?
+  criteria:
+    "true": Identify the internal representation decision, the consuming expression that depends on its layout or encoding, and a plausible representation change that breaks the expression. A concrete consumer can be inside the repository.
+    "false": An explicitly shared wire format, a stable data schema meant for consumers, an opaque accessor or the existence of an unused public binding alone does not establish this coupling.
+- id: common-closure
+  language: Text
+  extensions: [ccp]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.8
+  ask: Do separate changes repeatedly require these packages to update independent copies of the same policy in lockstep?
+  criteria:
+    "true": Point to the same decision in both package patches in distinct commits and show which behavior would become inconsistent if one of the edits were omitted.
+    "false": Co-occurrence alone, a release sweep, formatting, a migration applied once, or independent changes to different policies do not establish repeated synchronization.
+- id: acyclic-dependencies
+  language: Text
+  extensions: [adp]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.61
+  ask: Does this verified package cycle contain a dependency on a separable responsibility whose relocation would remove a specific edge of the shown cycle?
+  criteria:
+    "true": Identify the directed edge and the concrete responsibility imported across it. Explain from its definition and uses how moving the responsibility or passing a narrower operation removes the need for that edge.
+    "false": A cycle witness by itself, a test harness intentionally exercising the production stack, or a proposed move that still requires the same edge or merely renames it is insufficient.

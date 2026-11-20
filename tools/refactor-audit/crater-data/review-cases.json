@@ -1,0 +1,244 @@
+[
+  {
+    "id": "profiling-refs",
+    "task": "hyrum",
+    "label": "bad",
+    "reason": "レンダラー内部の計測カウンター5個を公開し、呼び出し側が同じ Ref の値を直接変更できる。",
+    "refs": [
+      {
+        "path": "renderer/renderer/perf_native.mbt",
+        "start": 1,
+        "end": 23
+      },
+      {
+        "path": "renderer/renderer/pkg.generated.mbti",
+        "start": 73,
+        "end": 83
+      }
+    ],
+    "screen": "renderer/renderer/perf_native.mbt"
+  },
+  {
+    "id": "profiling-capability",
+    "task": "least-privilege",
+    "label": "bad",
+    "reason": "計測値の読み取りに必要な範囲を超え、利用者にカウンターの書き込み権限が渡る。",
+    "refs": [
+      {
+        "path": "renderer/renderer/perf_native.mbt",
+        "start": 1,
+        "end": 23
+      }
+    ],
+    "screen": "renderer/renderer/perf_native.mbt"
+  },
+  {
+    "id": "alignment-policy",
+    "task": "single-responsibility",
+    "label": "clean",
+    "reason": "軸・整列の計算を共通の core 実装へ転送しており、異なる利用者の独立した方針は見えない。",
+    "refs": [
+      {
+        "path": "layout/alignment/alignment.mbt",
+        "start": 1,
+        "end": 69
+      }
+    ],
+    "screen": "layout/alignment/alignment.mbt"
+  },
+  {
+    "id": "alignment-forwarding",
+    "task": "parkinson",
+    "label": "clean",
+    "reason": "薄い転送関数群が同じ計算結果や状態を二重に維持している証拠はない。",
+    "refs": [
+      {
+        "path": "layout/alignment/alignment.mbt",
+        "start": 1,
+        "end": 69
+      }
+    ],
+    "screen": "layout/alignment/alignment.mbt"
+  },
+  {
+    "id": "alignment-values",
+    "task": "least-privilege",
+    "label": "clean",
+    "reason": "整列計算に必要な引数を core に渡す。可変の内部ストアを協力者へ渡す API はない。",
+    "refs": [
+      {
+        "path": "layout/alignment/alignment.mbt",
+        "start": 5,
+        "end": 35
+      }
+    ],
+    "screen": "layout/alignment/alignment.mbt"
+  },
+  {
+    "id": "capture-dependency",
+    "task": "dependency-boundary",
+    "label": "bad",
+    "reason": "同じ実装で WebDriver エラー応答を組み立て、フレームバッファ生成と PNG 符号化にも具体的な描画パッケージを呼ぶ。",
+    "refs": [
+      {
+        "path": "webdriver/webdriver/moon.pkg",
+        "start": 19,
+        "end": 27
+      },
+      {
+        "path": "webdriver/webdriver/bidi_browsing_context_actual_paint.mbt",
+        "start": 724,
+        "end": 754
+      },
+      {
+        "path": "webdriver/webdriver/bidi_browsing_context_actual_paint.mbt",
+        "start": 1081,
+        "end": 1107
+      }
+    ]
+  },
+  {
+    "id": "ffi-failure-cause",
+    "task": "kernighan",
+    "label": "bad",
+    "reason": "フォントプロバイダが存在しない場合と実行中に例外が出た場合が同じ空文字に集約され、原因が再構成できない。",
+    "refs": [
+      {
+        "path": "webdriver/webdriver/bidi_browsing_context_actual_paint.mbt",
+        "start": 28,
+        "end": 50
+      },
+      {
+        "path": "webdriver/webdriver/bidi_browsing_context_actual_paint.mbt",
+        "start": 54,
+        "end": 82
+      }
+    ],
+    "screen": "webdriver/webdriver/bidi_browsing_context_actual_paint.mbt"
+  },
+  {
+    "id": "incremental-lifetime",
+    "task": "shared-state-lifetime",
+    "label": "bad",
+    "reason": "ツリー単位の node map と統計、clean 判定と dispatcher をプロセス共有状態に設置し、処理後に復元している。",
+    "refs": [
+      {
+        "path": "layout/tree/incremental_compute.mbt",
+        "start": 426,
+        "end": 481
+      },
+      {
+        "path": "core/node/node.mbt",
+        "start": 185,
+        "end": 225
+      }
+    ]
+  },
+  {
+    "id": "viewport-lifetime",
+    "task": "shared-state-lifetime",
+    "label": "bad",
+    "reason": "通常描画と全体描画の差を、全体描画中だけ共有フラグを変更して表現している。",
+    "refs": [
+      {
+        "path": "renderer/renderer/viewport_skeleton.mbt",
+        "start": 8,
+        "end": 38
+      },
+      {
+        "path": "renderer/renderer/render_api.mbt",
+        "start": 77,
+        "end": 88
+      }
+    ]
+  },
+  {
+    "id": "root-export-missing",
+    "task": "named-export-parity",
+    "label": "bad",
+    "reason": "型で宣言する3つのアクセシビリティ関数を ESM の配布入口は再公開していない。",
+    "refs": [
+      {
+        "path": "js/index.d.ts",
+        "start": 448,
+        "end": 467
+      },
+      {
+        "path": "js/index.js",
+        "start": 1,
+        "end": 87
+      },
+      {
+        "path": "js/scripts/copy-dist.mjs",
+        "start": 37,
+        "end": 39
+      }
+    ]
+  },
+  {
+    "id": "root-export-present",
+    "task": "named-export-parity",
+    "label": "clean",
+    "reason": "renderHtml は型宣言と ESM のルート再公開の両方にある。",
+    "refs": [
+      {
+        "path": "js/index.d.ts",
+        "start": 43,
+        "end": 49
+      },
+      {
+        "path": "js/index.js",
+        "start": 1,
+        "end": 10
+      }
+    ]
+  },
+  {
+    "id": "single-tree-contract",
+    "task": "least-surprise",
+    "label": "clean",
+    "reason": "createTree は単一ツリーを置き換えて0を返し、公開ドキュメントも単一ツリーで戻り値が常に0と明示する。",
+    "refs": [
+      {
+        "path": "js/index.d.ts",
+        "start": 148,
+        "end": 155
+      },
+      {
+        "path": "js/js.mbt",
+        "start": 182,
+        "end": 204
+      }
+    ]
+  },
+  {
+    "id": "memo-goodhart",
+    "task": "goodhart",
+    "label": "clean",
+    "reason": "ベンチの一部が改善しても別のページの悪化を測定し、キャッシュ案を棄却している。",
+    "refs": [
+      {
+        "path": "benchmarks/BASELINE.md",
+        "start": 1235,
+        "end": 1265
+      }
+    ],
+    "revision": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e",
+    "screen": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e"
+  },
+  {
+    "id": "memo-campbell",
+    "task": "campbell",
+    "label": "clean",
+    "reason": "悪化した条件の測定値も併記し、集計対象から外していない。",
+    "refs": [
+      {
+        "path": "benchmarks/BASELINE.md",
+        "start": 1235,
+        "end": 1265
+      }
+    ],
+    "revision": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e",
+    "screen": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e"
+  }
+]

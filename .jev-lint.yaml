@@ -3,6 +3,7 @@
 # Do not enable the editorial prose pack for agent instruction manuals.
 model: jev-1.14.0
 rules:
+  text/description-trigger-policy: on
   text/description-body-contract: on
   text/instructions-consistent: on
   text/terminology-consistent: on

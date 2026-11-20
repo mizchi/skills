@@ -1,0 +1,40 @@
+[
+  {
+    "id": "mutable-tuning-tables",
+    "screen": "packages/vlmkit-ai/src/nlp.ts",
+    "task": "hyrum",
+    "label": "bad",
+    "reason": "パッケージの説明が内部調整用とする Set と辞書は wildcard で公開され、呼び出し元が変更できる。推論側は同じオブジェクトを毎回読む。",
+    "refs": [
+      {"path":"packages/vlmkit-ai/package.json","start":33,"end":41},
+      {"path":"packages/vlmkit-ai/src/index.ts","start":3,"end":7},
+      {"path":"packages/vlmkit-ai/src/nlp.ts","start":1,"end":35},
+      {"path":"packages/vlmkit-ai/src/reasoning.ts","start":8,"end":8},
+      {"path":"packages/vlmkit-ai/src/reasoning.ts","start":165,"end":172}
+    ]
+  },
+  {
+    "id":"html-resolution-loses-cause",
+    "screen":"src/api/routes/helpers.ts",
+    "task":"kernighan",
+    "label":"bad",
+    "reason":"入力欠落、URL の拒否、取得時の例外がすべて null になり、compare の 400 応答から原因も失敗した入力側も追跡できない。",
+    "refs":[
+      {"path":"src/api/routes/helpers.ts","start":8,"end":35},
+      {"path":"src/api/routes/compare.ts","start":25,"end":29}
+    ]
+  },
+  {
+    "id":"shared-version-literal",
+    "screen":"packages/vlmkit-core/src/version.ts",
+    "task":"parkinson",
+    "label":"clean",
+    "reason":"コメントが説明する重複は過去の実装で、現在の CLI と MCP は同じ定数を参照する。配布用定数と manifest の突合はテストに明記されている。",
+    "refs":[
+      {"path":"packages/vlmkit-core/src/version.ts","start":1,"end":17},
+      {"path":"src/cli/cli.ts","start":510,"end":510},
+      {"path":"packages/vlmkit-mcp/src/server.ts","start":7,"end":12},
+      {"path":"src/cli/version.test.ts","start":34,"end":46}
+    ]
+  }
+]

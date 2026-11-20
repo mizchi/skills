@@ -1,0 +1,507 @@
+[
+  {
+    "group": "modules",
+    "file": "adapters/go/cmd/counter-replay/main.go.impl",
+    "sha256": "708843b039e23387e798048a252e55449908616fbd6a3d73ff4eefb9b5505e7d"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/cmd/finite-bench/main.go.impl",
+    "sha256": "e3b99edfdeeaf54dd2e4fd1fb1d58db5aa19311bfab37a627cba53c9532035e7"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/cmd/history-check/main.go.impl",
+    "sha256": "eebadb953f8e9dc821ec38d11517d6aa5caa7a76e257542dc3956d41b886229b"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/contracts.go.surface",
+    "sha256": "181dbb37698b330869fa4387f6ea8ff3e5f123f510240b8e5abb55f80c79e600"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/core.go.surface",
+    "sha256": "622bc144e8f3dbf0fe51ce85281a93699d19dfef9df44da6258f290d80ac3a95"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/internal/counter/counter.go.impl",
+    "sha256": "6742d19b172a232cb8910d34533bd9c92eda2e73d31d4eb464245586764269e8"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/loaded.go.surface",
+    "sha256": "aee7f748314dd187dac05b72cf71f07351ece7bfb413048f31a471e70942d7d5"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/run.go.surface",
+    "sha256": "1d977849494bc17f330bf00c0fca13f3251186f429b21e4241a72551df1fc7f1"
+  },
+  {
+    "group": "modules",
+    "file": "adapters/go/value.go.surface",
+    "sha256": "60c731fc896dbba965291f63e02d631c310c2fa471118e0d2791e6f586c2dc77"
+  },
+  {
+    "group": "modules",
+    "file": "cli/idealis.ts.impl",
+    "sha256": "797d46a0f3d6a9f854beb86011760c811530135b82a38f33fc9394551f0a365b"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/finite.rs.surface",
+    "sha256": "8c30df2803f099f0fcbd3644beb65eb7e7c2b37627fad987c032a1e84d441ed5"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/history.rs.surface",
+    "sha256": "10cf0a3bebcaf2e6ad4d9397a962b927d1a12e8f1d743821e4d1456985d82c62"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/host.rs.surface",
+    "sha256": "b97a46a5709db0c04546c9f0163cd952bc9e54185e92b373c4c4299b84540fd5"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/lib.rs.surface",
+    "sha256": "724d94fb009632ba25e623b85697488a1c75f5c2d84d82ca26661b6a68e2558b"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/main.rs.impl",
+    "sha256": "53bb89288b640786136aec8bcab3cbe18a55a6df5c39d3f463eb8657849d5fd7"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/shrink.rs.surface",
+    "sha256": "da94c9aed76f8f2cafba76615ac330613ef88664298cd32acf033ffff6a10c2a"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-core/src/wasm.rs.surface",
+    "sha256": "be00429d847b62dfe764cd0db8ed65ff13cb1e418bec1a8c31052d58e6322f5d"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/lib.rs.surface",
+    "sha256": "658e0c913e5cc351a9000f1282d5ac392e354066a4d7f98b1de46796f6403deb"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/main.rs.impl",
+    "sha256": "5281afd3ec8c2c581cfec38897cd3adf99afb40e6b44f5da8967795130271ceb"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/parser.rs.impl",
+    "sha256": "6e226d1387e27970b3cf04614997aea4ac504714676f8ebab9a51cead4037251"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/protocol.rs.surface",
+    "sha256": "7b3f9323f47666449f188745c21912ad34a72055b75479a357129f8540e0f3a9"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/script.rs.surface",
+    "sha256": "25aa1c27b5c846bad1c02a52a4a3675e7835fba32fe0d987fd12d9f6e95e59a1"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/solver.rs.surface",
+    "sha256": "bae65a73f9b829e7a8a303138cca9767f252bb8675398984ea0e23545af80dfa"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-smt/src/wasm.rs.surface",
+    "sha256": "3549b9ea6e595dfbb112a4190bf678deee381d089859afa61811c96be05a020c"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/compare.rs.surface",
+    "sha256": "181278d9675553d305eb4b80bd4148e47ea312da2f4a9ab17126d0f488d9efc7"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/engine.rs.surface",
+    "sha256": "47336efb2be6628f41bfba796bc2952c469e6845ba7b24edd7557081042d01f9"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/generator.rs.surface",
+    "sha256": "be6d89790df53fc90df5672af0b81b8c714be2c6cae5da16e3f3751442e5602b"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/lib.rs.surface",
+    "sha256": "dbdd06cfceed419e34b31e2784050ff16fdeba55abecad9c266b95d52c5bb479"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/main.rs.impl",
+    "sha256": "7b6e86fb96f5fd7aee3675a4328ebbeffe67e2ff8a78551b799c08c09f17abbe"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/schedule.rs.surface",
+    "sha256": "00ef30a98d2afb0d0776e885980b2f0330b3d9562da954cec076080e2bae51cf"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/session.rs.surface",
+    "sha256": "277a3ce3d7a3a936f7391d898ff1dcc5b9ca0f936ca45e1be560d419b74bb83c"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/shrink.rs.impl",
+    "sha256": "ea46d720bd30fe114ebd8e3353d46ef7cfe8011ac3fcdab3879ecb36e5fa2ecb"
+  },
+  {
+    "group": "modules",
+    "file": "crates/idealis-testing/src/wasm.rs.surface",
+    "sha256": "ce1fca3f71028f5489e29ab72c5941eab7039c97f0dab03e1062777e45a661c0"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/check.rs.impl",
+    "sha256": "3e9c471da027e9f2d42bf7a68d9f4c27afe0da2560f6d42aba0f19ddca1c95e5"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/engine.rs.surface",
+    "sha256": "faff44fde76d354a08366ea944c3bef5ad8867679d793ce0589a327164e8239a"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/eval.rs.impl",
+    "sha256": "c2c9a852a85587c1b3c0cc0c27412b2ffdd23ab4745615a2180f8fb03a137712"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/instance.rs.impl",
+    "sha256": "b589093515c0c58eae0908c414c16900e2c94a9cc1bb22022cac0754f9e1c333"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/lib.rs.surface",
+    "sha256": "e7caa1604b825e0d987d371794c698e41a66a646b466b2bbde1d710b93e6eb83"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/main.rs.impl",
+    "sha256": "f7aa44d5b863083235b855f7ee41ea1dc75a85835bc806a2346347e59bd2e1fa"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/parser.rs.impl",
+    "sha256": "8cb92495f582b12a4f61ec0aee00f72a2417c3ebae6872707a11e61d102e167c"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/search.rs.impl",
+    "sha256": "929a16b435085f7f41557ff0ed4b377ae77bc300cdcd4d2669911dfcf3649e4e"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/syntax.rs.impl",
+    "sha256": "902183a467b74da89e7c8c5c15c88ef09307b21f599576da61dc0decaa743dfa"
+  },
+  {
+    "group": "modules",
+    "file": "crates/ralloy/src/wasm.rs.surface",
+    "sha256": "8ed8e2d7dce085929d70abc6bba39fcbee2aa7ca9eb2839fbc7a9385058bceba"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla-compiler/src/lib.rs.surface",
+    "sha256": "2011fb339403f6a320665a2353da1f1b0498585424a9c53fdeed557013655609"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla-compiler/src/link.rs.impl",
+    "sha256": "39fd56a5de949fb39c8dd341e7e93459f68bc4e1a699ea5561f3b00d61f5b117"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla-compiler/src/rewrite.rs.impl",
+    "sha256": "2954bbd28f1e09133c3b746f048101b156f2bc22b61ae594aed544a10ea7931d"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/ast.rs.surface",
+    "sha256": "d86a6ebf6796573aed7cde5d576bed711f324820ecbdc8ce162086d3b48dc8cb"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/config.rs.surface",
+    "sha256": "4c2c629b2bbfde7b1d2437a8eef7b5abf2610ae3f488ea941a3d19f49cda85d7"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/error.rs.surface",
+    "sha256": "becf9380ecab429573a88236b17c7a7f5bd01c89e4ddfe5dd347dbbf35310190"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/lexer.rs.impl",
+    "sha256": "5fe351cf2977dea05f1a7cb7762de05432ebcf600bbb803cb58f515059f47e9e"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/lib.rs.impl",
+    "sha256": "92cd2bfb779e14d616667fe600406833ea680d40db43eeea147f2bc0da773b24"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/main.rs.impl",
+    "sha256": "96e6a2fe6a923c1f4f772dd6fcff8bf7cf97102b8469607146edbc5bcd17f32b"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/parser.rs.surface",
+    "sha256": "9299159d1f28a2ba7c706865da59447dbc13caf6ad46bde47adbd2c56624635d"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/protocol.rs.surface",
+    "sha256": "c9cc4f2731e26c9fad66518f0494b84d2192ed3af7f75b0a833697809a803e88"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtla/src/wasm.rs.surface",
+    "sha256": "34bb84eff9bdd1e28a61955729a3e4ecb210fd7f6fda6e5bfd6057df86f73967"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/benchmarks.rs.impl",
+    "sha256": "082df519d573635de84521e0c11566c338dd0722a55984010f49188ab463f113"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/ir.rs.surface",
+    "sha256": "8b396e20d9ab1ff25bb3b9694e49f2351228a81da8109158953fd05abb4e7995"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/lib.rs.impl",
+    "sha256": "dc0abc4697a7a8d03fe46b786ac4f227b816342b170b7195aba6cd51e1df1212"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/safety.rs.surface",
+    "sha256": "87478bd36b8ad6fb14cbc6cd9b88c724e957df1bf652d91dfaac77463a1e51fb"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/safety_expressions.rs.impl",
+    "sha256": "55e3e9aeeb0f04a773275a7819346185391dc3b731dba7190b6346fc69a49509"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/safety_parallel.rs.impl",
+    "sha256": "f3f1b64b1d552dafdf7174f88d6b7663eb6e3436df62e4910d2fcda70596a87a"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/safety_values.rs.impl",
+    "sha256": "c358cb74e4a14b352ffbcaebbe6fa0299d1165457a56e7222e8ce21c54c424bf"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/safety_work.rs.impl",
+    "sha256": "e4b227f77979f36db8c7d02cbee51e2dc5303bd5c36c40fb5b372a721f62703a"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/temporal.rs.impl",
+    "sha256": "df72fc28d7f183f32be6475e5337e150253f4d3499c7c1adc0c518dc56bf485c"
+  },
+  {
+    "group": "modules",
+    "file": "crates/rtlc/src/value.rs.surface",
+    "sha256": "1e7d61ebc3ba1dfd632ed705b17587457112a49075ab30af6103d18d62cf7c6d"
+  },
+  {
+    "group": "modules",
+    "file": "src/alloy.ts.surface",
+    "sha256": "a9a7c492b51793fd4bda79da736e1b2b9fb2302d66c2f3cde412f6178fe4c0d2"
+  },
+  {
+    "group": "modules",
+    "file": "src/backend.ts.surface",
+    "sha256": "b96d43650ebdb9ab10cfb3585c0af4292d733c1f7dd117484d93bac993cc9ab3"
+  },
+  {
+    "group": "modules",
+    "file": "src/budget.ts.surface",
+    "sha256": "f4af91feceea5baf4d1f5d7f08d96c43e00e61086d2949b0ee8f3c5faa2f9a00"
+  },
+  {
+    "group": "modules",
+    "file": "src/checker.ts.surface",
+    "sha256": "8642109f60fe37b6db70b6fff0a5fe70a426409a4eb77c6d4d8560295fdc34b4"
+  },
+  {
+    "group": "modules",
+    "file": "src/compose.ts.surface",
+    "sha256": "6c8a7c68eeac651efcdc35f2306a2c49c07b2726425d6127b6fcdb93594919e1"
+  },
+  {
+    "group": "modules",
+    "file": "src/conformance.ts.surface",
+    "sha256": "ae238f7c2cae87f6918c54dc6e77f3ef2cd443dae63e1c65737e47fe73bafa95"
+  },
+  {
+    "group": "modules",
+    "file": "src/contracts.ts.surface",
+    "sha256": "1a168236950cdefeebb6264abe43b55aa167fc50a26e66df99faca57ad83082e"
+  },
+  {
+    "group": "modules",
+    "file": "src/finite.ts.surface",
+    "sha256": "28d2912524f8f733b97ca39c9dc5740d5d12499e787dd9ee6345ac9cc9a1ff3b"
+  },
+  {
+    "group": "modules",
+    "file": "src/history.ts.surface",
+    "sha256": "b89c23fc514237e0fe5c01a335b452d5873c389d0e61230b58ab8a03dadcef9e"
+  },
+  {
+    "group": "modules",
+    "file": "src/host.ts.surface",
+    "sha256": "72293ae0b36ccf8ccbba330459e19accb68ffd783df0510d4b070302dc5a8e2f"
+  },
+  {
+    "group": "modules",
+    "file": "src/index.ts.impl",
+    "sha256": "7fb7005af13bb5bab3ff7128833c933f3e4e905981615591470d71359f57b18d"
+  },
+  {
+    "group": "modules",
+    "file": "src/portable-value.ts.surface",
+    "sha256": "f1fe50d5f4c1643dcf0c93458d64f0a083a80e74bb4ae1e34f4259117be8f205"
+  },
+  {
+    "group": "modules",
+    "file": "src/portable-wasm.ts.surface",
+    "sha256": "29d26150af3eecb84ad19927ab96783f6c64fccd778ce540802ed614c5775d22"
+  },
+  {
+    "group": "modules",
+    "file": "src/portable.ts.impl",
+    "sha256": "fa03520230ce1e15737918d0026d7aa5b9de74e23c81dae3e8b23a0d8e283c0c"
+  },
+  {
+    "group": "modules",
+    "file": "src/property.ts.surface",
+    "sha256": "b7adf631cbd2b64ee3ea8275bac4e4473ef0e8bda16cf7544069eb2fc87a791a"
+  },
+  {
+    "group": "modules",
+    "file": "src/safety-program.ts.impl",
+    "sha256": "52265004a4ff7def0ff9351cee77344b9a455b50a30c31744dd3d27fce078986"
+  },
+  {
+    "group": "modules",
+    "file": "src/safety.ts.surface",
+    "sha256": "25c83a299b91e8d7f4e354809018c4d35ec5353ecaccc28209fc178d4e1a49a1"
+  },
+  {
+    "group": "modules",
+    "file": "src/scheduling.ts.surface",
+    "sha256": "1689b3a63570eff5ea1ca6d43f978041de8a84a5e9d7b7246f75648a28b6159b"
+  },
+  {
+    "group": "modules",
+    "file": "src/sharding.ts.surface",
+    "sha256": "b07043f19c9745742e08a317adb86325e378ef200ff2f0cb65aa40e182dc970e"
+  },
+  {
+    "group": "modules",
+    "file": "src/shrink.ts.surface",
+    "sha256": "ca7ab14caba285703123ab02dc6656011155082b9258ad0c43a9384257e93bb5"
+  },
+  {
+    "group": "modules",
+    "file": "src/smt.ts.surface",
+    "sha256": "d8ed3973ac2a9929e064e803ec83b6a391a07485981f430130e8d3936428ec2c"
+  },
+  {
+    "group": "modules",
+    "file": "src/testing-wire.ts.surface",
+    "sha256": "14a3cd87f2272954c89dba09a47b81e587817b5dbe5a77fe029fbf3da9bc9e76"
+  },
+  {
+    "group": "modules",
+    "file": "src/testing.ts.surface",
+    "sha256": "6f1f232cde54918413410f12a7f6758454712d2a874cf58c5049e885e7702896"
+  },
+  {
+    "group": "modules",
+    "file": "src/tla-safety.ts.surface",
+    "sha256": "116eb5a557ff9e16729a8345ed4f0a1b48993b605c75067d497e0fc440b9d52c"
+  },
+  {
+    "group": "modules",
+    "file": "src/tla-source.ts.surface",
+    "sha256": "f667130ae5ee55922e4712dbb08843d54e8a62c9abc307e0606ae8ae9cdf28e8"
+  },
+  {
+    "group": "modules",
+    "file": "src/tla.ts.surface",
+    "sha256": "1a9ccee713156692bf4cbd7869603dd9ce1d86d1c11538342eddb0594daabe6d"
+  },
+  {
+    "group": "modules",
+    "file": "src/trace.ts.surface",
+    "sha256": "87948e16dae073742be886e90c5f50f6d3f036bddacc9a71611ea5fb5d8f790c"
+  },
+  {
+    "group": "architecture",
+    "file": "0c4c3f6256c1aec50624c01f.ccp",
+    "sha256": "0c4c3f6256c1aec50624c01f1901dcdf41770590aa5702fb0ae5711a221391a4"
+  },
+  {
+    "group": "architecture",
+    "file": "0ccaaa8bf67f4946ca516fb7.ccp",
+    "sha256": "0ccaaa8bf67f4946ca516fb71236e5a437202510a8cf65990ccf96fbb298963c"
+  },
+  {
+    "group": "architecture",
+    "file": "1e8039c5304ed4113e3898d4.ccp",
+    "sha256": "1e8039c5304ed4113e3898d4a709c02d0c3ef1233983a72f60a98fe045ae6184"
+  },
+  {
+    "group": "architecture",
+    "file": "3776a46fba86501a50a601ec.isp",
+    "sha256": "cdb821db36b00fecc127e744d044652cc806db2c90d895df5c43a15d741d465c"
+  },
+  {
+    "group": "architecture",
+    "file": "6a827877dcb8816ed7c834fc.parnas",
+    "sha256": "920ae3260dbc6feeb7c331c9b2990b0e9b311ae322d84b7381b44aa7127b6a43"
+  },
+  {
+    "group": "architecture",
+    "file": "723fc91300dfee2bed023b97.ccp",
+    "sha256": "723fc91300dfee2bed023b9750086afa1b9b0d88ec4268cd04d12356c4430583"
+  },
+  {
+    "group": "architecture",
+    "file": "b6b68873529d6bc54a1fce3f.ccp",
+    "sha256": "b6b68873529d6bc54a1fce3f7a68f14ba6fd237838606d486102a53cca76177a"
+  },
+  {
+    "group": "architecture",
+    "file": "d49c81e20e26fd43f123ea21.ccp",
+    "sha256": "d49c81e20e26fd43f123ea216352044f10cb4bd33e18b524d46390dbb3d16067"
+  },
+  {
+    "group": "architecture",
+    "file": "fd045f6bf5719d318aea99ae.lsp",
+    "sha256": "970beaa8f55d30a1908ec236191872649f14d886777b37240dd65b8e14f8d980"
+  }
+]

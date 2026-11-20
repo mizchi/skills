@@ -1,0 +1,5 @@
+owner.ts:7 // Storage uses a packed uint array internally.
+owner.ts:8 const slots = new Uint32Array(MAX * 2)
+owner.ts:9 export function elapsedMs(id) { return slots[id * 2 + 1] }
+panel.ts:36 import {elapsedMs} from 'retry/owner'
+panel.ts:39 const value = elapsedMs(job.id)

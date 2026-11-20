@@ -1,0 +1,7 @@
+Module: src/queue.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "peek", 3]
+Module source starting at line 1:
+const queue: string[] = []
+/** Read the next item without consuming it. */
+export function peek() { return queue.shift() }

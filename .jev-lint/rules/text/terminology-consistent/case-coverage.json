@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "file": "fixtures/d.md",
+      "kind": "false-positive-risk",
+      "reason": "Queue is explicitly qualified by two different contexts."
+    },
+    {
+      "file": "fixtures/h.md",
+      "kind": "false-positive-risk",
+      "reason": "The aliases are explicit and compatible."
+    },
+    {
+      "file": "fixtures/i.md",
+      "kind": "false-positive-risk",
+      "reason": "Historical and current command names are distinguished."
+    },
+    {
+      "file": "fixtures/a.md",
+      "kind": "false-negative-risk",
+      "reason": "Baseline is assigned incompatible artifact contents in one workflow."
+    },
+    {
+      "file": "fixtures/c.md",
+      "kind": "false-negative-risk",
+      "reason": "Frame slot changes from in-flight storage ownership to visible-frame identity."
+    },
+    {
+      "file": "fixtures/e.md",
+      "kind": "false-negative-risk",
+      "reason": "Input size switches incompatible units without a conversion or scope distinction."
+    },
+    {
+      "file": "fixtures/b.md",
+      "kind": "unrelated",
+      "reason": "Distinct terms identify distinct artifacts."
+    },
+    {
+      "file": "fixtures/k.md",
+      "kind": "unrelated",
+      "reason": "Two artifacts with different purposes retain different names."
+    },
+    {
+      "file": "fixtures/l.md",
+      "kind": "unrelated",
+      "reason": "The word cache has explicitly separated software and hardware scopes."
+    }
+  ],
+  "independencePairs": []
+}

@@ -1,0 +1,8 @@
+Module: src/sync.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "sync", 1]
+Module source starting at line 1:
+export async function sync(read: () => Promise<string>, commit: (s: string) => Promise<void>) {
+  try { await commit(await read()) }
+  catch { throw new Error("sync failed") }
+}

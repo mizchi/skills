@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "stage": "evaluation",
+  "recordedAt": "2026-11-17T11:36:46.553Z",
+  "model": "jev-1.14.0",
+  "repeat": 3,
+  "threshold": 0.565,
+  "developmentRecord": "development-v2/text/description-trigger-policy/calibration.json",
+  "sourceHashes": {
+    "rules/text/description-trigger-policy/rule.yml": "db83cddd1eeabff21bcaee2d0497ee2de845db843e4eb395d8063c3e87cf532f",
+    "rules/text/description-trigger-policy/expect.yml": "d27ee18d24c35b547f9eefec85a32004f190481ec1dd99c753a0712e66fdde22",
+    "rules/text/description-trigger-policy/case-coverage.json": "d3cb8565ac80324fa2f6b0c0b0abf7643ea8c7ddd0be0435e07b9dece7ab79af",
+    "description-trigger-contract.md": "a355e80d9eca209d2004c92bdc18456f7a08763ac8d9442c43ad3aa4b3e190a5",
+    "rules/text/description-trigger-policy/fixtures/a.md": "8ebc71372a52bc8b29fb09aa7f6a29e907bc74a4c0ffc8f4d1d23c16f9025c60",
+    "rules/text/description-trigger-policy/fixtures/b.md": "a321f14a0a76445186c8ba53333d86277b7724ff78727c35e62173ef9e3c5ff3",
+    "rules/text/description-trigger-policy/fixtures/c.md": "7173cccd40573a362bf8cf1fb40798f3c6d892e76e48b9dc05fb3894e4a1c019",
+    "rules/text/description-trigger-policy/fixtures/d.md": "bb97bd4bfcf6979d430cd132fea916d7c652521284172a65623469145389995d",
+    "rules/text/description-trigger-policy/fixtures/e.md": "b4753ff99b85a7502e7676f7a5fd0636457a607cd12dc6105b5ef920bb8c8542",
+    "rules/text/description-trigger-policy/fixtures/f.md": "b797a5fe49a51949998d95040eec74d1bfdb3c720ae42ffe2220c803c1218a7b",
+    "rules/text/description-trigger-policy/fixtures/g.md": "4b2ae598ac34d5aab2d3b02b863e03e56e2ff8e7c82c27824b2e12dd5774516f",
+    "rules/text/description-trigger-policy/fixtures/h.md": "44a0245e37eed7ee8484d70c2b98f818cc4338ba50f210694d5db1d36a0f045d",
+    "rules/text/description-trigger-policy/fixtures/i.md": "d2e00816ef94ee9bccee972d93c798add69e8953ad773c95e3a05cdf514b5847",
+    "rules/text/description-trigger-policy/fixtures/j.md": "067295d861c72e29475d72a5cb60e674afb24a097b68ece8f08cde888ded3196",
+    "rules/text/description-trigger-policy/fixtures/k.md": "0df6ce520b81404240d02e85b059f60495e04991cb462aff1781068c5ab395db",
+    "rules/text/description-trigger-policy/fixtures/l.md": "777f9e5e4714138ff16f46301e79c57bd4d6e6c6f0fd86b232982cf97d72ec63",
+    "rules/text/description-trigger-policy/fixtures/m.md": "cad5d92e261850f980c3b6eb7c56d6a3011f96cbf22b36241493f6b4245f3b2d",
+    "rules/text/description-trigger-policy/fixtures/n.md": "8e4ced5d6e85aa94a5dc440191b17450cf9d98a569b6ebd44c6f010bab7bf61e",
+    "rules/text/description-trigger-policy/fixtures/o.md": "79f9bf3fa43bcdf18b6e558b559cada29e09859358f950302243859fc93e1907",
+    "rules/text/description-trigger-policy/fixtures/p.md": "42b454dfbec50a219fd63d3be676699034e6f2811bc5c244863e28ca4970d532"
+  }
+}

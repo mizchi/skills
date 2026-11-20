@@ -1,0 +1,4 @@
+contract.ts:2 interface ReportSource { read(id:string): Report; purge(id:string): void }
+render.ts:8 function render(s:ReportSource) { return draw(s.read(activeId)) }
+archive.ts:14 // Immutable archive, used only by render.
+archive.ts:15 const archived: ReportSource = {read:loadArchived, purge() { throw Error('unsupported on an archive') }}

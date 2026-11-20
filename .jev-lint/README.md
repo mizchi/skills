@@ -37,6 +37,7 @@ repository checks.
 | Rule | Checks | Cutoff |
 | --- | --- | --- |
 | text/description-body-contract | An advertised behavior versus a body restriction that makes it impossible | 0.36 |
+| text/description-trigger-policy | Meta descriptions require explicit user intent; Project descriptions accept relevant symptoms without the exact skill name | 0.565 |
 | text/instructions-consistent | Required actions that conflict under the same conditions | 0.70 |
 | text/terminology-consistent | Incompatible meanings of an operational term within one workflow | 0.35 |
 
@@ -58,12 +59,55 @@ just --justfile skill-lint.justfile eval    # live, three passes
 just --justfile skill-lint.justfile replay  # offline
 ```
 
-The 45 labelled fixtures contain 17 defects and 28 controls, including explicit
+The original three rules' 45 labelled fixtures contain 17 defects and 28 controls, including explicit
 exceptions, scoped alternatives, quoted incorrect examples, Japanese text, and
 three real false-positive controls. The accepted three-pass records have 17 true
 positives, zero false positives, zero false negatives, and no decision flips.
 These measurements describe this corpus; the [audit](AUDIT.md) separately reviews
 results on repository skills the initial corpus had not seen.
+
+The added description-trigger policy comes from `optimizing-descriptions`.
+Its first development run missed a Meta capability summary that omitted the
+explicit-request gate. The revised question checks the description itself;
+relying on a later body restriction is insufficient for description-based
+selection. It does not replace the full skill or measure an installed agent's
+actual invocation rate.
+
+Seven development examples, each run three times, separated at clean <= 0.19
+and bad >= 0.94. The fixed midpoint is 0.565. A separate synthetic evaluation
+suite has 16 cases (7 defects, 9 controls), with TP 7 / FP 0 / FN 0 and no
+decision flips over three passes. The unrelated appendices preserve both a
+clean and a bad decision. These examples have wide margins, so the rule carries
+an explicit `inconclusive` declaration: cutoff-boundary accuracy and drift
+sensitivity are not established. The evaluated sources, raw answers and accepted
+record are kept in its directory; the two development attempts are under
+`development/` and `development-v2/`.
+
+## Mandatory controls when authoring rules
+
+Every new or revised rule must carry `case-coverage.json` with three kinds of
+explicitly labelled case:
+
+- `false-positive-risk`: a clean case that resembles a violation, including
+  legitimate exceptions or narrower scope.
+- `false-negative-risk`: a violation that superficially looks acceptable.
+- `unrelated`: a different concern or irrelevant information that must not
+  create or repair this rule's defect. Prefer paired variants on both clean
+  and bad inputs, preserving their operative prefix and expected label.
+
+The names describe the errors the cases guard against, not invented observed
+misclassifications. Scope-only filtering is not evidence that a model ignores
+irrelevant material; this rule's appendix controls are actually sent to Jev.
+Paired decisions are controls, not statistical proof of zero correlation.
+
+`pnpm lint:rule-cases` and `pnpm test:skill-lint` reject missing categories,
+wrong clean/bad labels, missing/duplicate inputs, implicit default labels and
+changed operative prefixes in declared pairs. Live/plan skill scans run the
+same coverage check first. The `plan`, `check`, `eval` and `replay` recipes also
+require it. Expected labels and reasons stay in sidecars, never in fixtures.
+This repository stores `expect.yml` in JSON syntax, which is valid YAML, so the
+offline coverage checker can read the same explicit labels without a new parser
+dependency.
 
 Run evaluation from inside `.jev-lint/`, as the package scripts do: v0.8.0's text
 directory matching loses the leading dot of relative hidden-directory roots and

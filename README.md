@@ -150,6 +150,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [dotenvx](dotenvx/) | `dotenvx` | dotenvx reference for existing adoption or explicit user choice (encryption, multi-env, CI). |
 | [justfile](justfile/) | `justfile` | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
+| [disk-cleanup](disk-cleanup/) | `disk-cleanup` | Bounded disk survey, inactive project caches, pushed worktrees and merged local branches, Nix GC/optimisation, and obsolete tool-version cleanup. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
 | [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |

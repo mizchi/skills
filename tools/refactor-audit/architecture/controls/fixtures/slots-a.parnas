@@ -1,0 +1,5 @@
+owner.ts:7 // Internal compact storage for retries. Layout may change; clients need elapsed milliseconds.
+owner.ts:8 export const slots = new Uint32Array(MAX * 2)
+retry.ts:45 slots[id * 2 + 1] = elapsedMs
+panel.ts:36 import {slots} from 'retry/owner'
+panel.ts:39 const elapsedMs = slots[job.id * 2 + 1]

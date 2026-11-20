@@ -1,0 +1,217 @@
+{
+  "schema": "jev-lint-eval-1",
+  "recorded": "2026-11-17T11:36:15.501Z",
+  "model": "jev-1.14.0",
+  "suite": "text/description-trigger-policy",
+  "rules": [
+    {
+      "id": "description-trigger-policy",
+      "draft": "3d959d5b1dac",
+      "at": 0.7
+    }
+  ],
+  "cutoffs": {},
+  "passes": [
+    [
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.16,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.19,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.95,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.14,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "development-v2/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      }
+    ]
+  ],
+  "spent": {
+    "calls": 21,
+    "inputTokens": 26298,
+    "usd": 0.001104516,
+    "ms": 566
+  }
+}

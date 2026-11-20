@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "file": "fixtures/a.md",
+      "kind": "false-positive-risk",
+      "reason": "Meta activation is explicitly requested, with no ambient path."
+    },
+    {
+      "file": "fixtures/b.md",
+      "kind": "false-negative-risk",
+      "reason": "Task completion alone selects an explicit-only maintenance activity."
+    },
+    {
+      "file": "fixtures/c.md",
+      "kind": "false-positive-risk",
+      "reason": "Project symptoms select a relevant diagnostic skill without naming it."
+    },
+    {
+      "file": "fixtures/d.md",
+      "kind": "false-negative-risk",
+      "reason": "Exact-name invocation suppresses relevant Project diagnostics."
+    },
+    {
+      "file": "fixtures/e.md",
+      "kind": "false-negative-risk",
+      "reason": "A Meta capability summary omits its explicit-request gate."
+    },
+    {
+      "file": "fixtures/f.md",
+      "kind": "false-positive-risk",
+      "reason": "Existing tool adoption is an allowed project boundary."
+    },
+    {
+      "file": "fixtures/g.md",
+      "kind": "unrelated",
+      "reason": "An unrelated diagram caption does not change the same explicit-only Meta gate."
+    }
+  ],
+  "independencePairs": [
+    {
+      "base": "fixtures/a.md",
+      "variant": "fixtures/g.md"
+    }
+  ]
+}

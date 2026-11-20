@@ -1,0 +1,9 @@
+Module: src/registry.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "debugRegistry", 3]
+[".", "register", 4]
+Module source starting at line 1:
+const handlers = new Map<string, () => void>()
+/** Used by our internal reset hook between test runs. */
+export const debugRegistry = () => handlers
+export const register = (key: string, fn: () => void) => handlers.set(key, fn)

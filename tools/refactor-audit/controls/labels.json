@@ -1,0 +1,127 @@
+{
+  "$default": "clean",
+  "modules/account.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "single-responsibility",
+      "reason": "Invoice taxation and session retention change under separate policies."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "kernighan",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    }
+  ],
+  "modules/catalog.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "least-privilege",
+      "reason": "A title formatter receives eraseAll and setPrice."
+    }
+  ],
+  "modules/queue.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "least-surprise",
+      "reason": "Peek consumes the very item its contract preserves."
+    }
+  ],
+  "modules/registry.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "hyrum",
+      "reason": "The test reset's live backing map is publicly reachable."
+    }
+  ],
+  "modules/selection.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "parkinson",
+      "reason": "Two identical Sets are maintained in lockstep."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "single-responsibility",
+      "reason": "Membership updates and queries share one responsibility."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "least-privilege",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "least-surprise",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    }
+  ],
+  "modules/sync.surface": [
+    {
+      "line": 1,
+      "label": "bad",
+      "rule": "kernighan",
+      "reason": "A generic error loses which of the two operations failed and its cause."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "hyrum",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "parkinson",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    }
+  ],
+  "modules/palette.surface": [
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "single-responsibility",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "least-surprise",
+      "reason": "A caller receives a separately mutable Set exactly as promised."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "hyrum",
+      "reason": "Changing a snapshot cannot alter the backing table."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "parkinson",
+      "reason": "The two sets have different owners and lifetimes."
+    }
+  ],
+  "modules/reader.surface": [
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "least-privilege",
+      "reason": "Reader offers exactly the single operation that decoding requires."
+    },
+    {
+      "line": 1,
+      "label": "clean",
+      "rule": "kernighan",
+      "reason": "The wrapper preserves the failing operation as the error cause."
+    }
+  ]
+}

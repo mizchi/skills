@@ -1,0 +1,58 @@
+{
+  "fixtures/a.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Meta activation is explicitly requested, with no ambient path."
+    }
+  ],
+  "fixtures/b.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Task completion alone selects an explicit-only maintenance activity."
+    }
+  ],
+  "fixtures/c.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Project symptoms select a relevant diagnostic skill without naming it."
+    }
+  ],
+  "fixtures/d.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "Exact-name invocation suppresses relevant Project diagnostics."
+    }
+  ],
+  "fixtures/e.md": [
+    {
+      "line": 1,
+      "label": "bad",
+      "window": 0,
+      "reason": "A Meta capability summary omits its explicit-request gate."
+    }
+  ],
+  "fixtures/f.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "Existing tool adoption is an allowed project boundary."
+    }
+  ],
+  "fixtures/g.md": [
+    {
+      "line": 1,
+      "label": "clean",
+      "window": 0,
+      "reason": "An unrelated diagram caption does not change the same explicit-only Meta gate."
+    }
+  ]
+}

@@ -11,6 +11,9 @@ importers:
       jev-lint:
         specifier: 0.8.0
         version: 0.8.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
 packages:
 
@@ -72,6 +75,11 @@ packages:
     engines: {node: '>=24'}
     hasBin: true
 
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   yaml@2.9.1:
     resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
     engines: {node: '>= 14.6'}
@@ -118,5 +126,7 @@ snapshots:
     dependencies:
       '@ast-grep/cli': 0.45.3
       yaml: 2.9.1
+
+  typescript@5.9.3: {}
 
   yaml@2.9.1: {}

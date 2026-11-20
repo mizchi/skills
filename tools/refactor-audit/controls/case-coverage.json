@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "rule": "single-responsibility",
+      "fixture": "modules/account.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "Invoice taxation and session retention change under separate policies."
+    },
+    {
+      "rule": "single-responsibility",
+      "fixture": "modules/selection.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "Membership updates and queries share one responsibility."
+    },
+    {
+      "rule": "single-responsibility",
+      "fixture": "modules/palette.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "least-privilege",
+      "fixture": "modules/catalog.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "A title formatter receives eraseAll and setPrice."
+    },
+    {
+      "rule": "least-privilege",
+      "fixture": "modules/reader.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "Reader offers exactly the single operation that decoding requires."
+    },
+    {
+      "rule": "least-privilege",
+      "fixture": "modules/selection.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "least-surprise",
+      "fixture": "modules/queue.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "Peek consumes the very item its contract preserves."
+    },
+    {
+      "rule": "least-surprise",
+      "fixture": "modules/palette.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "A caller receives a separately mutable Set exactly as promised."
+    },
+    {
+      "rule": "least-surprise",
+      "fixture": "modules/selection.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "hyrum",
+      "fixture": "modules/registry.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "The test reset's live backing map is publicly reachable."
+    },
+    {
+      "rule": "hyrum",
+      "fixture": "modules/palette.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "Changing a snapshot cannot alter the backing table."
+    },
+    {
+      "rule": "hyrum",
+      "fixture": "modules/sync.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "parkinson",
+      "fixture": "modules/selection.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "Two identical Sets are maintained in lockstep."
+    },
+    {
+      "rule": "parkinson",
+      "fixture": "modules/palette.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "The two sets have different owners and lifetimes."
+    },
+    {
+      "rule": "parkinson",
+      "fixture": "modules/sync.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "kernighan",
+      "fixture": "modules/sync.surface",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "A generic error loses which of the two operations failed and its cause."
+    },
+    {
+      "rule": "kernighan",
+      "fixture": "modules/reader.surface",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "The wrapper preserves the failing operation as the error cause."
+    },
+    {
+      "rule": "kernighan",
+      "fixture": "modules/account.surface",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "goodhart",
+      "fixture": "history/search",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "The search silently omits all later shards."
+    },
+    {
+      "rule": "goodhart",
+      "fixture": "history/lookup",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "The indexed lookup improves the fixed latency measure while preserving results."
+    },
+    {
+      "rule": "goodhart",
+      "fixture": "history/coverage",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    },
+    {
+      "rule": "campbell",
+      "fixture": "history/availability",
+      "kind": "false-negative-risk",
+      "label": "bad",
+      "reason": "Timed-out cases vanish from the availability denominator."
+    },
+    {
+      "rule": "campbell",
+      "fixture": "history/report",
+      "kind": "false-positive-risk",
+      "label": "clean",
+      "reason": "The completed-jobs measure gets its own name and the original remains."
+    },
+    {
+      "rule": "campbell",
+      "fixture": "history/lookup",
+      "kind": "unrelated",
+      "label": "clean",
+      "reason": "The change concerns a different behavior from the rule predicate."
+    }
+  ]
+}

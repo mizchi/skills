@@ -1,0 +1,74 @@
+{
+  "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+  "edges": [
+    {
+      "from": "idealis-core",
+      "to": "rtla",
+      "kind": "normal"
+    },
+    {
+      "from": "idealis-core",
+      "to": "rtla-compiler",
+      "kind": "normal"
+    },
+    {
+      "from": "idealis-core",
+      "to": "rtlc",
+      "kind": "normal"
+    },
+    {
+      "from": "rtla-compiler",
+      "to": "rtla",
+      "kind": "normal"
+    },
+    {
+      "from": "rtla-compiler",
+      "to": "rtlc",
+      "kind": "normal"
+    }
+  ],
+  "candidates": [
+    {
+      "file": "d49c81e20e26fd43f123ea21.ccp",
+      "rule": "common-closure",
+      "id": "@mizchi/idealis / idealis-core",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "d49c81e20e26fd43f123ea216352044f10cb4bd33e18b524d46390dbb3d16067"
+    },
+    {
+      "file": "0ccaaa8bf67f4946ca516fb7.ccp",
+      "rule": "common-closure",
+      "id": "@mizchi/idealis / rtla",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "0ccaaa8bf67f4946ca516fb71236e5a437202510a8cf65990ccf96fbb298963c"
+    },
+    {
+      "file": "1e8039c5304ed4113e3898d4.ccp",
+      "rule": "common-closure",
+      "id": "@mizchi/idealis / rtla-compiler",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "1e8039c5304ed4113e3898d4a709c02d0c3ef1233983a72f60a98fe045ae6184"
+    },
+    {
+      "file": "723fc91300dfee2bed023b97.ccp",
+      "rule": "common-closure",
+      "id": "rtla / rtla-compiler",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "723fc91300dfee2bed023b9750086afa1b9b0d88ec4268cd04d12356c4430583"
+    },
+    {
+      "file": "0c4c3f6256c1aec50624c01f.ccp",
+      "rule": "common-closure",
+      "id": "@mizchi/idealis / rtlc",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "0c4c3f6256c1aec50624c01f1901dcdf41770590aa5702fb0ae5711a221391a4"
+    },
+    {
+      "file": "b6b68873529d6bc54a1fce3f.ccp",
+      "rule": "common-closure",
+      "id": "rtla-compiler / rtlc",
+      "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+      "sha256": "b6b68873529d6bc54a1fce3f7a68f14ba6fd237838606d486102a53cca76177a"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+Module: src/account.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "quoteInvoice", 1]
+[".", "expireSessions", 2]
+Module source starting at line 1:
+export function quoteInvoice(net: number, tax: number) { return Math.round(net * (1 + tax)) }
+export function expireSessions<A extends {lastSeen: number}>(sessions: A[], now: number) {
+  return sessions.filter(s => now - s.lastSeen < 86_400_000)
+}

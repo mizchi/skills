@@ -1,0 +1,282 @@
+{
+  "suites": [
+    {
+      "suite": "text/description-trigger-policy",
+      "dir": "rules/text/description-trigger-policy",
+      "ok": true,
+      "unanswered": 0,
+      "score": {
+        "rules": [
+          {
+            "rule": "description-trigger-policy",
+            "at": 0.565,
+            "subjects": 16,
+            "tp": 7,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1,
+            "recall": 1,
+            "flips": 0,
+            "fitted": 0.48,
+            "fitReason": "midpoint of the clean/violation gap",
+            "cleanTop": 0.08,
+            "fnMargin": 0.34,
+            "fpMargin": 0.49,
+            "fnSpread": 0.02,
+            "fpSpread": 0.02,
+            "blind": true,
+            "unstable": false,
+            "inconclusiveReason": "The separate 16-case synthetic evaluation tried Meta guard omission, ambient alternatives, exact-name-only Project activation, adoption/authorization exceptions, Japanese wording and unrelated controls. Cleans stayed at or below 0.09 and defects at or above 0.86 across three passes. Both mean margins exceed 0.25 at the development-only cutoff, so these fixtures cannot detect a moderate cutoff drift. This informational candidate does not establish boundary accuracy."
+          }
+        ],
+        "cases": [
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/a.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.05,
+              0.07,
+              0.05
+            ],
+            "mean": 0.05666666666666667,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/b.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.89,
+              0.9,
+              0.91
+            ],
+            "mean": 0.9,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/c.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.08,
+              0.07,
+              0.07
+            ],
+            "mean": 0.07333333333333335,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/d.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.9,
+              0.92,
+              0.94
+            ],
+            "mean": 0.9199999999999999,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/e.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.05,
+              0.05,
+              0.05
+            ],
+            "mean": 0.05000000000000001,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/f.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.86,
+              0.93,
+              0.91
+            ],
+            "mean": 0.9,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/g.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.03,
+              0.03,
+              0.02
+            ],
+            "mean": 0.02666666666666667,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/h.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.97,
+              0.97,
+              0.97
+            ],
+            "mean": 0.9700000000000001,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/i.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.04,
+              0.04,
+              0.04
+            ],
+            "mean": 0.04,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/j.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.93,
+              0.94,
+              0.94
+            ],
+            "mean": 0.9366666666666666,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/k.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.04,
+              0.05,
+              0.04
+            ],
+            "mean": 0.043333333333333335,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/l.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.97,
+              0.97,
+              0.98
+            ],
+            "mean": 0.9733333333333333,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/m.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.06,
+              0.06,
+              0.06
+            ],
+            "mean": 0.06,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/n.md",
+            "line": 1,
+            "label": "bad",
+            "values": [
+              0.94,
+              0.94,
+              0.95
+            ],
+            "mean": 0.9433333333333334,
+            "decision": "flag",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/o.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.03,
+              0.03,
+              0.02
+            ],
+            "mean": 0.02666666666666667,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          },
+          {
+            "rule": "description-trigger-policy",
+            "file": "rules/text/description-trigger-policy/fixtures/p.md",
+            "line": 1,
+            "label": "clean",
+            "values": [
+              0.07,
+              0.07,
+              0.09
+            ],
+            "mean": 0.07666666666666667,
+            "decision": "pass",
+            "right": true,
+            "flip": false
+          }
+        ]
+      },
+      "diff": null,
+      "changedDrafts": [],
+      "recorded": "2026-11-17T11:36:47.864Z",
+      "passes": 3
+    }
+  ],
+  "failed": 0
+}

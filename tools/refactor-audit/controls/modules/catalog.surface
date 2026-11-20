@@ -1,0 +1,9 @@
+Module: src/catalog.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "showTitle", 3]
+Module source starting at line 1:
+type Catalog = { title: string; eraseAll(): void; setPrice(id: string, price: number): void }
+/** Render the catalog title using the supplied formatter. */
+export function showTitle(catalog: Catalog, format: (value: Catalog) => string) {
+  return format(catalog)
+}

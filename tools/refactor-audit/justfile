@@ -1,0 +1,76 @@
+set positional-arguments
+
+jev := justfile_directory() / "../../node_modules/jev-lint/dist/cli.js"
+module_rules := justfile_directory() / "rules/modules.yml"
+history_rules := justfile_directory() / "rules/history.yml"
+
+default:
+    @just --list
+
+test:
+    node --test audit.test.mjs moon-workspace.test.mjs crater-data/dataset.test.mjs vlmkit-data/inputs.test.mjs architecture/architecture.test.mjs
+
+# Use absolute paths for inputs outside this directory.
+inventory manifest output:
+    node cli.mjs "$1" "$2"
+
+# Run from the evidence directory so jev-lint also sees evidence under .cache.
+plan evidence:
+    cd "$1" && node "{{jev}}" check . --no-config --cache none -R "{{module_rules}}" --dry-run --json
+
+check evidence record:
+    cd "$1" && node "{{jev}}" check . --no-config --cache none -R "{{module_rules}}" --record "$2" --summary
+
+history-plan repo range:
+    cd "$1" && node "{{jev}}" commits "$2" --no-config --cache none -R "{{history_rules}}" --dry-run --json
+
+history repo range record:
+    cd "$1" && node "{{jev}}" commits "$2" --no-config --cache none -R "{{history_rules}}" --record "$3" --summary
+
+controls record:
+    cd controls && node "{{jev}}" calibrate modules --no-config --cache none -R ../rules/modules.yml --labels labels.json --repeat 3 --record "$1"
+
+benchmark manifest range:
+    node benchmark.mjs "$1" "$2"
+
+moon-inventory repo output:
+    node moon-workspace.mjs "$1" "$2"
+
+crater-dataset repo output:
+    node crater-data/dataset.mjs "$1" "$2"
+
+crater-verify:
+    node crater-data/dataset.mjs --verify
+    node "{{jev}}" replay crater-data/records/modules.json --no-config --fail-on error --summary
+    node "{{jev}}" replay crater-data/records/history.json --no-config --fail-on error --summary
+
+vlmkit-inventory repo output:
+    node vlmkit-data/inputs.mjs "$1" "$2"
+
+vlmkit-dataset repo output:
+    node vlmkit-data/dataset.mjs "$1" "$2"
+
+vlmkit-verify:
+    node vlmkit-data/dataset.mjs --verify
+
+architecture_rules := justfile_directory() / "rules/architecture.yml"
+
+architecture-inputs repo spec output:
+    node architecture/scan.mjs "$1" "$2" "$3"
+
+architecture-plan evidence:
+    cd "$1" && node "{{jev}}" check . --no-config --cache none -R "{{architecture_rules}}" --dry-run --json
+
+architecture-check evidence record:
+    cd "$1" && node "{{jev}}" check . --no-config --cache none -R "{{architecture_rules}}" --model jev-1.14.0 --base-url https://api.typesafe.ai --record "$2" --fail-on error --summary
+
+architecture-calibrate record:
+    cd architecture/controls && node "{{jev}}" calibrate fixtures --no-config --cache none -R "{{architecture_rules}}" --model jev-1.14.0 --base-url https://api.typesafe.ai --labels labels.json --repeat 3 --record "$1"
+
+architecture-dataset evidence record output:
+    node architecture/dataset.mjs "$1" "$2" "$3"
+
+architecture-replay:
+    node "{{jev}}" replay architecture/controls/calibration.json --no-config --fail-on error --labels architecture/controls/labels.json
+    node "{{jev}}" replay architecture/vlmkit-run.json --no-config --fail-on error --summary
+    node "{{jev}}" replay architecture/vlmkit-reviewed-run.json --no-config --fail-on error --labels architecture/vlmkit-reviewed.json

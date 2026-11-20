@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "stage": "development-only",
+  "model": "jev-1.14.0",
+  "repeat": 3,
+  "sourceHashes": {
+    "development-v2/text/description-trigger-policy/rule.yml": "882d957ec12734153404ec77e8edff95c469abc0cc863cccad3310e8dbd02440",
+    "development-v2/text/description-trigger-policy/expect.yml": "931f55294ed214c6a7716e7a729f96f8f933d26aa900f3df3dc6e4d9a581ece1",
+    "development-v2/text/description-trigger-policy/case-coverage.json": "15844186327beb44a569d38ed146d1df09ba05945cccf76f8496464f11b61367",
+    "description-trigger-contract.md": "a355e80d9eca209d2004c92bdc18456f7a08763ac8d9442c43ad3aa4b3e190a5",
+    "development-v2/text/description-trigger-policy/fixtures/a.md": "8f52b90ef69c8278da8d93a6c2bfa8a494afbb68ca03d0f0e1bfabaddfe97735",
+    "development-v2/text/description-trigger-policy/fixtures/b.md": "646ab438e992501cb676b1b986a0a18ff5d127bdcbd795269ecad3d036b5b15b",
+    "development-v2/text/description-trigger-policy/fixtures/c.md": "f67571e11d60747f1ddf8d6c6bd4f05990e7a03aa0772880d8f2b5f4da066ffb",
+    "development-v2/text/description-trigger-policy/fixtures/d.md": "87052dddd6a2c298f05d580f674822b3348773362a6c84965a440df5232ca58c",
+    "development-v2/text/description-trigger-policy/fixtures/e.md": "bc5378da6d8ee1d96aa77fde3741cca4f24ecc49dcf785d00ca08ec38767fd52",
+    "development-v2/text/description-trigger-policy/fixtures/f.md": "8bde873d4c267b62fcf7d09c203018545fbbe5bd085f6b2fbf1ff890594f8bf3",
+    "development-v2/text/description-trigger-policy/fixtures/g.md": "bab2eea1248cbe0576f5925a322badc73000ebba9961d862a33f3d863fc9d20e"
+  }
+}

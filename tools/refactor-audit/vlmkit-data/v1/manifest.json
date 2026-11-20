@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "repository": "mizchi/vlmkit",
+  "revision": "468888c59ff07097892993b1e304882271a4a861",
+  "model": "jev-1.14.0",
+  "jevLint": "0.8.0",
+  "split": "test",
+  "inventory": {
+    "typescript": {
+      "entries": 305,
+      "publicNames": 4558,
+      "modules": 414,
+      "publicDefinitionModules": 275,
+      "sourceLines": 153697,
+      "internalTypeReferences": 0,
+      "hiddenStateWithWrites": 19,
+      "hiddenStateCandidates": 216
+    },
+    "unresolved": 535,
+    "publicSurface": {
+      "paths": 305,
+      "wildcardPaths": 288,
+      "distinctNames": 2438,
+      "wildcardOnlyNames": 1545
+    },
+    "byPackage": {
+      "@mizchi/vlmkit": {
+        "paths": 3,
+        "wildcardPaths": 0,
+        "distinctNames": 24,
+        "wildcardOnlyNames": 0
+      },
+      "@mizchi/vlmkit-ai": {
+        "paths": 20,
+        "wildcardPaths": 19,
+        "distinctNames": 171,
+        "wildcardOnlyNames": 91
+      },
+      "@mizchi/vlmkit-animation-eval": {
+        "paths": 5,
+        "wildcardPaths": 4,
+        "distinctNames": 41,
+        "wildcardOnlyNames": 17
+      },
+      "@mizchi/vlmkit-capture": {
+        "paths": 16,
+        "wildcardPaths": 15,
+        "distinctNames": 139,
+        "wildcardOnlyNames": 26
+      },
+      "@mizchi/vlmkit-core": {
+        "paths": 59,
+        "wildcardPaths": 56,
+        "distinctNames": 482,
+        "wildcardOnlyNames": 292
+      },
+      "@mizchi/vlmkit-generate": {
+        "paths": 7,
+        "wildcardPaths": 5,
+        "distinctNames": 26,
+        "wildcardOnlyNames": 1
+      },
+      "@mizchi/vlmkit-heal": {
+        "paths": 14,
+        "wildcardPaths": 13,
+        "distinctNames": 49,
+        "wildcardOnlyNames": 2
+      },
+      "@mizchi/vlmkit-judge": {
+        "paths": 27,
+        "wildcardPaths": 26,
+        "distinctNames": 434,
+        "wildcardOnlyNames": 209
+      },
+      "@mizchi/vlmkit-markup": {
+        "paths": 148,
+        "wildcardPaths": 146,
+        "distinctNames": 1176,
+        "wildcardOnlyNames": 965
+      },
+      "@mizchi/vlmkit-plan": {
+        "paths": 6,
+        "wildcardPaths": 4,
+        "distinctNames": 29,
+        "wildcardOnlyNames": 0
+      }
+    },
+    "moon": {
+      "packages": 3,
+      "files": 19,
+      "lines": 5415
+    }
+  },
+  "rows": 2218,
+  "teacherSha256": "9c168bf532634950f5b397f752b0fb40d8f164662a3326d87bdd02b991418e49",
+  "reviewedSha256": "4449f18d5720a8b66eecbf62628d150bc2d53e2ce22b36e458c641b19516cfb3",
+  "comparisons": [
+    {
+      "review": "mutable-tuning-tables",
+      "teacher": "packages/vlmkit-ai/src/nlp.ts.surface#hyrum",
+      "score": 0.05,
+      "jev": "clean",
+      "reviewed": "bad"
+    },
+    {
+      "review": "html-resolution-loses-cause",
+      "teacher": "src/api/routes/helpers.ts.impl#kernighan",
+      "score": 0.84,
+      "jev": "bad",
+      "reviewed": "bad"
+    },
+    {
+      "review": "shared-version-literal",
+      "teacher": "packages/vlmkit-core/src/version.ts.surface#parkinson",
+      "score": 0.7,
+      "jev": "bad",
+      "reviewed": "clean"
+    }
+  ],
+  "byRule": {
+    "campbell": {
+      "rows": 20,
+      "bad": 0
+    },
+    "goodhart": {
+      "rows": 20,
+      "bad": 0
+    },
+    "hyrum": {
+      "rows": 293,
+      "bad": 2
+    },
+    "kernighan": {
+      "rows": 433,
+      "bad": 3
+    },
+    "least-privilege": {
+      "rows": 293,
+      "bad": 0
+    },
+    "least-surprise": {
+      "rows": 293,
+      "bad": 0
+    },
+    "parkinson": {
+      "rows": 433,
+      "bad": 4
+    },
+    "single-responsibility": {
+      "rows": 433,
+      "bad": 0
+    }
+  },
+  "historyRetry": {
+    "rows": 30,
+    "commits": 15
+  },
+  "records": {
+    "modules": "62fcaad5a8ec8660c28ed5b5fd92e35ca669891289f1547aeb41b386021ab8cc",
+    "history": "ce1703ced2c84878c6824e1d45180eae6bc8291c800144dfd60f06e19bb20917",
+    "history-retry": "f62a3880b1ef10e12529c8aceb38c6dc13645646127ddf230321044abc2d317c"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "file": "fixtures/a.md",
+      "kind": "false-positive-risk",
+      "reason": "Diagnosis does not promise unapproved implementation."
+    },
+    {
+      "file": "fixtures/s.md",
+      "kind": "false-positive-risk",
+      "reason": "Diagnosis and fixes remain supported; explicit approval is already stated in the description and body."
+    },
+    {
+      "file": "fixtures/t.md",
+      "kind": "false-positive-risk",
+      "reason": "Choosing whether to delegate is compatible with a single-agent default and explicit gates."
+    },
+    {
+      "file": "fixtures/c.md",
+      "kind": "false-negative-risk",
+      "reason": "Automatic activation directly conflicts with explicit-only invocation."
+    },
+    {
+      "file": "fixtures/m.md",
+      "kind": "false-negative-risk",
+      "reason": "A suggested implementation is explicitly the only output, contradicting creation of a working endpoint."
+    },
+    {
+      "file": "fixtures/o.md",
+      "kind": "false-negative-risk",
+      "reason": "Reuse across future runs is ruled out by current-response-only storage."
+    },
+    {
+      "file": "fixtures/b.md",
+      "kind": "unrelated",
+      "reason": "Diagnostic waiting and rendering-loop waiting have different scopes."
+    },
+    {
+      "file": "fixtures/g.md",
+      "kind": "unrelated",
+      "reason": "An example does not restrict the advertised general capability."
+    },
+    {
+      "file": "fixtures/r.md",
+      "kind": "unrelated",
+      "reason": "Measuring surface patterns is compatible with declining an authorship inference."
+    }
+  ],
+  "independencePairs": []
+}

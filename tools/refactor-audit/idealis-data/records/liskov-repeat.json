@@ -1,0 +1,52 @@
+{
+  "schema": "jev-lint-run-1",
+  "policy": null,
+  "recorded": "2026-11-19T04:24:18.292Z",
+  "model": "jev-1.14.0",
+  "arm": null,
+  "cutoffs": {},
+  "unsureBelow": null,
+  "spent": {
+    "calls": 3,
+    "inputTokens": 9375,
+    "outputTokens": 72,
+    "ms": 661,
+    "retried": 0,
+    "rateLimited": 0,
+    "tokensPerSecond": 200000,
+    "splits": 0,
+    "usd": 0.00039375,
+    "wallMs": 237
+  },
+  "rules": [
+    {
+      "id": "liskov-substitution",
+      "kind": "noul",
+      "ask": "Can a caller following the shared contract observe a broken guarantee when it substitutes the shown implementation?",
+      "note": null,
+      "levels": null,
+      "draft": "d29d5da0f887",
+      "at": 0.53,
+      "state": "bare",
+      "subject": "block",
+      "severity": "info",
+      "category": "advisory",
+      "nextCheck": "Replay the same contract-valid input on both implementations. Compare the promised result or error, including the documented environment and any allowed variation.",
+      "language": "Text",
+      "languageDir": "text"
+    }
+  ],
+  "answers": [
+    {
+      "rule": "liskov-substitution",
+      "ruleKey": "text/liskov-substitution",
+      "file": "fd045f6bf5719d318aea99ae.lsp",
+      "line": 1,
+      "endLine": 221,
+      "kind": "noul",
+      "value": 0.6066666666666666,
+      "confidence": null,
+      "arm": "bare"
+    }
+  ]
+}

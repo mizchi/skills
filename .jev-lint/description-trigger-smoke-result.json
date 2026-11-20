@@ -1,0 +1,54 @@
+{
+  "findings": [],
+  "review": [],
+  "stats": {
+    "subjects": 3,
+    "reported": 0,
+    "missing": 0,
+    "unsure": 0,
+    "review": 0,
+    "byRule": {},
+    "byFile": {
+      "dotenvx/SKILL.md": {
+        "findings": 0,
+        "subjects": 1
+      },
+      "frontend-review-state/SKILL.md": {
+        "findings": 0,
+        "subjects": 1
+      },
+      "optimizing-descriptions/SKILL.md": {
+        "findings": 0,
+        "subjects": 1
+      }
+    }
+  },
+  "degraded": [],
+  "silentRules": [],
+  "idleLanguages": [],
+  "ignored": {
+    "subjects": 0,
+    "files": [],
+    "unknownRules": [],
+    "invalidDirectives": []
+  },
+  "unpaired": {
+    "subjects": 0,
+    "files": []
+  },
+  "retry": 3,
+  "spent": {
+    "calls": 9,
+    "inputTokens": 28917,
+    "outputTokens": 216,
+    "ms": 2136,
+    "retried": 0,
+    "rateLimited": 0,
+    "tokensPerSecond": 200000,
+    "splits": 0,
+    "usd": 0.001214514,
+    "wallMs": 298
+  },
+  "errors": [],
+  "elapsedMs": 307
+}

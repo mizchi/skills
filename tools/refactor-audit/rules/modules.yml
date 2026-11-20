@@ -1,0 +1,73 @@
+# Experimental cutoffs. Use the labelled controls before enabling a gate.
+- id: single-responsibility
+  language: Text
+  extensions: [surface, impl]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does this module implement two independently changeable policies for unrelated consumers?
+  criteria:
+    "true": Identify both policies and the concrete reason each changes independently, such as currency conversion and analytics retention.
+    "false": Parsing, validating and serializing one format can form one responsibility. Re-exporting symbols, implementing one adapter, or file length alone is insufficient.
+- id: least-privilege
+  language: Text
+  extensions: [surface]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does a listed public binding grant a collaborator capabilities beyond those needed by its declared job?
+  criteria:
+    "true": The public API hands a callback or peer a live writable resource, credential or control object, while the visible contract and implementation need only a narrower value or operation.
+    "false": The collaborator needs the granted control for its documented job, receives a copy or a narrow interface, or the capability transfer is not visible.
+- id: least-surprise
+  language: Text
+  extensions: [surface]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does a listed public binding perform an observable effect that contradicts the promise in its public name or documentation?
+  criteria:
+    "true": Identify the promise and a contradicting effect such as consuming a value in a peek operation, mutating caller data in a copy operation, or returning a different unit.
+    "false": An internal cache preserving the promised behavior, explicitly documented mutation or an unfamiliar but consistent convention honors the contract.
+- id: hyrum
+  language: Text
+  extensions: [surface]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does a listed public binding expose an implementation-only control or representation that clients can come to depend on?
+  criteria:
+    "true": A binding or its publicly reachable member exposes a live internal table, test reset, or hook explicitly reserved for implementation bookkeeping; connect the evidence to the named public path.
+    "false": Documented extension points, snapshots, private members, and an internal module export absent from the public binding list are insufficient.
+- id: parkinson
+  language: Text
+  extensions: [surface, impl]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does the module maintain duplicate machinery for the same behavior with no distinct requirement visible in the source?
+  criteria:
+    "true": Identify two implementations or synchronized representations serving the same operation with the same lifecycle, whose maintenance work would disappear if one were shared.
+    "false": Separate platforms, externally required formats, fast paths, or independent lifetimes explain the duplication. Size and unverifiable staffing costs alone give no evidence.
+- id: kernighan
+  language: Text
+  extensions: [surface, impl]
+  subject: block
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Is a failure path difficult to reconstruct because the implementation erases causal evidence or relies on an unexplained order-dependent state transition?
+  criteria:
+    "true": Trace the concrete failure sequence and the lost cause or hidden invariant. No comment or test shown explains that sequence.
+    "false": The error preserves the causal chain or the visible tests or comments explain the delicate transition. File length, missing test excerpts or a cropped body are insufficient.

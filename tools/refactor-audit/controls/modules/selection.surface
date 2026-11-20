@@ -1,0 +1,11 @@
+Module: src/selection.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "select", 3]
+[".", "deselect", 4]
+[".", "isSelected", 5]
+Module source starting at line 1:
+const keys = new Set<string>()
+const mirror = new Set<string>()
+export function select(key: string) { keys.add(key); mirror.add(key) }
+export function deselect(key: string) { keys.delete(key); mirror.delete(key) }
+export function isSelected(key: string) { return keys.has(key) && mirror.has(key) }

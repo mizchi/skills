@@ -1,0 +1,42 @@
+{
+  "0b4ed9c3cb33b6bc5e6cf806.isp": [
+    {
+      "rule": "interface-segregation",
+      "line": 1,
+      "label": "clean",
+      "reason": "Intent requires complete(prompt) alone and both adapters supply it."
+    }
+  ],
+  "292ec94c8d4eee48b25f2e1a.lsp": [
+    {
+      "rule": "liskov-substitution",
+      "line": 1,
+      "label": "clean",
+      "reason": "The published CLI passes the full generated bridge through. The JSON entry point is available for the shown command."
+    }
+  ],
+  "91ae5ea8880469a848414009.parnas": [
+    {
+      "rule": "parnas-information-hiding",
+      "line": 1,
+      "label": "bad",
+      "reason": "The owner calls the dictionary internal tuning data. The reasoning consumer depends on the Set method and dictionary indexing."
+    }
+  ],
+  "da824980e0039af62c8ad20c.lsp": [
+    {
+      "rule": "liskov-substitution",
+      "line": 1,
+      "label": "bad",
+      "reason": "With no MoonBit toolchain in the npm installation, omitting the JSON entry point forces an unavailable build. The same valid JSON input works in the source workspace."
+    }
+  ],
+  "ea4c5599d9f980390be10015.parnas": [
+    {
+      "rule": "parnas-information-hiding",
+      "line": 1,
+      "label": "clean",
+      "reason": "MobileCheckOptions.insets documents the four named fields. The gate displays those fields with their documented meanings."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+Module: src/reader.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "readRecord", 2]
+Module source starting at line 1:
+type Reader = { read(id: string): Promise<string> }
+export async function readRecord(reader: Reader, id: string) {
+  try { return JSON.parse(await reader.read(id)) }
+  catch (cause) { throw new Error("Cannot read record " + id, { cause }) }
+}

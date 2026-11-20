@@ -1,0 +1,194 @@
+{
+  "repository": "mizchi/idealis",
+  "revision": "d147550c80d814e23f5d76f8ded25e30bf190da4",
+  "packages": [
+    "."
+  ],
+  "sourceDirs": [
+    "src",
+    "cli"
+  ],
+  "paths": {
+    "@mizchi/idealis/backend": [
+      "src/backend.ts"
+    ],
+    "@mizchi/idealis/scheduling": [
+      "src/scheduling.ts"
+    ],
+    "@mizchi/idealis/portable": [
+      "src/portable.ts"
+    ],
+    "@mizchi/idealis/budget": [
+      "src/budget.ts"
+    ],
+    "@mizchi/idealis/sharding": [
+      "src/sharding.ts"
+    ],
+    "@mizchi/idealis": [
+      "src/index.ts"
+    ],
+    "@mizchi/idealis/property": [
+      "src/property.ts"
+    ],
+    "@mizchi/idealis/tla": [
+      "src/tla.ts"
+    ],
+    "@mizchi/idealis/smt": [
+      "src/smt.ts"
+    ],
+    "@mizchi/idealis/finite": [
+      "src/finite.ts"
+    ],
+    "@mizchi/idealis/host": [
+      "src/host.ts"
+    ],
+    "@mizchi/idealis/history": [
+      "src/history.ts"
+    ],
+    "@mizchi/idealis/shrink": [
+      "src/shrink.ts"
+    ],
+    "@mizchi/idealis/alloy": [
+      "src/alloy.ts"
+    ],
+    "@mizchi/idealis/testing": [
+      "src/testing.ts"
+    ]
+  },
+  "historyDepth": 20,
+  "cases": [
+    {
+      "id": "product-state-key",
+      "rule": "liskov-substitution",
+      "refs": {
+        "contract": [
+          [
+            "AGENTS.md",
+            6,
+            8
+          ],
+          [
+            "src/contracts.ts",
+            6,
+            19
+          ],
+          [
+            "docs/using-models.md",
+            24,
+            25
+          ]
+        ],
+        "implementation": [
+          [
+            "src/compose.ts",
+            3,
+            11
+          ],
+          [
+            "src/compose.ts",
+            32,
+            55
+          ],
+          [
+            "src/compose.ts",
+            81,
+            123
+          ],
+          [
+            "src/compose.ts",
+            124,
+            139
+          ],
+          [
+            "src/compose.ts",
+            160,
+            166
+          ]
+        ],
+        "alternative": [
+          [
+            "src/finite.ts",
+            192,
+            201
+          ],
+          [
+            "src/finite.ts",
+            217,
+            239
+          ]
+        ],
+        "example": [
+          [
+            "src/checker.ts",
+            41,
+            65
+          ],
+          [
+            "src/checker.ts",
+            66,
+            86
+          ]
+        ]
+      }
+    },
+    {
+      "id": "driver-lifecycle",
+      "rule": "interface-segregation",
+      "refs": {
+        "contract": [
+          [
+            "src/contracts.ts",
+            21,
+            25
+          ]
+        ],
+        "consumer": [
+          [
+            "src/conformance.ts",
+            141,
+            159
+          ]
+        ],
+        "implementation": [
+          [
+            "examples/durable-counter.ts",
+            19,
+            31
+          ],
+          [
+            "examples/durable-counter.ts",
+            42,
+            58
+          ]
+        ]
+      }
+    },
+    {
+      "id": "portable-record-layout",
+      "rule": "parnas-information-hiding",
+      "refs": {
+        "decision": [
+          [
+            "src/portable.ts",
+            1,
+            20
+          ]
+        ],
+        "representation": [
+          [
+            "src/contracts.ts",
+            49,
+            65
+          ]
+        ],
+        "consumer": [
+          [
+            "src/portable-value.ts",
+            193,
+            223
+          ]
+        ]
+      }
+    }
+  ]
+}

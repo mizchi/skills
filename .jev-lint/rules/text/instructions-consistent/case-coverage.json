@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "file": "fixtures/b.md",
+      "kind": "false-positive-risk",
+      "reason": "Existing-project scope is an explicit exception to the new-project default."
+    },
+    {
+      "file": "fixtures/d.md",
+      "kind": "false-positive-risk",
+      "reason": "Prior authorization satisfies the prerequisite."
+    },
+    {
+      "file": "fixtures/f.md",
+      "kind": "false-positive-risk",
+      "reason": "Generated updates do not violate the by-hand prohibition."
+    },
+    {
+      "file": "fixtures/a.md",
+      "kind": "false-negative-risk",
+      "reason": "The required update changes the dependency versions the other directive forbids changing."
+    },
+    {
+      "file": "fixtures/c.md",
+      "kind": "false-negative-risk",
+      "reason": "The same test execution is required and prohibited."
+    },
+    {
+      "file": "fixtures/j.md",
+      "kind": "false-negative-risk",
+      "reason": "The same run must finish before and start after the same delivery."
+    },
+    {
+      "file": "fixtures/g.md",
+      "kind": "unrelated",
+      "reason": "Application state persistence and CI test artifacts have distinct scopes."
+    },
+    {
+      "file": "fixtures/l.md",
+      "kind": "unrelated",
+      "reason": "The contradictory text is explicitly an incorrect example, not operative instructions."
+    }
+  ],
+  "independencePairs": []
+}

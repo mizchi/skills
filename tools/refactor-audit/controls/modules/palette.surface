@@ -1,0 +1,7 @@
+Module: src/palette.ts
+Public bindings (subpath, exported name, declaration line):
+[".", "colors", 3]
+Module source starting at line 1:
+const palette = new Set(["red", "blue"])
+/** Return an independently editable snapshot of the current palette. */
+export function colors() { return new Set(palette) }

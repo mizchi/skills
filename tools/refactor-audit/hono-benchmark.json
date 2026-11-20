@@ -1,0 +1,105 @@
+{
+  "mode": "offline-dry-run",
+  "node": "v24.22.2",
+  "platform": "darwin",
+  "arch": "arm64",
+  "versions": {
+    "typescript": "5.9.3",
+    "jev-lint": "0.8.0"
+  },
+  "package": "@hono/hono",
+  "revision": "f7d272abe1644e50ab5fe9cb53f5965c35d77226",
+  "dirty": false,
+  "historyRange": "HEAD~20..HEAD",
+  "summary": {
+    "entries": 97,
+    "publicNames": 591,
+    "modules": 175,
+    "publicDefinitionModules": 130,
+    "sourceLines": 22938,
+    "internalTypeReferences": 3,
+    "hiddenStateWithWrites": 29,
+    "hiddenStateCandidates": 50
+  },
+  "issues": [
+    "src/adapter/bun/serve-static.ts:2 unresolved 'node:fs/promises'",
+    "src/adapter/bun/serve-static.ts:3 unresolved 'node:path'",
+    "src/adapter/deno/serve-static.ts:1 unresolved 'node:path'",
+    "src/adapter/lambda-edge/handler.ts:1 unresolved 'node:crypto'",
+    "src/middleware/context-storage/index.ts:6 unresolved 'node:async_hooks'"
+  ],
+  "modules": {
+    "subjects": 915,
+    "requests": 176,
+    "estimatedTokens": 1900390,
+    "estimatedUSD": 0.07981638,
+    "subjectsByRule": {
+      "parkinson": 175,
+      "kernighan": 175,
+      "single-responsibility": 175,
+      "hyrum": 130,
+      "least-surprise": 130,
+      "least-privilege": 130
+    }
+  },
+  "history": {
+    "subjects": 40,
+    "requests": 20,
+    "estimatedTokens": 49530,
+    "estimatedUSD": 0.00208026,
+    "subjectsByRule": {
+      "campbell": 20,
+      "goodhart": 20
+    }
+  },
+  "elapsedMs": {
+    "inventory": [
+      588,
+      425,
+      361
+    ],
+    "modules": [
+      163,
+      123,
+      110
+    ],
+    "history": [
+      951,
+      775,
+      735
+    ]
+  },
+  "medianMs": {
+    "inventory": 425,
+    "modules": 123,
+    "history": 775
+  },
+  "internalReferences": [
+    {
+      "file": "src/adapter/bun/websocket.ts",
+      "references": [
+        {
+          "api": "BunWebSocketHandler",
+          "line": 16,
+          "type": "BunServerWebSocket",
+          "targetFile": "src/adapter/bun/websocket.ts",
+          "targetLine": 8
+        },
+        {
+          "api": "BunWebSocketHandler",
+          "line": 17,
+          "type": "BunServerWebSocket",
+          "targetFile": "src/adapter/bun/websocket.ts",
+          "targetLine": 8
+        },
+        {
+          "api": "BunWebSocketHandler",
+          "line": 18,
+          "type": "BunServerWebSocket",
+          "targetFile": "src/adapter/bun/websocket.ts",
+          "targetLine": 8
+        }
+      ]
+    }
+  ]
+}

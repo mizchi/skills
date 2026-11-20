@@ -14,7 +14,8 @@
     "lint:translations": "node scripts/lint-translations.mjs",
     "lint:translations:plan": "node scripts/lint-translations.mjs --dry-run",
     "lint:tool-policy": "jev-lint docs --document-manifest .jev-lint/tool-policy.json",
-    "test:skill-lint": "node --test scripts/skill-lint_test.mjs",
+    "test:skill-lint": "node --test scripts/skill-lint_test.mjs scripts/jev-rule-cases_test.mjs",
+    "lint:rule-cases": "node scripts/check-jev-rule-cases.mjs",
     "links:install": "node scripts/install-lychee.mjs",
     "lint:links": "node scripts/check-markdown-links.mjs",
     "lint:links:online": "node scripts/check-markdown-links.mjs --online",
@@ -30,6 +31,7 @@
     "test:skill-review": "node --test scripts/skill-review_test.mjs"
   },
   "devDependencies": {
-    "jev-lint": "0.8.0"
+    "jev-lint": "0.8.0",
+    "typescript": "5.9.3"
   }
 }

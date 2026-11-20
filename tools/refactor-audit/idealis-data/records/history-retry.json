@@ -1,0 +1,79 @@
+{
+  "schema": "jev-lint-run-1",
+  "policy": null,
+  "recorded": "2026-11-19T04:21:53.948Z",
+  "model": "jev-1.14.0",
+  "arm": null,
+  "cutoffs": {},
+  "unsureBelow": null,
+  "spent": {
+    "calls": 1,
+    "inputTokens": 7093,
+    "outputTokens": 44,
+    "ms": 245,
+    "retried": 0,
+    "rateLimited": 0,
+    "tokensPerSecond": 200000,
+    "splits": 0,
+    "usd": 0.000297906,
+    "wallMs": 246
+  },
+  "rules": [
+    {
+      "id": "campbell",
+      "kind": "noul",
+      "ask": "Does this change present a gated or reported metric as comparable while changing its collection or denominator to omit unfavorable cases?",
+      "note": null,
+      "levels": null,
+      "draft": "1f2ede6a8064",
+      "at": 0.7,
+      "state": "bare",
+      "subject": "commit",
+      "severity": "info",
+      "category": "advisory",
+      "nextCheck": "Recompute the reported metric on the old and new denominators using the same raw events. Check which cases disappeared and whether the dashboard or gate discloses that population change.",
+      "language": "Git",
+      "languageDir": "git"
+    },
+    {
+      "id": "goodhart",
+      "kind": "noul",
+      "ask": "Does this change improve a named proxy score by degrading the user outcome it is supposed to represent while keeping the measure itself fixed?",
+      "note": null,
+      "levels": null,
+      "draft": "96a13fbaf9e1",
+      "at": 0.7,
+      "state": "bare",
+      "subject": "commit",
+      "severity": "info",
+      "category": "advisory",
+      "nextCheck": "Replay the same representative requests before and after the change. Compare the reported target with the complete result or delivery guarantee a caller receives on those requests.",
+      "language": "Git",
+      "languageDir": "git"
+    }
+  ],
+  "answers": [
+    {
+      "rule": "campbell",
+      "ruleKey": "git/campbell",
+      "file": "fbf0d66485673d69b41f50b7dada8eea43c9889f",
+      "line": 1,
+      "endLine": 1,
+      "kind": "noul",
+      "value": 0.1,
+      "confidence": null,
+      "arm": "bare"
+    },
+    {
+      "rule": "goodhart",
+      "ruleKey": "git/goodhart",
+      "file": "fbf0d66485673d69b41f50b7dada8eea43c9889f",
+      "line": 1,
+      "endLine": 1,
+      "kind": "noul",
+      "value": 0.03,
+      "confidence": null,
+      "arm": "bare"
+    }
+  ]
+}

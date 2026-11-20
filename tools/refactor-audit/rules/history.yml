@@ -1,0 +1,23 @@
+# Experimental cutoffs. Both sides of the comparison must be visible in the diff.
+- id: goodhart
+  language: Git
+  subject: commit
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does this change improve a named proxy score by degrading the user outcome it is supposed to represent while keeping the measure itself fixed?
+  criteria:
+    "true": Identify the target, the behavior changed to score better, and the observable loss for a real caller, such as returning incomplete results to meet a latency target.
+    "false": An optimization preserving results, a change only to the measurement definition, or lack of evidence of a target and tradeoff is insufficient.
+- id: campbell
+  language: Git
+  subject: commit
+  state: bare
+  kind: noul
+  severity: info
+  threshold: 0.7
+  ask: Does this change present a gated or reported metric as comparable while changing its collection or denominator to omit unfavorable cases?
+  criteria:
+    "true": Identify the reported measure, the selective exclusion or reclassification introduced in the diff, and the unchanged claim or gate that now benefits from it.
+    "false": Disclosed rebaselining, removing out-of-scope inputs with a documented rationale, or improving the product with a fixed measurement method is insufficient.

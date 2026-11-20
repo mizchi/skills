@@ -1,0 +1,122 @@
+{
+  "fixtures/batches-a.lsp": [
+    {
+      "line": 1,
+      "rule": "liskov-substitution",
+      "label": "bad",
+      "reason": "Both sinks implement save but an empty flush now throws."
+    }
+  ],
+  "fixtures/batches-b.lsp": [
+    {
+      "line": 1,
+      "rule": "liskov-substitution",
+      "label": "clean",
+      "reason": "Both results satisfy the stated ordering contract."
+    }
+  ],
+  "fixtures/batches-c.lsp": [
+    {
+      "line": 1,
+      "rule": "liskov-substitution",
+      "label": "clean",
+      "reason": "A logging prefix leaves the contract and the relationships unchanged."
+    }
+  ],
+  "fixtures/archive-a.isp": [
+    {
+      "line": 1,
+      "rule": "interface-segregation",
+      "label": "bad",
+      "reason": "Rendering requires a purge implementation from a read-only archive."
+    }
+  ],
+  "fixtures/archive-b.isp": [
+    {
+      "line": 1,
+      "rule": "interface-segregation",
+      "label": "clean",
+      "reason": "An optional capability imposes no purge stub on archives."
+    }
+  ],
+  "fixtures/archive-c.isp": [
+    {
+      "line": 1,
+      "rule": "interface-segregation",
+      "label": "clean",
+      "reason": "A logging prefix leaves the contract and the relationships unchanged."
+    }
+  ],
+  "fixtures/slots-a.parnas": [
+    {
+      "line": 1,
+      "rule": "parnas-information-hiding",
+      "label": "bad",
+      "reason": "The panel encodes the owner's private stride and offset."
+    }
+  ],
+  "fixtures/slots-b.parnas": [
+    {
+      "line": 1,
+      "rule": "parnas-information-hiding",
+      "label": "clean",
+      "reason": "The consumer knows only the operation."
+    }
+  ],
+  "fixtures/slots-c.parnas": [
+    {
+      "line": 1,
+      "rule": "parnas-information-hiding",
+      "label": "clean",
+      "reason": "A logging prefix leaves the contract and the relationships unchanged."
+    }
+  ],
+  "fixtures/expiry-a.ccp": [
+    {
+      "line": 1,
+      "rule": "common-closure",
+      "label": "bad",
+      "reason": "Two independent trial policy changes must agree for badge and billing."
+    }
+  ],
+  "fixtures/expiry-b.ccp": [
+    {
+      "line": 1,
+      "rule": "common-closure",
+      "label": "clean",
+      "reason": "A coordinated release updates metadata only."
+    }
+  ],
+  "fixtures/expiry-c.ccp": [
+    {
+      "line": 1,
+      "rule": "common-closure",
+      "label": "clean",
+      "reason": "A logging prefix leaves the contract and the relationships unchanged."
+    }
+  ],
+  "fixtures/currency-a.adp": [
+    {
+      "line": 1,
+      "rule": "acyclic-dependencies",
+      "label": "bad",
+      "reason": "The leaf currency definition is the sole payments-to-orders dependency."
+    }
+  ],
+  "fixtures/currency-b.adp": [
+    {
+      "line": 1,
+      "rule": "acyclic-dependencies",
+      "label": "clean",
+      "reason": "The return edge exercises the consumer in an integration test."
+    }
+  ],
+  "fixtures/currency-c.adp": [
+    {
+      "line": 1,
+      "rule": "acyclic-dependencies",
+      "label": "clean",
+      "reason": "A logging prefix leaves the contract and the relationships unchanged."
+    }
+  ]
+}

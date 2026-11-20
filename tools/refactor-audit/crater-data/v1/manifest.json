@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "repository": "mizchi/crater",
+  "revision": "6a1c6a840f72a129d8254b65ee5f743e59107bad",
+  "model": "jev-1.14.0",
+  "jevLint": "0.8.0",
+  "dataset": {
+    "rows": 2902,
+    "sha256": "cbe9577b5502faf2715ec37b4afdfab32fd4c0aac35dcf3eedabed696190b857",
+    "labels": {
+      "clean": 2852,
+      "bad": 50
+    },
+    "split": {
+      "train": 1538,
+      "validation": 191,
+      "test": 1173
+    }
+  },
+  "reviewed": {
+    "rows": 14,
+    "sha256": "247328830c813b7a91e4537506e2993ed92b2c0f28d8b101d7e4fdbcf708b568",
+    "labels": {
+      "bad": 7,
+      "clean": 7
+    }
+  },
+  "records": {
+    "modules": "3ff840619343204d1b8e204179d9fd3749ba974e392b1491d8eeb310de65ab26",
+    "history": "fb2f23ad187697310702bb628072bf4a72ceae96c9a8c404947b6b04816d7cb8"
+  },
+  "byRule": {
+    "campbell": {
+      "clean": 20
+    },
+    "goodhart": {
+      "clean": 20
+    },
+    "hyrum": {
+      "clean": 310,
+      "bad": 14
+    },
+    "kernighan": {
+      "clean": 619,
+      "bad": 11
+    },
+    "least-privilege": {
+      "clean": 316,
+      "bad": 8
+    },
+    "least-surprise": {
+      "clean": 322,
+      "bad": 2
+    },
+    "parkinson": {
+      "clean": 615,
+      "bad": 15
+    },
+    "single-responsibility": {
+      "clean": 630
+    }
+  },
+  "comparisons": [
+    {
+      "id": "profiling-refs",
+      "screen": "pkg-renderer/pkg-renderer/perf_native.mbt.surface#hyrum",
+      "reviewed": "bad",
+      "jev": "bad",
+      "score": 0.79
+    },
+    {
+      "id": "profiling-capability",
+      "screen": "pkg-renderer/pkg-renderer/perf_native.mbt.surface#least-privilege",
+      "reviewed": "bad",
+      "jev": "clean",
+      "score": 0.61
+    },
+    {
+      "id": "alignment-policy",
+      "screen": "pkg-layout/pkg-alignment/alignment.mbt.surface#single-responsibility",
+      "reviewed": "clean",
+      "jev": "clean",
+      "score": 0.19
+    },
+    {
+      "id": "alignment-forwarding",
+      "screen": "pkg-layout/pkg-alignment/alignment.mbt.surface#parkinson",
+      "reviewed": "clean",
+      "jev": "clean",
+      "score": 0.1
+    },
+    {
+      "id": "alignment-values",
+      "screen": "pkg-layout/pkg-alignment/alignment.mbt.surface#least-privilege",
+      "reviewed": "clean",
+      "jev": "clean",
+      "score": 0.03
+    },
+    {
+      "id": "ffi-failure-cause",
+      "screen": "pkg-webdriver/pkg-webdriver/bidi_browsing_context_actual_paint.mbt.surface#kernighan",
+      "reviewed": "bad",
+      "jev": "clean",
+      "score": 0.5
+    },
+    {
+      "id": "memo-goodhart",
+      "screen": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e#goodhart",
+      "reviewed": "clean",
+      "jev": "clean",
+      "score": 0.03
+    },
+    {
+      "id": "memo-campbell",
+      "screen": "e7f8a0a6082e6b74e866ba530dbfb689c1ecf98e#campbell",
+      "reviewed": "clean",
+      "jev": "clean",
+      "score": 0.05
+    }
+  ],
+  "agreement": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 2,
+    "tn": 5
+  }
+}
