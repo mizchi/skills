@@ -151,6 +151,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [justfile](justfile/) | `justfile` | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
+| [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |
 | [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a Worker secret through cf. |
 

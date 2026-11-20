@@ -1,0 +1,5 @@
+node_modules/
+.env
+apm_modules/
+/.agents/skills/conventional-changelog/
+/.claude/skills/conventional-changelog/

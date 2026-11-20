@@ -1,0 +1,15 @@
+name: Feature request
+description: Describe a task the library could support.
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: "What are you trying to do?"
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: "What result would help?"
+    validations:
+      required: true

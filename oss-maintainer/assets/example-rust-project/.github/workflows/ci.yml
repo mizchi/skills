@@ -1,0 +1,25 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.22.0
+      - run: pnpm install --frozen-lockfile
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+      - run: cargo bench --locked -p line-count --bench count -- --test
+      - run: cargo install cargo-mutants --version 27.1.0 --locked
+      - run: cargo mutants --workspace
+      - run: pnpm audit --audit-level info
+      - run: pnpm secrets
+      - run: cargo install cargo-audit --version 0.23.0 --locked
+      - run: cargo audit

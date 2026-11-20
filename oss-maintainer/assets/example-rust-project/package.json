@@ -1,0 +1,25 @@
+{
+  "name": "line-count-maintenance",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "secrets": "secretlint \"**/*\"",
+    "hooks": "git config --local core.hooksPath .githooks",
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0"
+  },
+  "devDependencies": {
+    "conventional-changelog": "8.1.3",
+    "conventional-changelog-conventionalcommits": "10.4.1",
+    "lint-staged": "^16.0.0",
+    "secretlint": "14.0.1"
+  },
+  "lint-staged": {
+    "*": "secretlint"
+  },
+  "engines": {
+    "node": "^24.11.0 || >=26.0.0",
+    "pnpm": ">=12"
+  },
+  "packageManager": "pnpm@12.22.0"
+}

@@ -1,0 +1,21 @@
+name: Bug report
+description: Report unexpected behavior.
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: "Reproduction steps and input"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected result"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Actual result and versions"
+    validations:
+      required: true

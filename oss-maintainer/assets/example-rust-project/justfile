@@ -1,0 +1,13 @@
+check:
+    cargo fmt --all -- --check
+    cargo clippy --workspace --all-targets --locked -- -D warnings
+    cargo test --workspace --locked
+
+bench:
+    cargo bench --locked -p line-count --bench count
+
+mutants:
+    cargo mutants --workspace
+
+init:
+    apm install --frozen

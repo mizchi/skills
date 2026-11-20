@@ -1,0 +1,9 @@
+name: project-skills
+version: 0.1.0
+description: Project-local skills for maintaining release history
+targets:
+  - claude
+  - codex
+dependencies:
+  apm:
+    - mizchi/skills/conventional-changelog#93e6163ce3012f0365df91a0e457ce165c41c8aa

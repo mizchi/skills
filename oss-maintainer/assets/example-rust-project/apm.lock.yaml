@@ -1,0 +1,102 @@
+lockfile_version: '1'
+apm_version: 0.36.0
+dependencies:
+- repo_url: mizchi/skills
+  name: conventional-changelog
+  host: github.com
+  resolved_commit: 93e6163ce3012f0365df91a0e457ce165c41c8aa
+  resolved_ref: 93e6163ce3012f0365df91a0e457ce165c41c8aa
+  version: unknown
+  virtual_path: conventional-changelog
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/conventional-changelog
+  - .agents/skills/conventional-changelog/README.md
+  - .agents/skills/conventional-changelog/SKILL-ja.md
+  - .agents/skills/conventional-changelog/SKILL.md
+  - .claude/skills/conventional-changelog
+  - .claude/skills/conventional-changelog/README.md
+  - .claude/skills/conventional-changelog/SKILL-ja.md
+  - .claude/skills/conventional-changelog/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/conventional-changelog/README.md: sha256:65a40ab627e9487ec693c9b906fcdfad894b8cebb20aa8768394bfb0b6a52d2a
+    .agents/skills/conventional-changelog/SKILL-ja.md: sha256:6dac90006fcb7def1a2b13a68c40178c33a180a41bf16b3db2d55201cc3bcd84
+    .agents/skills/conventional-changelog/SKILL.md: sha256:32db91f3c91bb268144ff13ae1ad0b6b7b0403813b4c417e25ae233e1ff527b5
+    .claude/skills/conventional-changelog/README.md: sha256:65a40ab627e9487ec693c9b906fcdfad894b8cebb20aa8768394bfb0b6a52d2a
+    .claude/skills/conventional-changelog/SKILL-ja.md: sha256:6dac90006fcb7def1a2b13a68c40178c33a180a41bf16b3db2d55201cc3bcd84
+    .claude/skills/conventional-changelog/SKILL.md: sha256:32db91f3c91bb268144ff13ae1ad0b6b7b0403813b4c417e25ae233e1ff527b5
+  content_hash: sha256:5904a902ed97d3378cc4199bb708207d15adfa650dde993abe13d651dbf9ca3e
+deployments:
+- kind: project-relative
+  target: claude
+  value: .claude/skills/conventional-changelog
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/conventional-changelog/README.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:65a40ab627e9487ec693c9b906fcdfad894b8cebb20aa8768394bfb0b6a52d2a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/conventional-changelog/SKILL-ja.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:6dac90006fcb7def1a2b13a68c40178c33a180a41bf16b3db2d55201cc3bcd84
+- kind: project-relative
+  target: claude
+  value: .claude/skills/conventional-changelog/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:32db91f3c91bb268144ff13ae1ad0b6b7b0403813b4c417e25ae233e1ff527b5
+- kind: project-relative
+  target: codex
+  value: .agents/skills/conventional-changelog
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: null
+- kind: project-relative
+  target: codex
+  value: .agents/skills/conventional-changelog/README.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:65a40ab627e9487ec693c9b906fcdfad894b8cebb20aa8768394bfb0b6a52d2a
+- kind: project-relative
+  target: codex
+  value: .agents/skills/conventional-changelog/SKILL-ja.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:6dac90006fcb7def1a2b13a68c40178c33a180a41bf16b3db2d55201cc3bcd84
+- kind: project-relative
+  target: codex
+  value: .agents/skills/conventional-changelog/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - mizchi/skills/conventional-changelog
+  active_owner: mizchi/skills/conventional-changelog
+  content_hash: sha256:32db91f3c91bb268144ff13ae1ad0b6b7b0403813b4c417e25ae233e1ff527b5

@@ -1,0 +1,13 @@
+[package]
+name = "line-count"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[dev-dependencies]
+criterion = "0.8.2"
+
+[[bench]]
+name = "count"
+harness = false
