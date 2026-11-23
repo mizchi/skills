@@ -14,7 +14,6 @@ After a batch of edits, commit + push here, then the next `apm update -g <reques
 
 ## What is NOT in this repo
 
-- `npm-release/` — kept local-only per `~/.local/share/chezmoi/.chezmoiignore` (contains release-pipeline specifics that should not be public). If you add release-automation notes, put them in that chezmoi-tracked skill, not here.
 - Skills owned by other repos (`moonbit-*`, `flaker-setup`, `ast-grep`, `tuimbt-practice`) — edit them at their upstream.
 
 ## Before committing
@@ -28,7 +27,7 @@ After a batch of edits, commit + push here, then the next `apm update -g <reques
 - For upstream freshness, use `just --justfile skill-freshness.justfile plan` and `check`; review current evidence and relevant smoke tests before explicit `accept`. Do not accept baselines automatically in CI. See `docs/skill-freshness.md`.
 - Skill directory name must match the `name:` in its `SKILL.md` frontmatter.
 - Do not commit MoonBit build artifacts (`_build/`, `.mooncakes/`) or `node_modules/` — `.gitignore` covers them.
-- If a skill gains security-sensitive detail, move it to chezmoi-local and remove from this repo (see how `npm-release` is handled).
+- If a skill gains security-sensitive detail, move it to a gitignored or chezmoi-local file and remove it from this repo.
 
 ## Language policy
 
