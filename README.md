@@ -152,7 +152,9 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
 | [disk-cleanup](disk-cleanup/) | `disk-cleanup` | Bounded disk survey, inactive project caches, pushed worktrees and merged local branches, Nix GC/optimisation, and obsolete tool-version cleanup. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
-| [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages. |
+| [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages, and check a repository against the OSS release policy. |
+| [npm-release](npm-release/) | `npm-release` | Manual first publish, `npm trust` for OIDC Trusted Publishing, then tag-triggered npm publishes with protected `v*` tags. |
+| [oss-maintainer-review](oss-maintainer-review/) | `oss-maintainer-review` | Review incoming PRs for CI, dependency, and client execution risks before testing contributor code. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |
 | [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a Worker secret through cf. |
 
@@ -180,6 +182,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [multi-agent-orchestration](multi-agent-orchestration/) | `multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [task-based-eval](task-based-eval/) | `task-based-eval` | Measure goal achievement from fresh agents using tools, documents, interfaces or workflows; organize task definitions under `evals/<task-name>/` and improve from observable evidence. |
+| [repo-retrospective](repo-retrospective/) | `repo-retrospective` | A repository's history as data: decision points from git, KPI history recorded or re-measured at past commits, and a data contract so dashboards stay disposable views. |
 | [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
 | [skill-selector](skill-selector/) | `skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
 | [skill-finder](skill-finder/) | `skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
