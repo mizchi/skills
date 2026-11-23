@@ -1,0 +1,65 @@
+name: release
+
+# Push a v* tag to release. The job checks the tagged commit, publishes to npm
+# through OIDC trusted publishing (no NPM_TOKEN), then creates the GitHub
+# Release page from .github/releases/<tag>.md plus the CHANGELOG.md section.
+# Register this file once per package:
+#   npm trust github <pkg> --repo <owner>/<repo> --file release.yml --allow-publish
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh release create
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v5 # installs Node.js and pnpm from mise.toml
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches package.json version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "package.json is $version, tag is $GITHUB_REF_NAME"
+            exit 1
+          fi
+      - run: pnpm check
+      - name: Release notes from the summary and the changelog
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          summary=.github/releases/$GITHUB_REF_NAME.md
+          awk -v h="## $version" '$0 == h || index($0, h" ") == 1 { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > changes.md
+          if [ ! -s changes.md ]; then
+            echo "CHANGELOG.md has no section for $version. Run pnpm changelog and commit it before tagging."
+            exit 1
+          fi
+          if [ ! -f "$summary" ]; then
+            # 0.0.x prototypes may release with the changelog alone.
+            case "$version" in
+              0.0.*) summary=/dev/null ;;
+              *) echo "Missing $summary. Write it from .github/release-notes.md before tagging."; exit 1 ;;
+            esac
+          fi
+          { cat "$summary"; printf '\n## Changes\n'; cat changes.md; } > notes.md
+      - name: Publish to npm
+        run: |
+          if [ "$(node -p "require('./package.json').private === true")" = "true" ]; then
+            echo "package.json is private: skipping npm publish"
+            exit 0
+          fi
+          npm install --global npm@11
+          case "${GITHUB_REF_NAME#v}" in
+            *-*) npm publish --access public --tag next ;;
+            *) npm publish --access public ;;
+          esac
+      - name: GitHub Release
+        run: |
+          prerelease=""
+          case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md $prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}

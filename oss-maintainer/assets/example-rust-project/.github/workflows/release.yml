@@ -1,0 +1,54 @@
+name: release
+
+# Push a v* tag to release. The job checks the tagged commit, then creates the
+# GitHub Release page from .github/releases/<tag>.md plus the CHANGELOG.md
+# section. Publishing the crate to crates.io is not part of this template.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh release create
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v5 # installs Node.js and pnpm from mise.toml
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches package.json version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "package.json is $version, tag is $GITHUB_REF_NAME"
+            exit 1
+          fi
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+      - run: pnpm secrets
+      - name: Release notes from the summary and the changelog
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          summary=.github/releases/$GITHUB_REF_NAME.md
+          awk -v h="## $version" '$0 == h || index($0, h" ") == 1 { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > changes.md
+          if [ ! -s changes.md ]; then
+            echo "CHANGELOG.md has no section for $version. Run pnpm changelog and commit it before tagging."
+            exit 1
+          fi
+          if [ ! -f "$summary" ]; then
+            # 0.0.x prototypes may release with the changelog alone.
+            case "$version" in
+              0.0.*) summary=/dev/null ;;
+              *) echo "Missing $summary. Write it from .github/release-notes.md before tagging."; exit 1 ;;
+            esac
+          fi
+          { cat "$summary"; printf '\n## Changes\n'; cat changes.md; } > notes.md
+      - name: GitHub Release
+        run: |
+          prerelease=""
+          case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md $prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}

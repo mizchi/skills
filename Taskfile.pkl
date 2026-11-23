@@ -49,12 +49,23 @@ local testMaintainerPersona: Task = new {
   }
 }
 
+local testOssMaintainer: Task = new {
+  name = "test:oss-maintainer"
+  description = "Run node tests for the oss-maintainer release policy check"
+  cmd = "node --test oss-maintainer/scripts/release-policy_test.mjs"
+  inputs {
+    "oss-maintainer/scripts/*.mjs"
+    "oss-maintainer/assets/**"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
   deps {
     testFrontmatter
     testMaintainerPersona
+    testOssMaintainer
     checkFrontmatter
     checkReadme
   }
@@ -75,6 +86,7 @@ tasks {
   checkFrontmatter
   testFrontmatter
   testMaintainerPersona
+  testOssMaintainer
   genReadme
   checkReadme
   test

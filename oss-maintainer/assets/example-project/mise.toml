@@ -1,0 +1,5 @@
+# Tool versions for this repository. `mise install` installs them, and CI reads this file through jdx/mise-action,
+# so a version changes here and nowhere else. Keep pnpm equal to packageManager in package.json.
+[tools]
+node = "24.11.0"
+pnpm = "12.22.0"

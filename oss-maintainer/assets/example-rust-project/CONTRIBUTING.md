@@ -2,11 +2,19 @@
 
 From the copied project root, run `just init` with just and [APM](https://github.com/microsoft/apm) installed. This installs the locked project skills for Codex and Claude. See [AGENTS.md](AGENTS.md) for the project workflow.
 
-Copy the whole workspace into its own Git repository. Install rustup and just, then run `just check` for formatting, Clippy and tests. Use the bug form for unexpected counts and the feature form to describe a new use case.
+Copy the whole workspace into its own Git repository. Install rustup and just, then run `just check` for formatting, Clippy and tests. rustup installs the Rust version pinned in [rust-toolchain.toml](rust-toolchain.toml) on first use. Use the bug form for unexpected counts and the feature form to describe a new use case.
 
 Run `just bench` to measure the mixed-line input. Criterion builds its sample input outside the timed loop. To evaluate the tests, install `cargo install cargo-mutants --version 27.1.0 --locked` and run `just mutants`. Inspect surviving mutations in mutants.out and add a test if they change observable behavior.
 
-With Node.js 24.11+ on the 24.x line (or 26+) and pnpm 12+, run `pnpm install --frozen-lockfile` and `pnpm hooks` to enable the staged-file secretlint check. Run `pnpm secrets` for a full scan. Use Conventional Commits. For this single-crate example, keep the package.json release version aligned with the crate version before running `pnpm changelog` from a full checkout. Include a runnable user scenario in the [release notes](.github/release-notes.md).
+Node.js (24+) and pnpm (12+) for the repository tooling are pinned in [mise.toml](mise.toml). Run `mise install`, then `pnpm install --frozen-lockfile` and `pnpm hooks` to enable the staged-file secretlint check. Run `pnpm secrets` for a full scan. Use Conventional Commits.
+
+## Release
+
+For this single-crate example, keep the package.json release version aligned with the crate version.
+
+1. Run `GITHUB_TOKEN=$(gh auth token) pnpm changelog` from a full checkout. git-cliff writes CHANGELOG.md and credits outside contributors by GitHub login. Review the generated section against the release diff.
+2. Write `.github/releases/v<version>.md` from the [release notes template](.github/release-notes.md), including a runnable user scenario. It becomes the top of the release page.
+3. Commit, tag `v<version>`, and push the branch and the tag. The [release workflow](.github/workflows/release.yml) checks the tagged commit and creates the release page from the summary and the changelog section.
 
 ## Dependency updates
 
