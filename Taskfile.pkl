@@ -59,6 +59,13 @@ local testOssMaintainer: Task = new {
   }
 }
 
+local testMizchiSkill: Task = new {
+  name = "test:mizchi-skill"
+  description = "Test the mizchi-skill router scripts and check that its catalog is up to date"
+  cmd = "python3 mizchi-skill/scripts/test_catalog.py && python3 mizchi-skill/scripts/gen_catalog.py --check"
+  cache = false
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
@@ -66,6 +73,7 @@ local test: Task = new {
     testFrontmatter
     testMaintainerPersona
     testOssMaintainer
+    testMizchiSkill
     checkFrontmatter
     checkReadme
   }
@@ -87,6 +95,7 @@ tasks {
   testFrontmatter
   testMaintainerPersona
   testOssMaintainer
+  testMizchiSkill
   genReadme
   checkReadme
   test

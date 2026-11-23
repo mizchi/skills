@@ -184,6 +184,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [task-based-eval](task-based-eval/) | `task-based-eval` | Measure goal achievement from fresh agents using tools, documents, interfaces or workflows; organize task definitions under `evals/<task-name>/` and improve from observable evidence. |
 | [repo-retrospective](repo-retrospective/) | `repo-retrospective` | A repository's history as data: decision points from git, KPI history recorded or re-measured at past commits, and a data contract so dashboards stay disposable views. |
 | [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
+| [mizchi-skill](mizchi-skill/) | `mizchi-skill` | One installed router for this catalog: finds the skill that fits the task and loads it on demand, so the rest need not be installed. |
 | [skill-selector](skill-selector/) | `skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
 | [skill-finder](skill-finder/) | `skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
 | [waxa-eval](waxa-eval/) | `waxa-eval` | Operating manual for the `waxa` CLI — scenario authoring, grader selection, ledger schema, the four-stage iteration pattern, convergence rules. |
