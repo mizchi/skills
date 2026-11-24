@@ -76,6 +76,15 @@ local testBazelBuildCache: Task = new {
   }
 }
 
+local testHyperfineBenchmark: Task = new {
+  name = "test:hyperfine-benchmark"
+  description = "Test the hyperfine export comparison script"
+  cmd = "python3 hyperfine-benchmark/scripts/test_compare_runs.py"
+  inputs {
+    "hyperfine-benchmark/scripts/*.py"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
@@ -85,6 +94,7 @@ local test: Task = new {
     testOssMaintainer
     testMizchiSkill
     testBazelBuildCache
+    testHyperfineBenchmark
     checkFrontmatter
     checkReadme
   }
@@ -108,6 +118,7 @@ tasks {
   testOssMaintainer
   testMizchiSkill
   testBazelBuildCache
+  testHyperfineBenchmark
   genReadme
   checkReadme
   test

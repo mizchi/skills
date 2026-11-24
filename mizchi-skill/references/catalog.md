@@ -75,6 +75,7 @@ asks for that skill or its job by name.
 
 | Skill | Use for |
 | --- | --- |
+| `hyperfine-benchmark` | Command-level benchmarks with hyperfine 2.x — 2.0 migration, choosing a metric that can show the change (wall time vs instructions vs memory), noise control, vetting a number, CI regression checks. |
 | `playwright-cli` | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
 | `stryker-js` | Measure JavaScript/TypeScript test quality with StrykerJS; run Git diff mutations in CI and use surviving mutants to improve assertions locally. Includes setup snippets and AI-readable reports. |
 | `playwright-test` | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |

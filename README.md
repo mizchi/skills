@@ -121,6 +121,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
+| [hyperfine-benchmark](hyperfine-benchmark/) | `hyperfine-benchmark` | Command-level benchmarks with hyperfine 2.x — 2.0 migration, choosing a metric that can show the change (wall time vs instructions vs memory), noise control, vetting a number, CI regression checks. |
 | [playwright-cli](playwright-cli/) | `playwright-cli` | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
 | [stryker-js](stryker-js/) | `stryker-js` | Measure JavaScript/TypeScript test quality with StrykerJS; run Git diff mutations in CI and use surviving mutants to improve assertions locally. Includes setup snippets and AI-readable reports. |
 | [playwright-test](playwright-test/) | `playwright-test` | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
