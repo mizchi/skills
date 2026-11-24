@@ -140,6 +140,35 @@ test('empty, missing, duplicated or unplanned text answers cannot pass', () => {
   }
 });
 
+test('pull_request events resolve the PR head and its merge base from the pull ref', async () => {
+  const { eventRefs } = await import('./review-skills.mjs');
+  const f = fixture();
+  const checkout = mkdtempSync(join(tmpdir(), 'skill-review-checkout '));
+  try {
+    f.write('alpha/SKILL.md', '# Proposed\n');
+    const head = f.commit();
+    f.git('update-ref', 'refs/pull/1/head', head);
+    // The runner's checkout only has the base commit; the PR head arrives by fetch.
+    execFileSync('git', ['init', '--quiet', checkout]);
+    execFileSync('git', ['fetch', '--quiet', f.root, f.base], { cwd: checkout });
+    const event = {
+      number: 1,
+      pull_request: { head: { sha: head }, base: { sha: f.base } },
+    };
+    for (const name of ['pull_request', 'pull_request_target']) {
+      const refs = eventRefs(checkout, event, name, 'mizchi/skills', f.root);
+      assert.deepEqual(refs, { base: f.base, head });
+    }
+    assert.throws(
+      () => eventRefs(checkout, { ...event, number: 0 }, 'pull_request', 'mizchi/skills', f.root),
+      /Invalid PR identity/,
+    );
+  } finally {
+    rmSync(f.root, { recursive: true, force: true });
+    rmSync(checkout, { recursive: true, force: true });
+  }
+});
+
 test('review workspace receives every .jev-lint context document the rules may read', async () => {
   const { cpSync, existsSync, readdirSync } = await import('node:fs');
   const { runReview } = await import('./review-skills.mjs');

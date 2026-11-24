@@ -38,22 +38,29 @@ const git = (root, args) =>
     maxBuffer: 16 * 1024 * 1024,
   }).trim();
 
-export function eventRefs(root, event, name, repositoryName) {
+export function eventRefs(
+  root,
+  event,
+  name,
+  repositoryName,
+  remote = `https://github.com/${repositoryName}.git`,
+) {
+  const isPullRequest = name === 'pull_request' || name === 'pull_request_target';
   const head = sha(
-    name === 'pull_request_target'
+    isPullRequest
       ? event.pull_request?.head?.sha
       : event.after ?? event.workflow_dispatch?.sha ?? process.env.GITHUB_SHA,
   );
-  if (name === 'pull_request_target') {
+  if (isPullRequest) {
     if (
       !/^[\w.-]+\/[\w.-]+$/.test(repositoryName ?? '') ||
       !Number.isSafeInteger(event.number) || event.number < 1
     ) throw new Error('Invalid PR identity');
-    // Fetch objects only. Never checkout the proposed tree or run its scripts.
+    // Fetch objects only; proposed skill text is read with `git show` as data.
     git(root, [
       'fetch',
       '--no-tags',
-      `https://github.com/${repositoryName}.git`,
+      remote,
       `refs/pull/${event.number}/head`,
     ]);
     if (git(root, ['rev-parse', 'FETCH_HEAD']) !== head) {

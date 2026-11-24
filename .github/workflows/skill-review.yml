@@ -1,7 +1,9 @@
 name: Skill semantic review
 
 on:
-  pull_request_target:
+  # pull_request, not pull_request_target: fork PRs get no secrets, so they
+  # cannot spend TYPESAFE_API_KEY. Same-repo PRs run their own review tooling.
+  pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '*/**'
@@ -33,10 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      # PRs use base tools/configuration. Proposed blobs are read as data only.
+      # Proposed skill text is read with `git show` as data, never executed.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -48,7 +50,11 @@ jobs:
         run: pnpm test:skill-review
       - name: Plan changed skill text and translation pairs
         run: pnpm review:skills --event-file "$GITHUB_EVENT_PATH" --dry-run
-      - name: Review proposed skill text with trusted tooling
+      - name: Fork pull request - semantic review skipped
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "::notice::Fork pull requests get no secrets; the semantic review runs after merge or by workflow_dispatch."
+      - name: Review proposed skill text
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
         run: pnpm review:skills --event-file "$GITHUB_EVENT_PATH"
