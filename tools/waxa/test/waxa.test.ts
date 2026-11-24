@@ -209,6 +209,16 @@ test("iterate --max 1 records the iteration in ledger.yaml", () => {
   assert.match(ledger, /overall_pass_rate: 1/);
 });
 
+test("iterate rejects --max without a number before running anything", () => {
+  const f = fixture();
+  for (const args of [["--max"], ["--max", "many"], ["--max", "0"]]) {
+    const r = runCli(["iterate", f.evalPath, ...args], { WAXA_CLAUDE_BIN: f.fake });
+    assert.equal(r.status, 2, r.stdout + r.stderr);
+    assert.match(r.stderr, /--max needs a positive integer/);
+  }
+  assert.equal(existsSync(f.argsLog), false, "claude must not be started");
+});
+
 test("init scaffolds evals/ and audit reports frontmatter problems", () => {
   const dir = mkdtempSync(join(tmpdir(), "waxa-init-"));
   const r = runCli(["init", "--skill", "demo"], {}, dir);

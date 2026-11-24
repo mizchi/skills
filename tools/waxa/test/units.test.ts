@@ -8,6 +8,7 @@ import { rankVariants, summarizeResults } from "../src/compare.ts";
 import { buildTrialPrompt } from "../src/run.ts";
 import { SELF_REPORT_REQUEST } from "../src/self-report.ts";
 import { stats } from "../src/output.ts";
+import { rewriteDeclarationSpecifiers } from "../scripts/rewrite-dts.ts";
 import type { TaskResult } from "../src/types.ts";
 
 test("flagValue reads the value after a flag", () => {
@@ -53,6 +54,9 @@ test("convergence needs two trailing zero-unclear iterations; divergence needs t
   assert.equal(assessConvergence([iteration(1, 1), iteration(2, 0), iteration(3, 0)]), "converged");
   assert.equal(assessConvergence([iteration(1, 1), iteration(2, 1), iteration(3, 2)]), "diverged");
   assert.equal(assessConvergence([iteration(1, 3), iteration(2, 2), iteration(3, 1)]), undefined);
+  // empirical-prompt-tuning: divergence means new unclear points never decreased.
+  assert.equal(assessConvergence([iteration(1, 1), iteration(2, 3), iteration(3, 2)]), undefined);
+  assert.equal(assessConvergence([iteration(1, 1), iteration(2, 1), iteration(3, 1)]), "diverged");
 });
 
 test("classifyUnclear separates new rules from rules already in the ledger, case-insensitively", () => {
@@ -103,4 +107,12 @@ test("summaries, stats and variant ranking (accuracy, then unclear, then duratio
     { label: "candidate", skill: "b", s: { pass: 1, total: 1, acc: 0.9, unclear: 0, meanDur: 5 } },
   ]);
   assert.equal(ranked[0].label, "candidate");
+});
+
+test("declaration specifiers are rewritten from .ts to .js for older TypeScript consumers", () => {
+  const input = 'export { ExitCode } from "./args.ts";\nexport type { Task } from "./types.ts";\nimport x from "node:path";\nexport { y } from "pkg/file.ts";\n';
+  const out = rewriteDeclarationSpecifiers(input);
+  assert.ok(out.includes('from "./args.js"') && out.includes('from "./types.js"'));
+  assert.ok(out.includes('from "node:path"'));
+  assert.ok(out.includes('from "pkg/file.ts"'), "only relative specifiers are rewritten");
 });

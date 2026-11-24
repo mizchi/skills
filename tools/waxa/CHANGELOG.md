@@ -12,11 +12,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/waxa.ts` (one 1,700-line file ported from Deno) is split into modules:
   `args`, `types`, `process`, `self-report`, `graders`, `layout`, `run`,
   `output`, `ledger`, `compare`, `init`, `audit`. `waxa.ts` keeps the public
-  exports and `main`; behaviour is unchanged.
+  exports and `main`. Behaviour is unchanged except for the fixes below.
 - Pure logic is separated from I/O and unit-tested: `buildTrialPrompt`,
   `buildJudgePrompt` / `parseJudgeResponse`, `trailingZeroStreak` /
   `assessConvergence`, `classifyUnclear`, `rankVariants`, `flagValue`.
 - `tsc` now also rejects unused locals and parameters.
+
+### Fixed
+
+- `waxa iterate --max` with a missing, non-numeric or non-positive value now
+  exits with code 2 before running anything. 0.4.0 silently ran zero
+  iterations (`NaN`), and the first cut of this refactor ran five.
+- Divergence detection follows empirical-prompt-tuning ("new unclear points do
+  not decrease across 3+ iterations"): each of the last three counts must be at
+  least the previous one. Before, `[1, 3, 2]` counted as diverged because only
+  the first and last were compared.
+- `dist/*.d.ts` referenced sibling modules as `./x.ts`, which TypeScript 4.9
+  consumers reject; the build now rewrites them to `./x.js`.
 
 ## [0.4.0] - 2026-11-25
 

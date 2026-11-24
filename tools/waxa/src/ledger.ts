@@ -77,7 +77,8 @@ export function trailingZeroStreak(iterations: LedgerIteration[]): number {
 
 /**
  * Converged: the last two iterations found no new unclear points.
- * Diverged: the last three each found some, and the count did not fall.
+ * Diverged: the last three each found some, and the count never fell from one
+ * iteration to the next (empirical-prompt-tuning: "do not decrease across 3+").
  */
 export function assessConvergence(
   iterations: LedgerIteration[],
@@ -87,7 +88,8 @@ export function assessConvergence(
   if (
     last3.length === 3 &&
     last3.every((i) => i.new_unclear_count >= 1) &&
-    last3[2].new_unclear_count >= last3[0].new_unclear_count
+    last3[1].new_unclear_count >= last3[0].new_unclear_count &&
+    last3[2].new_unclear_count >= last3[1].new_unclear_count
   ) return "diverged";
   return undefined;
 }
@@ -98,7 +100,12 @@ export async function runIterate(args: string[]) {
     console.error("Usage: run.ts iterate <eval.yaml> [--max N] [--task ID]");
     throw new ExitCode(1);
   }
-  const max = parseInt(flagValue(args, "--max") ?? "5", 10);
+  const maxArg = args.includes("--max") ? flagValue(args, "--max") : "5";
+  const max = Number(maxArg);
+  if (!maxArg || !Number.isInteger(max) || max < 1) {
+    console.error(`--max needs a positive integer (got ${maxArg === undefined ? "nothing" : JSON.stringify(maxArg)})`);
+    throw new ExitCode(2);
+  }
   const taskFilter = flagValue(args, "--task");
 
   const evalCfg0 = await loadYaml<EvalConfig>(evalPath);

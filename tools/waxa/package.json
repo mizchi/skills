@@ -41,7 +41,7 @@
     "start": "node src/cli.ts",
     "test": "node --test test/*.test.ts",
     "check": "tsc -p tsconfig.json",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/rewrite-dts.ts dist && chmod +x dist/cli.js",
     "bundle:references": "mkdir -p references && cp ../../empirical-prompt-tuning/SKILL.md references/empirical-prompt-tuning.md",
     "prepack": "pnpm run build && pnpm run bundle:references"
   },
