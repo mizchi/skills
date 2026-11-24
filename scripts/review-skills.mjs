@@ -3,6 +3,7 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
@@ -116,10 +117,13 @@ export async function runReview(
     cpSync(join(root, '.jev-lint/rules'), join(workspace, '.jev-lint/rules'), {
       recursive: true,
     });
-    cpSync(
-      join(root, '.jev-lint/authoring-contract.md'),
-      join(workspace, '.jev-lint/authoring-contract.md'),
-    );
+    // Rules read context documents such as authoring-contract.md and
+    // description-trigger-contract.md; copy every one so a new document cannot
+    // break the review with "context document not found".
+    for (const name of readdirSync(join(root, '.jev-lint'))) {
+      if (!name.endsWith('.md')) continue;
+      cpSync(join(root, '.jev-lint', name), join(workspace, '.jev-lint', name));
+    }
     const invoke = (args) => {
       const r = run(process.execPath, [cli, ...args], {
         cwd: workspace,

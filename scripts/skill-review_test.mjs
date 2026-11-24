@@ -140,6 +140,33 @@ test('empty, missing, duplicated or unplanned text answers cannot pass', () => {
   }
 });
 
+test('review workspace receives every .jev-lint context document the rules may read', async () => {
+  const { cpSync, existsSync, readdirSync } = await import('node:fs');
+  const { runReview } = await import('./review-skills.mjs');
+  const f = fixture();
+  try {
+    f.write('beta/SKILL.md', '# Changed\n');
+    const head = f.commit();
+    cpSync('.jev-lint', join(f.root, '.jev-lint'), { recursive: true });
+    cpSync('.jev-lint.yaml', join(f.root, '.jev-lint.yaml'));
+    const docs = readdirSync('.jev-lint').filter((name) => name.endsWith('.md'));
+    let missing = null;
+    await runReview({
+      root: f.root,
+      base: f.base,
+      head,
+      run(_command, _args, options) {
+        missing = docs.filter((name) => !existsSync(join(options.cwd, '.jev-lint', name)));
+        return { status: 2, stdout: '' };
+      },
+    });
+    assert.ok(docs.includes('description-trigger-contract.md'));
+    assert.deepEqual(missing, []);
+  } finally {
+    rmSync(f.root, { recursive: true, force: true });
+  }
+});
+
 test('runner refuses an incomplete current record even when the process exits zero', async () => {
   const { cpSync, readFileSync } = await import('node:fs');
   const { runReview } = await import('./review-skills.mjs');
