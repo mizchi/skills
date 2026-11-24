@@ -373,6 +373,18 @@ pnpm run check   # tsc --noEmit over src/ and test/
 pnpm pack        # prepack: tsc → dist/, bundle references/empirical-prompt-tuning.md
 ```
 
+Releases are published by `.github/workflows/waxa-release.yml` through npm
+trusted publishing (OIDC, with provenance). Bump `version` in `package.json`,
+add the `## [x.y.z]` section to `CHANGELOG.md`, merge, then push a tag:
+
+```bash
+git tag waxa-v0.4.1 && git push origin waxa-v0.4.1
+```
+
+The workflow checks that the tag matches `package.json`, runs `check` and
+`test`, publishes, and creates a GitHub release from the changelog section. A
+tag for a version that is already on npm only creates the release.
+
 Set `WAXA_CLAUDE_BIN` to point the executor and the LLM judge at another
 binary (the tests use a fake `claude` script). Before publishing, install the
 packed tarball in an empty directory and run `waxa --help` plus one real eval:

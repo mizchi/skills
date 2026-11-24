@@ -1,0 +1,71 @@
+name: waxa-release
+
+# Push a waxa-v* tag to publish tools/waxa as @mizchi/waxa. The npm side trusts
+# this workflow by filename:
+#   npm trust github @mizchi/waxa --repo mizchi/skills --file waxa-release.yml --allow-publish -y
+# No NPM_TOKEN: npm authenticates through OIDC and attaches provenance.
+on:
+  push:
+    tags: ['waxa-v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # gh release create
+      id-token: write   # npm trusted publishing (OIDC)
+    defaults:
+      run:
+        working-directory: tools/waxa
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: tools/waxa/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: tools/waxa/pnpm-lock.yaml
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches package.json version
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if [ "waxa-v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "package.json is $v, tag is $GITHUB_REF_NAME"; exit 1
+          fi
+      - run: pnpm run check
+      - run: pnpm test
+      # Trusted publishing needs npm >= 11.5.1.
+      - run: npm install -g npm@11
+      - name: Publish (prepack builds dist/ and bundles references/)
+        run: |
+          version=${GITHUB_REF_NAME#waxa-v}
+          # 0.4.0 was published by hand before this workflow existed; a tag for an
+          # already published version only creates the GitHub release.
+          if npm view "@mizchi/waxa@$version" version >/dev/null 2>&1; then
+            echo "@mizchi/waxa@$version is already on npm; skipping publish"
+            exit 0
+          fi
+          case "$version" in
+            *-*) npm publish --access public --tag next ;;
+            *)   npm publish --access public ;;
+          esac
+      - name: GitHub release from the changelog
+        run: |
+          version=${GITHUB_REF_NAME#waxa-v}
+          prerelease=""
+          case "$version" in *-*) prerelease="--prerelease" ;; esac
+          # CHANGELOG.md uses Keep a Changelog headings: "## [x.y.z] - date"
+          awk -v h="## [$version]" 'index($0, h) == 1 { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > notes.md
+          if grep -q '[^[:space:]]' notes.md; then
+            gh release create "$GITHUB_REF_NAME" --title "@mizchi/waxa $version" --notes-file notes.md $prerelease
+          else
+            gh release create "$GITHUB_REF_NAME" --title "@mizchi/waxa $version" --generate-notes $prerelease
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
