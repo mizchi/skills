@@ -39,7 +39,7 @@ asks for that skill or its job by name.
 
 | Skill | Use for |
 | --- | --- |
-| `void-app` | Build full-stack apps with Void and Vite+ — React Pages, typed loaders/actions/forms, D1 migrations, tests, and deployment. [日本語チートシート](void-app/SKILL-ja.md) |
+| `void-app` | Build full-stack apps with Void and Vite+ — React Pages, typed loaders/actions/forms, D1 migrations, tests, and deployment. 日本語チートシート |
 | `cloudflare-deploy` | Deploy Workers and platform resources through cf and typed configuration. |
 | `cloudflare-access-app-setup` | One-shot Cloudflare Access self-hosted application provisioning via the API — app + email allowlist policy + service token. |
 | `cloudflare-workers-otel-utels` | Cloudflare Worker telemetry — OTLP traces / metrics / logs + utels error tracking + D1 Proxy slow-query warnings. |

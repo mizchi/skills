@@ -15,6 +15,7 @@ import sys
 
 SELF = "mizchi-skill"
 EXPLICIT = re.compile(r"invoke only when|do not auto-invoke|only when the user explicitly|explicitly asks about", re.I)
+RELATIVE_LINK = re.compile(r"\[([^\]]+)\]\((?![a-z][a-z0-9+.-]*:|#)[^)]*\)", re.I)
 ROW = re.compile(r"^\|\s*\[([\w.-]+)\]\([^)]*\)\s*\|\s*`[^`]*`\s*\|\s*(.+?)\s*\|\s*$")
 HEADER = """# mizchi/skills catalog
 
@@ -78,7 +79,8 @@ def readme_groups(root):
         elif cur is not None:
             m = ROW.match(line)
             if m:
-                cur[1].append((m.group(1), m.group(2)))
+                # README-relative links do not resolve from references/catalog.md; keep their text only.
+                cur[1].append((m.group(1), RELATIVE_LINK.sub(r"\1", m.group(2))))
     return groups
 
 

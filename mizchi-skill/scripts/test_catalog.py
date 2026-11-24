@@ -59,6 +59,19 @@ class Catalog(unittest.TestCase):
             alpha = next(l for l in out.splitlines() if "`alpha`" in l)
             self.assertNotIn("explicit only", alpha)
 
+    def test_relative_readme_links_become_plain_text(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = repo(tmp)
+            with open(os.path.join(root, "README.md"), "w") as f:
+                f.write("# skills\n\n## Skills\n\n### Deploy\n\n| Skill | Install path | Description |\n| --- | --- | --- |\n"
+                        "| [alpha](alpha/) | `alpha` | Ship alpha. [Cheat sheet](alpha/SKILL-ja.md), "
+                        "[spec](https://example.com/spec). |\n")
+            out = self.gen(root, "--stdout").stdout
+            alpha = next(l for l in out.splitlines() if "`alpha`" in l)
+            # The catalog lives in mizchi-skill/references/, where README-relative links do not resolve.
+            self.assertIn("Ship alpha. Cheat sheet, [spec](https://example.com/spec).", alpha)
+            self.assertNotIn("SKILL-ja.md", alpha)
+
     def test_check_mode_detects_a_stale_catalog(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = repo(tmp)
