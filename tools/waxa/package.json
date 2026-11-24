@@ -1,6 +1,6 @@
 {
   "name": "@mizchi/waxa",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Skill evaluation CLI with the empirical-prompt-tuning iteration loop, structured self-report grader, LLM-as-Judge, and with_skill / without_skill baseline comparison. Inspired by microsoft/waza and agentskills.io.",
   "license": "MIT",
   "author": "mizchi",
@@ -41,7 +41,7 @@
     "start": "node src/cli.ts",
     "test": "node --test test/*.test.ts",
     "check": "tsc -p tsconfig.json",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/rewrite-dts.ts dist && chmod +x dist/cli.js",
     "bundle:references": "mkdir -p references && cp ../../empirical-prompt-tuning/SKILL.md references/empirical-prompt-tuning.md",
     "prepack": "pnpm run build && pnpm run bundle:references"
   },
