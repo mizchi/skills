@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_binary")
+
+go_binary(
+    name = "gen",
+    srcs = ["main.go"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "data",
+    outs = ["data.json"],
+    cmd = "$(execpath :gen) $@",
+    tools = [":gen"],
+    visibility = ["//visibility:public"],
+)

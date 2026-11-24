@@ -66,6 +66,16 @@ local testMizchiSkill: Task = new {
   cache = false
 }
 
+local testBazelBuildCache: Task = new {
+  name = "test:bazel-build-cache"
+  description = "Test the Bazel hygiene check and run it on the bundled example"
+  cmd = "python3 bazel-build-cache/scripts/test_check_bazel_hygiene.py && python3 bazel-build-cache/scripts/check_bazel_hygiene.py bazel-build-cache/assets/polyglot"
+  inputs {
+    "bazel-build-cache/scripts/*.py"
+    "bazel-build-cache/assets/polyglot/**"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
@@ -74,6 +84,7 @@ local test: Task = new {
     testMaintainerPersona
     testOssMaintainer
     testMizchiSkill
+    testBazelBuildCache
     checkFrontmatter
     checkReadme
   }
@@ -96,6 +107,7 @@ tasks {
   testMaintainerPersona
   testOssMaintainer
   testMizchiSkill
+  testBazelBuildCache
   genReadme
   checkReadme
   test

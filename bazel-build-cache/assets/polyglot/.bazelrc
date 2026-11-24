@@ -1,0 +1,11 @@
+# Shared settings only. Put machine-local paths (disk cache, repository cache)
+# in ~/.bazelrc or .bazelrc.user so CI and each developer can choose their own.
+test --test_output=errors
+
+# CI: fail on a stale MODULE.bazel.lock, keep the disk cache bounded, and let
+# the GC run when the server shuts down at the end of the job.
+common:ci --lockfile_mode=error
+build:ci --experimental_disk_cache_gc_max_size=2G
+build:ci --experimental_disk_cache_gc_idle_delay=0s
+
+try-import %workspace%/.bazelrc.user
