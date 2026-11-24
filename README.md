@@ -148,7 +148,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [chezmoi-management](chezmoi-management/) | `chezmoi-management` | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
 | [conventional-changelog](conventional-changelog/) | `conventional-changelog` | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
 | [dotenvx](dotenvx/) | `dotenvx` | dotenvx reference for existing adoption or explicit user choice (encryption, multi-env, CI). |
-| [bazel-build-cache](bazel-build-cache/) | `bazel-build-cache` | Bazel for multi-language repos and hard-to-follow pipelines — Bzlmod on Bazel 9, disk / repository / remote cache layers, a GitHub Actions cache that actually updates, a hygiene check, cache-miss diagnosis. |
+| [bazel-build-cache](bazel-build-cache/) | `bazel-build-cache` | When Bazel pays off (artifacts crossing languages, multi-minute CI builds, shared cache) and how to cache it — Bzlmod on Bazel 9, a GitHub Actions cache that actually updates, a hygiene check, cache-miss diagnosis. |
 | [justfile](justfile/) | `justfile` | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
 | [disk-cleanup](disk-cleanup/) | `disk-cleanup` | Bounded disk survey, inactive project caches, pushed worktrees and merged local branches, Nix GC/optimisation, and obsolete tool-version cleanup. |

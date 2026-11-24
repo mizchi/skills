@@ -1,11 +1,27 @@
 ---
 name: bazel-build-cache
-description: Use when a repository mixes several languages (Go, Python, TypeScript/pnpm, shell, ...) or runs a multi-stage build pipeline that is hard to follow, and the goal is incremental builds with cache hits locally and on GitHub Actions. Covers choosing Bazel over a task runner, a Bzlmod-only setup verified on Bazel 9, disk / repository / remote cache layers, a GitHub Actions workflow whose cache actually updates, a hygiene check that blocks sandbox and cache escapes, and how to diagnose cache misses. Not for single-language repos that a task runner such as pkfire already caches well.
+description: Use when deciding whether a repository should adopt Bazel, or when setting up Bazel builds and their caches locally and on GitHub Actions. Bazel fits when at least two hold — artifacts flow between languages, a full CI build takes minutes while changes touch a small part, or a shared cache or reproducibility is required. Covers that decision and when to stay with a task runner such as pkfire, a Bzlmod-only setup verified on Bazel 9, disk / repository / remote cache layers, a GitHub Actions workflow whose cache actually updates, a hygiene check that blocks sandbox and cache escapes, and cache-miss diagnosis.
 ---
 
 # Bazel build cache
 
-Bazel earns its setup cost when a repository has several languages or a pipeline whose stages are hard to see. It turns every step into a declared action, so a change reruns only the actions whose inputs changed, and identical work is shared through a cache. In a single-language repository, a task runner with file-hash caching (pkfire, the language's own build cache) is usually cheaper. Say which side the repository is on before adding Bazel.
+Bazel turns every build step into a declared action, so a change reruns only the actions whose inputs changed and identical work is shared through a cache. It also has a fixed cost: on GitHub Actions the example still spent about 35 s per run with every action a cache hit, and each ruleset brings its own setup traps. Decide before adding it, and state the decision.
+
+## When to use Bazel
+
+Use Bazel when **at least two** of these hold:
+
+1. **Artifacts cross language boundaries.** One language's output is another's input: protobuf or OpenAPI code generation for several languages, data generated in Go and read by TypeScript. Several languages that merely sit side by side in one repository do not count.
+2. **A full CI build takes several minutes and most changes touch a small part of it.** Rebuilding only the affected actions has to beat the fixed cost. A build that already finishes in a minute or two gains little.
+3. **A shared cache or reproducibility is a requirement.** Developers and CI should share results, or builds must be hermetic.
+
+Do not use it, even then, when:
+
+- a language on the critical path has no maintained ruleset (MoonBit, Gleam): you would write and maintain custom rules;
+- the development loop depends on a framework's own tooling (Vite, Next.js, `wrangler dev` with hot reload): that loop stays outside Bazel, so either limit Bazel to CI build and test from the start, or do not adopt it;
+- the hard-to-follow part is side effects (deploys, migrations, external API calls): those cannot be Bazel actions and stay in the task runner.
+
+When the only problem is that the pipeline is hard to follow, first make each task's dependencies, inputs and outputs explicit in pkfire, which also caches by input hash and supports a remote cache. Move to Bazel when its action-level caching, sandboxed detection of undeclared inputs, or per-package incremental builds are what is missing. A combined layout also works: Bazel owns the build and test graph, and pkfire calls `bazel` for builds alongside dev servers and deploys.
 
 ## Ground rules
 
@@ -56,7 +72,7 @@ Follow `references/cache-misses.md`. In short: build twice with `--execution_log
 
 When you set up or change Bazel in a repository, report:
 
-- why Bazel fits this repository (languages, pipeline) or why it does not
+- which of the three conditions hold and which exclusions were checked, or why the repository stays with a task runner
 - the pinned Bazel and ruleset versions and where each came from
 - the hit count from an unchanged rebuild (`X disk cache hit` of `N`), measured
 - hygiene check and `bazel mod tidy` diff results
