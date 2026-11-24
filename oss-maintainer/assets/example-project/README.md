@@ -16,22 +16,22 @@ lines("alpha\r\n\r\nbeta"); // ["alpha", "", "beta"]
 
 ## Installation
 
-From a checkout of this example, use Node.js 24.11+ on the 24.x line (or 26+) and pnpm 12+.
+Requires Node.js 24.11+ on the 24.x line (or 26+).
 
 ```sh
-pnpm install --frozen-lockfile
+pnpm add example-lines
 ```
 
 ## Quick Start
 
-Run from the project root:
+Run in a project that has `example-lines` installed:
 
 ```sh
 node --input-type=module -e 'import { lines } from "example-lines"; console.log(lines("alpha\r\nbeta"))'
 # [ 'alpha', 'beta' ]
 ```
 
-See [Contributing](CONTRIBUTING.md) for development and release commands.
+See [Contributing](CONTRIBUTING.md) for the development setup, checks, and release steps.
 
 ## License
 

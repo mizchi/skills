@@ -1,0 +1,15 @@
+load("@rules_python//python:py_binary.bzl", "py_binary")
+
+py_binary(
+    name = "summarize",
+    srcs = ["summarize.py"],
+)
+
+genrule(
+    name = "summary",
+    srcs = ["//gen:data"],
+    outs = ["summary.json"],
+    cmd = "$(execpath :summarize) $(execpath //gen:data) $@",
+    tools = [":summarize"],
+    visibility = ["//visibility:public"],
+)

@@ -215,7 +215,7 @@ commit を conventional 規約で書いて main に push すると、自動で�
 
 **選択指針**: 単一 package・単一 publish 先（npm のみ）なら同一 workflow が簡潔。複数 publish 先（npm + GitHub Container Registry など）や手動 release も許容するなら `on: release` 別 workflow。OIDC Trusted Publishing を使う場合は `id-token: write` 権限を publish job 側にだけ付ければよく、どちらでも成立する。
 
-ローカル管理の `npm-release` skill は release-please を使わず、`v*` タグ push から OIDC Trusted Publishing で publish する（CHANGELOG は手書き）。
+`npm-release` skill は release-please を使わず、`v*` タグ push から OIDC Trusted Publishing で publish する（CHANGELOG は git-cliff で生成）。
 
 ### Pre-release (beta / rc) 段階リリース
 
@@ -437,7 +437,7 @@ git cz
 
 ## 関連
 
-- `npm-release` — 初回手動 publish → `npm trust` → タグ push で OIDC Trusted Publishing（release-please 不使用、ローカル管理）
+- `npm-release` — 初回手動 publish → `npm trust` → タグ push で OIDC Trusted Publishing（release-please 不使用）
 - `apm-usage` references/publishing.md — skill 公開時の CHANGELOG 慣習
 - `gh-fix-ci` — release workflow が CI で落ちたとき
 - Keep a Changelog: https://keepachangelog.com/

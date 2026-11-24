@@ -1,0 +1,56 @@
+name: release
+
+# Push a v* tag to publish. The npm side trusts this workflow by filename:
+#   npm trust github <pkg> --repo <owner>/<repo> --file release.yml --allow-publish
+# No NPM_TOKEN: npm authenticates through OIDC and attaches provenance.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # gh release create
+      id-token: write   # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v6
+      # pnpm: keep this step. npm: delete it and use `npm ci` / `npm run` below.
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Tag matches package.json version
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then
+            echo "package.json is $v, tag is $GITHUB_REF_NAME"; exit 1
+          fi
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - run: pnpm run build
+      # Trusted publishing needs npm >= 11.5.1.
+      - run: npm install -g npm@11
+      - name: Publish
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          case "$version" in
+            *-*) npm publish --access public --tag next ;;
+            *)   npm publish --access public ;;
+          esac
+      - name: GitHub release from the changelog
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          prerelease=""
+          case "$version" in *-*) prerelease="--prerelease" ;; esac
+          awk -v h="## $version" '$0 == h || index($0, h" ") == 1 { on = 1; next } on && /^## / { exit } on' CHANGELOG.md > notes.md 2>/dev/null || true
+          if grep -q '[^[:space:]]' notes.md; then
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md $prerelease
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes $prerelease
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

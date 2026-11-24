@@ -2,9 +2,12 @@
 
 From the copied project root, run `just init` with just and [APM](https://github.com/microsoft/apm) installed. This installs the locked project skills for Codex and Claude. See [AGENTS.md](AGENTS.md) for the project workflow.
 
-Copy the example (including dotfiles) into its own Git repository. From its root, run:
+## Setup
+
+Copy the example (including dotfiles) into its own Git repository. Node.js (24+) and pnpm (12+) are pinned in [mise.toml](mise.toml); install [mise](https://mise.jdx.dev) and CI uses the same versions. From the repository root, run:
 
 ```sh
+mise install
 pnpm install --frozen-lockfile
 pnpm hooks
 pnpm check
@@ -13,7 +16,15 @@ pnpm secrets
 
 The hook scans staged files with secretlint. Use the bug form for unexpected output and the feature form for a new use case. For a fix, include the input and a regression test.
 
-Use Conventional Commits, for example `fix: preserve empty trailing lines`. Before tagging a release, set the package version and run `pnpm changelog` from a checkout with complete commit and tag history. Review and commit the generated CHANGELOG.md. Draft the release page using the [release notes template](.github/release-notes.md).
+Use Conventional Commits, for example `fix: preserve empty trailing lines`.
+
+## Release
+
+1. Set the package version, then run `GITHUB_TOKEN=$(gh auth token) pnpm changelog` from a checkout with complete commit and tag history. git-cliff writes CHANGELOG.md and credits outside contributors by GitHub login. Review the generated section against the release diff.
+2. Write `.github/releases/v<version>.md` from the [release notes template](.github/release-notes.md). It becomes the top of the release page.
+3. Commit, tag `v<version>`, and push the branch and the tag. The [release workflow](.github/workflows/release.yml) checks the tagged commit, publishes to npm, and creates the release page from the summary and the changelog section.
+
+The example package is private, so the workflow skips the npm step. To publish, remove `private`, add the `repository` field, publish the first version by hand, and register the workflow as an npm trusted publisher (the command is at the top of the workflow file).
 
 ## Dependency updates
 

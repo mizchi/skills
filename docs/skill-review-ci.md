@@ -28,13 +28,17 @@ missing・証拠不足・未知の出力はexit 3、矛盾候補はexit 1、正�
 
 ## PRの実行境界
 
-`pull_request_target` でベースcommitの検査コード・ルール・lockfileを使う。
-PRのheadはfetchしてcommit SHAを照合し、対象SKILLのblobだけをデータとして取り出す。
-PRのcheckout、package.json、設定、scriptsは実行・採用しない。secretはモデル検査のstepだけに渡す。
-権限は `contents: read` で、インストールはtrusted lockfileと `--ignore-scripts` を使う。
+PRでは `pull_request` で起動し、PRのheadをcheckoutして、そのPRの検査コード・ルール・lockfileを使う。
+`pull_request_target` は使わない。forkのPRにsecretを渡すと、誰でもPRを開くだけで
+`TYPESAFE_API_KEY` の利用料を消費できるためである（`package.json` を1行変えるだけで全スキルが対象になる）。
 
-PRがこの検査実装自体を変更しても、そのPRを検査するのはベース版。
-提案版の実装はsecretなしのcontractsテストで確認し、main反映後のpush検査で使用する。
+- secretを使うモデル検査のstepは、push・手動実行・同じrepositoryのブランチからのPRだけで走る。
+  forkのPRではGitHubがsecretを渡さないので、このstepを飛ばしてnoticeを出す。forkの変更はmerge後のpush検査か `workflow_dispatch` で検査する。
+- 同じrepositoryのブランチをpushできる人はworkflow自体も書き換えられるので、そのPRの検査コードでsecretを使っても権限は増えない。
+- PRのheadはfetchしてcommit SHAを照合し、対象SKILLのblobだけを `git show` でデータとして取り出す。SKILL本文は実行しない。
+- 権限は `contents: read`、checkoutは `persist-credentials: false`、インストールは `--ignore-scripts` を使う。
+
+PRがこの検査実装自体を変更した場合、そのPRの検査にも変更後の実装が使われる。
 検査snapshotとsourceは `.cache/skill-review/current/` に保存し、CIでは14日間artifactとして保持する。
 新しい回答を得るため、このgateはtextの判定cacheを使わない。
 

@@ -1,27 +1,40 @@
 ---
 name: oss-maintainer
-description: Write or review OSS READMEs, contribution guides (CONTRIBUTING.md or CONTRIBUTE.md), changelogs, and release pages, or scaffold a Node.js or Rust OSS project with CI and contributor tooling.
+description: Write or review OSS READMEs, contribution guides (CONTRIBUTING.md or CONTRIBUTE.md), changelogs, and release pages, check a repository against the OSS release policy (0.0.x prototype vs 0.1.0+ requirements for npm tag releases, generated changelog with contributor credits, CI, license, English docs), or scaffold a Node.js or Rust OSS project with CI and contributor tooling.
 ---
 
 # OSS maintainer documentation
 
 Identify the reader's next decision and the version they are reading about. Follow the project's existing language, filenames, and conventions. Edit the requested document. Link to the canonical home of details that another document already maintains.
 
+## Release policy — Is this ready to release?
+
+Before releasing, or when asked whether a repository is ready for `0.1.0`, run the policy check from this skill’s directory and read [the release policy](references/release-policy.md) for the reasoning behind each item.
+
+```sh
+node scripts/release-policy.mjs <repo>              # against the current version
+node scripts/release-policy.mjs <repo> --as 0.1.0   # what is left before the first public release
+```
+
+`0.0.x` is a prototype: the check lists gaps as `todo` and nothing blocks a release. From `0.1.0` a `FAIL` blocks the release. The policy in brief: publish to npm from a `v*` tag workflow with OIDC, give each tag a release page with a usable summary, generate CHANGELOG.md with git-cliff and credit outside contributors by name, run CI on pull requests, ship CONTRIBUTING.md and a LICENSE (MIT or Apache-2.0 preferred), and write the README and other documents in English with Japanese as a linked supplement. The script only confirms that each piece is present. Fix a `FAIL` by copying the matching file from the example project and adapting it, then review the documents with the sections below.
+
 ## Initialize a project template
 
 Ship a root AGENTS.md with project-specific checks, an apm.yml declaring external skills and targets, and the generated apm.lock.yaml. From the copied project root, run `just init` to replay the lock with `apm install --frozen`. Keep the manifest and lock under version control and ignore the generated cache and deployed skill copies. Include an unanchored `.env` entry in every project template’s .gitignore so it covers nested packages too.
+
+Recommend KPIs in the initial AGENTS.md. Have the project name the few numbers that decide whether a change is an improvement, such as build time, bundle or binary size, peak memory, test pass rate against an external suite, or latency. Ask it to state for each how to measure it with one command, which direction is better, and how much noise to expect. Have agents log the values after each change that could move them, in a checked-in file such as `bench/kpi_log.tsv` or in CI benchmark history, and explain any regression in the change itself. A KPI recorded from the start lets a later retrospective use real history instead of re-measuring old commits (see the repo-retrospective skill). The templates’ AGENTS.md carries this as a placeholder to fill in when the project starts.
 
 ## Scaffold a Node.js project
 
 Copy [the example project](assets/example-project/README.md) including its dotfiles into the new repository. For a single-purpose library, keep the implementation in `src/`. For a medium-sized application, put deployable applications in `apps/<name>/` and shared packages in `packages/<name>/`. Add both globs to pnpm-workspace.yaml, give each workspace its own manifest, and check all affected workspaces in CI.
 
-Use Node.js 24+ and pnpm 12+, with compatible patch versions recorded in the manifest and CI. Prefer Vite+ for formatting, linting, testing, and builds when a build is needed. Keep issue forms for bugs and feature requests in `.github/ISSUE_TEMPLATE/`. Enable the secretlint pre-commit hook from the new repository root and run secretlint in GitHub Actions as well.
+Use Node.js 24+ and pnpm 12+. Pin both to exact versions in `mise.toml` (see the template’s), keep `packageManager` in package.json equal to the pnpm version, and have CI install them with `jdx/mise-action` instead of repeating versions in `setup-node` or `npm install -g pnpm@…`. Contributors run `mise install` once. The policy check reports this as `toolchain.node` and `toolchain.ci`. Prefer Vite+ for formatting, linting, testing, and builds when a build is needed. Keep issue forms for bugs and feature requests in `.github/ISSUE_TEMPLATE/`. Enable the secretlint pre-commit hook from the new repository root and run secretlint in GitHub Actions as well.
 
 For a new project choose MIT or Apache-2.0, include the full license text, and match its SPDX identifier in the manifest and README. The example uses MIT. Set the copyright holder before publishing. Preserve established licensing when updating existing projects.
 
 ## Scaffold a Rust workspace
 
-Copy [the Rust example](assets/example-rust-project/README.md) including dotfiles. Pin the compiler and components in `rust-toolchain.toml`, the filename rustup discovers. Use a virtual workspace at the root and place member packages under `crates/<name>/`. Commit the workspace lockfile.
+Copy [the Rust example](assets/example-rust-project/README.md) including dotfiles. Pin the compiler and components in `rust-toolchain.toml`, the filename rustup discovers, to an exact version rather than `stable` (`toolchain.rust` in the policy check). The Node.js and pnpm used for repository tooling (secretlint, git-cliff) are pinned in `mise.toml` as in the Node.js template; do not put Rust in mise.toml as well, so each version has one home. Use a virtual workspace at the root and place member packages under `crates/<name>/`. Commit the workspace lockfile.
 
 Run `just check` for fmt, Clippy across all targets, and workspace tests. Keep Criterion benchmarks in the owning crate’s `benches/` directory with `harness = false`. Use `just bench` for measurements and the benchmark’s `--test` mode for a CI smoke test. Use `just mutants` to check whether tests catch changes to production logic. The example preserves the issue forms, pre-commit secret scanning, changelog generation, and release guide from the Node.js template.
 
@@ -35,6 +48,8 @@ Use registry namespaces for mizchi-owned npm packages and GitHub owner paths for
 
 Use the [Solid README](https://github.com/solidjs/solid#readme) as the layout reference. Lead with the project name, a one-sentence purpose, and links to the main reader tasks. Show the public API with a tiny input and its observable result before setup. Where useful, generate an original project banner with imagegen, store it inside the project, and keep the introduction readable with images disabled. A banner is optional. Add badges only for live project resources.
 
+Make the project easy to try from the user's side. Installation shows how a user gets the released package. Quick Start follows with something to paste and the result to expect, then links to the next documents such as the API reference, configuration, and guides. Keep the README under about 200 lines. Move reference tables, advanced configuration, and long examples to `docs/` and link them. Put the development setup in the contribution guide and link to it.
+
 Include explicit Installation and Quick Start sections. Finish the README with Reference projects, linking each influence and naming what the project borrowed. Open with the concrete task the project solves. Show a minimal path from installation to an observable result. Include prerequisites where they first matter. For a library, show the import and a working call. For a CLI, show the command, a small input, and the expected output. Check the example against the version the install command actually selects, especially when the default branch contains unreleased changes.
 
 Place limitations that affect adoption near the example. Link to deeper API, configuration, and contribution guidance where the reader would need them. Review by following the quickstart from a clean consumer project with only the stated prerequisites.
@@ -45,19 +60,19 @@ The ripgrep README opens with the search task, then names the files a default se
 
 Keep the existing guide's filename, including CONTRIBUTE.md. For a new guide on GitHub, use CONTRIBUTING.md unless the project specifies another name. Start with the entry point for the contribution at hand: an issue template for a bug, a discussion for a proposal if the project uses one, or a pull request for a patch.
 
-Walk a first-time contributor from a fresh checkout to one focused local check. Derive setup, generated-file steps, and test commands from the repository's task runner and CI. Describe what a reviewer needs to reproduce the result, such as a regression test or a screenshot for a visible change. Include sign-off, agreements, or review commitments only when established by the project. Verify that a contributor can follow the path with ordinary contributor permissions.
+The contribution guide is the home of the development setup: prerequisites, install, the check command, and the release steps. Walk a first-time contributor from a fresh checkout to one focused local check. Derive setup, generated-file steps, and test commands from the repository's task runner and CI. Describe what a reviewer needs to reproduce the result, such as a regression test or a screenshot for a visible change. Include sign-off, agreements, or review commitments only when established by the project. Verify that a contributor can follow the path with ordinary contributor permissions.
 
 GitHub CLI answers whether to open an issue or a PR before explaining how to build. Its build section then tells contributors how to invoke the binary they just compiled. Borrow both decisions: give one example on each side of your project’s issue/PR boundary, then show how to exercise a local change when a released binary may already be on PATH. Derive labels and approval rules from the target project. [GitHub CLI v2.60.0 contribution guide](https://github.com/cli/cli/blob/v2.60.0/.github/CONTRIBUTING.md)
 
 ## CHANGELOG — What changed between two versions?
 
-Generate CHANGELOG.md with Conventional Changelog from Conventional Commits and version tags. Use the example’s `pnpm changelog` command with full Git history. Put observable behavior in commit subjects and migration details in breaking-change footers. Review the generated entries against the release diff. Correct the generator inputs or configuration when entries are missing.
+Generate CHANGELOG.md with git-cliff from Conventional Commits and version tags. Use the example’s cliff.toml and its `pnpm changelog` command with full Git history and `GITHUB_TOKEN` set. The template appends `by @login` to entries written by anyone other than the repository owner or a bot and lists first-time contributors. For a repository owned by an organization, replace the owner comparison with the maintainer list. Put observable behavior in commit subjects and migration details in breaking-change footers. Review the generated entries against the release diff. Correct the generator inputs or configuration when entries are missing.
 
 Keep a Changelog demonstrates its format with its own releases. In 1.1.2, a newly available translation goes under Added and a correction to an existing translation goes under Fixed. Apply the same test to a mixed PR: if it adds an output format and corrects escaping in an existing format, record the two effects in generator inputs so the released entries are independently searchable. [Keep a Changelog, worked example](https://keepachangelog.com/en/1.1.0/)
 
 ## Release page — Should I upgrade, and how?
 
-Include a use-case guide in each release page: identify the user’s task, show how to perform it with the released version, and give an observable result. For a bug fix, walk through the formerly failing case. Address users of the previous supported version. Lead with the change most likely to affect their upgrade decision. Identify affected users, required actions, compatibility constraints, and relevant known issues. Show a before/after example for a migration when it saves guesswork. Point readers to the appropriate package or download for this tag, then link to the full changelog or comparison. Verify the tag, version, artifact names, and availability before describing a release as available.
+Write the summary for a tag in `.github/releases/v<version>.md` before tagging. The example’s release workflow places it above the generated changelog section on the release page. Include a use-case guide in each release page: identify the user’s task, show how to perform it with the released version, and give an observable result. For a bug fix, walk through the formerly failing case. Address users of the previous supported version. Lead with the change most likely to affect their upgrade decision. Identify affected users, required actions, compatibility constraints, and relevant known issues. Show a before/after example for a migration when it saves guesswork. Point readers to the appropriate package or download for this tag, then link to the full changelog or comparison. Verify the tag, version, artifact names, and availability before describing a release as available.
 
 React 19 introduces Actions by showing the same name-update form before and after adoption. Readers can see who now handles the pending state. The opening also links directly to the upgrade guide. For a release with a major new API, keep the task and input constant across examples so the changed responsibility is visible. Give existing users a direct path to required migration steps. [React 19 release announcement](https://react.dev/blog/2024/12/05/react-19)
 

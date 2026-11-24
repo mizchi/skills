@@ -121,6 +121,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
+| [hyperfine-benchmark](hyperfine-benchmark/) | `hyperfine-benchmark` | Command-level benchmarks with hyperfine 2.x — 2.0 migration, choosing a metric that can show the change (wall time vs instructions vs memory), noise control, vetting a number, CI regression checks. |
 | [playwright-cli](playwright-cli/) | `playwright-cli` | Run Playwright via terminal CLI (test runner, codegen, screenshot, CI sharding). |
 | [stryker-js](stryker-js/) | `stryker-js` | Measure JavaScript/TypeScript test quality with StrykerJS; run Git diff mutations in CI and use surviving mutants to improve assertions locally. Includes setup snippets and AI-readable reports. |
 | [playwright-test](playwright-test/) | `playwright-test` | Playwright Test (E2E) best practices — no fixed waits, network triggers, DnD, CI sharding/retry. |
@@ -136,7 +137,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
-| [formal-methods-reconciler](formal-methods-reconciler/) | `formal-methods-reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks; choose Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq and translate counterexamples into domain questions. |
+| [formal-methods-reconciler](formal-methods-reconciler/) | `formal-methods-reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks — start from confirmed bug classes, not an inferred oracle; measure what the check catches with mutants; rule out vacuous proofs and sorry/axiom escapes; report each claim with its oracle, scope and method. |
 | [formal-methods-drift-guard](formal-methods-drift-guard/) | `formal-methods-drift-guard` | Maintain existing formal models by checking spec/code/model drift, classifying stale claims, and translating verifier changes into domain questions. |
 
 ### Tooling / Infra
@@ -148,11 +149,14 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [chezmoi-management](chezmoi-management/) | `chezmoi-management` | mizchi's personal chezmoi dotfiles workflow (diff/apply, skill placement, APM vs chezmoi boundary). |
 | [conventional-changelog](conventional-changelog/) | `conventional-changelog` | Conventional Commits + CHANGELOG generator comparison (release-please, changesets, git-cliff, towncrier). |
 | [dotenvx](dotenvx/) | `dotenvx` | dotenvx reference for existing adoption or explicit user choice (encryption, multi-env, CI). |
+| [bazel-build-cache](bazel-build-cache/) | `bazel-build-cache` | When Bazel pays off (artifacts crossing languages, multi-minute CI builds, shared cache) and how to cache it — Bzlmod on Bazel 9, a GitHub Actions cache that actually updates, a hygiene check, cache-miss diagnosis. |
 | [justfile](justfile/) | `justfile` | `just` command runner reference with GitHub Actions examples. |
 | [nix-setup](nix-setup/) | `nix-setup` | Requested or existing Nix environments — flakes, per-language templates, direnv, CI; devbox only when already adopted or explicitly selected. |
 | [disk-cleanup](disk-cleanup/) | `disk-cleanup` | Bounded disk survey, inactive project caches, pushed worktrees and merged local branches, Nix GC/optimisation, and obsolete tool-version cleanup. |
 | [upstream-fix-and-pin](upstream-fix-and-pin/) | `upstream-fix-and-pin` | Upstream PR + temporary git-ref pin workflow — branch HEAD SHA → merge SHA, `link:` fallback, pnpm v10 build script gating. |
-| [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages. |
+| [oss-maintainer](oss-maintainer/) | `oss-maintainer` | Write and review READMEs, contribution guides, changelogs, and release pages, and check a repository against the OSS release policy. |
+| [npm-release](npm-release/) | `npm-release` | Manual first publish, `npm trust` for OIDC Trusted Publishing, then tag-triggered npm publishes with protected `v*` tags. |
+| [oss-maintainer-review](oss-maintainer-review/) | `oss-maintainer-review` | Review incoming PRs for CI, dependency, and client execution risks before testing contributor code. |
 | [maintainer-persona](maintainer-persona/) | `maintainer-persona` | Measure a target repo's maintainers into an editable persona file, branch by OSS first-time / returning / internal team, draft in Japanese then translate and slop-check against their own PRs, gate the send. |
 | [utels-project-bootstrap](utels-project-bootstrap/) | `utels-project-bootstrap` | One-shot helper for registering a utels.dev project and writing the returned ingest token into a Worker secret through cf. |
 
@@ -180,7 +184,11 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [multi-agent-orchestration](multi-agent-orchestration/) | `multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [task-based-eval](task-based-eval/) | `task-based-eval` | Measure goal achievement from fresh agents using tools, documents, interfaces or workflows; organize task definitions under `evals/<task-name>/` and improve from observable evidence. |
-| [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
+| [repo-retrospective](repo-retrospective/) | `repo-retrospective` | A repository's history as data: decision points from git, KPI history recorded or re-measured at past commits, and a data contract so dashboards stay disposable views. |
+| [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into the highest enforcing level — structure, types, ast-grep rules, tests, then skills / CLAUDE.md rules. |
+| [blast-radius](blast-radius/) | `blast-radius` | Find what a small-looking change breaks outside its diff and prove the one fact it is safe because of by running real code. |
+| [mizchi-mode](mizchi-mode/) | `mizchi-mode` | Opt-in careful mode: strict TDD, questions before acting on unclear instructions, and an approved plan before file changes. Pin it per repository from CLAUDE.md. |
+| [mizchi-skill](mizchi-skill/) | `mizchi-skill` | One installed router for this catalog: finds the skill that fits the task and loads it on demand, so the rest need not be installed. |
 | [skill-selector](skill-selector/) | `skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
 | [skill-finder](skill-finder/) | `skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
 | [waxa-eval](waxa-eval/) | `waxa-eval` | Operating manual for the `waxa` CLI — scenario authoring, grader selection, ledger schema, the four-stage iteration pattern, convergence rules. |
@@ -245,7 +253,7 @@ Run via `npx` (no global install needed):
 npx @mizchi/waxa <eval.yaml>
 ```
 
-`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.1.1` when reproducibility matters (do not pin `0.1.0` — that release shipped a broken shebang and crashes before argv parsing).
+`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.4.0` when reproducibility matters. The previously published 0.1.x cannot start `claude` under Node and returns empty outputs in 0 ms.
 
 Alternatives:
 
@@ -253,10 +261,11 @@ Alternatives:
 # install globally (when calling waxa frequently)
 npm i -g @mizchi/waxa
 
-# run from source (requires Deno 2+)
+# run from source (Node 24 runs the TypeScript directly)
 git clone https://github.com/mizchi/skills.git
 cd skills/tools/waxa
-deno task run -- path/to/eval.yaml
+pnpm install
+node src/cli.ts ../../path/to/eval.yaml
 ```
 
 Requirements: `claude` CLI on `PATH` and authenticated (OAuth login or `ANTHROPIC_API_KEY`).

@@ -1,0 +1,63 @@
+name: bazel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bazel-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # bazelisk download and repository cache (keyed on MODULE.bazel / lock).
+      # Its own disk-cache option is left off: it keys on BUILD-file hashes and
+      # skips saving on an exact hit, so source-only changes never reach it.
+      - uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+          cache-save: ${{ github.event_name == 'push' }}
+          bazelrc: |
+            build --disk_cache=${{ runner.temp }}/bazel-disk
+
+      # Action outputs. A new key per commit so every main build saves;
+      # restore-keys pick the newest entry. Size is bounded by build:ci GC.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/bazel-disk
+          key: bazel-disk-${{ runner.os }}-${{ hashFiles('.bazelversion') }}-${{ github.sha }}
+          restore-keys: |
+            bazel-disk-${{ runner.os }}-${{ hashFiles('.bazelversion') }}-
+            bazel-disk-${{ runner.os }}-
+
+      - name: Bazel hygiene
+        run: python3 tools/check_bazel_hygiene.py .
+
+      - name: MODULE.bazel and lockfile are tidy
+        run: |
+          bazel mod tidy
+          git diff --exit-code -- MODULE.bazel MODULE.bazel.lock
+
+      - name: Test
+        run: bazel test //... --config=ci
+
+      # The disk cache GC (build:ci) runs when the server stops.
+      - name: Stop Bazel server
+        if: always()
+        run: bazel shutdown
+
+      # Only trusted pushes write; pull requests restore but never save.
+      - if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/bazel-disk
+          key: bazel-disk-${{ runner.os }}-${{ hashFiles('.bazelversion') }}-${{ github.sha }}

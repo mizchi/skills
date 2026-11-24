@@ -5,6 +5,12 @@ Use these templates to make formal-methods output reviewable by non-specialists.
 ## Full Ledger
 
 ```text
+bug class:
+  The class from the confirmed list (e.g. CWE-284 cross-tenant read, liveness: queue drains).
+
+oracle source:
+  user-confirmed / named document / inferred from code (say which code).
+
 source:
   docs / code / tests / config / logs / incident:
 
@@ -20,8 +26,18 @@ model question:
 tool:
   Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq / ...
 
+assumptions:
+  Bounds, small scope, fairness, constants, behaviour of other systems. Vacuity check result.
+  Proof escapes: output of scripts/check_proof_escapes.py, and `#print axioms` for Lean theorems.
+
 machine result:
   SAT / UNSAT / trace / proof failure / proved obligation.
+
+scope and method:
+  Unbounded or the exact bound; machine-checked (command) / bounded search / hand argument.
+
+sensitivity:
+  Mutants of this class and whether each was detected. detected / unverified.
 
 witness:
   Smallest input, relation instance, action trace, event schedule, or failed obligation.
@@ -72,6 +88,24 @@ Avoid:
 
 ```text
 Z3 returned unsat.
+```
+
+## Coverage Report
+
+One row per confirmed bug class. Put the scope in the row, not in a footnote.
+
+```text
+| Bug class | Status | Mutants | Oracle | Scope | Method |
+|---|---|---|---|---|---|
+| cross-tenant read (CWE-284) | detected | 4/4 | docs/authz.md role table | 3 orgs, 4 roles, 5 resources (Alloy scope 5) | Alloy, `make check-authz` |
+| retried payment charges twice | detected | 2/2 | user-confirmed | 2 workers, 3 retries, crash at any step | TLC, `make check-idempotency` |
+| queue eventually drains (liveness) | unverified | 0/2 | user-confirmed | — | time box (60 min) ran out; needs weak fairness on the worker |
+```
+
+Avoid:
+
+```text
+The billing service has no bugs. (Only for 2 workers and 3 retries.)
 ```
 
 ## Ambiguity Wording

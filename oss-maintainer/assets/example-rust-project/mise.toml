@@ -1,0 +1,6 @@
+# Node.js and pnpm versions for this repository's tooling (secretlint, git-cliff); Rust is pinned in
+# rust-toolchain.toml. `mise install` installs them, and CI reads this file through jdx/mise-action, so a version
+# changes here and nowhere else. Keep pnpm equal to packageManager in package.json.
+[tools]
+node = "24.11.0"
+pnpm = "12.22.0"

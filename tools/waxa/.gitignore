@@ -1,3 +1,5 @@
 npm/
 node_modules/
+dist/
+references/
 *.log

@@ -29,21 +29,23 @@ waxa is an independent tool, not a fork or compatibility layer. The concepts it 
 npx @mizchi/waxa <path/to/eval.yaml>
 
 # pin a version when reproducibility matters
-# (do NOT pin 0.1.0 — broken shebang, use 0.1.1+)
-npx @mizchi/waxa@0.1.1 <path/to/eval.yaml>
+# (the published 0.1.x cannot spawn `claude` under Node: every trial comes
+#  back empty in 0 ms. 0.2.x and 0.3.x were never published. Use 0.4.0+.)
+npx @mizchi/waxa@0.4.0 <path/to/eval.yaml>
 
 # install globally if you call waxa frequently and startup latency matters
 npm i -g @mizchi/waxa
 
-# or run from source via Deno
+# or run from source (Node 24 runs the TypeScript directly)
 git clone https://github.com/mizchi/skills.git
 cd skills/tools/waxa
-deno task run -- ../path/to/eval.yaml
+pnpm install
+node src/cli.ts ../../path/to/eval.yaml
 ```
 
 Requirements:
 
-- Node.js 24+ (for the npm CLI; ESM-only, built with dnt 0.42.3). Newly built packages declare `engines.node: ">=24"`; older published artifacts retain their original metadata.
+- Node.js 24+. ESM-only; the published package is compiled to `dist/` with `tsc`.
 - `claude` CLI on `PATH` and authenticated (OAuth login or
   `ANTHROPIC_API_KEY`) — waxa shells out to `claude -p` for the
   bias-suppressed executor
@@ -365,15 +367,29 @@ executor's response, parses the structured tail, and writes
 ## Build / publish
 
 ```bash
-deno task check       # type-check the source
-deno task build:npm   # dnt → ./npm (ESM-only)
-cd npm && npm publish --access public
+pnpm install
+pnpm test        # node --test; end-to-end tests run the CLI against a fake `claude`
+pnpm run check   # tsc --noEmit over src/ and test/
+pnpm pack        # prepack: tsc → dist/, bundle references/empirical-prompt-tuning.md
 ```
 
-The npm package is ESM-only (top-level `await` in `cli.ts`). dnt's compile-time
-type-check is skipped via `typeCheck: false` because the dnt shim's
-`Deno.errors.NotSupported` surface still trips ts-morph; type validation is
-performed by `deno task check` against the source instead.
+Releases are published by `.github/workflows/waxa-release.yml` through npm
+trusted publishing (OIDC, with provenance). Bump `version` in `package.json`,
+add the `## [x.y.z]` section to `CHANGELOG.md`, merge, then push a tag:
+
+```bash
+git tag waxa-v0.4.1 && git push origin waxa-v0.4.1
+```
+
+The workflow checks that the tag matches `package.json`, runs `check` and
+`test`, publishes, and creates a GitHub release from the changelog section. A
+tag for a version that is already on npm only creates the release.
+
+Set `WAXA_CLAUDE_BIN` to point the executor and the LLM judge at another
+binary (the tests use a fake `claude` script). Before publishing, install the
+packed tarball in an empty directory and run `waxa --help` plus one real eval:
+the dnt-built 0.1.1 package type-checked under Deno yet failed every trial under
+Node.
 
 ## License
 

@@ -56,6 +56,20 @@ Do not ship full conversation history. Pass only upstream artifacts, structured 
 
 Same model + same input + same tools + different persona is not diversity. Errors correlate. Collect independent evidence, then verify: disjoint search, different tests or model families, static analysis vs execution, implementer vs adversarial verifier, private answers before votes.
 
+## Briefing a worker
+
+A worker sees only its kickoff. Rules that reach the parent through a slash command, an invoked skill or the session's working mode do not reach a subagent unless the kickoff carries them. Every kickoff states:
+
+1. **The operator's goal**, then the task. A worker that knows only its slice optimizes the slice.
+2. **The bar.** The success criteria in the kickoff are the whole bar: the worker adds no check, gate or review round above them. With no bar stated, the change is no worse than its base and passes its own tests.
+3. **The working mode**, when the session runs in one (for example `mizchi-mode`: TDD required for every behavior change). Name the mode and the rules it changes; do not assume the worker can load the skill.
+4. **Stop rules.** A worker cannot ask the user. It makes any choice it can undo and reports the choice and the reason. It stops only before a deploy, data deletion, a force-push to a shared branch or a message outside the run. In a mode that forbids guessing, an unclear point becomes an unresolved item in the report instead of a choice.
+5. **Pointers, not payloads.** File paths and artifact refs, not pasted file bodies.
+
+Give a retry, a fix round or a follow-up to a **fresh** agent with the original brief, every later directive and the previous agent's report. Resume an existing agent only when the work needs state that lives in it and is costly to move: its checkout, its uncommitted changes, or a process it still runs.
+
+You own every worker's output. Read the diff and write your own summary; do not forward a worker's self-report as the result.
+
 ## Coding harness
 
 Each task is a contract, not a chat turn:
@@ -98,6 +112,9 @@ Evaluate quality / cost / latency, not agent count. Under a **fixed token budget
 | "There is a function call, so it cannot be parallel" | Freeze the callee's signature as an artifact; disjoint write-sets can still run together |
 | "Worktrees mean we can ignore write-sets" | Conflicts are deferred, not removed |
 | "More agents = more quality" | Sequential and tool-heavy tasks often get worse |
+| "The worker has the same CLAUDE.md, it knows the rules" | Mode and slash-loaded skills are session state; put them in the kickoff |
+| "Ask the worker to be thorough" | Without a stated bar it adds its own gates and review rounds; state the bar |
+| "Resume the last worker for the fix, it has context" | Its context includes the wrong turn; start fresh unless it holds a checkout or a running process |
 
 ## Optional: Flue
 

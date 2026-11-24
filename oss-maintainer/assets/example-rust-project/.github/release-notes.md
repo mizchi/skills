@@ -1,5 +1,3 @@
-# <version>
-
 <Who benefits, and what changes for them?>
 
 ## Try it with your data

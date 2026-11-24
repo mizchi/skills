@@ -1,0 +1,8 @@
+{
+  "name": "polyglot-example",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "6.0.3"
+  }
+}

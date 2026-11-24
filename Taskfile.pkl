@@ -49,12 +49,75 @@ local testMaintainerPersona: Task = new {
   }
 }
 
+local testOssMaintainer: Task = new {
+  name = "test:oss-maintainer"
+  description = "Run node tests for the oss-maintainer release policy check"
+  cmd = "node --test oss-maintainer/scripts/release-policy_test.mjs"
+  inputs {
+    "oss-maintainer/scripts/*.mjs"
+    "oss-maintainer/assets/**"
+  }
+}
+
+local testMizchiSkill: Task = new {
+  name = "test:mizchi-skill"
+  description = "Test the mizchi-skill router scripts and check that its catalog is up to date"
+  cmd = "python3 mizchi-skill/scripts/test_catalog.py && python3 mizchi-skill/scripts/gen_catalog.py --check"
+  cache = false
+}
+
+local testBazelBuildCache: Task = new {
+  name = "test:bazel-build-cache"
+  description = "Test the Bazel hygiene check and run it on the bundled example"
+  cmd = "python3 bazel-build-cache/scripts/test_check_bazel_hygiene.py && python3 bazel-build-cache/scripts/check_bazel_hygiene.py bazel-build-cache/assets/polyglot"
+  inputs {
+    "bazel-build-cache/scripts/*.py"
+    "bazel-build-cache/assets/polyglot/**"
+  }
+}
+
+local testHyperfineBenchmark: Task = new {
+  name = "test:hyperfine-benchmark"
+  description = "Test the hyperfine export comparison script"
+  cmd = "python3 hyperfine-benchmark/scripts/test_compare_runs.py"
+  inputs {
+    "hyperfine-benchmark/scripts/*.py"
+  }
+}
+
+local testFormalMethodsReconciler: Task = new {
+  name = "test:formal-methods-reconciler"
+  description = "Test the proof-escape checker"
+  cmd = "python3 formal-methods-reconciler/scripts/test_check_proof_escapes.py"
+  inputs {
+    "formal-methods-reconciler/scripts/*.py"
+  }
+}
+
+local testWaxa: Task = new {
+  name = "test:waxa"
+  description = "Type-check and test the waxa CLI (end-to-end against a fake claude)"
+  cmd = "pnpm --dir tools/waxa install --frozen-lockfile --silent && pnpm --dir tools/waxa run check && pnpm --dir tools/waxa test"
+  inputs {
+    "tools/waxa/src/**"
+    "tools/waxa/test/**"
+    "tools/waxa/package.json"
+    "tools/waxa/pnpm-lock.yaml"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
   deps {
     testFrontmatter
     testMaintainerPersona
+    testOssMaintainer
+    testMizchiSkill
+    testBazelBuildCache
+    testHyperfineBenchmark
+    testFormalMethodsReconciler
+    testWaxa
     checkFrontmatter
     checkReadme
   }
@@ -75,6 +138,12 @@ tasks {
   checkFrontmatter
   testFrontmatter
   testMaintainerPersona
+  testOssMaintainer
+  testMizchiSkill
+  testBazelBuildCache
+  testHyperfineBenchmark
+  testFormalMethodsReconciler
+  testWaxa
   genReadme
   checkReadme
   test
