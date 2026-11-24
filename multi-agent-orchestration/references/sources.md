@@ -42,3 +42,9 @@ Keep these as leads. Do not treat unnamed numbers as facts until the paper is op
 - Lemon — generate roles / model capacity / deps as one spec; counterfactual RL on local edits
 - Gated-Memory Routing (2026-09) — choose next role / model / stop from compressed run memory; author-reported HumanEval cost −31.9%
 - Multi-Agent Deliberation Under Information Asymmetry — closed debate does not add external information; prior work reports >60% error correlation across agents
+
+## Worker briefing
+
+| Claim used in the skill | Source |
+|---|---|
+| Kickoff carries the operator's rules; the stated bar is the whole bar; fresh agent by default, resume only for state that is costly to move | pstack `poteto-mode` Subagents section and `worker.md` ([cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack), MIT, v0.15.48). Rewritten, not copied. |

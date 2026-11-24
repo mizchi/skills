@@ -1,6 +1,6 @@
 ---
 name: retrospective-codify
-description: 'Pair "what failed first" with "what finally worked" and codify the should-have-known-it insight as an ast-grep rule, a skill, or a CLAUDE.md rule. Meta-skill: invoke ONLY when the user explicitly says "codify today''s lessons," "make it a skill," "drop it into lint," or asks to extract a reusable rule from a trial-and-error fix. Do NOT auto-invoke at every task completion. Spares future-you (or another agent) the same trap.'
+description: 'Pair "what failed first" with "what finally worked" and codify the should-have-known-it insight at the highest level that enforces it — a structural or type change, an ast-grep rule, a test, a skill, or a CLAUDE.md rule. Meta-skill: invoke ONLY when the user explicitly says "codify today''s lessons," "make it a skill," "drop it into lint," or asks to extract a reusable rule from a trial-and-error fix. Do NOT auto-invoke at every task completion. Spares future-you (or another agent) the same trap.'
 ---
 
 # Retrospective Codify
@@ -55,12 +55,33 @@ When not to use:
 5. **Draft**: Prepare a proposed diff using the chosen template. A draft is a review artifact, not an edit to the authoritative skill, lint or CLAUDE.md.
 6. **Apply within authorization**: If the user already selected the rules and destination, apply that authorized diff. Otherwise show the completed draft and obtain the missing selection before modifying the authoritative files. A rejected proposal stays a session note.
 
+## Enforcement ladder
+
+Assume the next contributor is an agent that sees only the files it opened, copies the nearest example and takes the shortest path that compiles. Prose is the weakest fix: nothing fails when an agent skips it. Fix each lesson at the highest level that works, and in the proposal say why each higher level did not:
+
+1. **Structure** — remove the way to make the mistake. Give the state one owner and the task one supported path, hide internals so the wrong import fails, replace a hand-synced list with one source of truth, delete the old way an agent would copy.
+2. **Types** — make the bad state impossible to write.
+3. **Lint / CI check** — an ast-grep rule or CI step whose message names the file, type or function to use instead. If the bad pattern is already common, fail only on additions.
+4. **Test** — a behavior test that fails when the mistake comes back.
+5. **Skill or CLAUDE.md** — only for judgment calls the levels above cannot decide.
+
+Two extra gates for levels 1–4:
+
+- **Prove it catches the real mistake.** Run the new check against the code that had the mistake (the failing commit, or the snippet from this session) and paste the failure. A check that never failed on a real case is unproven.
+- **A repeat escalates.** If the lesson already exists as prose and the mistake happened again, that is the evidence prose failed. Propose a higher level, not a rewording. A mistake class counts as recurring once it has happened twice.
+
+When a repository keeps project rules in its CLAUDE.md or AGENTS.md, propose keeping a table there that pairs each rule with what enforces it (`rule | enforced by | path`). A rule with nothing in the second column is a candidate for escalation; a rule whose mistake can no longer happen can be dropped.
+
 ## Classification decision
 
-In proposal labels, `[lint]` means an executable static check; `[rule]` means an always-loaded CLAUDE.md instruction; `[skill append]` and `[skill new]` mean procedural guidance.
+In proposal labels, `[structure]` means an architecture change that removes the mistake; `[type]` means a type change; `[lint]` means an executable static check; `[test]` means a behavior test; `[rule]` means an always-loaded CLAUDE.md instruction; `[skill append]` and `[skill new]` mean procedural guidance.
 
 ```dot
 digraph classify {
+    "Removable by structure or types?" [shape=diamond];
+    "structure / type change" [shape=box];
+    "Removable by structure or types?" -> "structure / type change" [label="yes"];
+    "Removable by structure or types?" -> "Mechanically detectable?" [label="no"];
     "Mechanically detectable?" [shape=diamond];
     "Short instruction to apply every time?" [shape=diamond];
     "Involves multi-step procedure or judgment?" [shape=diamond];
@@ -80,6 +101,7 @@ digraph classify {
 
 | Decision axis | Output destination | Example |
 |---|---|---|
+| A second path or unowned state makes the mistake possible | Structure or type change (one owner, one supported path, branded type) | "Agents call the DB client directly" → make the client module-private and export only the repository |
 | Detectable at the code/config syntax level | `ast-grep` rule or existing linter config | "Do not use `Array.from(set).length`, use `set.size`" |
 | Short, always-applied, no judgment involved | `CLAUDE.md` (user global / project) | "Use pnpm v10 or later" |
 | Requires procedure, contextual judgment, or templates | New skill or append to existing skill | "Steps to write a C binding for MoonBit" |
@@ -165,6 +187,8 @@ Stop once if the following thoughts appear.
 | "It is project-specific but let's make a skill just in case" | Skills bloat and searchability drops. A commit message / PR is enough. |
 | "Skip approval and write it out first; I can show it later" | Modifying CLAUDE.md / skills on your own makes future behavior unpredictable. Prepare the draft first; apply it only within the user's existing or subsequent authorization. |
 | "I kind of could write it in ast-grep, but writing it in natural language as a rule is faster" | Writing statically detectable things in prose means agents do not follow them. Prefer ast-grep. |
+| "The rule is already in CLAUDE.md; I'll make it more emphatic" | It already failed once. Escalate to structure, types, lint or a test. |
+| "The lint rule looks right, no need to run it on the old code" | A check that never failed on the real mistake is unproven. Run it and paste the failure. |
 | "The insight is thin, but I have to write something to save face" | Zero proposals is also a correct answer. An empty retrospective causes no harm. |
 | "Dedup checks are tedious; skip them, erase duplicates later" | If duplicate rules remain, behavior splits. Dedup is a mandatory step. |
 | "Omit the failure side and only write the final solution" | Without describing the failure, your future self will fall into the same pitfall again. |
@@ -189,7 +213,9 @@ At the end of a task, present the stock-taking in the following form. **Multiple
 ## Proposals
 
 Adoption candidates:
-- [lint] <rule name>: <1 line> (artifact: <path>, from lesson N)
+- [structure] / [type] <change>: <1 line> (why not lower: <1 line>, from lesson N)
+- [lint] <rule name>: <1 line> (artifact: <path>, proven on: <commit or snippet>, from lesson N)
+- [test] <test name>: <1 line> (proven on: <commit or snippet>, from lesson N)
 - [skill append] <existing skill name>: <1 line> (from lesson N)
 - [skill new] <skill name>: <1 line> (from lesson N)
 - [rule] CLAUDE.md (global/project): <1 line> (from lesson N)

@@ -183,7 +183,9 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 | [empirical-prompt-tuning](empirical-prompt-tuning/) | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. |
 | [task-based-eval](task-based-eval/) | `task-based-eval` | Measure goal achievement from fresh agents using tools, documents, interfaces or workflows; organize task definitions under `evals/<task-name>/` and improve from observable evidence. |
 | [repo-retrospective](repo-retrospective/) | `repo-retrospective` | A repository's history as data: decision points from git, KPI history recorded or re-measured at past commits, and a data contract so dashboards stay disposable views. |
-| [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into ast-grep rules / skills / CLAUDE.md rules. |
+| [retrospective-codify](retrospective-codify/) | `retrospective-codify` | Convert trial-and-error lessons into the highest enforcing level — structure, types, ast-grep rules, tests, then skills / CLAUDE.md rules. |
+| [blast-radius](blast-radius/) | `blast-radius` | Find what a small-looking change breaks outside its diff and prove the one fact it is safe because of by running real code. |
+| [mizchi-mode](mizchi-mode/) | `mizchi-mode` | Opt-in careful mode: strict TDD, questions before acting on unclear instructions, and an approved plan before file changes. Pin it per repository from CLAUDE.md. |
 | [mizchi-skill](mizchi-skill/) | `mizchi-skill` | One installed router for this catalog: finds the skill that fits the task and loads it on demand, so the rest need not be installed. |
 | [skill-selector](skill-selector/) | `skill-selector` | Decide which skills to add to a project — Phase 1 picks from a curated catalog (Phase 2 escalates to `skill-finder`). |
 | [skill-finder](skill-finder/) | `skill-finder` | Cross-source skill discovery (Anthropic official → claude-skill-registry → VoltAgent → ComposioHQ → Superpowers → GitHub topic) with a mandatory waxa eval gate before adoption. |
