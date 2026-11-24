@@ -144,6 +144,28 @@ iterations:
     reseen_rules: []
     actions:
       - Confirmed config/Z3, authz/relation, and async/TLA+/P scenarios all pass 2/2 trials in one full-suite run.
+  - iter: 8
+    timestamp: '2026-11-25T03:30:00.000Z'
+    scope: with_skill, full three-scenario suite after the oracle / sensitivity / fidelity rewrite
+    overall_pass_rate: 1.0
+    new_unclear_count: 1
+    reseen_count: 0
+    total_unclear: 1
+    new_rules:
+      - When a scenario gives no repository but the executor can run tools, state where
+        runnable artifacts go (a temp dir plus their paths) instead of leaving it implicit.
+    reseen_rules: []
+    actions:
+      - Rewrote the skill to start from confirmed bug classes, measure detection with mutants,
+        write down assumptions, rule out vacuous proofs and sorry/axiom escapes, and report each
+        claim with oracle, scope and method (Kuniwak, blog.kuniwak.com/entry/vibe-fm).
+      - All 6 trials passed. Outputs showed the new behaviour without new graders - bug classes
+        marked "proposed, not confirmed" with no stop, per-class detected/unverified tables
+        with mutants, scope and method on claims.
+      - The one unclear point (artifact location with no repo) is from the eval setup; added one
+        sentence to the Output Contract rather than a grader.
+      - The npm @mizchi/waxa 0.1.1 package failed every trial (dntShim.Deno.Command is not a
+        constructor, 0 ms, empty output); this run used tools/waxa 0.3.1 from source via Deno.
 convergence:
   status: validated_once
   rationale: >-

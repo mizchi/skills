@@ -96,7 +96,7 @@ task is to keep it aligned with later spec/code/log changes, switch to
 
 ## Reporting Discipline
 
-**Every claim carries its own scope, in the same sentence.** A reader who stops after the claim must not come away believing more than was checked. In the experiment cited in the reference, agents usually stated the real limits somewhere in the message, yet individual sentences said "holds for every input" about a check of 40 tokens up to length 3, or asserted "the function is pure" and "the Lean model mirrors the code" without testing either. For each "holds", "proved", "is a bug" or "detected", state:
+**Every claim carries its own scope, in the same sentence.** A reader who stops after the claim must not come away believing more than was checked. In the experiment cited in the reference, agents usually stated the real limits somewhere in the message, yet individual sentences said "holds for every input" about a check of short inputs from a small alphabet, or asserted "the function is pure" and "the Lean model mirrors the code" without testing either. For each "holds", "proved", "is a bug" or "detected", state:
 
 - **oracle**: given by the user / taken from a named document / inferred from the code
 - **scope**: unbounded, or the exact bound (input length ≤ 3, 4 processes, Alloy scope 5)
@@ -163,6 +163,8 @@ Always aim to leave one of these artifacts:
 - a per-class table: bug class, detected / unverified, mutants used, scope, method
 
 If no formal model is worth building, say why and propose the cheaper check.
+
+When no repository was given, write runnable artifacts to a temporary directory, list their paths, and say where they would go in a repository.
 
 ## Designing for verification
 

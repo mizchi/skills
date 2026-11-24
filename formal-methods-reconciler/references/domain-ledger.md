@@ -97,15 +97,15 @@ One row per confirmed bug class. Put the scope in the row, not in a footnote.
 ```text
 | Bug class | Status | Mutants | Oracle | Scope | Method |
 |---|---|---|---|---|---|
-| precedence mismatch vs table | detected | 6/6 | table from docs/precedence.md | expressions ≤ 3 operators | Z3, `make check-precedence` |
-| non-SyntaxError exception | detected | 3/3 | user-confirmed | all inputs ≤ 40 chars | bounded search |
-| non-termination | unverified | 0/2 | user-confirmed | — | time box (60 min) ran out |
+| cross-tenant read (CWE-284) | detected | 4/4 | docs/authz.md role table | 3 orgs, 4 roles, 5 resources (Alloy scope 5) | Alloy, `make check-authz` |
+| retried payment charges twice | detected | 2/2 | user-confirmed | 2 workers, 3 retries, crash at any step | TLC, `make check-idempotency` |
+| queue eventually drains (liveness) | unverified | 0/2 | user-confirmed | — | time box (60 min) ran out; needs weak fairness on the worker |
 ```
 
 Avoid:
 
 ```text
-The parser has no bugs. (Only for inputs up to length 3.)
+The billing service has no bugs. (Only for 2 workers and 3 retries.)
 ```
 
 ## Ambiguity Wording
