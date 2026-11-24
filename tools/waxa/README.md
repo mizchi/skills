@@ -29,8 +29,8 @@ waxa is an independent tool, not a fork or compatibility layer. The concepts it 
 npx @mizchi/waxa <path/to/eval.yaml>
 
 # pin a version when reproducibility matters
-# (0.1.x and the dnt-built 0.2.x / 0.3.x cannot spawn `claude` under Node:
-#  every trial comes back empty in 0 ms. Use 0.4.0 or later.)
+# (the published 0.1.x cannot spawn `claude` under Node: every trial comes
+#  back empty in 0 ms. 0.2.x and 0.3.x were never published. Use 0.4.0+.)
 npx @mizchi/waxa@0.4.0 <path/to/eval.yaml>
 
 # install globally if you call waxa frequently and startup latency matters
@@ -376,7 +376,7 @@ pnpm pack        # prepack: tsc → dist/, bundle references/empirical-prompt-tu
 Set `WAXA_CLAUDE_BIN` to point the executor and the LLM judge at another
 binary (the tests use a fake `claude` script). Before publishing, install the
 packed tarball in an empty directory and run `waxa --help` plus one real eval:
-the 0.2.x / 0.3.x packages passed `deno task check` yet failed every trial under
+the dnt-built 0.1.1 package type-checked under Deno yet failed every trial under
 Node.
 
 ## License

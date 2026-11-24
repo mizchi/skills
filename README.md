@@ -253,7 +253,7 @@ Run via `npx` (no global install needed):
 npx @mizchi/waxa <eval.yaml>
 ```
 
-`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.4.0` when reproducibility matters. Releases before 0.4.0 cannot start `claude` under Node and return empty outputs in 0 ms.
+`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.4.0` when reproducibility matters. The previously published 0.1.x cannot start `claude` under Node and returns empty outputs in 0 ms.
 
 Alternatives:
 
