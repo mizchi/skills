@@ -5,6 +5,12 @@ Use these templates to make formal-methods output reviewable by non-specialists.
 ## Full Ledger
 
 ```text
+bug class:
+  The class from the confirmed list (e.g. CWE-284 cross-tenant read, liveness: queue drains).
+
+oracle source:
+  user-confirmed / named document / inferred from code (say which code).
+
 source:
   docs / code / tests / config / logs / incident:
 
@@ -20,8 +26,18 @@ model question:
 tool:
   Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq / ...
 
+assumptions:
+  Bounds, small scope, fairness, constants, behaviour of other systems. Vacuity check result.
+  Proof escapes: output of scripts/check_proof_escapes.py, and `#print axioms` for Lean theorems.
+
 machine result:
   SAT / UNSAT / trace / proof failure / proved obligation.
+
+scope and method:
+  Unbounded or the exact bound; machine-checked (command) / bounded search / hand argument.
+
+sensitivity:
+  Mutants of this class and whether each was detected. detected / unverified.
 
 witness:
   Smallest input, relation instance, action trace, event schedule, or failed obligation.
@@ -72,6 +88,24 @@ Avoid:
 
 ```text
 Z3 returned unsat.
+```
+
+## Coverage Report
+
+One row per confirmed bug class. Put the scope in the row, not in a footnote.
+
+```text
+| Bug class | Status | Mutants | Oracle | Scope | Method |
+|---|---|---|---|---|---|
+| precedence mismatch vs table | detected | 6/6 | table from docs/precedence.md | expressions ≤ 3 operators | Z3, `make check-precedence` |
+| non-SyntaxError exception | detected | 3/3 | user-confirmed | all inputs ≤ 40 chars | bounded search |
+| non-termination | unverified | 0/2 | user-confirmed | — | time box (60 min) ran out |
+```
+
+Avoid:
+
+```text
+The parser has no bugs. (Only for inputs up to length 3.)
 ```
 
 ## Ambiguity Wording

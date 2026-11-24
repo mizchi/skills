@@ -137,7 +137,7 @@ Perspective sub-skills (invoked by `frontend-review-weekly`): `frontend-expert`,
 
 | Skill | Install path | Description |
 | --- | --- | --- |
-| [formal-methods-reconciler](formal-methods-reconciler/) | `formal-methods-reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks; choose Z3 / Alloy / TLA+ / P / Dafny / MoonBit prove / Lean / Rocq and translate counterexamples into domain questions. |
+| [formal-methods-reconciler](formal-methods-reconciler/) | `formal-methods-reconciler` | Reconcile specs, docs, code, tests, config, logs, and incidents with formal-methods checks — start from confirmed bug classes, not an inferred oracle; measure what the check catches with mutants; rule out vacuous proofs and sorry/axiom escapes; report each claim with its oracle, scope and method. |
 | [formal-methods-drift-guard](formal-methods-drift-guard/) | `formal-methods-drift-guard` | Maintain existing formal models by checking spec/code/model drift, classifying stale claims, and translating verifier changes into domain questions. |
 
 ### Tooling / Infra

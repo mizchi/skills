@@ -85,6 +85,15 @@ local testHyperfineBenchmark: Task = new {
   }
 }
 
+local testFormalMethodsReconciler: Task = new {
+  name = "test:formal-methods-reconciler"
+  description = "Test the proof-escape checker"
+  cmd = "python3 formal-methods-reconciler/scripts/test_check_proof_escapes.py"
+  inputs {
+    "formal-methods-reconciler/scripts/*.py"
+  }
+}
+
 local test: Task = new {
   name = "test"
   description = "Run repository checks"
@@ -95,6 +104,7 @@ local test: Task = new {
     testMizchiSkill
     testBazelBuildCache
     testHyperfineBenchmark
+    testFormalMethodsReconciler
     checkFrontmatter
     checkReadme
   }
@@ -119,6 +129,7 @@ tasks {
   testMizchiSkill
   testBazelBuildCache
   testHyperfineBenchmark
+  testFormalMethodsReconciler
   genReadme
   checkReadme
   test
