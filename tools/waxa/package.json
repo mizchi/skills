@@ -1,0 +1,52 @@
+{
+  "name": "@mizchi/waxa",
+  "version": "0.4.0",
+  "description": "Skill evaluation CLI with the empirical-prompt-tuning iteration loop, structured self-report grader, LLM-as-Judge, and with_skill / without_skill baseline comparison. Inspired by microsoft/waza and agentskills.io.",
+  "license": "MIT",
+  "author": "mizchi",
+  "type": "module",
+  "bin": {
+    "waxa": "dist/cli.js"
+  },
+  "exports": "./dist/waxa.js",
+  "files": [
+    "dist",
+    "references",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.28.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mizchi/skills.git",
+    "directory": "tools/waxa"
+  },
+  "bugs": {
+    "url": "https://github.com/mizchi/skills/issues"
+  },
+  "keywords": [
+    "agent-skill",
+    "eval",
+    "waza",
+    "llm-eval",
+    "claude"
+  ],
+  "scripts": {
+    "start": "node src/cli.ts",
+    "test": "node --test test/*.test.ts",
+    "check": "tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "bundle:references": "mkdir -p references && cp ../../empirical-prompt-tuning/SKILL.md references/empirical-prompt-tuning.md",
+    "prepack": "pnpm run build && pnpm run bundle:references"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3"
+  }
+}

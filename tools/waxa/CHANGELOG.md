@@ -5,6 +5,33 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-11-25
+
+### Changed
+
+- Rewritten for Node.js 24 without Deno or dnt. The CLI uses
+  `node:child_process`, `node:fs/promises` (including `glob`) and the `yaml`
+  package; the published package is compiled with `tsc` to `dist/`.
+- Exit codes are returned through `process.exitCode`, so output is flushed
+  before the process ends.
+
+### Fixed
+
+- The executor and the LLM judge failed on every trial under Node
+  (`dntShim.Deno.Command is not a constructor`), producing empty outputs in
+  0 ms and a pass rate of about 10%. A missing or failing `claude` binary is now
+  recorded per trial as `[runner-error] failed to start ...`.
+- The legacy layout ignored `.waxa.yaml` `paths.skills`, so the bundled
+  `examples/echo-skill` could not find its `SKILL.md`.
+- `examples/echo-skill`: `no_extra_prose` no longer counts the code fence that
+  models copy from the Self-report template.
+
+### Added
+
+- `WAXA_CLAUDE_BIN` selects the executor binary.
+- `node --test` suite with end-to-end runs against a fake `claude` (single run,
+  missing binary, `--baseline`, `iterate`, `init`, `audit`, legacy layout).
+
 ## [0.3.1] - 2026-05-12
 
 ### Changed

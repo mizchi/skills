@@ -18,9 +18,10 @@ graders:
     config:
       assertions:
         # Tolerate the appended Self-report block by counting only the
-        # deliverable lines (everything before "## Self-report"). The
-        # echo-skill should be a single line of output.
-        - "(output.split('## Self-report')[0]).trim().split('\\n').length === 1"
+        # deliverable lines (everything before "## Self-report"), minus the
+        # opening code fence many models copy from the Self-report template.
+        # The echo-skill should be a single line of output.
+        - "(output.split('## Self-report')[0]).replace(/```\\s*$/, '').trim().split('\\n').length === 1"
 
 tasks:
   - "tasks/*.yaml"

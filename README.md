@@ -253,7 +253,7 @@ Run via `npx` (no global install needed):
 npx @mizchi/waxa <eval.yaml>
 ```
 
-`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.1.1` when reproducibility matters (do not pin `0.1.0` — that release shipped a broken shebang and crashes before argv parsing).
+`npx` caches the package after the first run, so subsequent invocations are fast. Pin a version with `npx @mizchi/waxa@0.4.0` when reproducibility matters. Releases before 0.4.0 cannot start `claude` under Node and return empty outputs in 0 ms.
 
 Alternatives:
 
@@ -261,10 +261,11 @@ Alternatives:
 # install globally (when calling waxa frequently)
 npm i -g @mizchi/waxa
 
-# run from source (requires Deno 2+)
+# run from source (Node 24 runs the TypeScript directly)
 git clone https://github.com/mizchi/skills.git
 cd skills/tools/waxa
-deno task run -- path/to/eval.yaml
+pnpm install
+node src/cli.ts ../../path/to/eval.yaml
 ```
 
 Requirements: `claude` CLI on `PATH` and authenticated (OAuth login or `ANTHROPIC_API_KEY`).
