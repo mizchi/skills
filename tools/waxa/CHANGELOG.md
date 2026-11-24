@@ -5,6 +5,19 @@ All notable changes to `@mizchi/waxa` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `src/waxa.ts` (one 1,700-line file ported from Deno) is split into modules:
+  `args`, `types`, `process`, `self-report`, `graders`, `layout`, `run`,
+  `output`, `ledger`, `compare`, `init`, `audit`. `waxa.ts` keeps the public
+  exports and `main`; behaviour is unchanged.
+- Pure logic is separated from I/O and unit-tested: `buildTrialPrompt`,
+  `buildJudgePrompt` / `parseJudgeResponse`, `trailingZeroStreak` /
+  `assessConvergence`, `classifyUnclear`, `rankVariants`, `flagValue`.
+- `tsc` now also rejects unused locals and parameters.
+
 ## [0.4.0] - 2026-11-25
 
 ### Changed
