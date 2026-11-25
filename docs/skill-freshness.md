@@ -21,6 +21,9 @@ just --justfile skill-freshness.justfile check
 `check` はnpm・Hexの公開metadata、GitHub release・対象ファイル・branch、公式文書を
 取得してdigestを比較する。Actionsは実YAMLの正確なrefとcomposite内の依存も調べ、
 内蔵Nodeが24未満なら失敗する。プロジェクトのNode設定とは別の検査である。
+Cloudflare CLIの変更履歴、Cloudflare WorkersのNode.js互換表、MoonBitの最新FFI文書は、
+公式リポジトリのソースを監視する。公開ページを生成するときに加わる検索用メタデータや
+Markdown整形の変更は差分に含めない。
 pnpmのJSON形式は固定したpnpmによる読み取り専用の `pnpm audit --json` でも確認する。
 監査対象パッケージ名やadvisory本文は上流証拠へ含めない。
 

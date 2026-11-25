@@ -170,12 +170,15 @@
           "observed": "1.70.0"
         },
         {
-          "kind": "documentation",
-          "url": "https://developers.cloudflare.com/changelog/"
+          "kind": "github-path",
+          "repository": "cloudflare/cf",
+          "path": "packages/cli/CHANGELOG.md"
         },
         {
-          "kind": "documentation",
-          "url": "https://developers.cloudflare.com/workers/runtime-apis/nodejs/",
+          "kind": "github-path",
+          "repository": "cloudflare/cloudflare-docs",
+          "path": "src/content/docs/workers/runtime-apis/nodejs/index.mdx",
+          "ref": "production",
           "focus": [
             "fs",
             "http",
@@ -302,8 +305,10 @@
           ]
         },
         {
-          "kind": "documentation",
-          "url": "https://docs.moonbitlang.com/en/latest/language/ffi.html",
+          "kind": "github-path",
+          "repository": "moonbitlang/moonbit-docs",
+          "path": "next/language/ffi.md",
+          "ref": "main",
           "focus": [
             "Uint8Array",
             "FixedArray",
