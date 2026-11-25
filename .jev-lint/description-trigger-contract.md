@@ -13,6 +13,12 @@ descriptions.
 - Project skills help with a concrete development domain. A relevant symptom or
   task may select them even when the user does not name the skill. Do not require
   the user to say the exact skill name before recognizing such a problem.
+- A catalog router may run at the start of an in-scope project task to find and
+  load a matching skill. Apply the Project activation policy to a router whose
+  role is limited to task-based selection. It must preserve each routed skill's
+  own activation conditions, including explicit intent for Meta skills.
+  Installing, updating, enabling, or editing skills remains Meta maintenance
+  and requires an explicit relevant request.
 - Existing adoption and explicit user selection are legitimate boundaries for
   optional tools. A dotenvx skill need not trigger on every environment-file
   question. Authorization before executing a mutation is also distinct from

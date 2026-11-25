@@ -1,12 +1,12 @@
 {
   "schema": "jev-lint-eval-1",
-  "recorded": "2026-11-17T11:36:47.864Z",
+  "recorded": "2026-11-25T11:16:36.128Z",
   "model": "jev-1.14.0",
   "suite": "text/description-trigger-policy",
   "rules": [
     {
       "id": "description-trigger-policy",
-      "draft": "3d959d5b1dac",
+      "draft": "9e646eebb997",
       "at": 0.565
     }
   ],
@@ -15,65 +15,20 @@
     [
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/a.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.05,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/g.md",
-        "line": 1,
-        "endLine": 10,
-        "kind": "noul",
-        "value": 0.03,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
         "file": "rules/text/description-trigger-policy/fixtures/f.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.86,
+        "value": 0.93,
         "confidence": null
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/b.md",
+        "file": "rules/text/description-trigger-policy/fixtures/a.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.89,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/e.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.05,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/d.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.9,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/c.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.08,
+        "value": 0.06,
         "confidence": null
       },
       {
@@ -87,11 +42,20 @@
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/j.md",
+        "file": "rules/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 10,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/b.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.93,
+        "value": 0.78,
         "confidence": null
       },
       {
@@ -100,25 +64,25 @@
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.04,
+        "value": 0.05,
         "confidence": null
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/i.md",
+        "file": "rules/text/description-trigger-policy/fixtures/p.md",
+        "line": 1,
+        "endLine": 10,
+        "kind": "noul",
+        "value": 0.09,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/c.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.04,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/n.md",
-        "line": 1,
-        "endLine": 11,
-        "kind": "noul",
-        "value": 0.94,
+        "value": 0.06,
         "confidence": null
       },
       {
@@ -141,62 +105,6 @@
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/o.md",
-        "line": 1,
-        "endLine": 3,
-        "kind": "noul",
-        "value": 0.03,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/p.md",
-        "line": 1,
-        "endLine": 10,
-        "kind": "noul",
-        "value": 0.07,
-        "confidence": null
-      }
-    ],
-    [
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/c.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.07,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/a.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.07,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/b.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.9,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/g.md",
-        "line": 1,
-        "endLine": 10,
-        "kind": "noul",
-        "value": 0.03,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
         "file": "rules/text/description-trigger-policy/fixtures/e.md",
         "line": 1,
         "endLine": 8,
@@ -206,16 +114,7 @@
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/f.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.93,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/d.md",
+        "file": "rules/text/description-trigger-policy/fixtures/j.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
@@ -224,139 +123,29 @@
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/i.md",
+        "file": "rules/text/description-trigger-policy/fixtures/router.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.04,
+        "value": 0.26,
         "confidence": null
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/j.md",
+        "file": "rules/text/description-trigger-policy/fixtures/router-maintenance.md",
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.94,
+        "value": 0.77,
         "confidence": null
       },
       {
         "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/h.md",
+        "file": "rules/text/description-trigger-policy/fixtures/router-with-build-note.md",
         "line": 1,
-        "endLine": 8,
+        "endLine": 12,
         "kind": "noul",
-        "value": 0.97,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/l.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.97,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/k.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.05,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/n.md",
-        "line": 1,
-        "endLine": 11,
-        "kind": "noul",
-        "value": 0.94,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/m.md",
-        "line": 1,
-        "endLine": 11,
-        "kind": "noul",
-        "value": 0.06,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/p.md",
-        "line": 1,
-        "endLine": 10,
-        "kind": "noul",
-        "value": 0.07,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/o.md",
-        "line": 1,
-        "endLine": 3,
-        "kind": "noul",
-        "value": 0.03,
-        "confidence": null
-      }
-    ],
-    [
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/a.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.05,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/b.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.91,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/e.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.05,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/f.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.91,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/c.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.07,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/g.md",
-        "line": 1,
-        "endLine": 10,
-        "kind": "noul",
-        "value": 0.02,
+        "value": 0.18,
         "confidence": null
       },
       {
@@ -365,52 +154,7 @@
         "line": 1,
         "endLine": 8,
         "kind": "noul",
-        "value": 0.94,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/j.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.94,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/i.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.04,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/l.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.98,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/k.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.04,
-        "confidence": null
-      },
-      {
-        "rule": "description-trigger-policy",
-        "file": "rules/text/description-trigger-policy/fixtures/h.md",
-        "line": 1,
-        "endLine": 8,
-        "kind": "noul",
-        "value": 0.97,
+        "value": 0.91,
         "confidence": null
       },
       {
@@ -424,9 +168,137 @@
       },
       {
         "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/o.md",
+        "line": 1,
+        "endLine": 3,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 10,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.79,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.9,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.93,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.92,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
         "file": "rules/text/description-trigger-policy/fixtures/m.md",
         "line": 1,
         "endLine": 11,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.07,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
         "kind": "noul",
         "value": 0.06,
         "confidence": null
@@ -442,19 +314,228 @@
       },
       {
         "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.24,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router-maintenance.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.69,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/n.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.96,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/p.md",
+        "line": 1,
+        "endLine": 10,
+        "kind": "noul",
+        "value": 0.1,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router-with-build-note.md",
+        "line": 1,
+        "endLine": 12,
+        "kind": "noul",
+        "value": 0.18,
+        "confidence": null
+      }
+    ],
+    [
+      {
+        "rule": "description-trigger-policy",
         "file": "rules/text/description-trigger-policy/fixtures/p.md",
         "line": 1,
         "endLine": 10,
         "kind": "noul",
         "value": 0.09,
         "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/m.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/a.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/b.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.82,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/i.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/h.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/o.md",
+        "line": 1,
+        "endLine": 3,
+        "kind": "noul",
+        "value": 0.02,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/j.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.92,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router-with-build-note.md",
+        "line": 1,
+        "endLine": 12,
+        "kind": "noul",
+        "value": 0.18,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/c.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.06,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/n.md",
+        "line": 1,
+        "endLine": 11,
+        "kind": "noul",
+        "value": 0.94,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/d.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.92,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.17,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/l.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.97,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/k.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.05,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/router-maintenance.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.71,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/e.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.04,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/g.md",
+        "line": 1,
+        "endLine": 10,
+        "kind": "noul",
+        "value": 0.03,
+        "confidence": null
+      },
+      {
+        "rule": "description-trigger-policy",
+        "file": "rules/text/description-trigger-policy/fixtures/f.md",
+        "line": 1,
+        "endLine": 8,
+        "kind": "noul",
+        "value": 0.9,
+        "confidence": null
       }
     ]
   ],
   "spent": {
-    "calls": 48,
-    "inputTokens": 60984,
-    "usd": 0.002561328,
-    "ms": 1304
+    "calls": 57,
+    "inputTokens": 77457,
+    "usd": 0.003253194,
+    "ms": 394
   }
 }

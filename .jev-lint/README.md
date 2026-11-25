@@ -77,11 +77,10 @@ Seven development examples, each run three times, separated at clean <= 0.19
 and bad >= 0.94. The fixed midpoint is 0.565. A separate synthetic evaluation
 suite has 16 cases (7 defects, 9 controls), with TP 7 / FP 0 / FN 0 and no
 decision flips over three passes. The unrelated appendices preserve both a
-clean and a bad decision. These examples have wide margins, so the rule carries
-an explicit `inconclusive` declaration: cutoff-boundary accuracy and drift
-sensitivity are not established. The evaluated sources, raw answers and accepted
-record are kept in its directory; the two development attempts are under
-`development/` and `development-v2/`.
+clean and a bad decision. The 2026-11-25 follow-up added three router cases
+and ran all 19 cases three times at the same cutoff, yielding TP 8, FP 0, FN 0
+and no decision flips. See the [rule record](rules/text/description-trigger-policy/README.md)
+for the fixture scope and the original 16-case evaluation.
 
 ## Mandatory controls when authoring rules
 

@@ -1,14 +1,13 @@
 # Description trigger policy
 
-This local rule implements the semantic Meta/Project activation boundary in
-`optimizing-descriptions/SKILL.md`. It reads a skill's own description and
-operative body, not invocation logs.
+This local rule implements the [description activation policy](../../../description-trigger-contract.md).
+It reads a skill's own description and operative body.
 
 Meta descriptions need an explicit relevant user-request boundary. Project
 descriptions can accept related symptoms without requiring their exact skill
-name. Existing optional-tool adoption and authorization before a mutation are
-allowed. Character counts, YAML validity and unrelated body defects are outside
-this rule.
+name. A catalog router can select skills for an in-scope task while preserving
+the activation conditions of each skill. Existing optional-tool adoption and
+authorization before a mutation are allowed.
 
 The development-only cutoff is **0.565**, midway between the highest clean
 sample (0.19) and the lowest defect sample (0.94) over three passes of seven
@@ -22,11 +21,12 @@ pairs append the same unrelated information to one clean and one bad input;
 both retain their original decision.
 
 `case-coverage.json` describes those roles outside the model-visible input.
-`expect.yml` has the expected labels and reasons. `freeze.json` and
-`evaluation.json` retain the pre-evaluation source hashes and raw API answers.
-`baseline.json` is the accepted native Jev record; `acceptance.json` records the
-offline acceptance after adding the honest `inconclusive` annotation. That
-annotation changes no model-visible question.
+`expect.yml` has the expected labels and reasons. `freeze.json`,
+`evaluation.json` and `acceptance.json` document the original 16-case evaluation.
+The 2026-11-25 evaluation after the router exception ran all 19 cases three
+times at the existing cutoff. It returned TP 8, FP 0, FN 0 and zero decision
+flips. The last three cases cover routing, automatic maintenance, and an
+unrelated build note. `baseline.json` contains the accepted 19-case run.
 
 This corpus is self-authored, small and wide-margin. It does not establish
 cutoff-boundary accuracy, statistical independence from every nuisance, actual

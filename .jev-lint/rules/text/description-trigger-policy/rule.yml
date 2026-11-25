@@ -10,13 +10,6 @@ context: [../../../description-trigger-contract.md]
 # Fitted on seven development cases, three passes: clean <= 0.19, bad >= 0.94.
 # Evaluation cases are not used to choose this 0.565 midpoint.
 threshold: 0.565
-inconclusive: >-
-  The separate 16-case synthetic evaluation tried Meta guard omission, ambient
-  alternatives, exact-name-only Project activation, adoption/authorization
-  exceptions, Japanese wording and unrelated controls. Cleans stayed at or below
-  0.09 and defects at or above 0.86 across three passes. Both mean margins exceed
-  0.25 at the development-only cutoff, so these fixtures cannot detect a moderate
-  cutoff drift. This informational candidate does not establish boundary accuracy.
 severity: info
 ask: >-
   This skill's YAML description fails the repository's Meta-versus-Project activation policy: a Meta description does not require an explicit relevant user request, or a Project description requires the exact skill name.

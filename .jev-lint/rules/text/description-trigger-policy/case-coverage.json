@@ -80,6 +80,21 @@
       "file": "fixtures/p.md",
       "kind": "unrelated",
       "reason": "An unrelated unit inconsistency does not establish a description activation-policy defect."
+    },
+    {
+      "file": "fixtures/router.md",
+      "kind": "false-positive-risk",
+      "reason": "A task-based router loads matching skills and preserves the explicit-request gate of routed Meta skills."
+    },
+    {
+      "file": "fixtures/router-maintenance.md",
+      "kind": "false-negative-risk",
+      "reason": "A router description also permits automatic maintenance of installed skills."
+    },
+    {
+      "file": "fixtures/router-with-build-note.md",
+      "kind": "unrelated",
+      "reason": "An unrelated build note does not change the task-based routing boundary."
     }
   ],
   "independencePairs": [
@@ -90,6 +105,10 @@
     {
       "base": "fixtures/d.md",
       "variant": "fixtures/n.md"
+    },
+    {
+      "base": "fixtures/router.md",
+      "variant": "fixtures/router-with-build-note.md"
     }
   ]
 }
