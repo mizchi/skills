@@ -138,6 +138,7 @@ asks for that skill or its job by name.
 | `multi-agent-orchestration` | Decide whether to spawn agents and which topology to use — single-agent default, independently verifiable work, DAG + verifier. |
 | `empirical-prompt-tuning` | Iteratively evaluate and improve agent-facing text instructions using unbiased subagent executors. (explicit only) |
 | `task-based-eval` | Measure goal achievement from fresh agents using tools, documents, interfaces or workflows; organize task definitions under `evals/<task-name>/` and improve from observable evidence. |
+| `rex-control` | Run commands in reusable Rex side panes, switch commands and capture output from an agent session. |
 | `repo-retrospective` | A repository's history as data: decision points from git, KPI history recorded or re-measured at past commits, and a data contract so dashboards stay disposable views. |
 | `retrospective-codify` | Convert trial-and-error lessons into the highest enforcing level — structure, types, ast-grep rules, tests, then skills / CLAUDE.md rules. (explicit only) |
 | `blast-radius` | Find what a small-looking change breaks outside its diff and prove the one fact it is safe because of by running real code. |

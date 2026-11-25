@@ -66,6 +66,15 @@ local testMizchiSkill: Task = new {
   cache = false
 }
 
+local testRexControl: Task = new {
+  name = "test:rex-control"
+  description = "Check Rex side pane selection with live and stale anchors"
+  cmd = "node --test rex-control/scripts/registry.test.mts"
+  inputs {
+    "rex-control/scripts/*.mts"
+  }
+}
+
 local testBazelBuildCache: Task = new {
   name = "test:bazel-build-cache"
   description = "Test the Bazel hygiene check and run it on the bundled example"
@@ -114,6 +123,7 @@ local test: Task = new {
     testMaintainerPersona
     testOssMaintainer
     testMizchiSkill
+    testRexControl
     testBazelBuildCache
     testHyperfineBenchmark
     testFormalMethodsReconciler
@@ -140,6 +150,7 @@ tasks {
   testMaintainerPersona
   testOssMaintainer
   testMizchiSkill
+  testRexControl
   testBazelBuildCache
   testHyperfineBenchmark
   testFormalMethodsReconciler
