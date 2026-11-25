@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-11-25T11:17:53.748Z",
+  "checkedAt": "2026-11-25T12:39:33.381Z",
   "watchDigest": "02b5c799833bc971641c8ca70964833dde86f30351df8b56ed9ddfca4d89aa48",
   "sources": {
     "99c5b030bfd1ceb046d52f92b2dcf875ff350810f02ab5013c8cfed7b2f836b4": {
@@ -23,17 +23,6 @@
       "digest": "6fcd82610bf3d133ced1a16eeabd1217bcaa0db64fcd31a5cd7083501ee36037",
       "url": "https://api.github.com/repos/actions/cache/releases/latest"
     },
-    "064099a28f33317e829147690a7446a7bd2062c0936bc3b643de35ada2e2464e": {
-      "revision": "5b0524f730db83f9513c18ab31a6c086c7239076",
-      "digest": "6f59103ef549bb54728f2fd8e8946f3b76e9e0e6e74eb62698fc3ada2bbf167f",
-      "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=3d3c42e5aac5ba805825da76410c181273ba90b1",
-      "runtime": "node24"
-    },
-    "48fa5f438099f5ebf8dbb13916d58c9b3b5c65d06389a4bdd49d310881ed15c1": {
-      "revision": "v6.3.0",
-      "digest": "98bc9c7ed0835bbd0cd0fd3fcf010e29872613a87b2d3c9bb25ff743b437a16a",
-      "url": "https://api.github.com/repos/aws-actions/configure-aws-credentials/releases/latest"
-    },
     "857665967f5195a481526857a1b5f3619c4a29e3ea51762624f6a1d78f478892": {
       "revision": "v6.1.1",
       "digest": "399019002ec4d013d620bb9d19db8164bf3ae95c3f8116f9b98e54abe0b23ba3",
@@ -43,6 +32,17 @@
       "revision": "v8.0.2",
       "digest": "6dea61ad4600836e89b6f43c88bb23c0ffd8ac877ed59656e840e62f6bf5e403",
       "url": "https://api.github.com/repos/actions/download-artifact/releases/latest"
+    },
+    "48fa5f438099f5ebf8dbb13916d58c9b3b5c65d06389a4bdd49d310881ed15c1": {
+      "revision": "v6.3.0",
+      "digest": "98bc9c7ed0835bbd0cd0fd3fcf010e29872613a87b2d3c9bb25ff743b437a16a",
+      "url": "https://api.github.com/repos/aws-actions/configure-aws-credentials/releases/latest"
+    },
+    "064099a28f33317e829147690a7446a7bd2062c0936bc3b643de35ada2e2464e": {
+      "revision": "5b0524f730db83f9513c18ab31a6c086c7239076",
+      "digest": "6f59103ef549bb54728f2fd8e8946f3b76e9e0e6e74eb62698fc3ada2bbf167f",
+      "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "runtime": "node24"
     },
     "19b0006a26f3e0ee2c6084cbec4de1877d7dfdb3d22647732c1dd5a354eaf778": {
       "revision": "31057efa69b67281683c7b601a1d202329eaa3c1",
@@ -78,10 +78,11 @@
       "digest": "261b22280d09611ec3584cd2fb371db5b3780a7d271a5f362a6b3da43679b8ad",
       "url": "https://registry.npmjs.org/cf/latest"
     },
-    "fa481aea11292ae1cb1b70fe0b60f630eb46b49e57c835dd2fe42acb324cc316": {
-      "revision": "1.70.1",
-      "digest": "90902fd158fdafaa673293b7a875285f10da5e74d2188e6753128d290c679da7",
-      "url": "https://registry.npmjs.org/%40cloudflare%2Fvite-plugin/latest"
+    "9d1eb3bc1ca375b4a2338131f884f65c2bd57e607029ed307a6540ec245d2792": {
+      "revision": "1e37115e0c7decc8687e296fc59086ecf4fcffaa",
+      "digest": "4a7a10b6065f25ba3b30902296a799a17ecba477fa6dfe4c1d547bfa400762d5",
+      "url": "https://api.github.com/repos/pnpm/action-setup/contents/action.yml?ref=73e46992e05b19abd31f2f3c20e0e7370d762115",
+      "runtime": "node24"
     },
     "9aa7e77e15634e00a4488b41c0cbf14234c208de697cfc01216e51dbcd5ae52d": {
       "revision": "fdfdff598f5e88eb93ef987f86739841c3fc85c6",
@@ -89,45 +90,50 @@
       "url": "https://api.github.com/repos/aws-actions/configure-aws-credentials/contents/action.yml?ref=e1253824e5c10ff9df46874f81ed3ec929e19cfd",
       "runtime": "node24"
     },
+    "f523d9348c01646d76834d4e28a77f3b297ce8bdbdb0eba090c35dafba04be26": {
+      "revision": "eadd229eddbed30df2a2d85ad13143b189297c859dc50754ea487ff99ef728d6",
+      "digest": "eadd229eddbed30df2a2d85ad13143b189297c859dc50754ea487ff99ef728d6",
+      "url": "https://developers.cloudflare.com/changelog/"
+    },
     "f4673c107da0e8a5f073d945911df00f49f2d514423fcfdb2af3a71b094d4ffc": {
       "revision": "2bfb4ffce3ddd16c74dc85a3a9a7532cb41913956291661a459bcd93a1772ce6",
       "digest": "2bfb4ffce3ddd16c74dc85a3a9a7532cb41913956291661a459bcd93a1772ce6",
       "url": "https://developers.cloudflare.com/workers/runtime-apis/nodejs/"
-    },
-    "f523d9348c01646d76834d4e28a77f3b297ce8bdbdb0eba090c35dafba04be26": {
-      "revision": "1eaa00257811f024c68fd023ca0a8c95ee2eaff753a1dea36fb3b36a1a6e27bd",
-      "digest": "1eaa00257811f024c68fd023ca0a8c95ee2eaff753a1dea36fb3b36a1a6e27bd",
-      "url": "https://developers.cloudflare.com/changelog/"
     },
     "0ac8f0d7434d26867f5964bf04051c12e85436759fe924b5db4805ff824ba41e": {
       "revision": "62f004df49be8f56fac1310fb05b762cbd8fa3a68b484a834aa43ad4f794d684",
       "digest": "62f004df49be8f56fac1310fb05b762cbd8fa3a68b484a834aa43ad4f794d684",
       "url": "https://developers.cloudflare.com/cf/get-started/resources/"
     },
-    "b633e8e386164b8f5a64fc7de8a59520f67d0053591d77865cde31dff72dc490": {
-      "revision": "7444988317fcf3002aeffb704a33100cd774308ae70b0ae66e96e90b6c754bf6",
-      "digest": "7444988317fcf3002aeffb704a33100cd774308ae70b0ae66e96e90b6c754bf6",
-      "url": "https://www.moonbitlang.com/updates"
-    },
     "904abc5263ba4a002167ea02fba6e87c39f6f64d74284169b81d72cffdea3537": {
       "revision": "2.0.0-rc.5",
       "digest": "faad80c0811ac1f2c095c0972c784e24cd13caf22cff5d103c3f0342a9a8f5cb",
       "url": "https://registry.npmjs.org/%40cloudflare%2Fvite-plugin/rc"
+    },
+    "fa481aea11292ae1cb1b70fe0b60f630eb46b49e57c835dd2fe42acb324cc316": {
+      "revision": "1.70.1",
+      "digest": "90902fd158fdafaa673293b7a875285f10da5e74d2188e6753128d290c679da7",
+      "url": "https://registry.npmjs.org/%40cloudflare%2Fvite-plugin/latest"
+    },
+    "b633e8e386164b8f5a64fc7de8a59520f67d0053591d77865cde31dff72dc490": {
+      "revision": "7444988317fcf3002aeffb704a33100cd774308ae70b0ae66e96e90b6c754bf6",
+      "digest": "7444988317fcf3002aeffb704a33100cd774308ae70b0ae66e96e90b6c754bf6",
+      "url": "https://www.moonbitlang.com/updates"
     },
     "d9ab26bde489e8fc908e21cf55d8d0a97ee1c3fde65ba55c7b08eb3860c5c3cf": {
       "revision": "bad9de8fedbb4bc450ead6b8248b081e57f825b6",
       "digest": "0fb3676ac7b4b8c94947e012358c5195116260524ee7921fb3162eafc73dfc77",
       "url": "https://api.github.com/repos/cloudflare/cf/contents/packages/cli/README.md"
     },
-    "bfe9c3f915be5fcf85f9a49c1a96aa9816883d04357d412989d46555ddf2cc3a": {
-      "revision": "a553546da09682dee33821fe7c3eca9e60bfa2d3",
-      "digest": "40d3f20280baac243c5984577272442fa3a3ebf7fcfa4b22a57b040ccfe5abc2",
-      "url": "https://api.github.com/repos/moonbitlang/moon/commits/main"
-    },
     "8e4b5c89aa4c3c830bbe607b0f9ba2eddb07bd3177fc3fdabd6c5603b39e64d8": {
       "revision": "c63ad46e9906a352eaefd28bcff401e034a7e82f",
       "digest": "ac06531205fdb82185e2494e27dedc49273bf4d46153dc67c0b953581d5f9d15",
       "url": "https://api.github.com/repos/moonbitlang/async/contents/moon.mod"
+    },
+    "ceb431ed95fabb5eab3c63d5cc7ad0337f2feacad79ad21b7dea40f385aba47e": {
+      "revision": "bc4d146dbee1efb055cc3417c04d6a671f8f0223",
+      "digest": "b5a2ec844b76bedbb54c09751b911b81851d59a1cfaadb211124c5b34acc8f89",
+      "url": "https://api.github.com/repos/mizchi/js.mbt/contents/CHANGELOG.md"
     },
     "705089d504c8f206f129bc52fda397230d00bf36dde465e16bf8e9402517478a": {
       "revision": "936d56fe8520646e44d25224d14dd911625eb7c6800b31f1abb29d46fd487607",
@@ -139,26 +145,20 @@
       "digest": "7edf0160cea297c8a3f98bc49be7fb9db791f218a7df9d4d75f5d27e25d6cb52",
       "url": "https://www.moonbitlang.com/updates/2026/11/05/index"
     },
-    "ceb431ed95fabb5eab3c63d5cc7ad0337f2feacad79ad21b7dea40f385aba47e": {
-      "revision": "bc4d146dbee1efb055cc3417c04d6a671f8f0223",
-      "digest": "b5a2ec844b76bedbb54c09751b911b81851d59a1cfaadb211124c5b34acc8f89",
-      "url": "https://api.github.com/repos/mizchi/js.mbt/contents/CHANGELOG.md"
+    "bfe9c3f915be5fcf85f9a49c1a96aa9816883d04357d412989d46555ddf2cc3a": {
+      "revision": "a553546da09682dee33821fe7c3eca9e60bfa2d3",
+      "digest": "40d3f20280baac243c5984577272442fa3a3ebf7fcfa4b22a57b040ccfe5abc2",
+      "url": "https://api.github.com/repos/moonbitlang/moon/commits/main"
     },
     "b1fb91f7f350e30cb66959a06aa42bdaf5e6dc56edabab9f81ce31e78656873e": {
-      "revision": "cdbe470ce90d5970b205baf8d9e3b7f6f5271a6027d8528597d302ce1d210b86",
-      "digest": "cdbe470ce90d5970b205baf8d9e3b7f6f5271a6027d8528597d302ce1d210b86",
+      "revision": "effb39aa2c1d45f1a798bf342ca47dff2688780c9a14e6c3cee7a66d086ff891",
+      "digest": "effb39aa2c1d45f1a798bf342ca47dff2688780c9a14e6c3cee7a66d086ff891",
       "url": "https://docs.moonbitlang.com/en/latest/language/ffi.html"
     },
     "19ca2b18abb5693cc2191e6ca8cbfa99bca4ce0ff79e3f9410f7da477658eb13": {
       "revision": "2fdeb11e59a3145e68d1fdb70c42dbadb95bc8c6",
       "digest": "7b1b8f868cdb88586378bd89ec074418cea19cbb60143dc6788587eed93ead97",
       "url": "https://api.github.com/repos/mizchi/x/contents/moon.mod"
-    },
-    "9d1eb3bc1ca375b4a2338131f884f65c2bd57e607029ed307a6540ec245d2792": {
-      "revision": "1e37115e0c7decc8687e296fc59086ecf4fcffaa",
-      "digest": "4a7a10b6065f25ba3b30902296a799a17ecba477fa6dfe4c1d547bfa400762d5",
-      "url": "https://api.github.com/repos/pnpm/action-setup/contents/action.yml?ref=73e46992e05b19abd31f2f3c20e0e7370d762115",
-      "runtime": "node24"
     },
     "815208a5384c66cfd811c550242880521779ed050489f4616f17de3bdb59d3f3": {
       "revision": "0.73.1",
@@ -169,11 +169,6 @@
       "revision": "1.6.0",
       "digest": "5d4aec95d115ddf8b70a3a35b93e5c41a26b1e280bb8566775509f267d7f70ca",
       "url": "https://registry.npmjs.org/%40earendil-works%2Fpi-coding-agent/latest"
-    },
-    "12e63ffef63a82a97acf1259bb5cb50f47525a3ebd182640a7838a566da2ca56": {
-      "revision": "v0.38.1",
-      "digest": "f864949425246bd96e2fcddab57ae65ba9c15dc61e5841980244291ca03c3981",
-      "url": "https://api.github.com/repos/microsoft/apm/releases/latest"
     },
     "c2db6a455683c957c44792e0ee3d0b5bb48a4fe40cf37de8e1e86db65703ebe7": {
       "revision": "ca2ce463bea29b3ab3025b631eab17d5e544df5601dca175c5d2f9a5016f28e9",
@@ -190,50 +185,55 @@
       "digest": "d9034ccbf2219a58712d8dd4fcdf47e687d77131e71dd5d119d8a71e9bd2a2e8",
       "url": "https://api.github.com/repos/earendil-works/pi/contents/packages/coding-agent/docs/sdk.md"
     },
-    "01a24f1e52cc8c6b9609914bc35ee8c5ab52428ba10bcc809bfd51c0a1b2172b": {
-      "revision": "2558850d1b87dac5ee5b8b7d5e5b4652eaae453b",
-      "digest": "d1d2b1bd4e57a3b2ab6f910068e8382759d12a94fbecf1332e96a9ebe4683eb4",
-      "url": "https://api.github.com/repos/earendil-works/pi/contents/packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+    "12e63ffef63a82a97acf1259bb5cb50f47525a3ebd182640a7838a566da2ca56": {
+      "revision": "v0.38.1",
+      "digest": "f864949425246bd96e2fcddab57ae65ba9c15dc61e5841980244291ca03c3981",
+      "url": "https://api.github.com/repos/microsoft/apm/releases/latest"
     },
     "9f873b684481223efaf185586fc3d7beea5e6b09adc4152f75b4c1a9989b7fb2": {
       "revision": "d7973f93ec761f978f419ca71399dbdc41109355",
       "digest": "1c0ef1c3d4bb3ce288c5aeb725d5074b25b231ce293cf50999406b13f04782c6",
       "url": "https://api.github.com/repos/vercel-labs/skills/contents/README.md"
     },
+    "01a24f1e52cc8c6b9609914bc35ee8c5ab52428ba10bcc809bfd51c0a1b2172b": {
+      "revision": "2558850d1b87dac5ee5b8b7d5e5b4652eaae453b",
+      "digest": "d1d2b1bd4e57a3b2ab6f910068e8382759d12a94fbecf1332e96a9ebe4683eb4",
+      "url": "https://api.github.com/repos/earendil-works/pi/contents/packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+    },
     "0719374ed55f177fdd82f30cd7416123e9b416f3b2b9f6ec2ad14066beb0afd1": {
       "revision": "0.5.0",
       "digest": "69d102c26353fef5bc468335e55999604e4040e5663a4788e5e8f4d6f6597810",
       "url": "https://registry.npmjs.org/%40mizchi%2Fvrt/latest"
-    },
-    "c9841311384b4fad4d0f910bbcfc80837015c75ce22d07944b4f56395ebfa948": {
-      "revision": "0.24.0",
-      "digest": "aee12058a6459a7285171aed8237ed5d227d5f34109ebac03b9fdd4c90c64b7c",
-      "url": "https://registry.npmjs.org/%40mizchi%2Fvlmkit/latest"
-    },
-    "6c30f38a11a0615450972ec3c46f26ad0fa328267443116072c68d040d026ec4": {
-      "revision": "c85d287a88253e1311afa660fa3fe99e3f71c305",
-      "digest": "3d33038243dd7be31349cae0841de0163dfead3d0f4f30b073879a88b8544a53",
-      "url": "https://api.github.com/repos/mizchi/vlmkit/contents/CHANGELOG.md"
     },
     "d1968a39e4a435661f23e6d0018eb8ab304d95192c7c06a4a5b61ae1eeff94b7": {
       "revision": "v0.9.1",
       "digest": "93f6f5b3d48d3f0c24a34d174714844e9f1686fdf4cfbe3918cf599011289bee",
       "url": "https://api.github.com/repos/mizchi/vlmkit/releases/latest"
     },
-    "8eead3164438355d9ce296ff5bc9579c0e39badf675f4ba906ce2b6b7a493a69": {
-      "revision": "0.301.2",
-      "digest": "f7c6c8963e1a7c60a9dcb112ea2201ced8b3f3c1a31e654596656bb33cc30c4f",
-      "url": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-node/latest"
+    "c9841311384b4fad4d0f910bbcfc80837015c75ce22d07944b4f56395ebfa948": {
+      "revision": "0.24.0",
+      "digest": "aee12058a6459a7285171aed8237ed5d227d5f34109ebac03b9fdd4c90c64b7c",
+      "url": "https://registry.npmjs.org/%40mizchi%2Fvlmkit/latest"
+    },
+    "2d5490368eee1d0117a94d8c0bb613d179ff52fe7065247487ec46899bed81c3": {
+      "revision": "b979dd50907aae38df92284186e98278abb734ec02e56ee8324511974adcb7ff",
+      "digest": "b979dd50907aae38df92284186e98278abb734ec02e56ee8324511974adcb7ff",
+      "url": "https://code.claude.com/docs/en/plugins-reference"
+    },
+    "6c30f38a11a0615450972ec3c46f26ad0fa328267443116072c68d040d026ec4": {
+      "revision": "c85d287a88253e1311afa660fa3fe99e3f71c305",
+      "digest": "3d33038243dd7be31349cae0841de0163dfead3d0f4f30b073879a88b8544a53",
+      "url": "https://api.github.com/repos/mizchi/vlmkit/contents/CHANGELOG.md"
     },
     "830910fe6646d32794ee25d2609127d2bf1babd45d824aa43212db086d21b9c7": {
       "revision": "3.1.1",
       "digest": "9f7c671e8e13cca9ce1e2926caab55d74c72f1c357c76fc9c9f44dca1c49118e",
       "url": "https://registry.npmjs.org/%40opentelemetry%2Fresources/latest"
     },
-    "944cbcfff2279df3f62f590085ba318c998fd88b6f6cc39e82a13e2bc95b5b5e": {
-      "revision": "2.12.0",
-      "digest": "0be2f5f1039ead3730f67e1ca72287f1322946dc34a5b67010972a921652239f",
-      "url": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-base/latest"
+    "8eead3164438355d9ce296ff5bc9579c0e39badf675f4ba906ce2b6b7a493a69": {
+      "revision": "0.301.2",
+      "digest": "f7c6c8963e1a7c60a9dcb112ea2201ced8b3f3c1a31e654596656bb33cc30c4f",
+      "url": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-node/latest"
     },
     "fe7bcb7d8be6936692bb8b42ea679d2e5ccb5fcbc658dd5614cd7ba4da2bd013": {
       "revision": "1.11.0",
@@ -245,40 +245,45 @@
       "digest": "4e15ab8460884af100b771a48c1bd47bb9f9abde3adcbbb529cc5cca5d299fd0",
       "url": "https://opentelemetry.io/docs/specs/semconv/"
     },
+    "1b1a2749794bf4376d082b3d4fcd8662889ed00844e0dbe1e8c50e34787f6606": {
+      "revision": "1.8.0",
+      "digest": "30d6db2c2198bbd93cc7de333efc857be8865439f24373cff9b3f2a0cffb8659",
+      "url": "https://registry.npmjs.org/vite-plus/latest"
+    },
     "1bd1a04e62e83398fdab098ee1b63ab55ae54738ddde8c1ec18fce5bd68c5908": {
       "revision": "26991a80458c197dcb0f0580644abea2a1d1c742",
       "digest": "674c47e4ef6b7fae060f380378945ed5c6d33e234610be208b23990a16ce818e",
       "url": "https://api.github.com/repos/open-telemetry/opentelemetry-js/contents/doc/3.x/migration-guide.md"
     },
-    "1b1a2749794bf4376d082b3d4fcd8662889ed00844e0dbe1e8c50e34787f6606": {
-      "revision": "1.8.0",
-      "digest": "30d6db2c2198bbd93cc7de333efc857be8865439f24373cff9b3f2a0cffb8659",
-      "url": "https://registry.npmjs.org/vite-plus/latest"
+    "944cbcfff2279df3f62f590085ba318c998fd88b6f6cc39e82a13e2bc95b5b5e": {
+      "revision": "2.12.0",
+      "digest": "0be2f5f1039ead3730f67e1ca72287f1322946dc34a5b67010972a921652239f",
+      "url": "https://registry.npmjs.org/%40opentelemetry%2Fsdk-trace-base/latest"
     },
     "b1eef541c189c6a5798631242f3a8402b4a0aab0e4d1f2e8e33749261effa543": {
       "revision": "1.11.0",
       "digest": "e1499534f5a5f308f5ee118b1cd3d3d7c4bb9ce78afc6ee2971022886b2368b3",
       "url": "https://registry.npmjs.org/%40void%2Freact/latest"
     },
-    "b54f7eb86365e498a5ba6f485498393e020e7567f8fb133b4381d08f307b1e78": {
-      "revision": "1.65.1",
-      "digest": "b41c94412d0b1fb9ea3144a0ee6ef5a419f3ef53a7d249abf5710201e39739f7",
-      "url": "https://registry.npmjs.org/%40playwright%2Ftest/latest"
-    },
     "6d28a1c7677e66718519761afacde10aaf70468fe66510a4bfe52e506196707b": {
       "revision": "fa48a2608b5e6c6d9772240cc71cbee614383f9585e7e4392149d834ebb0c6d5",
       "digest": "fa48a2608b5e6c6d9772240cc71cbee614383f9585e7e4392149d834ebb0c6d5",
       "url": "https://playwright.dev/docs/release-notes"
     },
+    "0719ee5b3fd649b7b4d952117c79ea2ccc3ec568e9d2c2ae53fecab2e6a38a9a": {
+      "revision": "397f6eb6fca57375eb9986070173b511fc365fc5c6913d12558e8a2e1c8b28fc",
+      "digest": "397f6eb6fca57375eb9986070173b511fc365fc5c6913d12558e8a2e1c8b28fc",
+      "url": "https://nodejs.org/docs/latest-v24.x/api/sqlite.html"
+    },
     "8486ae83716ea648a55cea391523cef7595df9808df33bd4079f7fc56422b3a0": {
-      "revision": "ff46fa30a980f7ca8d23f7be9114e463d13ea0b7",
-      "digest": "545d05a41f664d234f958bbf03d77f0b127d9e24015e2c1c6edc3777b739918c",
+      "revision": "dfcf47a46c63fadce666d6cc9df09a9556f0d75a",
+      "digest": "f7a61436bbdc4d4868c1b4aa3d0ee44fd121a4630d6d5445dadcaf17ab335f3c",
       "url": "https://api.github.com/repos/voidzero-dev/void/contents/docs/guide/pages-routing/actions-and-forms.md"
     },
-    "0168477dec8514c1e278729b3f7619174b288c464a4d36926115cb21260baabc": {
-      "revision": "36e1dee0078de500d204d3e5c67384da412bd732",
-      "digest": "db7675cc77456c9b1f4d0068f4ed1493836dc8b455baa8c15eb655d95b998e51",
-      "url": "https://api.github.com/repos/voidzero-dev/void/contents/docs/reference/api/rewrites.md"
+    "b54f7eb86365e498a5ba6f485498393e020e7567f8fb133b4381d08f307b1e78": {
+      "revision": "1.65.1",
+      "digest": "b41c94412d0b1fb9ea3144a0ee6ef5a419f3ef53a7d249abf5710201e39739f7",
+      "url": "https://registry.npmjs.org/%40playwright%2Ftest/latest"
     },
     "653a30fcb1d2c14451578d1d2b79e748cd39cad0b16513e3af234894d9370433": {
       "revision": "0a836439c48d0ff80e532f75b9730882f4c2d0d1d4b6ddd97a9785473f9d4168",
@@ -290,35 +295,35 @@
       "digest": "b5cd26bbc49fc200ecfbf49fd96f589e0c02e01784a2436203b0c48c270576f1",
       "url": "https://registry.npmjs.org/pnpm/latest"
     },
-    "0719ee5b3fd649b7b4d952117c79ea2ccc3ec568e9d2c2ae53fecab2e6a38a9a": {
-      "revision": "397f6eb6fca57375eb9986070173b511fc365fc5c6913d12558e8a2e1c8b28fc",
-      "digest": "397f6eb6fca57375eb9986070173b511fc365fc5c6913d12558e8a2e1c8b28fc",
-      "url": "https://nodejs.org/docs/latest-v24.x/api/sqlite.html"
+    "85305def64cdc63b9acf273199509e2ecf1bced20706a7c473da1780a066f484": {
+      "revision": "ed540e0a4042fbd3d7d4cfaaa5dc21bd68d61e29605e0d0006a44041823452ae",
+      "digest": "ed540e0a4042fbd3d7d4cfaaa5dc21bd68d61e29605e0d0006a44041823452ae",
+      "url": "https://www.thoughtworks.com/radar/faq"
     },
     "efa8aa66af2336ba3fa09d7bf0951336b8c1ef9915fceca448c1f3fdf55599e5": {
       "revision": "c47455f8d2eaf6acb8c177d3396b5f3d2ae8b5e4c71c056b59ba9cab90b6a145",
       "digest": "c47455f8d2eaf6acb8c177d3396b5f3d2ae8b5e4c71c056b59ba9cab90b6a145",
       "url": "https://pnpm.io/cli/audit"
     },
-    "68a2761a18af4ca3c76ae79603375cc6b4dce01c544aa918284c1556450bf21b": {
-      "revision": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
-      "digest": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
-      "url": "https://stateofjs.com/"
-    },
     "dc5172e09911194705a10fc8a32a14352f3f930a1b7a6c059a86a1ce1a98e490": {
       "revision": "10.28.2",
       "digest": "e913086856ed07fc68103d0d13ae63db029d771573d678acd539aeb312c9313a",
       "url": "https://pnpm.io/cli/audit"
     },
+    "0168477dec8514c1e278729b3f7619174b288c464a4d36926115cb21260baabc": {
+      "revision": "36e1dee0078de500d204d3e5c67384da412bd732",
+      "digest": "db7675cc77456c9b1f4d0068f4ed1493836dc8b455baa8c15eb655d95b998e51",
+      "url": "https://api.github.com/repos/voidzero-dev/void/contents/docs/reference/api/rewrites.md"
+    },
+    "68a2761a18af4ca3c76ae79603375cc6b4dce01c544aa918284c1556450bf21b": {
+      "revision": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
+      "digest": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
+      "url": "https://stateofjs.com/"
+    },
     "adb5ffdfbcf470f62075c2a3600c73c341461eec87d682736bf3dd16cb7f6d31": {
       "revision": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
       "digest": "819b9905fb05d8c054695c881aa0fecf594f9a815f1dc5fc49400d65f8e790b3",
       "url": "https://stateofcss.com/"
-    },
-    "85305def64cdc63b9acf273199509e2ecf1bced20706a7c473da1780a066f484": {
-      "revision": "ed540e0a4042fbd3d7d4cfaaa5dc21bd68d61e29605e0d0006a44041823452ae",
-      "digest": "ed540e0a4042fbd3d7d4cfaaa5dc21bd68d61e29605e0d0006a44041823452ae",
-      "url": "https://www.thoughtworks.com/radar/faq"
     },
     "2a356c84f572844b28c032f8bc9796be2149f1883545f63711611b247c967ba0": {
       "revision": "c023c4d4af1e5c74302965ee106c167879e777f3b5ba259506b14dca90cad637",
@@ -330,10 +335,10 @@
       "digest": "f3809e2cdabe741a0562602a3a96cf29a124edef610881694de496e21d5b8d14",
       "url": "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws"
     },
-    "2d5490368eee1d0117a94d8c0bb613d179ff52fe7065247487ec46899bed81c3": {
-      "revision": "b979dd50907aae38df92284186e98278abb734ec02e56ee8324511974adcb7ff",
-      "digest": "b979dd50907aae38df92284186e98278abb734ec02e56ee8324511974adcb7ff",
-      "url": "https://code.claude.com/docs/en/plugins-reference"
+    "8e4dd9beea2904cb2ec00ad93d16a62590e36629923adb2a010fe81dbc2dfa89": {
+      "revision": "8974c69ebfc7e02a6f5e7641355b2bfce993a8b2339ba8f0e9c2ade31e776f4b",
+      "digest": "8974c69ebfc7e02a6f5e7641355b2bfce993a8b2339ba8f0e9c2ade31e776f4b",
+      "url": "https://docs.aws.amazon.com/aws-managed-policy/latest/reference/ReadOnlyAccess.html"
     },
     "b11d76ef1036794d68710bc7bc55a2b8cd26472d0231957bff05126ee4cad070": {
       "revision": "b9bec22b2d3313076a1f1df5f465b3082847d53ba94454221047406491d66286",
@@ -345,20 +350,15 @@
       "digest": "5d256e6b0208a2da98793730f0519c4e65d41f38dee979e0c6566e59ca163dd1",
       "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html"
     },
-    "8e4dd9beea2904cb2ec00ad93d16a62590e36629923adb2a010fe81dbc2dfa89": {
-      "revision": "8974c69ebfc7e02a6f5e7641355b2bfce993a8b2339ba8f0e9c2ade31e776f4b",
-      "digest": "8974c69ebfc7e02a6f5e7641355b2bfce993a8b2339ba8f0e9c2ade31e776f4b",
-      "url": "https://docs.aws.amazon.com/aws-managed-policy/latest/reference/ReadOnlyAccess.html"
+    "a6f03bfda416e1909eac29641e9a10f8cc775ad47f068eb07160497e681f18a5": {
+      "revision": "2.2.2",
+      "digest": "46f17769f1e11baaa30421c91112ab14957ced4a11af4f8c18fcbb765af45d73",
+      "url": "https://hex.pm/api/packages/wisp"
     },
     "30aa6ddd3d366f759854dae2eca87de6f6aad1b33b75e3fc27167260b6e87a3b": {
       "revision": "1.3.0",
       "digest": "37693bdad00e958221873f2f41ca2e44062af19ce46c31d1b7e7e50c5450a1ae",
       "url": "https://hex.pm/api/packages/gleam_otp"
-    },
-    "a6f03bfda416e1909eac29641e9a10f8cc775ad47f068eb07160497e681f18a5": {
-      "revision": "2.2.2",
-      "digest": "46f17769f1e11baaa30421c91112ab14957ced4a11af4f8c18fcbb765af45d73",
-      "url": "https://hex.pm/api/packages/wisp"
     },
     "68c0b95ea55ced6027990e834696fa6e42519d962937da84c866ecf40fce2d6b": {
       "revision": "6.0.3",
@@ -370,30 +370,30 @@
       "digest": "8e759aa98b38225db7861803f200d3d222368d73baf6fa57a10f24b8e0c66c9d",
       "url": "https://gleam.run/writing-gleam/"
     },
-    "31d621eeae505230bbb31c06423e175ccb335e247bab907b643e06745a36674c": {
-      "revision": "v1.19.2",
-      "digest": "e3a4a15a5dd839e53d9756651f6ead2d8e3b152bb173bec798660f3169049a49",
-      "url": "https://api.github.com/repos/gleam-lang/gleam/releases/latest"
-    },
     "df698cf1a378c6d2a019f9e425a9bec4c557c2174a9b61ef3c4dba389c976b53": {
       "revision": "b0e9ab810767cc6cbd1d7c22f40ae0ab9a4b499e69715f44543b2d67c1b98387",
       "digest": "b0e9ab810767cc6cbd1d7c22f40ae0ab9a4b499e69715f44543b2d67c1b98387",
       "url": "https://ast-grep.github.io/guide/quick-start.html"
+    },
+    "31d621eeae505230bbb31c06423e175ccb335e247bab907b643e06745a36674c": {
+      "revision": "v1.19.2",
+      "digest": "e3a4a15a5dd839e53d9756651f6ead2d8e3b152bb173bec798660f3169049a49",
+      "url": "https://api.github.com/repos/gleam-lang/gleam/releases/latest"
     },
     "49620ee98ce2afcdafd0f42cb695f1d995391211ca32ed0cc7e88b740cc2b759": {
       "revision": "0.51.3",
       "digest": "bb2d425e9980715ec0c59bad84b414d2d53de1bc2de0b150e136bf5172c1e170",
       "url": "https://registry.npmjs.org/%40ast-grep%2Fcli/latest"
     },
-    "298b003a232b1d4d7d578d905dd28696909e1b7a008cca31c9ae3149aa779c8d": {
-      "revision": "0.51.3",
-      "digest": "2f891d9dc6e80e1f958e829db2181c0cd436e725614cdf9616fc67746f7e6030",
-      "url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest"
-    },
     "ab24dedd4f9851e014ff78be625bf5f6a46b28f7a18bc2c36ef2a866c7e9d565": {
       "revision": "c94fd315f3d331ff9eaf6e812b67e7646cb60092",
       "digest": "462fd9d3cfe0c592fae358d924cf44fe06a969c196e4f9fe079a21ebb6288c78",
       "url": "https://api.github.com/repos/NixOS/nix/contents/.version"
+    },
+    "298b003a232b1d4d7d578d905dd28696909e1b7a008cca31c9ae3149aa779c8d": {
+      "revision": "0.51.3",
+      "digest": "2f891d9dc6e80e1f958e829db2181c0cd436e725614cdf9616fc67746f7e6030",
+      "url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest"
     },
     "66da99b252ce081369cc92f5942ead82372c284c5dfe4a4d4c03da06d07b516e": {
       "revision": "f6cc825aa7869362bb4d44b55775c4386ac8abb7",
@@ -415,41 +415,35 @@
       "digest": "9df25a2c5546255e58be66038e50d5d80b7493d3cbbcd62fd41203f86e06156d",
       "url": "https://api.github.com/repos/moonbit-community/moon-nix/contents/README.org"
     },
-    "3f7e668d9d91edb538f619f0749bc2df8617763c928deb5a45a18bec8d800331": {
-      "revision": "8f9bdc0f8d693808794f8bdc72fed41c9e884289",
-      "digest": "c81e17bac594bef3aeda9f5ab97a54cad1dd52d5dbcb0fbd9ba500fce31ba451",
-      "url": "https://api.github.com/repos/jetify-com/devbox/contents/README.md"
-    },
     "9cf6cc42d3ef0b3a56ba4d5a921ffc283c66f4882624e0280c490a39749564d6": {
       "revision": "2.38.2",
       "digest": "001c61bd9d8d8263fae0bb66be64297f433daff9494413f62d84d44d625d9578",
       "url": "https://registry.npmjs.org/%40dotenvx%2Fdotenvx/latest"
+    },
+    "3f7e668d9d91edb538f619f0749bc2df8617763c928deb5a45a18bec8d800331": {
+      "revision": "8f9bdc0f8d693808794f8bdc72fed41c9e884289",
+      "digest": "c81e17bac594bef3aeda9f5ab97a54cad1dd52d5dbcb0fbd9ba500fce31ba451",
+      "url": "https://api.github.com/repos/jetify-com/devbox/contents/README.md"
     },
     "91dc899ec104079bfc2597c11f3a47592ad753577a1496ef91edfd9bfb2b56a0": {
       "revision": "v2.38.2",
       "digest": "b92ca73f586e1e4d99bac91c4f7b8faf979bb5f75b54f8a6243a46b87ddbb89f",
       "url": "https://api.github.com/repos/dotenvx/dotenvx/releases/latest"
     },
-    "3d7cdf15ab125d2f51be289a80053c90cca17f86f813f8ab8d7f5d31d9593032": {
-      "revision": "1c16901ca6d953855145b11409e5c3163732bbbd",
-      "digest": "e2e680b7d4dd0daa7e550116ac8b40681b3de2319b20479d3b9bd9e91a790d53",
-      "url": "https://api.github.com/repos/dotenvx/dotenvx/contents/README.md"
-    },
     "58958a10555477721cd68f675f3114556b5e1919a56def33230d19bea6e192a1": {
       "revision": "10.1.1",
       "digest": "af316200b884ef512634ff759488709e33d42a53b4c5b00a778a528095b15e68",
       "url": "https://registry.npmjs.org/%40stryker-mutator%2Fcore/latest"
     },
+    "3d7cdf15ab125d2f51be289a80053c90cca17f86f813f8ab8d7f5d31d9593032": {
+      "revision": "1c16901ca6d953855145b11409e5c3163732bbbd",
+      "digest": "e2e680b7d4dd0daa7e550116ac8b40681b3de2319b20479d3b9bd9e91a790d53",
+      "url": "https://api.github.com/repos/dotenvx/dotenvx/contents/README.md"
+    },
     "5d4f2998a0d506a908b0634999a7d9c3a3fe5fbe7f5b9f7c846b642dc8cd2603": {
       "revision": "v10.1.1",
       "digest": "263f1e992c1625a1e375023ef399620a0e748a97b64141a28cd2fe2050e798ba",
       "url": "https://api.github.com/repos/stryker-mutator/stryker-js/releases/latest"
-    },
-    "d4011d9dca9a4b7ffa22c4342f400a86d59a9f8e10c9e58e9c42feb51237c82e": {
-      "revision": "79813721449fefd25fbf7008327b5d59735eeb89",
-      "digest": "042d74344340126cf909db74f8df86204b7ef1866b9074259bbd6f46dd199b1e",
-      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=v6",
-      "runtime": "node24"
     },
     "0f6b7f38ad5a402b51de21bd3a5258f72544ca732b29c85810815754c1fa4263": {
       "revision": "767c416494ebd353bb13c8e2a97af6c539648576",
@@ -457,10 +451,11 @@
       "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=de0fac2e4500dabe0009e67214ff5f5447ce83dd",
       "runtime": "node24"
     },
-    "6510d4ee17bccc9192fcb04f09789519ba9d227c50de5e30ac82a8f893096a60": {
-      "revision": "2dfca3ea2696fc4e010b25d72ee4a330000578736c6785992534615f552a2eec",
-      "digest": "2dfca3ea2696fc4e010b25d72ee4a330000578736c6785992534615f552a2eec",
-      "url": "https://stryker-mutator.io/docs/stryker-js/getting-started/"
+    "d4011d9dca9a4b7ffa22c4342f400a86d59a9f8e10c9e58e9c42feb51237c82e": {
+      "revision": "79813721449fefd25fbf7008327b5d59735eeb89",
+      "digest": "042d74344340126cf909db74f8df86204b7ef1866b9074259bbd6f46dd199b1e",
+      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=v6",
+      "runtime": "node24"
     },
     "7617d5e1611680adce2877f77e16036099d04c1b58b9d75a9a56e29f32f387c4": {
       "revision": "28f04cc696830ad0609506e0888d8b3b83d5d616",
@@ -474,10 +469,15 @@
       "url": "https://api.github.com/repos/actions/cache/contents/action.yml?ref=caa296126883cff596d87d8935842f9db880ef25",
       "runtime": "node24"
     },
-    "2a9f87532e4755849207ed6c265076129e6bd03d981242c0a6050a3655bace1a": {
-      "revision": "5b0524f730db83f9513c18ab31a6c086c7239076",
-      "digest": "6f59103ef549bb54728f2fd8e8946f3b76e9e0e6e74eb62698fc3ada2bbf167f",
-      "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "6510d4ee17bccc9192fcb04f09789519ba9d227c50de5e30ac82a8f893096a60": {
+      "revision": "2dfca3ea2696fc4e010b25d72ee4a330000578736c6785992534615f552a2eec",
+      "digest": "2dfca3ea2696fc4e010b25d72ee4a330000578736c6785992534615f552a2eec",
+      "url": "https://stryker-mutator.io/docs/stryker-js/getting-started/"
+    },
+    "9c47e08cac3bdd18536333cc79f628a340bf568fca66dccd982e929c31b675d2": {
+      "revision": "31057efa69b67281683c7b601a1d202329eaa3c1",
+      "digest": "0764bb5169a857c920aef8402b3a88582d8eaf0fb14359aeb24708fc5f4d1cf4",
+      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=949feb2413d6458794dcd2491c4babbbce0c15c1",
       "runtime": "node24"
     },
     "07075d5a09989c57c67e6cff68e3813068b874b41120e1889033d9a70f5b31df": {
@@ -486,10 +486,10 @@
       "url": "https://api.github.com/repos/pnpm/action-setup/contents/action.yml?ref=73e46992e05b19abd31f2f3c20e0e7370d762115",
       "runtime": "node24"
     },
-    "9c47e08cac3bdd18536333cc79f628a340bf568fca66dccd982e929c31b675d2": {
-      "revision": "31057efa69b67281683c7b601a1d202329eaa3c1",
-      "digest": "0764bb5169a857c920aef8402b3a88582d8eaf0fb14359aeb24708fc5f4d1cf4",
-      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=949feb2413d6458794dcd2491c4babbbce0c15c1",
+    "2a9f87532e4755849207ed6c265076129e6bd03d981242c0a6050a3655bace1a": {
+      "revision": "5b0524f730db83f9513c18ab31a6c086c7239076",
+      "digest": "6f59103ef549bb54728f2fd8e8946f3b76e9e0e6e74eb62698fc3ada2bbf167f",
+      "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=3d3c42e5aac5ba805825da76410c181273ba90b1",
       "runtime": "node24"
     },
     "1eafcda1368af42552f877cee1f1c2b3b32af2ad2b85f008cf22636ab8706744": {
@@ -498,28 +498,28 @@
       "url": "https://api.github.com/repos/actions/upload-artifact/contents/action.yml?ref=cf430e030ddbb5b0abf93d22962f4752f3646cd9",
       "runtime": "node24"
     },
-    "9b31e3ba2a34c51173393666b6ff55ff1faf530a426afc14ac032487bc81ed5e": {
-      "revision": "31057efa69b67281683c7b601a1d202329eaa3c1",
-      "digest": "0088930ba50f0bb98a0b75648e99bd293b6997cab280f31f263b70714909a21e",
-      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=v7",
-      "runtime": "node24"
-    },
-    "7e7d27fa33be42a2f5f6b74cd37728f08f17a6e21cb3dff55cb72da10b596025": {
-      "revision": "2606455d4cedc2a06e05c1bf7feb8cc41aaf28f9",
-      "digest": "2874df821e91b3eef64a49239bcdff33995ee75cb8fccac3916e59f40fdbd2cf",
-      "url": "https://api.github.com/repos/actions/cache/contents/action.yml?ref=v6",
-      "runtime": "node24"
-    },
     "5831f392767a88ef932de7b1b93ab781b38b11987196790d68a578c5130a6e07": {
       "revision": "5b0524f730db83f9513c18ab31a6c086c7239076",
       "digest": "703251cc6aa9f1d95ebbb5c9757fbc1527e16d4912c7056e235a8680cd72f942",
       "url": "https://api.github.com/repos/actions/checkout/contents/action.yml?ref=v7",
       "runtime": "node24"
     },
+    "9b31e3ba2a34c51173393666b6ff55ff1faf530a426afc14ac032487bc81ed5e": {
+      "revision": "31057efa69b67281683c7b601a1d202329eaa3c1",
+      "digest": "0088930ba50f0bb98a0b75648e99bd293b6997cab280f31f263b70714909a21e",
+      "url": "https://api.github.com/repos/actions/setup-node/contents/action.yml?ref=v7",
+      "runtime": "node24"
+    },
     "4719cf65e5a97d8a60d1eb44c293aaa973f4d05ea4e95d2ac524691bc79d2d5a": {
       "revision": "c2ec35a40dd51543da29ab070c0955fcd5c96442",
       "digest": "3db2bd6a7a85bf5b873e3d0bc9dd51b55e154217b36b25910185103d7fcf3196",
       "url": "https://api.github.com/repos/erlef/setup-beam/contents/action.yml?ref=v1",
+      "runtime": "node24"
+    },
+    "7e7d27fa33be42a2f5f6b74cd37728f08f17a6e21cb3dff55cb72da10b596025": {
+      "revision": "2606455d4cedc2a06e05c1bf7feb8cc41aaf28f9",
+      "digest": "2874df821e91b3eef64a49239bcdff33995ee75cb8fccac3916e59f40fdbd2cf",
+      "url": "https://api.github.com/repos/actions/cache/contents/action.yml?ref=v6",
       "runtime": "node24"
     },
     "a0a7cdb0a195a812e5753d41868a7e37f0acf450067e60b49d12cada155afdb8": {
@@ -668,7 +668,7 @@
       "snapshotDigest": "6c965c067e93fd876b860d49e51d18ac7b13a7b014148e4655e00a3bc2f9263d"
     },
     "cloudflare": {
-      "key": "c7fde76574735bc8585115108c0276cd2e8ef80f5e2bc6cd5bbd84a4c214b245",
+      "key": "b3e84b6b17691563a332bd40f5c3f4a4d824a5eb0118e01c1301eb48a655df63",
       "exitCode": 0,
       "coverage": {
         "expected": 3,
@@ -683,10 +683,10 @@
       },
       "model": "jev-1.14.0",
       "questionDigest": "209d6df378ccb747fcb0e821998fcd6105bc76638a88d22488d3b398d6a21595",
-      "snapshotDigest": "081a6b93e259508665ca1ff2d246d2142cefb2903c6050798a1248f94135f652"
+      "snapshotDigest": "0d79413cea0d4dd3628730e2d4fecf0ca56b351f6d1cf2952f1c470af2684939"
     },
     "moonbit": {
-      "key": "61f0536751160184bd892acec749adb7a38709ce4d9b3156a5fcc58043f6ffa4",
+      "key": "2e7a56119a9eaafdb88a7a1cf410864c466b680902aaab547cdd7defb8b70883",
       "exitCode": 0,
       "coverage": {
         "expected": 2,
@@ -701,7 +701,7 @@
       },
       "model": "jev-1.14.0",
       "questionDigest": "209d6df378ccb747fcb0e821998fcd6105bc76638a88d22488d3b398d6a21595",
-      "snapshotDigest": "ebc80b1d1a9bd8a39444dc7a2d56b6477c411f20421fd7cb123330c2aa0833c9"
+      "snapshotDigest": "c9521e9791411f99d08bae8483775c85327b6ee1de21d25a6fe9f888f03fd6df"
     },
     "agent-distribution": {
       "key": "350288558195611fb715c733bd5ee07a8400f5dd934637613ff140477bc9a7d2",
@@ -758,7 +758,7 @@
       "snapshotDigest": "437c27b1c8c10ab272c7febe66e0e5f612b5bfb25c8e16c19159b6d6c384381a"
     },
     "void": {
-      "key": "0598e1a4a8e0034be01012280c8b328c6bb3e5737d76675e41de1edab80f8595",
+      "key": "a69cee1ed44230730b29a70551eb787b72cfdb8b6732c3d994098cfac90c3d2e",
       "exitCode": 0,
       "coverage": {
         "expected": 3,
@@ -773,7 +773,7 @@
       },
       "model": "jev-1.14.0",
       "questionDigest": "209d6df378ccb747fcb0e821998fcd6105bc76638a88d22488d3b398d6a21595",
-      "snapshotDigest": "fb136767649a7d29e313bd3065a3411bf0368f84f268b346255ba5c69c00e231"
+      "snapshotDigest": "2cc412a4b8a057d7a80350fa81ba6137a23b1f5ff90b5e3ff526808742dc4496"
     },
     "browser-testing": {
       "key": "01b1bc9cb52e88b0c04f902e31b92988f9eb220e1ceca37a37c807c56ceaba59",
