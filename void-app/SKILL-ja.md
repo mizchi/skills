@@ -5,7 +5,9 @@ description: "Build full-stack apps with Void (the void npm package from VoidZer
 
 # Void でアプリを作るチートシート
 
-**現行確認（2026-11-16）: Void / @void/react 1.9.1、Vite+ 1.6.0、Node 24.22.2、pnpm 10.28.2。** Void runtime の Node 条件は `^24.22.0 || >=26.12.0`。新規 React/SQLite アプリでローカル migration、Playwright による追加・成功時 reset・再読み込み後の保持・検証失敗時の入力保持・redirect を確認した。[検証記録](references/current-validation.md)を参照。以前の 2026-10-18 確認は Void 1.1.11 / Vite+ 1.3.0 で、現行 API に置き換わった回避策は履歴として扱う。更新時は `engines`、help、peer dependencies、同梱 docs を再確認する。英語の [SKILL.md](SKILL.md) を正本とする。
+公開パッケージ確認（2026-11-25）は **Void / @void/react 1.11.0、Vite+ 1.8.0**。Void runtime の Node 条件は `^24.22.0 || >=26.12.0`。
+
+2026-11-16 のローカル検証では **Void / @void/react 1.9.1、Vite+ 1.6.0、Node 24.22.2、pnpm 10.28.2** を使用した。新規 React/SQLite アプリでローカル migration、Playwright による追加・成功時 reset・再読み込み後の保持・検証失敗時の入力保持・redirect を確認した。[検証記録](references/current-validation.md)を参照。以前の 2026-10-18 確認は Void 1.1.11 / Vite+ 1.3.0 で、現行 API に置き換わった回避策は履歴として扱う。更新時は `engines`、help、peer dependencies、同梱 docs を再確認する。英語の [SKILL.md](SKILL.md) を正本とする。
 
 ## 最初に読むもの
 

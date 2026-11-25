@@ -1,9 +1,9 @@
 # Verify the npx skills CLI
 
-Distribution watch (2026-11-16): npm `skills@1.8.1` requires Node `>=22.20.0`;
+Distribution watch (2026-11-25): npm `skills@1.9.0` requires Node `>=22.20.0`;
 this repository uses Node 24+. The concrete 1.7.0 behavior checks below are dated
 records. Re-run the installed CLI help and consumer checks before transferring
-its path/update behavior to 1.8.1.
+its path/update behavior to a newer version.
 
 
 Record `npx --yes skills@latest --version`, then pin that **CLI version** in reproducible smoke commands. This pin does not pin the installed skill's Git revision. The command examples below use `skills@1.7.0`, the version checked when this guide was written; review current `--help` when adopting a newer version.

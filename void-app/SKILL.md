@@ -5,9 +5,11 @@ description: "Build full-stack apps with Void (the void npm package from VoidZer
 
 # Void app cheat sheet
 
-Current check (2026-11-16): **Void / @void/react 1.9.1, Vite+ 1.6.0,
-Node 24.22.2, pnpm 10.28.2**. The Void runtime requires Node `^24.22.0 || >=26.12.0`.
-A fresh React/SQLite app passed local migration, Playwright create/reset,
+Published package check (2026-11-25): **Void / @void/react 1.11.0, Vite+ 1.8.0**.
+The Void runtime requires Node `^24.22.0 || >=26.12.0`.
+
+Local smoke test (2026-11-16): with **Void / @void/react 1.9.1, Vite+ 1.6.0,
+Node 24.22.2 and pnpm 10.28.2**, a fresh React/SQLite app passed local migration, Playwright create/reset,
 reload persistence, failed-input retention and redirect checks. See the
 [validation record](references/current-validation.md) for scope.
 The earlier 2026-10-18 baseline used Void 1.1.11 / Vite+ 1.3.0; version-specific

@@ -603,11 +603,11 @@
       "comparisons": [
         {
           "path": "void-app/SKILL.md",
-          "contains": "Current check (2026-11-16)"
+          "contains": "Published package check"
         },
         {
           "path": "void-app/SKILL-ja.md",
-          "contains": "現行確認（2026-11-16）"
+          "contains": "公開パッケージ確認"
         },
         {
           "path": "void-app/SKILL.md",

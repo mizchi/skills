@@ -10,7 +10,7 @@ Use `cf` for Cloudflare operations. Use the decision trees below to pick a produ
 ## Prerequisites
 
 - Node.js 24+ and pnpm; satisfy the installed packages' exact `engines` patch floors. Install the npm package **`cf`**, not `@cloudflare/cf`.
-- Keep `cf` in project devDependencies and commit the lockfile. The [smoke project](assets/smoke/package.json) checks `cf@1.0.0-rc.1` with `@cloudflare/vite-plugin@2.0.0-rc.1`, Vite 8.3.8 and Node 24.22.2 (2026-11-18). Vite projects require plugin 2.0.0-rc.0 or later; legacy Wrangler builds require Wrangler 4.163.0 or later. Select a compatible plugin 2 release explicitly; its `latest` tag still points to version 1.
+- Keep `cf` in project devDependencies and commit the lockfile. The [smoke project](assets/smoke/package.json) checks `cf@1.0.0-rc.1` with `@cloudflare/vite-plugin@2.0.0-rc.1`, Vite 8.3.8 and Node 24.22.2 (2026-11-18). The cf 1.0 release candidate requires plugin 2.0.0-rc.0 or later for Vite builds, or Wrangler 4.163.0 or later for legacy Wrangler builds. Check the published plugin tags and pin a compatible 2.x release in Vite projects.
 - The [1.0 release candidate](https://developers.cloudflare.com/changelog/post/2026-11-17-release-candidate/) stabilizes typed configuration, Build Output and project commands. Some generated API command paths can still change. When upgrading from beta, rebuild into `.cloudflare/output/v1/` before using `--prebuilt`; see the [upgrade guide](references/cf/README.md).
 - Workers use `cloudflare.config.ts`. For an existing Wrangler project, run `cf migrate --dry-run`, then `cf migrate` and resolve its follow-up items before project commands. Automatic configuration does not import the old bindings.
 
